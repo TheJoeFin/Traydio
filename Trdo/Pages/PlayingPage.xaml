@@ -635,7 +635,9 @@
             Visibility="{x:Bind ViewModel.IsLocalMusicActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
@@ -651,31 +653,31 @@
                 <FontIcon FontSize="14" Glyph="&#xE892;" />
             </Button>
 
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                <Slider
-                    x:Name="SeekSlider"
-                    Maximum="100"
-                    Minimum="0"
-                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
-                    PointerPressed="SeekSlider_PointerPressed"
-                    Value="{x:Bind ViewModel.SeekProgress, Mode=TwoWay}" />
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <TextBlock
-                        Grid.Column="0"
-                        FontSize="11"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{x:Bind ViewModel.PositionDisplay, Mode=OneWay}" />
-                    <TextBlock
-                        Grid.Column="2"
-                        FontSize="11"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{x:Bind ViewModel.DurationDisplay, Mode=OneWay}" />
-                </Grid>
-            </StackPanel>
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontSize="11"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.PositionDisplay, Mode=OneWay}" />
 
+            <Slider
+                x:Name="SeekSlider"
+                Grid.Column="2"
+                Maximum="100"
+                Minimum="0"
+                PointerCaptureLost="SeekSlider_PointerCaptureLost"
+                PointerPressed="SeekSlider_PointerPressed"
+                Value="{x:Bind ViewModel.SeekProgress, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="3"
+                VerticalAlignment="Center"
+                FontSize="11"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.DurationDisplay, Mode=OneWay}" />
             <Button
                 x:Name="NextTrackButton"
-                Grid.Column="2"
+                Grid.Column="4"
                 Padding="8"
                 VerticalAlignment="Center"
                 Background="Transparent"
