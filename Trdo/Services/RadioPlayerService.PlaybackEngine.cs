@@ -830,13 +830,37 @@ public sealed partial class RadioPlayerService
     /// </summary>
     private void OnBackendPlaybackEnded(object? sender, EventArgs e)
     {
-        if (_activeSourceKind != AudioSourceKind.Files)
+        if (_activeSourceKind != AudioSourceKind.Files ||
+            Interlocked.CompareExchange(ref _localTrackCompletionGate, 1, 0) != 0)
         {
             return;
         }
 
-        Debug.WriteLine("[RadioPlayerService] Local track ended - advancing");
-        TryEnqueueOnUi(() => _ = NextLocalTrackAsync());
+        TryEnqueueOnUi(() => _ = HandleLocalTrackEndedAsync());
+    }
+
+    private async Task HandleLocalTrackEndedAsync()
+    {
+        try
+        {
+            LocalMusicTrackEndAction action = LocalMusicPlaybackPolicy.ResolveTrackEnd(
+                _localTrackIndex,
+                _localTrackList.Count,
+                SettingsService.LocalMusicLoopMode);
+
+            SetLocalTrackIndex(action.SelectedTrackIndex);
+            if (action.ShouldPlay)
+                await PlayLocalTrackAtIndexAsync(action.SelectedTrackIndex);
+            else if (action.SelectedTrackIndex == 0)
+            {
+                // set the seek position to 0
+                
+            }
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _localTrackCompletionGate, 0);
+        }
     }
 
     private void DisposePlaybackEngine()

@@ -152,6 +152,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Volume));
             OnPropertyChanged(nameof(VolumePercent));
         };
+        _player.LocalTrackChanged += (_, _) => RefreshLocalMusicTrackState();
 
         // Subscribe to watchdog status changes
         _player.Watchdog.StreamStatusChanged += (_, args) =>

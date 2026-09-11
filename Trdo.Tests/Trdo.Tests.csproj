@@ -28,6 +28,8 @@
     <Compile Include="..\Trdo\Services\Playback\StreamDiagnostics.cs" Link="Playback\StreamDiagnostics.cs" />
     <Compile Include="..\Trdo\Services\SongChangeAnnouncementPolicy.cs" Link="Services\SongChangeAnnouncementPolicy.cs" />
     <Compile Include="..\Trdo\Services\PlaybackErrorPolicy.cs" Link="Services\PlaybackErrorPolicy.cs" />
+    <Compile Include="..\Trdo\Services\LocalMusicPlaybackPolicy.cs" Link="Services\LocalMusicPlaybackPolicy.cs" />
+    <Compile Include="..\Trdo\Models\LocalMusicLoopMode.cs" Link="Models\LocalMusicLoopMode.cs" />
     <Compile Include="..\Trdo\Models\RadioStation.cs" Link="Models\RadioStation.cs" />
     <Compile Include="..\Trdo\Models\WhiteNoiseColor.cs" Link="Models\WhiteNoiseColor.cs" />
     <Compile Include="..\Trdo\Models\AudioSourceKind.cs" Link="Models\AudioSourceKind.cs" />

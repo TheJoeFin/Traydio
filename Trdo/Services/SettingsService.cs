@@ -1,4 +1,5 @@
 using System;
+using Trdo.Models;
 using Trdo.Services.Playback;
 using Windows.Storage;
 
@@ -29,6 +30,7 @@ public static class SettingsService
     private const string StationSortModeKey = "StationSortMode";
     private const string StationGroupByModeKey = "StationGroupByMode";
     private const string IsRadioStaticEnabledKey = "IsRadioStaticEnabled";
+    private const string LocalMusicLoopModeKey = "LocalMusicLoopMode";
 
     public static event EventHandler? MusicSearchServicesChanged;
 
@@ -576,6 +578,40 @@ public static class SettingsService
     {
         get => GetBoolSetting(IsRadioStaticEnabledKey, defaultValue: false);
         set => SetBoolSetting(IsRadioStaticEnabledKey, value);
+    }
+
+    /// <summary>Controls whether local music stops, repeats the track, or repeats the album.</summary>
+    public static LocalMusicLoopMode LocalMusicLoopMode
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(LocalMusicLoopModeKey, out object? value) &&
+                    value is string savedMode &&
+                    Enum.TryParse(savedMode, ignoreCase: true, out LocalMusicLoopMode mode))
+                {
+                    return mode;
+                }
+            }
+            catch
+            {
+                // Fall through to the compatibility-safe default.
+            }
+
+            return LocalMusicLoopMode.None;
+        }
+        set
+        {
+            try
+            {
+                ApplicationData.Current.LocalSettings.Values[LocalMusicLoopModeKey] = value.ToString();
+            }
+            catch
+            {
+                // Match the rest of the settings service when local settings are unavailable.
+            }
+        }
     }
 
     /// <summary>

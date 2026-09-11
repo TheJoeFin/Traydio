@@ -46,6 +46,7 @@ public sealed partial class RadioPlayerService : IDisposable
     private WhiteNoiseColor _whiteNoiseColor = WhiteNoiseColor.White;
     private IReadOnlyList<string> _localTrackList = [];
     private int _localTrackIndex = -1;
+    private int _localTrackCompletionGate;
 
     // What the currently prepared source actually is. Stays Radio - the default - until a
     // transition to a different kind actually lands, which is what keeps IsPlaying/IsBuffering
@@ -67,6 +68,7 @@ public sealed partial class RadioPlayerService : IDisposable
     public event EventHandler<double>? VolumeChanged;
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<StreamMetadata>? StreamMetadataChanged;
+    public event EventHandler? LocalTrackChanged;
     public event EventHandler? NextStationRequested;
     public event EventHandler? PreviousStationRequested;
 
@@ -803,7 +805,7 @@ public sealed partial class RadioPlayerService : IDisposable
         CancellationToken cancellationToken = default)
     {
         _localTrackList = LocalMusicFolderScanner.ScanTracks(station.LocalFolderPath);
-        _localTrackIndex = 0;
+        SetLocalTrackIndex(0);
 
         if (_localTrackList.Count == 0)
         {
@@ -831,7 +833,7 @@ public sealed partial class RadioPlayerService : IDisposable
             return false;
         }
 
-        _localTrackIndex = index;
+        SetLocalTrackIndex(index);
 
         await TransitionToStationAsync(
             ToFileUri(_localTrackList[_localTrackIndex]),
@@ -843,6 +845,17 @@ public sealed partial class RadioPlayerService : IDisposable
             cancellationToken: cancellationToken);
 
         return true;
+    }
+
+    private void SetLocalTrackIndex(int index)
+    {
+        if (_localTrackIndex == index)
+        {
+            return;
+        }
+
+        _localTrackIndex = index;
+        TryEnqueueOnUi(() => LocalTrackChanged?.Invoke(this, EventArgs.Empty));
     }
 
     /// <summary>Advances to the next track in the folder, if there is one. No wraparound.</summary>
@@ -938,7 +951,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         // Don't attempt to open a stream when the machine is offline - it would just
         // spin through prepare/fallback and fail. Tell the user instead.
-        if (!NetworkStatusService.IsInternetAvailable())
+        if (_activeSourceKind is AudioSourceKind.Radio && !NetworkStatusService.IsInternetAvailable())
         {
             LogService.Warn("RadioPlayerService", "No internet connection; aborting play attempt");
             Debug.WriteLine("[RadioPlayerService] No network available, aborting play attempt");
