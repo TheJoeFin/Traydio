@@ -69,6 +69,7 @@ public sealed partial class RadioPlayerService : IDisposable
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<StreamMetadata>? StreamMetadataChanged;
     public event EventHandler? LocalTrackChanged;
+    public event EventHandler? LocalTrackListChanged;
     public event EventHandler? NextStationRequested;
     public event EventHandler? PreviousStationRequested;
 
@@ -805,6 +806,8 @@ public sealed partial class RadioPlayerService : IDisposable
         CancellationToken cancellationToken = default)
     {
         _localTrackList = LocalMusicFolderScanner.ScanTracks(station.LocalFolderPath);
+        LogService.Info("RadioPlayerService", $"Local track list (re)scanned: {_localTrackList.Count} track(s) in {LogService.Redact(station.LocalFolderPath)}");
+        TryEnqueueOnUi(() => LocalTrackListChanged?.Invoke(this, EventArgs.Empty));
         SetLocalTrackIndex(0);
 
         if (_localTrackList.Count == 0)
@@ -854,6 +857,7 @@ public sealed partial class RadioPlayerService : IDisposable
             return;
         }
 
+        LogService.Info("RadioPlayerService", $"Local track index changed: {_localTrackIndex} -> {index}");
         _localTrackIndex = index;
         TryEnqueueOnUi(() => LocalTrackChanged?.Invoke(this, EventArgs.Empty));
     }

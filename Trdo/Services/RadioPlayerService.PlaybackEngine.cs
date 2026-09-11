@@ -853,8 +853,7 @@ public sealed partial class RadioPlayerService
                 await PlayLocalTrackAtIndexAsync(action.SelectedTrackIndex);
             else if (action.SelectedTrackIndex == 0)
             {
-                // set the seek position to 0
-                
+                Seek(TimeSpan.Zero);
             }
         }
         finally

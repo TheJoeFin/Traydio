@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System.Diagnostics;
 using Trdo.Models;
@@ -104,12 +103,13 @@ public sealed partial class NowPlayingPage : Page
         }
     }
 
-    private void LocalTrackRow_Tapped(object sender, TappedRoutedEventArgs e)
+    private void LocalTrackList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is FrameworkElement element && element.Tag is int index)
+        if (sender is ListView { SelectedIndex: >= 0 } listView &&
+            listView.SelectedIndex != ViewModel.CurrentLocalTrackIndex)
         {
-            Debug.WriteLine($"[NowPlayingPage] Local track row tapped: {index}");
-            ViewModel.PlayLocalTrackAtIndex(index);
+            Debug.WriteLine($"[NowPlayingPage] Local track row selected: {listView.SelectedIndex}");
+            ViewModel.PlayLocalTrackAtIndex(listView.SelectedIndex);
         }
     }
 }

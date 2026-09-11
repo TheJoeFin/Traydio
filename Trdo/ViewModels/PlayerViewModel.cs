@@ -153,6 +153,11 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(VolumePercent));
         };
         _player.LocalTrackChanged += (_, _) => RefreshLocalMusicTrackState();
+        _player.LocalTrackListChanged += (_, _) =>
+        {
+            Debug.WriteLine("[PlayerViewModel] LocalTrackListChanged event fired - refreshing LocalTrackList");
+            OnPropertyChanged(nameof(LocalTrackList));
+        };
 
         // Subscribe to watchdog status changes
         _player.Watchdog.StreamStatusChanged += (_, args) =>
@@ -1003,7 +1008,12 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     private void RefreshLocalMusicTrackState()
     {
-        OnPropertyChanged(nameof(LocalTrackList));
+        Debug.WriteLine($"[PlayerViewModel] RefreshLocalMusicTrackState - CurrentLocalTrackIndex={CurrentLocalTrackIndex}");
+
+        // Deliberately does NOT touch LocalTrackList - that only changes when the folder's
+        // track list itself changes (see LocalTrackListChanged above). Raising it here too,
+        // on every track/playback change, rebuilds the ListView's ItemsSource with a new
+        // collection instance and wipes out its selection and scroll position.
         OnPropertyChanged(nameof(CurrentLocalTrackIndex));
         OnPropertyChanged(nameof(CanGoToNextLocalTrack));
         OnPropertyChanged(nameof(CanGoToPreviousLocalTrack));

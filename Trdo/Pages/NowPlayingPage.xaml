@@ -372,6 +372,7 @@
                 Padding="0,0,12,0"
                 ItemsSource="{x:Bind ViewModel.LocalTrackList, Mode=OneWay}"
                 SelectedIndex="{x:Bind ViewModel.CurrentLocalTrackIndex, Mode=OneWay}"
+                SelectionChanged="LocalTrackList_SelectionChanged"
                 SelectionMode="Single">
                 <ListView.Resources>
                     <StaticResource
@@ -396,10 +397,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="vm:LocalTrackDisplayItem">
-                        <Grid
-                            Padding="6"
-                            Tag="{x:Bind Index}"
-                            Tapped="LocalTrackRow_Tapped">
+                        <Grid Padding="6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />

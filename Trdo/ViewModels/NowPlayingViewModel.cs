@@ -62,6 +62,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
 
     private void OnPlayerViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(PlayerViewModel.LocalTrackList) or nameof(PlayerViewModel.CurrentLocalTrackIndex))
+        {
+            Debug.WriteLine($"[NowPlayingViewModel] PlayerViewModel.{e.PropertyName} changed");
+        }
+
         if (e.PropertyName is nameof(PlayerViewModel.IsPlaybackActive)
             or nameof(PlayerViewModel.IsRefreshingMetadata)
             or nameof(PlayerViewModel.CanRefreshMetadata))
@@ -76,9 +81,21 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             or nameof(PlayerViewModel.CurrentLocalTrackIndex))
         {
             OnPropertyChanged(nameof(IsLocalMusicActive));
-            OnPropertyChanged(nameof(CurrentLocalTrackIndex));
-            OnPropertyChanged(nameof(LocalTrackList));
             OnPropertyChanged(nameof(HasEnabledMusicServices));
+        }
+
+        // Kept separate from the block above: LocalTrackList rebuilds the whole displayed
+        // collection, which would reset the ListView's selection if raised on every track
+        // change - it only needs to fire when the folder's track list itself changes.
+        if (e.PropertyName is nameof(PlayerViewModel.IsLocalMusicActive)
+            or nameof(PlayerViewModel.LocalTrackList))
+        {
+            OnPropertyChanged(nameof(LocalTrackList));
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentLocalTrackIndex))
+        {
+            OnPropertyChanged(nameof(CurrentLocalTrackIndex));
         }
     }
 
@@ -384,7 +401,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         get
         {
             IReadOnlyList<string> tracks = PlayerViewModel.Shared.LocalTrackList;
-            int currentIndex = PlayerViewModel.Shared.CurrentLocalTrackIndex;
+            Debug.WriteLine($"[NowPlayingViewModel] LocalTrackList rebuilt ({tracks.Count} track(s)) - this swaps the ListView's ItemsSource");
 
             List<LocalTrackDisplayItem> items = new(tracks.Count);
             for (int i = 0; i < tracks.Count; i++)
@@ -402,7 +419,6 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
                     Index = i,
                     Path = tracks[i],
                     DisplayTitle = trackTitle,
-                    IsCurrent = i == currentIndex,
                 });
             }
 
