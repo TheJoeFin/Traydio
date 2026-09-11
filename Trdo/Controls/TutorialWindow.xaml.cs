@@ -34,6 +34,6 @@ public sealed partial class TutorialWindow : WindowEx
         Close();
 
         if (App.Current is App currentApp)
-            currentApp.TryShowFlyout();
+            currentApp.ShowFlyout();
     }
 }

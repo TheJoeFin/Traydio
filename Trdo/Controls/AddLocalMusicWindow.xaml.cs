@@ -65,4 +65,10 @@ public sealed partial class AddLocalMusicWindow : WindowEx
     {
         Close();
     }
+
+    private void WindowEx_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
+    {
+        if (App.Current is App currentApp)
+            currentApp.ShowFlyout();
+    }
 }

@@ -10,6 +10,7 @@
     Title="Traydio"
     Width="400"
     Height="420"
+    Closed="WindowEx_Closed"
     IsMaximizable="False"
     IsMinimizable="False"
     mc:Ignorable="d">
@@ -36,9 +37,7 @@
                     <TextBox
                         x:Name="StationNameTextBox"
                         x:Uid="AddLocalMusic_StationNamePlaceholder"
-                        Text="{x:Bind ViewModel.StationName,
-                                      Mode=TwoWay,
-                                      UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{x:Bind ViewModel.StationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
                 <!--  Folder picker  -->
@@ -109,8 +108,7 @@
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="SaveButton_Click"
-                    IsEnabled="{x:Bind ViewModel.CanSave,
-                                       Mode=OneWay}"
+                    IsEnabled="{x:Bind ViewModel.CanSave, Mode=OneWay}"
                     Style="{StaticResource AccentButtonStyle}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="16" Glyph="&#xE74E;" />
