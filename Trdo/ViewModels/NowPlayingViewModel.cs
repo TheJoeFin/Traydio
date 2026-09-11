@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,6 +76,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             or nameof(PlayerViewModel.CurrentLocalTrackIndex))
         {
             OnPropertyChanged(nameof(IsLocalMusicActive));
+            OnPropertyChanged(nameof(CurrentLocalTrackIndex));
             OnPropertyChanged(nameof(LocalTrackList));
             OnPropertyChanged(nameof(HasEnabledMusicServices));
         }
@@ -371,9 +373,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// <summary>True when the selected station is a local music folder rather than radio/white noise.</summary>
     public bool IsLocalMusicActive => PlayerViewModel.Shared.IsLocalMusicActive;
 
+    /// <summary>Gets the index of the local track that is currently playing.</summary>
+    public int CurrentLocalTrackIndex => PlayerViewModel.Shared.CurrentLocalTrackIndex;
+
     /// <summary>
-    /// The current folder's tracks, in order, each flagged with whether it's the one currently
-    /// playing so the details page can highlight it.
+    /// The current folder's tracks, in order.
     /// </summary>
     public IReadOnlyList<LocalTrackDisplayItem> LocalTrackList
     {
@@ -385,11 +389,19 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             List<LocalTrackDisplayItem> items = new(tracks.Count);
             for (int i = 0; i < tracks.Count; i++)
             {
+                TagLib.File tfile = TagLib.File.Create(tracks[i]);
+
+                string trackTitle = tfile.Tag.Title;
+
+                // If no title tag, use the filename without extension
+                if (string.IsNullOrWhiteSpace(trackTitle))
+                    trackTitle = Path.GetFileNameWithoutExtension(tracks[i]);
+
                 items.Add(new LocalTrackDisplayItem
                 {
                     Index = i,
                     Path = tracks[i],
-                    DisplayTitle = System.IO.Path.GetFileNameWithoutExtension(tracks[i]),
+                    DisplayTitle = trackTitle,
                     IsCurrent = i == currentIndex,
                 });
             }
