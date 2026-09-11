@@ -24,7 +24,7 @@ namespace Trdo.Services.Audio;
 /// wrong trade.
 /// </para>
 /// </remarks>
-internal sealed class WhiteNoisePlaybackEngine : IDisposable
+internal sealed partial class WhiteNoisePlaybackEngine : IDisposable
 {
     private const double FadeMs = 300;
 

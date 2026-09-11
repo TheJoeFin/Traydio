@@ -10,7 +10,7 @@ namespace Trdo.ViewModels;
 /// Backs the page that creates or edits a white noise "station" - one that plays generated
 /// noise locally instead of connecting to a stream. See <see cref="RadioStation.SourceKind"/>.
 /// </summary>
-public sealed class AddWhiteNoiseViewModel : INotifyPropertyChanged
+public sealed partial class AddWhiteNoiseViewModel : INotifyPropertyChanged
 {
     private string _stationName = LocalizationService.GetString("AddWhiteNoise_DefaultName", "White Noise");
     private WhiteNoiseColor _noiseColor = WhiteNoiseColor.White;

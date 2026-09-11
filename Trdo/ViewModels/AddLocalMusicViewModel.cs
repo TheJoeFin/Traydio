@@ -14,7 +14,7 @@ namespace Trdo.ViewModels;
 /// Backs the page that creates or edits a local music "station" - one that plays a folder of
 /// local audio files instead of connecting to a stream. See <see cref="RadioStation.SourceKind"/>.
 /// </summary>
-public sealed class AddLocalMusicViewModel : INotifyPropertyChanged
+public sealed partial class AddLocalMusicViewModel : INotifyPropertyChanged
 {
     private string _stationName = string.Empty;
     private string? _folderPath;

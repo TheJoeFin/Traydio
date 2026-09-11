@@ -18,7 +18,7 @@ namespace Trdo.Services.Audio;
 /// no render device, or one whose device is held in exclusive mode, must fall back to silence
 /// rather than throw, since this is decoration on top of playback and never worth failing over.
 /// </remarks>
-public sealed class RadioStaticService : IDisposable
+public sealed partial class RadioStaticService : IDisposable
 {
     private static readonly Lazy<RadioStaticService> _instance = new(() => new RadioStaticService());
     public static RadioStaticService Instance => _instance.Value;
