@@ -102,12 +102,6 @@ public partial class App : Application
         SettingsService.SongChangePopupEnabledChanged += OnSongChangePopupEnabledChanged;
     }
 
-    public void TryShowFlyout()
-    {
-        WindowPlacementService.CapturePointerAnchor();
-        ShowTrayPopup();
-    }
-
     public void ShowMiniPlayerWindow()
     {
         WindowPlacementService.CapturePointerAnchor();
@@ -545,7 +539,7 @@ public partial class App : Application
         ShowSongChangePopup(displayText);
     }
 
-    private void ShowFlyout(TrayIconEventArgs args)
+    public void ShowFlyout(TrayIconEventArgs? args = null)
     {
         // Unlike TryShowFlyout/ShowMiniPlayerWindow (invoked from a button
         // inside the app, where the pointer position is meaningful), this is
@@ -553,6 +547,7 @@ public partial class App : Application
         // and pen taps don't move the hardware cursor, so capturing it here
         // can anchor the popup to a stale, unrelated position instead of the
         // icon — clear it so placement always derives from the icon's rect.
+
         WindowPlacementService.ClearPointerAnchor();
         ShowTrayPopup();
     }
