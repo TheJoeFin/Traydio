@@ -611,6 +611,15 @@
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>تعذّر إعادة ضبط المحركات المحفوظة: {0}</value>
   </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>إعادة تعيين السجلات</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>تعذّرت إعادة تعيين السجلات: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>تم مسح ملفات السجل.</value>
+  </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>إعادة ضبط المحركات المحفوظة</value>
   </data>

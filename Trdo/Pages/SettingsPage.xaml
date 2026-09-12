@@ -638,6 +638,10 @@
                                 x:Name="CopyDiagnosticsButton"
                                 x:Uid="SettingsPage_CopyDiagnostics"
                                 Click="CopyDiagnosticsButton_Click" />
+                            <Button
+                                x:Name="ResetLogsButton"
+                                x:Uid="SettingsPage_ResetLogs"
+                                Click="ResetLogsButton_Click" />
                         </StackPanel>
                         <InfoBar
                             x:Name="DiagnosticsInfoBar"

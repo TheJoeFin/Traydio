@@ -262,6 +262,28 @@ public sealed partial class SettingsPage : Page
         }
     }
 
+    private void ResetLogsButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            LogService.ClearLogs();
+            LogService.Info("SettingsPage", "User reset the diagnostic logs");
+
+            DiagnosticsInfoBar.Severity = InfoBarSeverity.Success;
+            DiagnosticsInfoBar.Message = LocalizationService.GetString(
+                "SettingsPage_ResetLogsSuccess", "Cleared the log files.");
+        }
+        catch (Exception ex)
+        {
+            DiagnosticsInfoBar.Severity = InfoBarSeverity.Error;
+            DiagnosticsInfoBar.Message = string.Format(
+                LocalizationService.GetString("SettingsPage_ResetLogsFailed", "Couldn't reset the logs: {0}"),
+                ex.Message);
+        }
+
+        DiagnosticsInfoBar.IsOpen = true;
+    }
+
     private void AutoPlayOnStartupToggle_Toggled(object sender, RoutedEventArgs e)
     {
         if (_isUpdatingAutoPlayToggle)

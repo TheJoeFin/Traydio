@@ -611,6 +611,15 @@
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>No se pudieron restablecer los motores recordados: {0}</value>
   </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Restablecer registros</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>No se pudieron restablecer los registros: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Registros borrados.</value>
+  </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>Restablecer motores recordados</value>
   </data>

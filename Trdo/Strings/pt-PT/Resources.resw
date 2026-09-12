@@ -611,6 +611,15 @@
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>Não foi possível repor os motores memorizados: {0}</value>
   </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Repor registos</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Não foi possível repor os registos: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Ficheiros de registo limpos.</value>
+  </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>Repor motores memorizados</value>
   </data>

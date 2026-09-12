@@ -611,6 +611,15 @@
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>Gespeicherte Engines konnten nicht zurückgesetzt werden: {0}</value>
   </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Protokolle zurücksetzen</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Protokolle konnten nicht zurückgesetzt werden: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Protokolldateien gelöscht.</value>
+  </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>Gespeicherte Engines zurücksetzen</value>
   </data>

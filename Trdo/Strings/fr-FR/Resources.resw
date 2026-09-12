@@ -611,6 +611,15 @@
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>Impossible de réinitialiser les moteurs mémorisés : {0}</value>
   </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Réinitialiser les journaux</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Impossible de réinitialiser les journaux : {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Journaux effacés.</value>
+  </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>Réinitialiser les moteurs mémorisés</value>
   </data>
