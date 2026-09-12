@@ -2185,10 +2185,12 @@ public sealed partial class RadioPlayerService : IDisposable
                         if (thumbnailSet)
                         {
                             _currentAlbumArtUrl = metadata.AlbumArtUrl;
+                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from track art: {metadata.AlbumArtUrl}");
                             Debug.WriteLine($"[RadioPlayerService] Successfully set album art from metadata");
                         }
                         else
                         {
+                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from track art: {metadata.AlbumArtUrl}; will try favicon");
                             Debug.WriteLine($"[RadioPlayerService] Failed to set album art from metadata, will try favicon");
                         }
                     }
@@ -2210,10 +2212,12 @@ public sealed partial class RadioPlayerService : IDisposable
                         if (thumbnailSet)
                         {
                             _currentAlbumArtUrl = _currentStationFaviconUrl;
+                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from station favicon: {_currentStationFaviconUrl}");
                             Debug.WriteLine($"[RadioPlayerService] Successfully set favicon as thumbnail");
                         }
                         else
                         {
+                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from station favicon: {_currentStationFaviconUrl}");
                             Debug.WriteLine($"[RadioPlayerService] Failed to set favicon as thumbnail");
                             _currentAlbumArtUrl = null; // Reset so we can retry later
                         }
@@ -2234,6 +2238,7 @@ public sealed partial class RadioPlayerService : IDisposable
                         {
                             _currentAlbumArtUrl = null;
                             updater.Thumbnail = null;
+                            LogService.Info("RadioPlayerService", "Cleared SMTC thumbnail (no track art or favicon available)");
                             Debug.WriteLine("[RadioPlayerService] Cleared album art");
                         }
                         updater.Update();
@@ -2286,28 +2291,43 @@ public sealed partial class RadioPlayerService : IDisposable
             // Create a RandomAccessStreamReference from the stream
             RandomAccessStreamReference thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
 
-            // Set the thumbnail on the UI thread
-            bool success = false;
-            TryEnqueueOnUi(() =>
+            // Set the thumbnail on the UI thread. This must actually be awaited: TryEnqueueOnUi
+            // only enqueues the action and returns immediately when called from this background
+            // thread, so a bare bool written inside the callback would always still read false
+            // here - which used to make every call look like a failure and fall through to the
+            // favicon, then to clearing the thumbnail entirely, even when the set had worked.
+            var tcs = new TaskCompletionSource<bool>();
+            void SetThumbnail()
             {
                 try
                 {
                     updater.Thumbnail = thumbnail;
                     updater.Update();
                     Debug.WriteLine("[RadioPlayerService] Album art set successfully");
-                    success = true;
+                    tcs.TrySetResult(true);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[RadioPlayerService] Failed to set album art thumbnail: {ex.Message}");
+                    tcs.TrySetResult(false);
                 }
-                finally
-                {
-                    // Dispose the stream after setting the thumbnail
-                    stream?.Dispose();
-                }
-            });
-            return success;
+            }
+
+            if (_uiQueue is null || _uiQueue.HasThreadAccess)
+            {
+                SetThumbnail();
+            }
+            else if (!_uiQueue.TryEnqueue(SetThumbnail))
+            {
+                tcs.TrySetResult(false);
+            }
+
+            // Deliberately not disposing `stream` here: SMTC/Action Center reads the referenced
+            // stream lazily after Update() returns, not synchronously, so disposing it this soon
+            // risks the shell reading an already-closed stream and showing a blank/default icon
+            // instead of the art that was just "successfully" set. It's small and short-lived
+            // enough to leave for the GC once nothing references it anymore.
+            return await tcs.Task;
         }
         catch (HttpRequestException ex)
         {
