@@ -567,13 +567,22 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <FontIcon
+                <Grid
                     Grid.Column="0"
-                    VerticalAlignment="Center"
-                    animations:Connected.Key="NowPlayingTrackIcon"
-                    FontSize="14"
-                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                    Glyph="&#xE8D6;" />
+                    Width="24"
+                    Height="24"
+                    VerticalAlignment="Center">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        animations:Connected.Key="NowPlayingTrackIcon"
+                        FontSize="14"
+                        Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                        Glyph="&#xE8D6;" />
+                    <Border CornerRadius="2">
+                        <Image Source="{x:Bind ViewModel.CurrentAlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                    </Border>
+                </Grid>
                 <Grid
                     x:Name="NowPlayingTextHost"
                     Grid.Column="1"

@@ -80,15 +80,24 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <FontIcon
-                                x:Name="TrackIcon"
+                            <Grid
                                 Grid.Column="0"
+                                Width="40"
+                                Height="40"
                                 Margin="0,0,12,0"
-                                VerticalAlignment="Center"
-                                animations:Connected.Key="NowPlayingTrackIcon"
-                                FontSize="24"
-                                Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                Glyph="&#xE8D6;" />
+                                VerticalAlignment="Center">
+                                <FontIcon
+                                    x:Name="TrackIcon"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    animations:Connected.Key="NowPlayingTrackIcon"
+                                    FontSize="24"
+                                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                    Glyph="&#xE8D6;" />
+                                <Border CornerRadius="2">
+                                    <Image Source="{x:Bind ViewModel.AlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                </Border>
+                            </Grid>
 
                             <StackPanel
                                 Grid.Column="1"
@@ -375,18 +384,10 @@
                 SelectionChanged="LocalTrackList_SelectionChanged"
                 SelectionMode="Single">
                 <ListView.Resources>
-                    <StaticResource
-                        x:Key="ListViewItemBackgroundSelected"
-                        ResourceKey="AccentFillColorDefaultBrush" />
-                    <StaticResource
-                        x:Key="ListViewItemBackgroundSelectedPointerOver"
-                        ResourceKey="AccentFillColorDefaultBrush" />
-                    <StaticResource
-                        x:Key="ListViewItemBackgroundSelectedPressed"
-                        ResourceKey="AccentFillColorDefaultBrush" />
-                    <StaticResource
-                        x:Key="ListViewItemForegroundSelected"
-                        ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                    <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemForegroundSelected" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                 </ListView.Resources>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

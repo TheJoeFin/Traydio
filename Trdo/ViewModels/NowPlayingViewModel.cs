@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -112,6 +113,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     private void OnStreamMetadataChanged(object? sender, StreamMetadata metadata)
     {
         OnPropertyChanged(nameof(CurrentMetadata));
+        OnPropertyChanged(nameof(AlbumArtImageSource));
         OnPropertyChanged(nameof(StreamTitle));
         OnPropertyChanged(nameof(Artist));
         OnPropertyChanged(nameof(Title));
@@ -170,6 +172,13 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// Gets the current stream metadata.
     /// </summary>
     public StreamMetadata CurrentMetadata => _player.CurrentMetadata;
+
+    /// <summary>
+    /// Gets the current track's album art, if any, to replace the music note icon with.
+    /// Reuses <see cref="PlayerViewModel"/>'s loading/validation so both surfaces agree on
+    /// what counts as displayable art.
+    /// </summary>
+    public ImageSource? AlbumArtImageSource => PlayerViewModel.Shared.CurrentAlbumArtImageSource;
 
     /// <summary>
     /// Gets the full stream title string.
