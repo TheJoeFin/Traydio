@@ -316,6 +316,11 @@ public sealed partial class StreamMetadataService : IDisposable
         }
     }
 
+    // ICY servers typically re-send the same metadata block on every poll until the track
+    // changes. Without this, the album-art logging in ParseIcyMetadata would repeat every
+    // ~10s for an unchanged track, drowning out the signal in the bounded log file.
+    private static string? _lastLoggedIcyMetadata;
+
     /// <summary>
     /// Parses an ICY metadata string into a StreamMetadata object.
     /// Format is typically: StreamTitle='Artist - Song';StreamUrl='...';
@@ -333,10 +338,13 @@ public sealed partial class StreamMetadataService : IDisposable
 
         Debug.WriteLine($"[StreamMetadataService] Raw metadata String: {metadataStr}");
 
+        bool logArtworkOutcome = !string.Equals(_lastLoggedIcyMetadata, metadataStr, StringComparison.Ordinal);
+        _lastLoggedIcyMetadata = metadataStr;
+
         // Check for "Exploring" format (used by iHeartRadio and some other stations)
         if (metadataStr.Contains("Exploring ", StringComparison.OrdinalIgnoreCase))
         {
-            ParseExploringFormat(metadataStr, metadata);
+            ParseExploringFormat(metadataStr, metadata, logArtworkOutcome);
             return metadata;
         }
 
@@ -368,10 +376,22 @@ public sealed partial class StreamMetadataService : IDisposable
 
                 // Try to extract album artwork from within StreamTitle if present
                 string? artworkUrl = ExtractAttribute(metadata.StreamTitle, "amgArtworkURL");
-                if (!string.IsNullOrWhiteSpace(artworkUrl) && IsImageUrl(artworkUrl))
+                if (!string.IsNullOrWhiteSpace(artworkUrl))
                 {
-                    metadata.AlbumArtUrl = artworkUrl;
-                    Debug.WriteLine($"[StreamMetadataService] AlbumArtUrl from StreamTitle: {metadata.AlbumArtUrl}");
+                    if (IsImageUrl(artworkUrl))
+                    {
+                        metadata.AlbumArtUrl = artworkUrl;
+                        if (logArtworkOutcome)
+                        {
+                            LogService.Info("StreamMetadataService", $"Album art found via amgArtworkURL: {artworkUrl}");
+                        }
+
+                        Debug.WriteLine($"[StreamMetadataService] AlbumArtUrl from StreamTitle: {metadata.AlbumArtUrl}");
+                    }
+                    else if (logArtworkOutcome)
+                    {
+                        LogService.Info("StreamMetadataService", $"amgArtworkURL present but not recognized as an image, ignoring: {artworkUrl}");
+                    }
                 }
             }
         }
@@ -392,9 +412,23 @@ public sealed partial class StreamMetadataService : IDisposable
                 if (IsImageUrl(streamUrl))
                 {
                     metadata.AlbumArtUrl = streamUrl;
+                    if (logArtworkOutcome)
+                    {
+                        LogService.Info("StreamMetadataService", $"Album art found via StreamUrl: {streamUrl}");
+                    }
+
                     Debug.WriteLine($"[StreamMetadataService] AlbumArtUrl: {metadata.AlbumArtUrl}");
                 }
+                else if (logArtworkOutcome && string.IsNullOrWhiteSpace(metadata.AlbumArtUrl))
+                {
+                    LogService.Info("StreamMetadataService", $"StreamUrl present but not recognized as an image, ignoring: {streamUrl}");
+                }
             }
+        }
+
+        if (logArtworkOutcome && string.IsNullOrWhiteSpace(metadata.AlbumArtUrl))
+        {
+            LogService.Info("StreamMetadataService", $"No album art found in ICY metadata: {metadataStr}");
         }
 
         return metadata;
@@ -439,7 +473,7 @@ public sealed partial class StreamMetadataService : IDisposable
     /// Parses the "Exploring" metadata format used by iHeartRadio and similar stations.
     /// Format: Exploring title="Song",artist="Artist",amgArtworkURL="http://..."
     /// </summary>
-    private static void ParseExploringFormat(string metadataStr, StreamMetadata metadata)
+    private static void ParseExploringFormat(string metadataStr, StreamMetadata metadata, bool logArtworkOutcome)
     {
         // Extract title
         string? title = ExtractAttribute(metadataStr, "title");
@@ -472,10 +506,26 @@ public sealed partial class StreamMetadataService : IDisposable
                           ?? ExtractAttribute(metadataStr, "artworkURL")
                           ?? ExtractAttribute(metadataStr, "url");
 
-        if (!string.IsNullOrWhiteSpace(artworkUrl) && IsImageUrl(artworkUrl))
+        if (!string.IsNullOrWhiteSpace(artworkUrl))
         {
-            metadata.AlbumArtUrl = artworkUrl;
-            Debug.WriteLine($"[StreamMetadataService] Exploring format - AlbumArtUrl: {artworkUrl}");
+            if (IsImageUrl(artworkUrl))
+            {
+                metadata.AlbumArtUrl = artworkUrl;
+                if (logArtworkOutcome)
+                {
+                    LogService.Info("StreamMetadataService", $"Album art found via Exploring format: {artworkUrl}");
+                }
+
+                Debug.WriteLine($"[StreamMetadataService] Exploring format - AlbumArtUrl: {artworkUrl}");
+            }
+            else if (logArtworkOutcome)
+            {
+                LogService.Info("StreamMetadataService", $"Exploring format artwork attribute present but not recognized as an image, ignoring: {artworkUrl}");
+            }
+        }
+        else if (logArtworkOutcome)
+        {
+            LogService.Info("StreamMetadataService", $"No album art found in Exploring format metadata: {metadataStr}");
         }
     }
 

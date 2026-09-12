@@ -95,7 +95,8 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
                 break;
             case PlaybackBackendKind.LibVlc when libVlcPlayer is not null:
                 _libVlcMetadataProvider.Attach(libVlcPlayer);
-                Debug.WriteLine("[StreamMetadataOrchestrator] Using LibVLC metadata + HLS segment polling");
+                StartIcyPollingForStream(streamUrl);
+                Debug.WriteLine("[StreamMetadataOrchestrator] Using LibVLC metadata + ICY polling");
                 break;
             default:
                 StartIcyPollingForStream(streamUrl);
@@ -199,10 +200,21 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
             return;
         }
 
-        if (_currentMetadata.StreamTitle == metadata.StreamTitle &&
+        bool sameTrack = _currentMetadata.StreamTitle == metadata.StreamTitle &&
             _currentMetadata.Artist == metadata.Artist &&
-            _currentMetadata.Title == metadata.Title &&
-            _currentMetadata.AlbumArtUrl == metadata.AlbumArtUrl)
+            _currentMetadata.Title == metadata.Title;
+
+        if (sameTrack &&
+            string.IsNullOrWhiteSpace(metadata.AlbumArtUrl) &&
+            !string.IsNullOrWhiteSpace(_currentMetadata.AlbumArtUrl))
+        {
+            // A source without artwork (e.g. LibVLC's own meta, which never sees ICY-embedded
+            // art) shouldn't blank out artwork another source already found for this same track.
+            LogService.Info("StreamMetadata", $"{source} has no art for '{metadata.DisplayText}'; keeping existing art from another source: {_currentMetadata.AlbumArtUrl}");
+            metadata.AlbumArtUrl = _currentMetadata.AlbumArtUrl;
+        }
+
+        if (sameTrack && _currentMetadata.AlbumArtUrl == metadata.AlbumArtUrl)
         {
             // Worth recording: this is the point where a repeat is dropped, so a track that
             // was seen once but never announced will never be offered again.
@@ -211,7 +223,8 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
         }
 
         _currentMetadata = metadata;
-        LogService.Info("StreamMetadata", $"Updated via {source}: '{metadata.DisplayText}'");
+        string artStatus = string.IsNullOrWhiteSpace(metadata.AlbumArtUrl) ? "none" : metadata.AlbumArtUrl;
+        LogService.Info("StreamMetadata", $"Updated via {source}: '{metadata.DisplayText}' (art={artStatus})");
         Debug.WriteLine($"[StreamMetadataOrchestrator] Metadata updated via {source}: {metadata.DisplayText}");
         MetadataChanged?.Invoke(this, metadata);
     }

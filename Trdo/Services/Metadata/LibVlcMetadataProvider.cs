@@ -125,6 +125,8 @@ public sealed partial class LibVlcMetadataProvider : IDisposable
         }
 
         _currentMetadata = metadata;
+        string artStatus = string.IsNullOrWhiteSpace(metadata.AlbumArtUrl) ? "none" : metadata.AlbumArtUrl;
+        LogService.Info("LibVlcMetadataProvider", $"Metadata updated: {metadata.DisplayText} (art={artStatus})");
         Debug.WriteLine($"[LibVlcMetadataProvider] Metadata updated: {metadata.DisplayText}");
         MetadataChanged?.Invoke(this, metadata);
     }
