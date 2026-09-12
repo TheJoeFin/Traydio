@@ -137,6 +137,7 @@ public sealed partial class SongChangePopupWindow : Window
         // way here as everywhere else "now playing" is shown.
         AlbumArtImage.Source = PlayerViewModel.Shared.CurrentAlbumArtImageSource;
         TrackIcon.Glyph = PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
+        TrackIcon.Visibility = PlayerViewModel.Shared.CurrentAlbumArtPlaceholderVisibility;
 
         // The window hugs its content, so the height has to be remeasured for
         // every song: a title that wraps to two lines needs a taller pill.

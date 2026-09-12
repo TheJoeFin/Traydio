@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -90,6 +91,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(AlbumArtPlaceholderGlyph));
         }
 
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentAlbumArtPlaceholderVisibility))
+        {
+            OnPropertyChanged(nameof(AlbumArtPlaceholderVisibility));
+        }
+
         // Kept separate from the block above: LocalTrackList rebuilds the whole displayed
         // collection, which would reset the ListView's selection if raised on every track
         // change - it only needs to fire when the folder's track list itself changes.
@@ -119,6 +125,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     {
         OnPropertyChanged(nameof(CurrentMetadata));
         OnPropertyChanged(nameof(AlbumArtImageSource));
+        OnPropertyChanged(nameof(AlbumArtPlaceholderVisibility));
         OnPropertyChanged(nameof(StreamTitle));
         OnPropertyChanged(nameof(Artist));
         OnPropertyChanged(nameof(Title));
@@ -191,6 +198,12 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// does - so this screen and the transport bar always agree on which placeholder to show.
     /// </summary>
     public string AlbumArtPlaceholderGlyph => PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
+
+    /// <summary>
+    /// Whether <see cref="AlbumArtPlaceholderGlyph"/> should be shown instead of
+    /// <see cref="AlbumArtImageSource"/>. Delegates for the same reason the other two do.
+    /// </summary>
+    public Visibility AlbumArtPlaceholderVisibility => PlayerViewModel.Shared.CurrentAlbumArtPlaceholderVisibility;
 
     /// <summary>
     /// Gets the full stream title string.

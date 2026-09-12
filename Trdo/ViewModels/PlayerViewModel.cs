@@ -184,6 +184,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(MetadataArtistDisplay));
             OnPropertyChanged(nameof(MetadataTitleDisplay));
             OnPropertyChanged(nameof(CurrentAlbumArtImageSource));
+            OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderVisibility));
             OnPropertyChanged(nameof(CurrentTrackDisplay));
             OnPropertyChanged(nameof(CurrentTrackSupportingText));
             OnPropertyChanged(nameof(MiniPlayerPrimaryText));
@@ -415,6 +416,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsLocalMusicActive));
             OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
             OnPropertyChanged(nameof(CurrentAlbumArtImageSource));
+            OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderVisibility));
             RefreshLocalMusicTrackState();
             SyncStationCyclingAvailability();
 
@@ -716,6 +718,16 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// instead of falling back to a generic note for everything that isn't live radio.
     /// </summary>
     public string CurrentAlbumArtPlaceholderGlyph => SelectedStation?.FaviconPlaceholderGlyph ?? "\uE8D6";
+
+    /// <summary>
+    /// Whether <see cref="CurrentAlbumArtPlaceholderGlyph"/> should be shown instead of
+    /// <see cref="CurrentAlbumArtImageSource"/>. Switched exclusively rather than just layering
+    /// the two and trusting the image to fully hide the icon underneath - a rounded corner or a
+    /// not-yet-loaded image would otherwise let the glyph show through and clash with the art.
+    /// </summary>
+    public Visibility CurrentAlbumArtPlaceholderVisibility => CurrentAlbumArtImageSource is null
+        ? Visibility.Visible
+        : Visibility.Collapsed;
 
     public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl);
 

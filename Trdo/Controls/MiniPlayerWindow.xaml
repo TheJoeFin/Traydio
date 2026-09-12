@@ -74,7 +74,8 @@
                                     VerticalAlignment="Center"
                                     FontSize="28"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                    Glyph="{x:Bind ViewModel.CurrentAlbumArtPlaceholderGlyph, Mode=OneWay}" />
+                                    Glyph="{x:Bind ViewModel.CurrentAlbumArtPlaceholderGlyph, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.CurrentAlbumArtPlaceholderVisibility, Mode=OneWay}" />
                                 <Border CornerRadius="{StaticResource OverlayCornerRadius}">
                                     <Image Source="{x:Bind ViewModel.CurrentAlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                                 </Border>

@@ -93,7 +93,8 @@
                                     animations:Connected.Key="NowPlayingTrackIcon"
                                     FontSize="24"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                    Glyph="{x:Bind ViewModel.AlbumArtPlaceholderGlyph, Mode=OneWay}" />
+                                    Glyph="{x:Bind ViewModel.AlbumArtPlaceholderGlyph, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.AlbumArtPlaceholderVisibility, Mode=OneWay}" />
                                 <Border CornerRadius="2">
                                     <Image Source="{x:Bind ViewModel.AlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                                 </Border>
