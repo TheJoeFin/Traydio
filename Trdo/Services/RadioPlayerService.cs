@@ -2,6 +2,7 @@ using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -2268,6 +2269,15 @@ public sealed partial class RadioPlayerService : IDisposable
                 string base64 = imageUrl[(commaIndex + 1)..];
                 imageData = Convert.FromBase64String(base64);
                 Debug.WriteLine($"[RadioPlayerService] Decoded embedded album art ({imageData.Length} bytes)");
+            }
+            else if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri) && uri.IsFile)
+            {
+                // A local album's favicon is the folder's own cover art on disk (see
+                // LocalMusicFolderScanner), not something HttpClient can dial - it throws
+                // NotSupportedException on a file:// scheme.
+                Debug.WriteLine($"[RadioPlayerService] Reading album art from disk: {uri.LocalPath}");
+                imageData = await File.ReadAllBytesAsync(uri.LocalPath);
+                Debug.WriteLine($"[RadioPlayerService] Read {imageData.Length} bytes of album art from disk");
             }
             else
             {

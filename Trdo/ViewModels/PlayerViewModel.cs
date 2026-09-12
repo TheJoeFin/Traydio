@@ -414,6 +414,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(SelectedStationDisplayName));
             OnPropertyChanged(nameof(IsLocalMusicActive));
             OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
+            OnPropertyChanged(nameof(CurrentAlbumArtImageSource));
             RefreshLocalMusicTrackState();
             SyncStationCyclingAvailability();
 
@@ -696,7 +697,16 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     public string CurrentTrackSupportingText => MetadataArtistDisplay;
 
-    public ImageSource? CurrentAlbumArtImageSource => CreateImageSource(CurrentMetadata?.AlbumArtUrl);
+    /// <summary>
+    /// The art to show for what's currently playing: the track's own art when the stream/file
+    /// carries one, else the station's favicon/cover - the same priority order
+    /// <see cref="RadioPlayerService"/> already uses for the SMTC thumbnail. A local album's
+    /// tracks often have no embedded art of their own but the station does carry the folder's
+    /// <c>cover.jpg</c> as its favicon, so without this fallback the UI would show nothing even
+    /// though a perfectly good picture is right there.
+    /// </summary>
+    public ImageSource? CurrentAlbumArtImageSource =>
+        CreateImageSource(CurrentMetadata?.AlbumArtUrl) ?? CreateImageSource(SelectedStation?.FaviconUrl);
 
     /// <summary>
     /// The icon shown behind <see cref="CurrentAlbumArtImageSource"/> in the transport bar and
@@ -2076,12 +2086,16 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     private static ImageSource? CreateImageSource(string? url)
     {
-        if (!IsValidUrl(url))
+        // Deliberately not IsValidUrl: that gate is for stream/homepage URLs and only ever
+        // allows http(s), which would silently blank out a local track's embedded art (a
+        // "data:" URI - see LocalFileMetadataService/Id3TagParser) and a local album's own
+        // cover art on disk (a "file://" URI - see LocalMusicFolderScanner).
+        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
         {
             return null;
         }
 
-        return new BitmapImage(new Uri(url!, UriKind.Absolute));
+        return new BitmapImage(uri);
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)
