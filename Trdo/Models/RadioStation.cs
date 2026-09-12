@@ -121,8 +121,17 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
             if (value == _faviconUrl) return;
             _faviconUrl = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowsFaviconPlaceholder));
         }
     }
+
+    /// <summary>
+    /// Whether the row's placeholder icon (see <see cref="FaviconPlaceholderGlyph"/>) should be
+    /// shown instead of the favicon/album art image. Kept as its own binding rather than just
+    /// letting the image draw over the icon, since a transparent or not-yet-loaded image would
+    /// otherwise let the icon show through and clash with the art underneath.
+    /// </summary>
+    public bool ShowsFaviconPlaceholder => string.IsNullOrWhiteSpace(FaviconUrl);
 
     /// <summary>
     /// Per-station playback volume as a fraction where 1.0 == 100% of the stream

@@ -111,7 +111,8 @@
                         VerticalAlignment="Center"
                         FontSize="14"
                         Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                        Glyph="{x:Bind FaviconPlaceholderGlyph, Mode=OneWay}" />
+                        Glyph="{x:Bind FaviconPlaceholderGlyph, Mode=OneWay}"
+                        Visibility="{x:Bind ShowsFaviconPlaceholder, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                     <Border CornerRadius="4">
                         <Image Source="{x:Bind FaviconUrl, Converter={StaticResource StringToImageSourceConverter}, Mode=OneWay}" Stretch="UniformToFill" />
                     </Border>
