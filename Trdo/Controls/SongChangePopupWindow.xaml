@@ -26,13 +26,23 @@
         ColumnSpacing="14"
         RightTapped="RootGrid_RightTapped"
         Tapped="RootGrid_Tapped">
-        <FontIcon
+        <Grid
             Grid.Column="0"
-            VerticalAlignment="Center"
-            AutomationProperties.AccessibilityView="Raw"
-            FontSize="22"
-            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-            Glyph="&#xE8D6;" />
+            Width="28"
+            Height="28"
+            VerticalAlignment="Center">
+            <FontIcon
+                x:Name="TrackIcon"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                AutomationProperties.AccessibilityView="Raw"
+                FontSize="18"
+                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                Glyph="&#xE8D6;" />
+            <Border CornerRadius="2">
+                <Image x:Name="AlbumArtImage" Stretch="UniformToFill" />
+            </Border>
+        </Grid>
         <StackPanel
             Grid.Column="1"
             VerticalAlignment="Center"

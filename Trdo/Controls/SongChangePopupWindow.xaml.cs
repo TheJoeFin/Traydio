@@ -131,6 +131,13 @@ public sealed partial class SongChangePopupWindow : Window
         SongText.Text = displayText;
         AutomationProperties.SetName(RootGrid, $"Now playing: {displayText}");
 
+        // Same art PlayingPage/NowPlayingPage show - track art if the source has one, else the
+        // station's own favicon/cover - and the same per-source-kind glyph behind it while that
+        // loads or when there is none, so a local album or white noise station reads the same
+        // way here as everywhere else "now playing" is shown.
+        AlbumArtImage.Source = PlayerViewModel.Shared.CurrentAlbumArtImageSource;
+        TrackIcon.Glyph = PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
+
         // The window hugs its content, so the height has to be remeasured for
         // every song: a title that wraps to two lines needs a taller pill.
         int height = MeasureContentHeight();
