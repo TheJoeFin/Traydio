@@ -413,6 +413,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(SelectedStationFaviconImageSource));
             OnPropertyChanged(nameof(SelectedStationDisplayName));
             OnPropertyChanged(nameof(IsLocalMusicActive));
+            OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
             RefreshLocalMusicTrackState();
             SyncStationCyclingAvailability();
 
@@ -696,6 +697,15 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     public string CurrentTrackSupportingText => MetadataArtistDisplay;
 
     public ImageSource? CurrentAlbumArtImageSource => CreateImageSource(CurrentMetadata?.AlbumArtUrl);
+
+    /// <summary>
+    /// The icon shown behind <see cref="CurrentAlbumArtImageSource"/> in the transport bar and
+    /// Now Playing screen while no art is loaded - the same per-<see cref="AudioSourceKind"/>
+    /// glyph the station list uses (see <see cref="RadioStation.FaviconPlaceholderGlyph"/>), so a
+    /// local album or white noise station reads the same way there as it does in the list,
+    /// instead of falling back to a generic note for everything that isn't live radio.
+    /// </summary>
+    public string CurrentAlbumArtPlaceholderGlyph => SelectedStation?.FaviconPlaceholderGlyph ?? "\uE8D6";
 
     public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl);
 

@@ -85,6 +85,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(HasEnabledMusicServices));
         }
 
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentAlbumArtPlaceholderGlyph))
+        {
+            OnPropertyChanged(nameof(AlbumArtPlaceholderGlyph));
+        }
+
         // Kept separate from the block above: LocalTrackList rebuilds the whole displayed
         // collection, which would reset the ListView's selection if raised on every track
         // change - it only needs to fire when the folder's track list itself changes.
@@ -179,6 +184,13 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// what counts as displayable art.
     /// </summary>
     public ImageSource? AlbumArtImageSource => PlayerViewModel.Shared.CurrentAlbumArtImageSource;
+
+    /// <summary>
+    /// The icon shown behind <see cref="AlbumArtImageSource"/> while no art is loaded. Delegates
+    /// to <see cref="PlayerViewModel"/> for the same reason <see cref="AlbumArtImageSource"/>
+    /// does - so this screen and the transport bar always agree on which placeholder to show.
+    /// </summary>
+    public string AlbumArtPlaceholderGlyph => PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
 
     /// <summary>
     /// Gets the full stream title string.
