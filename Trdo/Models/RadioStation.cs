@@ -371,8 +371,22 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
             if (value == _sourceKind) return;
             _sourceKind = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(FaviconPlaceholderGlyph));
         }
     }
+
+    /// <summary>
+    /// The icon shown behind the favicon/album art image when <see cref="FaviconUrl"/> has none
+    /// to display - a distinct placeholder per <see cref="SourceKind"/>, since the row otherwise
+    /// gives no clue what kind of station it is: an album for local music, a sound wave for
+    /// white noise, and a broadcast tower for everything else (live radio).
+    /// </summary>
+    public string FaviconPlaceholderGlyph => SourceKind switch
+    {
+        AudioSourceKind.Files => "\uE93C",
+        AudioSourceKind.WhiteNoise => "\uF61F",
+        _ => "\uEC05",
+    };
 
     /// <summary>
     /// The shape <see cref="SourceKind"/> was saved under before it existed. A file written by

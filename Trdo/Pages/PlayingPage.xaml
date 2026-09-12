@@ -99,15 +99,20 @@
                     Background="{ThemeResource DividerStrokeColorDefaultBrush}"
                     Visibility="{x:Bind GroupId, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}" />
 
-                <!--  Favicon  -->
+                <!--  Favicon - falls back to a placeholder icon per SourceKind when there's no cover art  -->
                 <Grid
                     Grid.Column="1"
                     Width="24"
                     Height="24"
                     Margin="0,0,12,0"
-                    VerticalAlignment="Center"
-                    Visibility="{x:Bind FaviconUrl, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="4">
+                    VerticalAlignment="Center">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                        Glyph="{x:Bind FaviconPlaceholderGlyph, Mode=OneWay}" />
+                    <Border CornerRadius="4">
                         <Image Source="{x:Bind FaviconUrl, Converter={StaticResource StringToImageSourceConverter}, Mode=OneWay}" Stretch="UniformToFill" />
                     </Border>
                 </Grid>
