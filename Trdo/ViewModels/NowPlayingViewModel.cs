@@ -108,6 +108,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         if (e.PropertyName is nameof(PlayerViewModel.CurrentLocalTrackIndex))
         {
             OnPropertyChanged(nameof(CurrentLocalTrackIndex));
+            UpdateLocalTrackPlayingFlags();
         }
     }
 
@@ -427,6 +428,14 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// <summary>Gets the index of the local track that is currently playing.</summary>
     public int CurrentLocalTrackIndex => PlayerViewModel.Shared.CurrentLocalTrackIndex;
 
+    // Cached alongside the source track list it was built from, keyed by reference: PlayerViewModel's
+    // LocalTrackList only changes identity when the folder is (re)scanned, so this lets the getter
+    // below hand back the same item instances across every other PropertyChanged (e.g. a track change),
+    // which in turn lets UpdateLocalTrackPlayingFlags mutate IsPlaying in place instead of swapping the
+    // ListView's ItemsSource and resetting its selection/scroll position.
+    private IReadOnlyList<string>? _localTrackListSource;
+    private List<LocalTrackDisplayItem>? _localTrackDisplayItems;
+
     /// <summary>
     /// The current folder's tracks, in order.
     /// </summary>
@@ -435,8 +444,15 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         get
         {
             IReadOnlyList<string> tracks = PlayerViewModel.Shared.LocalTrackList;
+
+            if (_localTrackDisplayItems != null && ReferenceEquals(_localTrackListSource, tracks))
+            {
+                return _localTrackDisplayItems;
+            }
+
             Debug.WriteLine($"[NowPlayingViewModel] LocalTrackList rebuilt ({tracks.Count} track(s)) - this swaps the ListView's ItemsSource");
 
+            int currentIndex = CurrentLocalTrackIndex;
             List<LocalTrackDisplayItem> items = new(tracks.Count);
             for (int i = 0; i < tracks.Count; i++)
             {
@@ -453,10 +469,31 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
                     Index = i,
                     Path = tracks[i],
                     DisplayTitle = trackTitle,
+                    IsPlaying = i == currentIndex,
                 });
             }
 
+            _localTrackListSource = tracks;
+            _localTrackDisplayItems = items;
             return items;
+        }
+    }
+
+    /// <summary>
+    /// Updates which cached <see cref="LocalTrackDisplayItem"/> reports <see cref="LocalTrackDisplayItem.IsPlaying"/>,
+    /// without rebuilding the list itself - see the caching note above <see cref="LocalTrackList"/>.
+    /// </summary>
+    private void UpdateLocalTrackPlayingFlags()
+    {
+        if (_localTrackDisplayItems == null)
+        {
+            return;
+        }
+
+        int currentIndex = CurrentLocalTrackIndex;
+        foreach (LocalTrackDisplayItem item in _localTrackDisplayItems)
+        {
+            item.IsPlaying = item.Index == currentIndex;
         }
     }
 

@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System.Diagnostics;
 using Trdo.Models;
@@ -110,6 +111,23 @@ public sealed partial class NowPlayingPage : Page
         {
             Debug.WriteLine($"[NowPlayingPage] Local track row selected: {listView.SelectedIndex}");
             ViewModel.PlayLocalTrackAtIndex(listView.SelectedIndex);
+        }
+    }
+
+    /// <summary>Reveals the hover play icon on a non-playing track row - see <c>HoverPlayIcon</c> in the row's DataTemplate.</summary>
+    private void LocalTrackRow_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("HoverPlayIcon") is FrameworkElement icon)
+        {
+            icon.Opacity = 1;
+        }
+    }
+
+    private void LocalTrackRow_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("HoverPlayIcon") is FrameworkElement icon)
+        {
+            icon.Opacity = 0;
         }
     }
 }

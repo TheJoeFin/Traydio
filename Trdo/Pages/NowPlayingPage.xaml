@@ -399,18 +399,34 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="vm:LocalTrackDisplayItem">
-                        <Grid Padding="6">
+                        <Grid
+                            Padding="6"
+                            Background="Transparent"
+                            PointerEntered="LocalTrackRow_PointerEntered"
+                            PointerExited="LocalTrackRow_PointerExited">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <FontIcon
+                            <Grid
                                 Grid.Column="0"
+                                Width="12"
                                 Margin="0,0,8,0"
-                                VerticalAlignment="Center"
-                                FontSize="12"
-                                Glyph="&#xE768;" />
+                                VerticalAlignment="Center">
+                                <!--  Currently-playing indicator  -->
+                                <FontIcon
+                                    FontSize="12"
+                                    Glyph="&#xE767;"
+                                    Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <!--  Shown on hover of a non-playing track, to indicate clicking plays it  -->
+                                <FontIcon
+                                    x:Name="HoverPlayIcon"
+                                    FontSize="12"
+                                    Glyph="&#xE768;"
+                                    Opacity="0"
+                                    Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                            </Grid>
 
                             <TextBlock
                                 Grid.Column="1"
