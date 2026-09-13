@@ -36,10 +36,9 @@ internal static class LocalMusicFolderScanner
 
         try
         {
-            return Directory.EnumerateFiles(folderPath, "*", SearchOption.TopDirectoryOnly)
+            return [.. Directory.EnumerateFiles(folderPath, "*", SearchOption.TopDirectoryOnly)
                 .Where(path => SupportedExtensions.Contains(Path.GetExtension(path)))
-                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-                .ToList();
+                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -60,10 +59,9 @@ internal static class LocalMusicFolderScanner
 
         try
         {
-            return Directory.EnumerateDirectories(parentFolderPath, "*", SearchOption.TopDirectoryOnly)
+            return [.. Directory.EnumerateDirectories(parentFolderPath, "*", SearchOption.TopDirectoryOnly)
                 .Where(path => ScanTracks(path).Count > 0)
-                .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+                .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

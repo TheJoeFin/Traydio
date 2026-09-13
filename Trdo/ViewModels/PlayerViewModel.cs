@@ -379,8 +379,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         set
         {
             Debug.WriteLine($"=== SelectedStation SETTER START ===");
-            Debug.WriteLine($"[PlayerViewModel] Current station: {(_selectedStation?.Name ?? "null")}");
-            Debug.WriteLine($"[PlayerViewModel] New station: {(value?.Name ?? "null")}");
+            Debug.WriteLine($"[PlayerViewModel] Current station: {_selectedStation?.Name ?? "null"}");
+            Debug.WriteLine($"[PlayerViewModel] New station: {value?.Name ?? "null"}");
 
             if (value == _selectedStation)
             {
@@ -820,7 +820,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     {
         Debug.WriteLine("=== Toggle START ===");
         Debug.WriteLine($"[PlayerViewModel] Current IsPlaying: {IsPlaying}");
-        Debug.WriteLine($"[PlayerViewModel] Selected station: {(_selectedStation?.Name ?? "null")}");
+        Debug.WriteLine($"[PlayerViewModel] Selected station: {_selectedStation?.Name ?? "null"}");
         Debug.WriteLine($"[PlayerViewModel] Current stream URL in player: {_player.StreamUrl ?? "null"}");
 
         try

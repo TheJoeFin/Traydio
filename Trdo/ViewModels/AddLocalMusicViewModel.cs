@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Trdo.Models;
 using Trdo.Services;
 using Windows.Storage;
@@ -142,7 +143,7 @@ public sealed partial class AddLocalMusicViewModel : INotifyPropertyChanged
     /// station name hasn't been touched yet - defaults <see cref="StationName"/> to the
     /// folder's leaf name.
     /// </summary>
-    public async System.Threading.Tasks.Task<bool> PickFolderAsync(nint windowHandle)
+    public async Task<bool> PickFolderAsync(nint windowHandle)
     {
         FolderPicker picker = new();
         WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
