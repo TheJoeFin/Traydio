@@ -707,8 +707,40 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// <c>cover.jpg</c> as its favicon, so without this fallback the UI would show nothing even
     /// though a perfectly good picture is right there.
     /// </summary>
-    public ImageSource? CurrentAlbumArtImageSource =>
-        CreateImageSource(CurrentMetadata?.AlbumArtUrl) ?? CreateImageSource(SelectedStation?.FaviconUrl);
+    public ImageSource? CurrentAlbumArtImageSource
+    {
+        get
+        {
+            string? trackArtUrl = CurrentMetadata?.AlbumArtUrl;
+            string? faviconUrl = SelectedStation?.FaviconUrl;
+            LogAlbumArtChoice(trackArtUrl, faviconUrl);
+            return CreateImageSource(trackArtUrl) ?? CreateImageSource(faviconUrl);
+        }
+    }
+
+    private string? _lastLoggedAlbumArtChoice;
+
+    /// <summary>
+    /// Logs which picture the now-playing surfaces are about to show, once per change rather
+    /// than once per binding read - the getter above is hit by every bound Image on every
+    /// PropertyChanged, so unconditional logging there would drown the log.
+    /// </summary>
+    private void LogAlbumArtChoice(string? trackArtUrl, string? faviconUrl)
+    {
+        string choice = !string.IsNullOrWhiteSpace(trackArtUrl)
+            ? $"track art ({ImageFormat.DescribeUrl(trackArtUrl)})"
+            : !string.IsNullOrWhiteSpace(faviconUrl)
+                ? $"station favicon ({faviconUrl})"
+                : "none (placeholder glyph)";
+
+        if (choice == _lastLoggedAlbumArtChoice)
+        {
+            return;
+        }
+
+        _lastLoggedAlbumArtChoice = choice;
+        LogService.Info("AlbumArt", $"Now-playing art for '{SelectedStation?.Name ?? "<no station>"}' / '{CurrentMetadata?.DisplayText ?? "<no metadata>"}': {choice}");
+    }
 
     /// <summary>
     /// The icon shown behind <see cref="CurrentAlbumArtImageSource"/> in the transport bar and

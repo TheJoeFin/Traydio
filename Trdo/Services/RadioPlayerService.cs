@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Trdo.Helpers;
 using Trdo.Models;
 using Trdo.Services.Audio;
 using Trdo.Services.Playback;
@@ -2186,12 +2187,12 @@ public sealed partial class RadioPlayerService : IDisposable
                         if (thumbnailSet)
                         {
                             _currentAlbumArtUrl = metadata.AlbumArtUrl;
-                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from track art: {metadata.AlbumArtUrl}");
+                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from track art: {ImageFormat.DescribeUrl(metadata.AlbumArtUrl)}");
                             Debug.WriteLine($"[RadioPlayerService] Successfully set album art from metadata");
                         }
                         else
                         {
-                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from track art: {metadata.AlbumArtUrl}; will try favicon");
+                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from track art: {ImageFormat.DescribeUrl(metadata.AlbumArtUrl)}; will try favicon");
                             Debug.WriteLine($"[RadioPlayerService] Failed to set album art from metadata, will try favicon");
                         }
                     }
@@ -2269,6 +2270,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 string base64 = imageUrl[(commaIndex + 1)..];
                 imageData = Convert.FromBase64String(base64);
                 Debug.WriteLine($"[RadioPlayerService] Decoded embedded album art ({imageData.Length} bytes)");
+                LogService.Info("AlbumArt", $"SMTC art from embedded art: {ImageFormat.Describe(imageData)}");
             }
             else if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri) && uri.IsFile)
             {
@@ -2278,12 +2280,23 @@ public sealed partial class RadioPlayerService : IDisposable
                 Debug.WriteLine($"[RadioPlayerService] Reading album art from disk: {uri.LocalPath}");
                 imageData = await File.ReadAllBytesAsync(uri.LocalPath);
                 Debug.WriteLine($"[RadioPlayerService] Read {imageData.Length} bytes of album art from disk");
+                LogService.Info("AlbumArt", $"SMTC art from file {uri.LocalPath}: {ImageFormat.Describe(imageData)}");
             }
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
                 imageData = await _httpClient.GetByteArrayAsync(imageUrl);
                 Debug.WriteLine($"[RadioPlayerService] Downloaded {imageData.Length} bytes of album art");
+                LogService.Info("AlbumArt", $"SMTC art from {imageUrl}: {ImageFormat.Describe(imageData)}");
+            }
+
+            if (ImageFormat.DetectMime(imageData) is null)
+            {
+                // updater.Thumbnail accepts any stream; the shell only discovers it isn't an
+                // image when it decodes it later, and then just shows nothing. Report it here
+                // and let the caller fall through to the favicon instead.
+                LogService.Warn("AlbumArt", $"SMTC art is not a recognized image; skipping it: {ImageFormat.Describe(imageData)}");
+                return false;
             }
 
             // Create a random access stream from the image data
@@ -2319,6 +2332,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[RadioPlayerService] Failed to set album art thumbnail: {ex.Message}");
+                    LogService.Warn("AlbumArt", $"SMTC updater rejected the thumbnail: {ex.GetType().Name}: {ex.Message}");
                     tcs.TrySetResult(false);
                 }
             }
@@ -2342,11 +2356,13 @@ public sealed partial class RadioPlayerService : IDisposable
         catch (HttpRequestException ex)
         {
             Debug.WriteLine($"[RadioPlayerService] Failed to download album art: {ex.Message}");
+            LogService.Warn("AlbumArt", $"SMTC art download failed for {imageUrl}: {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[RadioPlayerService] Error setting album art: {ex.Message}");
+            LogService.Warn("AlbumArt", $"SMTC art failed for {ImageFormat.DescribeUrl(imageUrl)}: {ex.GetType().Name}: {ex.Message}");
             return false;
         }
     }
