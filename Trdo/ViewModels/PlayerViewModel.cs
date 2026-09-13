@@ -2096,19 +2096,13 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
     }
 
-    private static ImageSource? CreateImageSource(string? url)
-    {
-        // Deliberately not IsValidUrl: that gate is for stream/homepage URLs and only ever
-        // allows http(s), which would silently blank out a local track's embedded art (a
-        // "data:" URI - see LocalFileMetadataService/Id3TagParser) and a local album's own
-        // cover art on disk (a "file://" URI - see LocalMusicFolderScanner).
-        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
-        {
-            return null;
-        }
-
-        return new BitmapImage(uri);
-    }
+    /// <summary>
+    /// Deliberately not IsValidUrl: that gate is for stream/homepage URLs and only ever allows
+    /// http(s), which would silently blank out a local track's embedded art and a local album's
+    /// own cover on disk. See <see cref="ImageSourceFactory"/> for why those two need special
+    /// handling rather than a plain <see cref="BitmapImage"/>.
+    /// </summary>
+    private static ImageSource? CreateImageSource(string? url) => ImageSourceFactory.Create(url);
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)
     {
