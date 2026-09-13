@@ -795,7 +795,7 @@ public sealed partial class RadioPlayerService : IDisposable
         _activeSourceKind == AudioSourceKind.Files && _localTrackIndex + 1 < _localTrackList.Count;
 
     public bool CanGoToPreviousLocalTrack =>
-        _activeSourceKind == AudioSourceKind.Files && _localTrackIndex > 0;
+        _activeSourceKind == AudioSourceKind.Files && _localTrackList.Count > 0;
 
     /// <summary>
     /// Scans <see cref="RadioStation.LocalFolderPath"/> fresh and starts playing its first
@@ -868,9 +868,25 @@ public sealed partial class RadioPlayerService : IDisposable
     public Task<bool> NextLocalTrackAsync(CancellationToken cancellationToken = default) =>
         PlayLocalTrackAtIndexAsync(_localTrackIndex + 1, cancellationToken);
 
-    /// <summary>Returns to the previous track in the folder, if there is one. No wraparound.</summary>
-    public Task<bool> PreviousLocalTrackAsync(CancellationToken cancellationToken = default) =>
-        PlayLocalTrackAtIndexAsync(_localTrackIndex - 1, cancellationToken);
+    /// <summary>How far into a track "previous" still counts as "go to the previous track" rather than restarting the current one.</summary>
+    private static readonly TimeSpan RestartTrackThreshold = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// Mimics standard media-player "previous" behavior: restarts the current track from the
+    /// beginning if it's more than a few seconds in, or if there's no earlier track to go back
+    /// to. Otherwise jumps to the previous track in the folder.
+    /// </summary>
+    public Task<bool> PreviousLocalTrackAsync(CancellationToken cancellationToken = default)
+    {
+        if (_activeSourceKind == AudioSourceKind.Files &&
+            (_localTrackIndex <= 0 || Position > RestartTrackThreshold))
+        {
+            Seek(TimeSpan.Zero);
+            return Task.FromResult(true);
+        }
+
+        return PlayLocalTrackAtIndexAsync(_localTrackIndex - 1, cancellationToken);
+    }
 
     private static string ToFileUri(string path) => new Uri(path).AbsoluteUri;
 
@@ -2004,11 +2020,25 @@ public sealed partial class RadioPlayerService : IDisposable
                     break;
                 case SystemMediaTransportControlsButton.Next:
                     Debug.WriteLine("[RadioPlayerService] Next button pressed from system controls");
-                    NextStationRequested?.Invoke(this, EventArgs.Empty);
+                    if (_activeSourceKind == AudioSourceKind.Files)
+                    {
+                        _ = NextLocalTrackAsync();
+                    }
+                    else
+                    {
+                        NextStationRequested?.Invoke(this, EventArgs.Empty);
+                    }
                     break;
                 case SystemMediaTransportControlsButton.Previous:
                     Debug.WriteLine("[RadioPlayerService] Previous button pressed from system controls");
-                    PreviousStationRequested?.Invoke(this, EventArgs.Empty);
+                    if (_activeSourceKind == AudioSourceKind.Files)
+                    {
+                        _ = PreviousLocalTrackAsync();
+                    }
+                    else
+                    {
+                        PreviousStationRequested?.Invoke(this, EventArgs.Empty);
+                    }
                     break;
                 default:
                     Debug.WriteLine($"[RadioPlayerService] Unhandled button: {args.Button}");
@@ -2109,8 +2139,12 @@ public sealed partial class RadioPlayerService : IDisposable
 
         try
         {
-            _systemMediaControls.IsNextEnabled = _isStationCyclingEnabled;
-            _systemMediaControls.IsPreviousEnabled = _isStationCyclingEnabled;
+            _systemMediaControls.IsNextEnabled = _activeSourceKind == AudioSourceKind.Files
+                ? CanGoToNextLocalTrack
+                : _isStationCyclingEnabled;
+            _systemMediaControls.IsPreviousEnabled = _activeSourceKind == AudioSourceKind.Files
+                ? CanGoToPreviousLocalTrack
+                : _isStationCyclingEnabled;
 
             // Get the display updater
             SystemMediaTransportControlsDisplayUpdater updater = _systemMediaControls.DisplayUpdater;
