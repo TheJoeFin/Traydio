@@ -194,6 +194,105 @@
   <data name="AddStation_UrlRequired" xml:space="preserve">
     <value>Wymagany jest adres URL strumienia.</value>
   </data>
+  <data name="AddLocalMusic_AddPageTitle" xml:space="preserve">
+    <value>Dodaj muzykę lokalną</value>
+  </data>
+  <data name="AddLocalMusic_EditPageTitle" xml:space="preserve">
+    <value>Edytuj muzykę lokalną</value>
+  </data>
+  <data name="AddLocalMusic_StationNameLabel.Text" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+  <data name="AddLocalMusic_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>np. Moja muzyka, Ulubione</value>
+  </data>
+  <data name="AddLocalMusic_FolderLabel.Text" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="AddLocalMusic_BrowseButton.Content" xml:space="preserve">
+    <value>Przeglądaj...</value>
+  </data>
+  <data name="AddLocalMusic_VolumeLabel.Text" xml:space="preserve">
+    <value>Głośność</value>
+  </data>
+  <data name="AddLocalMusic_NoFolderSelected" xml:space="preserve">
+    <value>Nie wybrano folderu</value>
+  </data>
+  <data name="AddLocalMusic_NoTracksFound" xml:space="preserve">
+    <value>W tym folderze nie znaleziono plików audio.</value>
+  </data>
+  <data name="AddLocalMusic_OneTrackFound" xml:space="preserve">
+    <value>Znaleziono 1 utwór.</value>
+  </data>
+  <data name="AddLocalMusic_TracksFound" xml:space="preserve">
+    <value>Znaleziono utworów: {0}.</value>
+  </data>
+  <data name="AddLocalMusic_OneAlbumFound" xml:space="preserve">
+    <value>Znaleziono 1 podfolder z muzyką. Stanie się osobną stacją w nowym folderze.</value>
+  </data>
+  <data name="AddLocalMusic_AlbumsFound" xml:space="preserve">
+    <value>Znaleziono podfoldery z muzyką: {0}. Każdy stanie się osobną stacją w nowym folderze.</value>
+  </data>
+  <data name="AddWhiteNoise_AddPageTitle" xml:space="preserve">
+    <value>Dodaj biały szum</value>
+  </data>
+  <data name="AddWhiteNoise_Blue.Content" xml:space="preserve">
+    <value>Niebieski</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Blue" xml:space="preserve">
+    <value>Jasny, z przewagą wysokich częstotliwości.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Brown" xml:space="preserve">
+    <value>Głęboki, ciężki pomruk niemal bez syczenia. Dobry do relaksu.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Grey" xml:space="preserve">
+    <value>Ukształtowany tak, aby brzmieć równie głośno na każdej częstotliwości. Dobry do skupienia.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Pink" xml:space="preserve">
+    <value>Łagodniejszy, z przewagą niskich częstotliwości, jak deszcz. Dobry do snu.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Violet" xml:space="preserve">
+    <value>Bardzo jasny, zdominowany przez wysokie częstotliwości.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_White" xml:space="preserve">
+    <value>Równomierny szum na wszystkich częstotliwościach. Dobry do maskowania hałasu i testów.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorLabel.Text" xml:space="preserve">
+    <value>Kolor szumu</value>
+  </data>
+  <data name="AddWhiteNoise_Brown.Content" xml:space="preserve">
+    <value>Brązowy</value>
+  </data>
+  <data name="AddWhiteNoise_DefaultName" xml:space="preserve">
+    <value>Biały szum</value>
+  </data>
+  <data name="AddWhiteNoise_EditPageTitle" xml:space="preserve">
+    <value>Edytuj biały szum</value>
+  </data>
+  <data name="AddWhiteNoise_Grey.Content" xml:space="preserve">
+    <value>Szary</value>
+  </data>
+  <data name="AddWhiteNoise_PageTitle.Text" xml:space="preserve">
+    <value>Dodaj biały szum</value>
+  </data>
+  <data name="AddWhiteNoise_Pink.Content" xml:space="preserve">
+    <value>Różowy</value>
+  </data>
+  <data name="AddWhiteNoise_StationNameLabel.Text" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+  <data name="AddWhiteNoise_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>np. Deszcz, Wentylator, Fale oceanu</value>
+  </data>
+  <data name="AddWhiteNoise_Violet.Content" xml:space="preserve">
+    <value>Fioletowy</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeLabel.Text" xml:space="preserve">
+    <value>Głośność</value>
+  </data>
+  <data name="AddWhiteNoise_White.Content" xml:space="preserve">
+    <value>Biały</value>
+  </data>
   <data name="App_ExitApplicationCommand.Description" xml:space="preserve">
     <value>Zamknij Traydio</value>
   </data>
@@ -296,6 +395,9 @@
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Ostatnio odtwarzane utwory</value>
   </data>
+  <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
+    <value>Utwory</value>
+  </data>
   <data name="NowPlayingPage_Title.Text" xml:space="preserve">
     <value>Teraz odtwarzane</value>
   </data>
@@ -319,6 +421,9 @@
   </data>
   <data name="PlaybackFailure_WithDetail" xml:space="preserve">
     <value>Nie można odtworzyć tej stacji: {0}</value>
+  </data>
+  <data name="PlaybackFailure_WhiteNoiseNoOutput" xml:space="preserve">
+    <value>Nie można odtworzyć białego szumu – brak dostępnego urządzenia wyjściowego audio.</value>
   </data>
   <data name="PlaybackFailure_WithSentenceDetail" xml:space="preserve">
     <value>Nie można odtworzyć tej stacji. {0}</value>
@@ -442,6 +547,27 @@
   </data>
   <data name="PlayingPage_ShowVolume.Text" xml:space="preserve">
     <value>Pokaż suwak głośności</value>
+  </data>
+  <data name="PlayingPage_CancelSleepTimer.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Anuluj wyłącznik czasowy</value>
+  </data>
+  <data name="PlayingPage_SleepTimer.Text" xml:space="preserve">
+    <value>Wyłącznik czasowy</value>
+  </data>
+  <data name="PlayingPage_SleepTimer15Minutes.Text" xml:space="preserve">
+    <value>15 minut</value>
+  </data>
+  <data name="PlayingPage_SleepTimer20Minutes.Text" xml:space="preserve">
+    <value>20 minut</value>
+  </data>
+  <data name="PlayingPage_SleepTimer30Minutes.Text" xml:space="preserve">
+    <value>30 minut</value>
+  </data>
+  <data name="PlayingPage_SleepTimer45Minutes.Text" xml:space="preserve">
+    <value>45 minut</value>
+  </data>
+  <data name="PlayingPage_SleepTimer50Minutes.Text" xml:space="preserve">
+    <value>50 minut</value>
   </data>
   <data name="PlayingPage_SortBy.Text" xml:space="preserve">
     <value>Sortowanie</value>
@@ -613,6 +739,24 @@
   </data>
   <data name="SettingsPage_PopupDwellSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Czas wyświetlania wyskakującego okna z informacją o zmianie utworu (w sekundach)</value>
+  </data>
+  <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
+    <value>Wypełnia ciszę podczas ładowania stacji delikatnym szumem radia FM. Narasta stopniowo zamiast włączać się nagle i wycisza się, gdy stacja zaczyna grać.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Posłuchaj szumu radiowego</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Odtwórz szum teraz, aby usłyszeć, jak brzmi</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.Content" xml:space="preserve">
+    <value>Testuj</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTitle.Text" xml:space="preserve">
+    <value>Szum radiowy podczas buforowania</value>
+  </data>
+  <data name="SettingsPage_RadioStaticToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Odtwarzaj szum radiowy podczas buforowania</value>
   </data>
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>Nie udało się zresetować zapamiętanych silników: {0}</value>
