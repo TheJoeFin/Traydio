@@ -1835,9 +1835,14 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// input, not the output.
     /// </para>
     /// </summary>
-    public void ApplyDisplayReorder()
+    /// <param name="movedRows">
+    /// The row(s) the drag actually moved (<c>DragItemsCompletedEventArgs.Items</c>), so
+    /// <see cref="StationLayoutPolicy.ApplyReorder"/> can tell them apart from rows that just
+    /// happen to sit near a folder they were never part of.
+    /// </param>
+    public void ApplyDisplayReorder(IReadOnlyCollection<object>? movedRows = null)
     {
-        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, [.. DisplayRows]));
+        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, [.. DisplayRows], movedRows));
     }
 
     /// <summary>

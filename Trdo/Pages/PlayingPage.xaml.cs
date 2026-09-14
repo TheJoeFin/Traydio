@@ -532,7 +532,11 @@ public sealed partial class PlayingPage : Page
         // The list control has already rewritten the rows; turn that back into the
         // arrangement, then save. Deliberately not SaveStations(): a reorder changes where a
         // station sits, not what it points at, and must not restart the stream.
-        ViewModel.ApplyDisplayReorder();
+        //
+        // args.Items is what was actually dragged - passing it through lets a folder tell a
+        // row that was just carried past it apart from one that genuinely belongs to it, so a
+        // station sitting below a folder is not swept into it by some unrelated drag.
+        ViewModel.ApplyDisplayReorder(args.Items);
         ViewModel.PersistStationList();
 
         // Re-save the selection so its stored position keeps up with the new order
