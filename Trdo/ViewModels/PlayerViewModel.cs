@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -376,103 +377,116 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     public RadioStation? SelectedStation
     {
         get => _selectedStation;
-        set
-        {
-            Debug.WriteLine($"=== SelectedStation SETTER START ===");
-            Debug.WriteLine($"[PlayerViewModel] Current station: {_selectedStation?.Name ?? "null"}");
-            Debug.WriteLine($"[PlayerViewModel] New station: {value?.Name ?? "null"}");
+        set => SetSelectedStation(value, forcePlayAfterSwitch: null);
+    }
 
-            if (value == _selectedStation)
+    /// <summary>
+    /// Selects a local album to browse its track list, without starting or resuming playback -
+    /// unlike the <see cref="SelectedStation"/> setter, which continues playing across a
+    /// selection change if something already was. "View Album Tracks" is a look, not a play
+    /// command; the user presses play on a specific track once the list is in front of them.
+    /// </summary>
+    public void SelectStationToBrowse(RadioStation station)
+    {
+        SetSelectedStation(station, forcePlayAfterSwitch: false);
+    }
+
+    private void SetSelectedStation(RadioStation? value, bool? forcePlayAfterSwitch)
+    {
+        Debug.WriteLine($"=== SelectedStation SETTER START ===");
+        Debug.WriteLine($"[PlayerViewModel] Current station: {_selectedStation?.Name ?? "null"}");
+        Debug.WriteLine($"[PlayerViewModel] New station: {value?.Name ?? "null"}");
+
+        if (value == _selectedStation)
+        {
+            Debug.WriteLine("[PlayerViewModel] Same station selected, no change needed");
+            Debug.WriteLine($"=== SelectedStation SETTER END (no change) ===");
+            return;
+        }
+
+        bool shouldResumePlayback = forcePlayAfterSwitch ?? (IsPlaying || IsBuffering);
+        Debug.WriteLine($"[PlayerViewModel] Should resume playback after station change: {shouldResumePlayback}");
+
+        CancelStationTransition();
+        RadioStation? previous = _selectedStation;
+        _selectedStation = value;
+
+        // Drives the row highlight. Kept on the model rather than resolved by the page,
+        // so it survives virtualisation, collapsing and sorting without the page having
+        // to hunt for containers.
+        previous?.IsSelectedStation = false;
+        _selectedStation?.IsSelectedStation = true;
+
+        // Drop anything the outgoing station was still holding before applying the new
+        // station's delay - re-timing a held track against a shorter delay would publish
+        // a song from the stream the user just left.
+        _player.ResetTrackInfoHold();
+        SyncTrackInfoDelay();
+
+        OnPropertyChanged();
+        OnPropertyChanged(nameof(CanPlay));
+        OnPropertyChanged(nameof(SelectedStationFallbackIconVisibility));
+        OnPropertyChanged(nameof(SelectedStationFaviconImageSource));
+        OnPropertyChanged(nameof(SelectedStationDisplayName));
+        OnPropertyChanged(nameof(IsLocalMusicActive));
+        OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
+        OnPropertyChanged(nameof(CurrentAlbumArtImageSource));
+        OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderVisibility));
+        RefreshLocalMusicTrackState();
+        SyncStationCyclingAvailability();
+
+        if (_selectedStation != null)
+        {
+            Debug.WriteLine($"[PlayerViewModel] New selected station: {_selectedStation.Name}");
+            Debug.WriteLine($"[PlayerViewModel] Stream URL: {_selectedStation.StreamUrl}");
+
+            // Save which station is selected
+            UpdateSelectedStationId();
+
+            LogService.Info("PlayerViewModel",
+                $"Station selected: '{_selectedStation.Name}' ({LogService.Redact(_selectedStation.StreamUrl)}), volume={_selectedStation.Volume:0.00}");
+
+            // Validate the URL. Only a Radio station actually dials StreamUrl - anything
+            // else (white noise today, a local file later) carries a placeholder there and
+            // never needs to pass this check.
+            if (_selectedStation.SourceKind == AudioSourceKind.Radio && !IsValidUrl(_selectedStation.StreamUrl))
             {
-                Debug.WriteLine("[PlayerViewModel] Same station selected, no change needed");
-                Debug.WriteLine($"=== SelectedStation SETTER END (no change) ===");
+                string logDetail = $"Invalid stream URL for {_selectedStation.Name}";
+                _lastError = string.Format(
+                    LocalizationService.GetString("PlayerViewModel_InvalidStreamUrl", "Invalid stream URL for {0}"),
+                    _selectedStation.Name);
+                LogService.Error("PlayerViewModel", logDetail);
+                Debug.WriteLine($"[PlayerViewModel] ERROR: {logDetail}");
+                PlaybackErrorService.Instance.Report(_lastError);
+                if (shouldResumePlayback)
+                {
+                    Debug.WriteLine("[PlayerViewModel] Pausing player due to invalid URL");
+                    _player.Pause();
+                }
+                Debug.WriteLine($"=== SelectedStation SETTER END (invalid URL) ===");
                 return;
             }
 
-            bool shouldResumePlayback = IsPlaying || IsBuffering;
-            Debug.WriteLine($"[PlayerViewModel] Should resume playback after station change: {shouldResumePlayback}");
-
-            CancelStationTransition();
-            RadioStation? previous = _selectedStation;
-            _selectedStation = value;
-
-            // Drives the row highlight. Kept on the model rather than resolved by the page,
-            // so it survives virtualisation, collapsing and sorting without the page having
-            // to hunt for containers.
-            previous?.IsSelectedStation = false;
-            _selectedStation?.IsSelectedStation = true;
-
-            // Drop anything the outgoing station was still holding before applying the new
-            // station's delay - re-timing a held track against a shorter delay would publish
-            // a song from the stream the user just left.
-            _player.ResetTrackInfoHold();
-            SyncTrackInfoDelay();
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(CanPlay));
-            OnPropertyChanged(nameof(SelectedStationFallbackIconVisibility));
-            OnPropertyChanged(nameof(SelectedStationFaviconImageSource));
-            OnPropertyChanged(nameof(SelectedStationDisplayName));
-            OnPropertyChanged(nameof(IsLocalMusicActive));
-            OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
-            OnPropertyChanged(nameof(CurrentAlbumArtImageSource));
-            OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderVisibility));
-            RefreshLocalMusicTrackState();
-            SyncStationCyclingAvailability();
-
-            if (_selectedStation != null)
+            try
             {
-                Debug.WriteLine($"[PlayerViewModel] New selected station: {_selectedStation.Name}");
-                Debug.WriteLine($"[PlayerViewModel] Stream URL: {_selectedStation.StreamUrl}");
-
-                // Save which station is selected
-                UpdateSelectedStationId();
-
-                LogService.Info("PlayerViewModel",
-                    $"Station selected: '{_selectedStation.Name}' ({LogService.Redact(_selectedStation.StreamUrl)}), volume={_selectedStation.Volume:0.00}");
-
-                // Validate the URL. Only a Radio station actually dials StreamUrl - anything
-                // else (white noise today, a local file later) carries a placeholder there and
-                // never needs to pass this check.
-                if (_selectedStation.SourceKind == AudioSourceKind.Radio && !IsValidUrl(_selectedStation.StreamUrl))
-                {
-                    string logDetail = $"Invalid stream URL for {_selectedStation.Name}";
-                    _lastError = string.Format(
-                        LocalizationService.GetString("PlayerViewModel_InvalidStreamUrl", "Invalid stream URL for {0}"),
-                        _selectedStation.Name);
-                    LogService.Error("PlayerViewModel", logDetail);
-                    Debug.WriteLine($"[PlayerViewModel] ERROR: {logDetail}");
-                    PlaybackErrorService.Instance.Report(_lastError);
-                    if (shouldResumePlayback)
-                    {
-                        Debug.WriteLine("[PlayerViewModel] Pausing player due to invalid URL");
-                        _player.Pause();
-                    }
-                    Debug.WriteLine($"=== SelectedStation SETTER END (invalid URL) ===");
-                    return;
-                }
-
-                try
-                {
-                    BeginStationTransition(_selectedStation, shouldResumePlayback);
-                }
-                catch (Exception ex)
-                {
-                    _lastError = string.Format(
-                        LocalizationService.GetString("PlayerViewModel_FailedToSwitch", "Failed to switch to {0}: {1}"),
-                        _selectedStation.Name, ex.Message);
-                    Debug.WriteLine($"[PlayerViewModel] EXCEPTION: Failed to switch to {_selectedStation.Name}: {ex.Message}");
-                    Debug.WriteLine($"[PlayerViewModel] Exception details: {ex}");
-                    PlaybackErrorService.Instance.Report(_lastError);
-                }
+                BeginStationTransition(_selectedStation, shouldResumePlayback);
             }
-            else
+            catch (Exception ex)
             {
-                Debug.WriteLine("[PlayerViewModel] Selected station is null");
+                _lastError = string.Format(
+                    LocalizationService.GetString("PlayerViewModel_FailedToSwitch", "Failed to switch to {0}: {1}"),
+                    _selectedStation.Name, ex.Message);
+                Debug.WriteLine($"[PlayerViewModel] EXCEPTION: Failed to switch to {_selectedStation.Name}: {ex.Message}");
+                Debug.WriteLine($"[PlayerViewModel] Exception details: {ex}");
+                PlaybackErrorService.Instance.Report(_lastError);
             }
-
-            Debug.WriteLine($"=== SelectedStation SETTER END ===");
         }
+        else
+        {
+            Debug.WriteLine("[PlayerViewModel] Selected station is null");
+        }
+
+        Debug.WriteLine($"=== SelectedStation SETTER END ===");
     }
 
     public bool IsPlaying
@@ -1327,6 +1341,20 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             return;
 
         await Launcher.LaunchUriAsync(new Uri(station.Homepage));
+    }
+
+    /// <summary>
+    /// Opens a local album's source folder in File Explorer - the local-music counterpart to
+    /// <see cref="VisitWebsite"/>, since a folder on disk has no homepage to visit.
+    /// </summary>
+    public async Task OpenLocalFolder(RadioStation station)
+    {
+        Debug.WriteLine($"[PlayerViewModel] Opening local folder: {station.Name} ({station.LocalFolderPath})");
+
+        if (string.IsNullOrWhiteSpace(station.LocalFolderPath) || !Directory.Exists(station.LocalFolderPath))
+            return;
+
+        await Launcher.LaunchFolderPathAsync(station.LocalFolderPath);
     }
 
     /// <summary>

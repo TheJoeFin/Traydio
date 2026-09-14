@@ -463,9 +463,47 @@ public sealed partial class PlayingPage : Page
     {
         if (sender is MenuFlyoutItem menuItem && menuItem.Tag is RadioStation station)
         {
+            if (station.SourceKind == AudioSourceKind.Files)
+            {
+                Debug.WriteLine($"[PlayingPage] Open Folder clicked: {station.Name}");
+                _ = ViewModel.OpenLocalFolder(station);
+                return;
+            }
+
             Debug.WriteLine($"[PlayingPage] Visit Station Site clicked: {station.Name}");
-            // Navigate to AddStation page in edit mode with the station data
             _ = ViewModel.VisitWebsite(station);
+        }
+    }
+
+    private void ViewAlbumTracks_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: RadioStation station })
+        {
+            Debug.WriteLine($"[PlayingPage] View Album Tracks clicked: {station.Name}");
+
+            // Now Playing's local track list reflects whichever station is selected, not
+            // whichever row was clicked - selecting it first is what makes it that album's
+            // tracks the page shows. Browsing, not playing: it must not start the album even
+            // if something else already happened to be playing.
+            ViewModel.SelectStationToBrowse(station);
+            _shellViewModel?.NavigateToNowPlayingPage();
+        }
+    }
+
+    /// <summary>Reveals the hover "view album tracks" chevron - see <c>ViewAlbumTracksButton</c> in the row's DataTemplate.</summary>
+    private void StationRow_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("ViewAlbumTracksButton") is FrameworkElement button)
+        {
+            button.Opacity = 1;
+        }
+    }
+
+    private void StationRow_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("ViewAlbumTracksButton") is FrameworkElement button)
+        {
+            button.Opacity = 0;
         }
     }
 
@@ -964,8 +1002,9 @@ public sealed partial class PlayingPage : Page
     }
 
     /// <summary>
-    /// Fills in the "move to group" submenu, which can only be built once the folders are
-    /// known and has to be rebuilt each time in case they have changed.
+    /// Rewrites the "Visit Website"/"Open Folder" entry for the row's source kind, then fills
+    /// in the "move to group" submenu, which can only be built once the folders are known and
+    /// has to be rebuilt each time in case they have changed.
     /// </summary>
     private void StationContextMenu_Opening(object sender, object e)
     {
@@ -973,13 +1012,30 @@ public sealed partial class PlayingPage : Page
             return;
 
         RadioStation? station = null;
+        MenuFlyoutItem? visitWebsiteItem = null;
         foreach (MenuFlyoutItemBase item in flyout.Items)
         {
-            if (item is MenuFlyoutItem { Tag: RadioStation tagged })
+            if (item is MenuFlyoutItem { Tag: RadioStation tagged } menuItem)
             {
                 station = tagged;
-                break;
+                // x:Name inside a DataTemplate names the instance, not a field on this class -
+                // there is no VisitWebsiteMenuItem to nameof() here, so the literal is it.
+                if (menuItem.Name == "VisitWebsiteMenuItem")
+                    visitWebsiteItem = menuItem;
             }
+        }
+
+        // A local album has no website to visit, but it does have a folder worth revealing -
+        // same spot in the menu, same intent ("show me where this came from"), different
+        // destination.
+        if (visitWebsiteItem is not null && station is not null)
+        {
+            bool isLocalAlbum = station.SourceKind == AudioSourceKind.Files;
+            visitWebsiteItem.Text = isLocalAlbum
+                ? LocalizationService.GetString("PlayingPage_OpenFolder", "Open Folder")
+                : LocalizationService.GetString("PlayingPage_VisitWebsite.Text", "Visit Website");
+            if (visitWebsiteItem.Icon is FontIcon icon)
+                icon.Glyph = isLocalAlbum ? "\uE8B7" : "\uEB41";
         }
 
         MenuFlyoutSubItem? subItem = null;

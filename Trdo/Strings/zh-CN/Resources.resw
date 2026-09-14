@@ -404,6 +404,9 @@
   <data name="PlayingPage_NewGroup.Text" xml:space="preserve">
     <value>新建分组</value>
   </data>
+  <data name="PlayingPage_OpenFolder" xml:space="preserve">
+    <value>打开文件夹</value>
+  </data>
   <data name="PlayingPage_PlaybackErrorClose" xml:space="preserve">
     <value>确定</value>
   </data>
@@ -448,6 +451,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>电台</value>
+  </data>
+  <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>查看专辑曲目</value>
   </data>
   <data name="PlayingPage_VisitWebsite.Text" xml:space="preserve">
     <value>访问网站</value>

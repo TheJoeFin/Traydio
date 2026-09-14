@@ -404,6 +404,9 @@
   <data name="PlayingPage_NewGroup.Text" xml:space="preserve">
     <value>Novo grupo</value>
   </data>
+  <data name="PlayingPage_OpenFolder" xml:space="preserve">
+    <value>Abrir pasta</value>
+  </data>
   <data name="PlayingPage_PlaybackErrorClose" xml:space="preserve">
     <value>OK</value>
   </data>
@@ -448,6 +451,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Estações</value>
+  </data>
+  <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ver faixas do álbum</value>
   </data>
   <data name="PlayingPage_VisitWebsite.Text" xml:space="preserve">
     <value>Visitar sítio Web</value>

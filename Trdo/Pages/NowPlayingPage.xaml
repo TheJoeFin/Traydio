@@ -377,12 +377,19 @@
                 FontWeight="SemiBold"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
+            <!--
+                ItemClick, not SelectionChanged: browsing an album (see PlayingPage's "View
+                Album Tracks") lands here with track 0 already selected but not playing, and
+                SelectionChanged never fires for a click that does not change which row is
+                selected - clicking that same first row would then do nothing.
+            -->
             <ListView
                 Grid.Row="1"
                 Padding="0,0,12,0"
+                IsItemClickEnabled="True"
+                ItemClick="LocalTrackList_ItemClick"
                 ItemsSource="{x:Bind ViewModel.LocalTrackList, Mode=OneWay}"
                 SelectedIndex="{x:Bind ViewModel.CurrentLocalTrackIndex, Mode=OneWay}"
-                SelectionChanged="LocalTrackList_SelectionChanged"
                 SelectionMode="Single">
                 <ListView.Resources>
                     <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="AccentFillColorDefaultBrush" />

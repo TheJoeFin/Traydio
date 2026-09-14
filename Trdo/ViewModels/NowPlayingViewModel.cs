@@ -76,6 +76,12 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsPlaybackActive));
             OnPropertyChanged(nameof(IsRefreshingMetadata));
             OnPropertyChanged(nameof(CanRefreshMetadata));
+
+            // A track can stop being "playing" without its index changing - e.g. browsing a
+            // local album's tracks selects track 0 but does not play it, and pausing keeps the
+            // same track selected. Either way the row's speaker glyph needs to catch up.
+            if (e.PropertyName is nameof(PlayerViewModel.IsPlaybackActive))
+                UpdateLocalTrackPlayingFlags();
         }
 
         if (e.PropertyName is nameof(PlayerViewModel.IsLocalMusicActive)
@@ -456,7 +462,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             List<LocalTrackDisplayItem> items = new(tracks.Count);
             for (int i = 0; i < tracks.Count; i++)
             {
-                TagLib.File tfile = TagLib.File.Create(tracks[i]);
+                using TagLib.File tfile = TagLib.File.Create(tracks[i]);
 
                 string trackTitle = tfile.Tag.Title;
 
@@ -469,7 +475,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
                     Index = i,
                     Path = tracks[i],
                     DisplayTitle = trackTitle,
-                    IsPlaying = i == currentIndex,
+                    IsPlaying = i == currentIndex && IsPlaybackActive,
                 });
             }
 
@@ -493,7 +499,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         int currentIndex = CurrentLocalTrackIndex;
         foreach (LocalTrackDisplayItem item in _localTrackDisplayItems)
         {
-            item.IsPlaying = item.Index == currentIndex;
+            item.IsPlaying = item.Index == currentIndex && IsPlaybackActive;
         }
     }
 

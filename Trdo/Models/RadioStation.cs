@@ -381,8 +381,17 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
             _sourceKind = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(FaviconPlaceholderGlyph));
+            OnPropertyChanged(nameof(IsLocalAlbum));
         }
     }
+
+    /// <summary>
+    /// True for a folder of local tracks rather than a stream or white noise - drives the
+    /// row's "view album tracks" affordance, which only makes sense when there is a track
+    /// list behind the row at all.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsLocalAlbum => SourceKind == AudioSourceKind.Files;
 
     /// <summary>
     /// The icon shown behind the favicon/album art image when <see cref="FaviconUrl"/> has none

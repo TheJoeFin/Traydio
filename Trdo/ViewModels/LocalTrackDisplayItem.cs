@@ -12,7 +12,11 @@ public sealed class LocalTrackDisplayItem : INotifyPropertyChanged
     public required string Path { get; init; }
     public required string DisplayTitle { get; init; }
 
-    /// <summary>True when this is the track currently loaded in the player.</summary>
+    /// <summary>
+    /// True when this is the track currently loaded in the player <em>and</em> playback is
+    /// actually active - loaded alone is not enough, since browsing an album's tracks (as
+    /// opposed to playing it) loads track 0 without starting it.
+    /// </summary>
     public bool IsPlaying
     {
         get => _isPlaying;

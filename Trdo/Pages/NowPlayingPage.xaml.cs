@@ -104,13 +104,12 @@ public sealed partial class NowPlayingPage : Page
         }
     }
 
-    private void LocalTrackList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void LocalTrackList_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (sender is ListView { SelectedIndex: >= 0 } listView &&
-            listView.SelectedIndex != ViewModel.CurrentLocalTrackIndex)
+        if (e.ClickedItem is LocalTrackDisplayItem item)
         {
-            Debug.WriteLine($"[NowPlayingPage] Local track row selected: {listView.SelectedIndex}");
-            ViewModel.PlayLocalTrackAtIndex(listView.SelectedIndex);
+            Debug.WriteLine($"[NowPlayingPage] Local track row clicked: {item.Index}");
+            ViewModel.PlayLocalTrackAtIndex(item.Index);
         }
     }
 

@@ -25,7 +25,17 @@
             before folders existed.
         -->
         <DataTemplate x:Key="StationRowTemplate" x:DataType="models:RadioStation">
-            <Grid ColumnDefinitions="Auto,Auto,*">
+            <!--
+                Background="Transparent" so the row is hit-testable across its empty stretches
+                too - otherwise hovering anywhere that is not already covered by the favicon or
+                the name text would never raise PointerEntered/Exited, and the chevron would
+                only ever appear over those two spots.
+            -->
+            <Grid
+                Background="Transparent"
+                ColumnDefinitions="Auto,Auto,*,Auto"
+                PointerEntered="StationRow_PointerEntered"
+                PointerExited="StationRow_PointerExited">
                 <Grid.ContextFlyout>
                     <!--
                         The three original commands stay first and in their original order:
@@ -33,7 +43,14 @@
                         than a tidier grouping.
                     -->
                     <MenuFlyout Opening="StationContextMenu_Opening">
+                        <!--
+                            Text and icon are rewritten in StationContextMenu_Opening for a
+                            local album - "Visit Website" makes no sense for one, and containers
+                            get recycled as the list scrolls, so the row-specific wording cannot
+                            just be set once here.
+                        -->
                         <MenuFlyoutItem
+                            x:Name="VisitWebsiteMenuItem"
                             x:Uid="PlayingPage_VisitWebsite"
                             Click="VisitSite_Click"
                             Tag="{x:Bind}">
@@ -85,7 +102,7 @@
                 <!--  Selection indicator  -->
                 <Border
                     x:Name="SelectionIndicator"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     Margin="-8,-6"
                     Background="{ThemeResource AccentAcrylicBackgroundFillColorDefaultBrush}"
                     CornerRadius="2"
@@ -126,6 +143,26 @@
                     Text="{x:Bind Name, Mode=OneWay}"
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="NoWrap" />
+
+                <!--
+                    View album tracks - a local album only, since that is the only row kind
+                    with a track list behind it. Hidden until the row is hovered; see
+                    StationRow_PointerEntered/Exited.
+                -->
+                <Button
+                    x:Name="ViewAlbumTracksButton"
+                    x:Uid="PlayingPage_ViewAlbumTracks"
+                    Grid.Column="3"
+                    Padding="6"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="ViewAlbumTracks_Click"
+                    Opacity="0"
+                    Tag="{x:Bind}"
+                    Visibility="{x:Bind IsLocalAlbum, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                    <FontIcon FontSize="12" Glyph="&#xE76C;" />
+                </Button>
             </Grid>
         </DataTemplate>
 
