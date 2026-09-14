@@ -47,7 +47,6 @@ internal static class ImageSourceFactory
                 return null;
             }
 
-            LogService.Info(LogComponent, $"UI image from embedded art: {ImageFormat.Describe(bytes)}");
             return LoadFromBytes(() => Task.FromResult(bytes), "embedded art");
         }
 
@@ -59,7 +58,6 @@ internal static class ImageSourceFactory
         if (uri.IsFile)
         {
             string path = uri.LocalPath;
-            LogService.Info(LogComponent, $"UI image from file: {path}");
             return LoadFromBytes(() => File.ReadAllBytesAsync(path), path);
         }
 
@@ -116,7 +114,6 @@ internal static class ImageSourceFactory
             // enough to leave to the GC.
             IRandomAccessStream stream = new MemoryStream(bytes).AsRandomAccessStream();
             await image.SetSourceAsync(stream);
-            LogService.Info(LogComponent, $"UI image '{description}' decoded: {image.PixelWidth}x{image.PixelHeight}");
         }
         catch (Exception ex)
         {

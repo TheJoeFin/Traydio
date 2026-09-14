@@ -2369,7 +2369,6 @@ public sealed partial class RadioPlayerService : IDisposable
                 string base64 = imageUrl[(commaIndex + 1)..];
                 imageData = Convert.FromBase64String(base64);
                 Debug.WriteLine($"[RadioPlayerService] Decoded embedded album art ({imageData.Length} bytes)");
-                LogService.Info("AlbumArt", $"SMTC art from embedded art: {ImageFormat.Describe(imageData)}");
             }
             else if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri) && uri.IsFile)
             {
@@ -2379,14 +2378,12 @@ public sealed partial class RadioPlayerService : IDisposable
                 Debug.WriteLine($"[RadioPlayerService] Reading album art from disk: {uri.LocalPath}");
                 imageData = await File.ReadAllBytesAsync(uri.LocalPath);
                 Debug.WriteLine($"[RadioPlayerService] Read {imageData.Length} bytes of album art from disk");
-                LogService.Info("AlbumArt", $"SMTC art from file {uri.LocalPath}: {ImageFormat.Describe(imageData)}");
             }
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
                 imageData = await _httpClient.GetByteArrayAsync(imageUrl);
                 Debug.WriteLine($"[RadioPlayerService] Downloaded {imageData.Length} bytes of album art");
-                LogService.Info("AlbumArt", $"SMTC art from {imageUrl}: {ImageFormat.Describe(imageData)}");
             }
 
             if (ImageFormat.DetectMime(imageData) is null)
