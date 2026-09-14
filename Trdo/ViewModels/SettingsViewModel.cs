@@ -100,6 +100,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
             if (languageTag == SettingsService.AppLanguage) return;
 
+            LogService.Info("Localization", $"User changed language: '{SettingsService.AppLanguage}' -> '{languageTag}'");
             SettingsService.AppLanguage = languageTag;
             OnPropertyChanged();
 

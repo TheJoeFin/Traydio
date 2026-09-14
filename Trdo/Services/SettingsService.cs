@@ -106,9 +106,9 @@ public static class SettingsService
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fall through to the default language.
+                LogService.Warn("Localization", $"Failed to read saved language, falling back to system: {ex.Message}");
             }
 
             return LocalizationService.SystemLanguage;
@@ -119,11 +119,12 @@ public static class SettingsService
             {
                 string normalized = string.IsNullOrWhiteSpace(value) ? LocalizationService.SystemLanguage : value;
                 ApplicationData.Current.LocalSettings.Values[AppLanguageKey] = normalized;
+                LogService.Info("Localization", $"Saved language setting: '{normalized}'");
                 LocalizationService.ApplyLanguage(normalized);
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail if unable to save
+                LogService.Warn("Localization", $"Failed to save language setting '{value}': {ex.Message}");
             }
         }
     }
