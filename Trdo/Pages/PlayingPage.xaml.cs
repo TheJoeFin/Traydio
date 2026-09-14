@@ -381,7 +381,15 @@ public sealed partial class PlayingPage : Page
         Debug.WriteLine("[PlayingPage] Close button clicked");
         // Persist any pending per-station volume change before quitting.
         ViewModel.FlushStationsSave();
-        Application.Current.Exit();
+
+        if (Application.Current is App app)
+        {
+            app.ShutdownAndExit();
+        }
+        else
+        {
+            Application.Current.Exit();
+        }
     }
 
     private void AddStationButton_Click(object sender, RoutedEventArgs e)

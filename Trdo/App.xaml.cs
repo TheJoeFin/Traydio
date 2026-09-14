@@ -300,7 +300,7 @@ public partial class App : Application
                 }
 
                 // Exit this instance gracefully
-                Exit();
+                ShutdownAndExit();
                 return;
             }
         }
@@ -745,22 +745,67 @@ public partial class App : Application
         }
     }
 
+    private bool _isShuttingDown;
+
     /// <summary>
-    /// Cleanup resources when the application exits
+    /// Tears down every long-lived service and native resource this app owns, then exits.
     /// </summary>
-    ~App()
+    /// <remarks>
+    /// This is the app's only real exit path (the Quit button and the duplicate-instance
+    /// early-out both route here) and must be called instead of <see cref="Application.Exit"/>
+    /// directly. A finalizer used to do this cleanup, but it never actually ran: <c>Exit()</c>
+    /// terminates the process without running finalizers, and <c>Application.Current</c> stays
+    /// GC-reachable for the app's whole life anyway, so it was never eligible for finalization
+    /// in the first place. That silently meant the radio player - its MediaPlayer, the LibVLC
+    /// engine, the watchdog's background monitor - was never disposed on quit.
+    /// </remarks>
+    internal void ShutdownAndExit()
     {
+        if (_isShuttingDown)
+            return;
+        _isShuttingDown = true;
+
+        Debug.WriteLine("[App] Shutting down");
+
         try
         {
+            _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
+            SettingsService.SongChangePopupEnabledChanged -= OnSongChangePopupEnabledChanged;
+
+            _trayPopupWindow?.Close();
+            _miniPlayerWindow?.Close();
+            _songChangePopupWindow?.Close();
+
+            if (_trayIcon is not null)
+            {
+                _trayIcon.IsVisible = false;
+                _trayIcon.Dispose();
+                _trayIcon = null;
+            }
+
+            // Order matters twice over: RadioStaticService unsubscribes from the player's events
+            // first, so nothing reacts to the source teardown below by starting static that would
+            // never fade out; then the player's Dispose() tears down the LibVlcPlaybackBackend
+            // (which owns a VlcMediaPlayer built on the shared native instance) before LibVlcHost
+            // frees that instance, since freeing it first would pull the native library out from
+            // under a still-live player.
+            RadioStaticService.Instance.Dispose();
+            RadioPlayerService.Instance.Dispose();
+            LibVlcHost.Dispose();
+
+            // Only ever owned when this instance created it (createdNew was true in
+            // OnLaunched) - the duplicate-instance path opens someone else's mutex and must not
+            // release it, but ReleaseMutex() on an unowned mutex just throws, which the catch
+            // below swallows.
             _singleInstanceMutex?.ReleaseMutex();
             _singleInstanceMutex?.Dispose();
             _trayIconRestoreEvent?.Dispose();
-            RadioStaticService.Instance.Dispose();
-            LibVlcHost.Dispose();
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore errors during cleanup
+            Debug.WriteLine($"[App] Error during shutdown: {ex.Message}");
         }
+
+        Exit();
     }
 }
