@@ -33,6 +33,13 @@ public sealed partial class RadioPlayerService : IDisposable
     private string? _currentAlbumArtUrl;
     private bool _isInternalStateChange;
     private bool _wasExternalPause;
+
+    // True from the moment a user pause finishes tearing down the source until the next play
+    // attempt begins. Clearing the native source on pause (see Pause()) makes the
+    // MediaPlaybackSession briefly read as Opening/Buffering, which is not a real "searching for
+    // signal" moment and must not make radio static play; a genuine start or station switch
+    // clears this before its own buffering begins, so that static is unaffected.
+    private volatile bool _isUserPaused;
     private Timer? _smtcUpdateTimer;
     private bool _smtcUpdatePending;
     private readonly Lock _smtcUpdateLock = new();
@@ -74,6 +81,15 @@ public sealed partial class RadioPlayerService : IDisposable
     public event EventHandler? LocalTrackListChanged;
     public event EventHandler? NextStationRequested;
     public event EventHandler? PreviousStationRequested;
+
+    /// <summary>
+    /// Raised the instant a radio pause is decided on, before any of its teardown runs. Lets
+    /// <see cref="Audio.RadioStaticService"/> cut short a static burst that is already ringing
+    /// (fading in or out) for an unrelated, legitimate buffering reason - a normal
+    /// <see cref="BufferingStateChanged"/>(false) only asks it to run its usual fade, which is
+    /// far too slow to feel like "stop now" when it lands moments before or after this.
+    /// </summary>
+    public event EventHandler? PlaybackPausedByUser;
 
     /// <summary>
     /// Raised when a play attempt cannot proceed or fails. The string payload is a
@@ -403,7 +419,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 currentState = _player.PlaybackSession.PlaybackState;
                 isPlaying = currentState == MediaPlaybackState.Playing;
                 isBuffering = currentState is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
-                LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering})");
+                LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering}, _isUserPaused={_isUserPaused})");
                 Debug.WriteLine($"[RadioPlayerService] PlaybackStateChanged event: IsPlaying={isPlaying}, IsBuffering={isBuffering}, State={currentState}, IsInternalChange={_isInternalStateChange}");
 
                 // Reaching Playing means the current attempt succeeded - reset failure tracking.
@@ -478,7 +494,21 @@ public sealed partial class RadioPlayerService : IDisposable
             TryEnqueueOnUi(() =>
             {
                 PlaybackStateChanged?.Invoke(this, isPlaying);
-                BufferingStateChanged?.Invoke(this, isBuffering);
+
+                // Suppress the false "buffering" reading a user pause's source teardown
+                // produces - see _isUserPaused. A real start/switch clears the flag before
+                // its own buffering happens, so that signal still comes through untouched.
+                if (_isUserPaused && isBuffering)
+                {
+                    LogService.Info("RadioPlayerService",
+                        $"Suppressed BufferingStateChanged(true) from native state {currentState} - _isUserPaused is set");
+                }
+                else
+                {
+                    LogService.Info("RadioPlayerService", $"Raising BufferingStateChanged({isBuffering}) from native state {currentState}");
+                    BufferingStateChanged?.Invoke(this, isBuffering);
+                }
+
                 ScheduleSystemMediaTransportControlsUpdate();
             });
         };
@@ -947,6 +977,11 @@ public sealed partial class RadioPlayerService : IDisposable
         LogService.Info("RadioPlayerService",
             $"Play requested for {LogService.Redact(_streamUrl)} (hasPlayedOnce={_hasPlayedOnce}, wasExternalPause={_wasExternalPause})");
 
+        // A real play attempt is starting, so any buffering it reports from here on is genuine
+        // and radio static should be allowed to react to it again - see _isUserPaused.
+        _isUserPaused = false;
+        LogService.Info("RadioPlayerService", "Play: _isUserPaused cleared");
+
         // Fresh user-initiated attempt: allow failures to be reported and retried again,
         // and give the recovery ladder a clean slate so a previous give-up doesn't stop
         // the watchdog from protecting this attempt.
@@ -1372,6 +1407,10 @@ public sealed partial class RadioPlayerService : IDisposable
             Debug.WriteLine("[RadioPlayerService] PlayWithBufferAsync called with no stream URL set");
             return false;
         }
+
+        // See Play(): a real play attempt is starting, so genuine buffering may play static again.
+        _isUserPaused = false;
+        LogService.Info("RadioPlayerService", "PlayWithBufferAsync: _isUserPaused cleared");
 
         bool needsBuffering;
 
@@ -1832,12 +1871,26 @@ public sealed partial class RadioPlayerService : IDisposable
         if (_isManuallyBuffering == isBuffering) return;
 
         Debug.WriteLine($"[RadioPlayerService] Manual buffering state changing from {_isManuallyBuffering} to {isBuffering}");
+        LogService.Info("RadioPlayerService", $"SetManualBuffering({isBuffering}) - was {_isManuallyBuffering}");
         _isManuallyBuffering = isBuffering;
 
         // Notify on UI thread
         TryEnqueueOnUi(() =>
         {
-            BufferingStateChanged?.Invoke(this, IsBuffering);
+            bool effectiveIsBuffering = IsBuffering;
+
+            // See _isUserPaused: while a user pause is in flight, the backend's own IsBuffering
+            // can still read true for a moment (Pause() hasn't fully settled, or the stream was
+            // mid-rebuffer at the instant it was paused) - not a real signal to react to.
+            if (_isUserPaused && effectiveIsBuffering)
+            {
+                LogService.Info("RadioPlayerService",
+                    $"SetManualBuffering: suppressed BufferingStateChanged(true) - _isUserPaused is set (effectiveIsBuffering={effectiveIsBuffering})");
+                return;
+            }
+
+            LogService.Info("RadioPlayerService", $"SetManualBuffering: raising BufferingStateChanged({effectiveIsBuffering})");
+            BufferingStateChanged?.Invoke(this, effectiveIsBuffering);
         });
     }
 
@@ -1875,6 +1928,16 @@ public sealed partial class RadioPlayerService : IDisposable
                 break;
         }
 
+        // Set before anything below runs: ActiveBackend.Pause() itself (not just the source
+        // teardown further down) can produce a stray Buffering/Opening reading if the stream
+        // happened to be mid-rebuffer at the moment of pausing, and SetManualBuffering(false)
+        // re-reads that same backend state a few lines down - see _isUserPaused.
+        _isUserPaused = true;
+        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true");
+
+        // Fired first, before any teardown: see PlaybackPausedByUser.
+        TryEnqueueOnUi(() => PlaybackPausedByUser?.Invoke(this, EventArgs.Empty));
+
         // Abort a still-buffering play attempt so it doesn't resume playback after this call
         CancelPendingPlayAttempt();
 
@@ -1884,6 +1947,7 @@ public sealed partial class RadioPlayerService : IDisposable
             SetInternalStateChange(true);
             ActiveBackend.Pause();
             Debug.WriteLine("[RadioPlayerService] ActiveBackend.Pause() called successfully");
+            LogService.Info("RadioPlayerService", "Pause: ActiveBackend.Pause() returned");
 
             // Clear manual buffering state when pausing
             SetManualBuffering(false);
@@ -1905,6 +1969,7 @@ public sealed partial class RadioPlayerService : IDisposable
             // _wasExternalPause is set (see above), so resuming re-opens a fresh connection.
             ClearActiveBackendSource();
             Debug.WriteLine("[RadioPlayerService] Cleared active backend source");
+            LogService.Info("RadioPlayerService", "Pause: cleared active backend source, pause path complete");
         }
         catch (Exception ex)
         {

@@ -73,7 +73,23 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 
     private void OnPlayerBuffering(object? sender, MediaPlayerBufferingEventArgs e)
     {
-        bool isBuffering = e.Cache < 100f;
+        // Cache genuinely dips below 100 under ordinary network jitter for a live stream even
+        // while audio keeps playing smoothly from what is already buffered - LibVLC reports the
+        // read-ahead fill level here, not whether anything audible is actually stalling. A cache
+        // dip only means the stream is really buffering (and radio static should react to it) if
+        // the player has actually left the Playing state; otherwise this fires many times a
+        // second throughout ordinary playback and reads as near-continuous static.
+        bool isBuffering = e.Cache < 100f && !_mediaPlayer.IsPlaying;
+
+        // LibVLC reports the cache percentage on nearly every read tick, not just when it
+        // actually changes - a jittery live stream can call this dozens of times a second even
+        // though the derived isBuffering value never moves. Without this guard, every one of
+        // those redundant ticks still spawns a dispatch and re-runs RadioStaticService's fade
+        // logic, which is needless overhead on a hot path and a plausible source of its own
+        // audio glitches. Only a genuine transition is worth telling anyone about.
+        if (_isBuffering == isBuffering)
+            return;
+
         _isBuffering = isBuffering;
         RaiseOffVlcThread(() => BufferingStateChanged?.Invoke(this, isBuffering));
     }

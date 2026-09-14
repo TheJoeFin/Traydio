@@ -808,8 +808,19 @@ public sealed partial class RadioPlayerService
 
     private void OnLibVlcBackendBufferingStateChanged(object? sender, bool isBuffering)
     {
+        LogService.Info("RadioPlayerService", $"LibVLC BufferingStateChanged received: isBuffering={isBuffering}, _isUserPaused={_isUserPaused}, _isManuallyBuffering={_isManuallyBuffering}");
+
         TryEnqueueOnUi(() =>
         {
+            // See _isUserPaused: a user pause's source teardown can read back as buffering
+            // even though nothing is actually searching for a signal.
+            if (_isUserPaused && isBuffering && !_isManuallyBuffering)
+            {
+                LogService.Info("RadioPlayerService", "LibVLC BufferingStateChanged: suppressed - _isUserPaused is set");
+                return;
+            }
+
+            LogService.Info("RadioPlayerService", $"LibVLC BufferingStateChanged: raising BufferingStateChanged({isBuffering || _isManuallyBuffering})");
             BufferingStateChanged?.Invoke(this, isBuffering || _isManuallyBuffering);
         });
     }

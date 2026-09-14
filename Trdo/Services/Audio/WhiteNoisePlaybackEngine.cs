@@ -29,7 +29,7 @@ internal sealed partial class WhiteNoisePlaybackEngine : IDisposable
     private const double FadeMs = 300;
 
     private WasapiPlayer? _player;
-    private FadeInOutSampleProvider? _fade;
+    private ContinuousFadeSampleProvider? _fade;
     private VolumeSampleProvider? _volume;
     private ColoredNoiseSampleProvider? _generator;
     private int _generation;
@@ -136,8 +136,9 @@ internal sealed partial class WhiteNoisePlaybackEngine : IDisposable
             ColoredNoiseSampleProvider generator = new(sampleRate, channels);
 
             // initiallySilent, so the very first buffer is already at zero and the ramp starts
-            // from silence rather than snapping to full level.
-            FadeInOutSampleProvider fade = new(generator, initiallySilent: true);
+            // from silence rather than snapping to full level. Level-aware, so a Play() that lands
+            // mid fade-out turns the level around instead of dropping to silence and ramping back.
+            ContinuousFadeSampleProvider fade = new(generator, initiallySilent: true);
             VolumeSampleProvider volume = new(fade) { Volume = 1f };
 
             player.Init(new SampleToWaveProvider(volume));

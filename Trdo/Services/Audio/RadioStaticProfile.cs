@@ -24,6 +24,15 @@ internal static class RadioStaticProfile
     /// </summary>
     internal const double FadeOutMs = 350;
 
+    /// <summary>
+    /// How long the static takes to go silent when the user explicitly pauses. Much shorter than
+    /// <see cref="FadeOutMs"/>: a pause is "stop now," not a graceful hand-off to an incoming
+    /// stream, so a burst already fading out from an unrelated buffering event must not be allowed
+    /// to keep ringing for the rest of its normal fade after that. Still nonzero so it does not
+    /// click.
+    /// </summary>
+    internal const double PauseFadeOutMs = 80;
+
     /// <summary>How long the Settings "Test" button holds the static at full level.</summary>
     internal const double TestBurstMs = 3000;
 

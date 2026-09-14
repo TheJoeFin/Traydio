@@ -29,7 +29,7 @@ public sealed partial class RadioStaticService : IDisposable
     private readonly Random _random = new();
 
     private WasapiPlayer? _player;
-    private FadeInOutSampleProvider? _fade;
+    private ContinuousFadeSampleProvider? _fade;
     private VolumeSampleProvider? _volume;
     private DriftingToneSampleProvider? _whine;
 
@@ -67,30 +67,56 @@ public sealed partial class RadioStaticService : IDisposable
 
         RadioPlayerService.Instance.BufferingStateChanged += OnBufferingStateChanged;
         RadioPlayerService.Instance.VolumeChanged += OnVolumeChanged;
+        RadioPlayerService.Instance.PlaybackPausedByUser += OnPlaybackPausedByUser;
         SettingsService.RadioStaticEnabledChanged += OnRadioStaticEnabledChanged;
     }
 
     private void OnBufferingStateChanged(object? sender, bool isBuffering)
     {
+        LogService.Info("RadioStatic",
+            $"BufferingStateChanged received: isBuffering={isBuffering}, ActiveSourceKind={RadioPlayerService.Instance.ActiveSourceKind}, " +
+            $"IsRadioStaticEnabled={SettingsService.IsRadioStaticEnabled}, _isAudible={_isAudible}");
+
         // Static is the sound of an actual radio dial searching for a signal - white noise
         // never buffers, and a local file merely opening (which briefly reads as "buffering"
         // on some backends) has nothing to do with a signal being found.
         if (RadioPlayerService.Instance.ActiveSourceKind != AudioSourceKind.Radio)
         {
             if (_isAudible)
+            {
+                LogService.Info("RadioStatic", "Active source is not Radio - stopping static");
                 RunDetached(StopCoreAsync);
+            }
+
             return;
         }
 
         if (isBuffering)
         {
             if (SettingsService.IsRadioStaticEnabled)
+            {
+                LogService.Info("RadioStatic", "isBuffering=true and setting enabled - starting static");
                 RunDetached(StartCoreAsync);
+            }
         }
         else
         {
+            LogService.Info("RadioStatic", "isBuffering=false - stopping static");
             RunDetached(StopCoreAsync);
         }
+    }
+
+    /// <summary>
+    /// A user pause was just decided on. Cuts a currently-ringing burst short instead of leaving
+    /// it to whatever fade it was already mid-way through - see <c>RadioPlayerService.PlaybackPausedByUser</c>.
+    /// </summary>
+    private void OnPlaybackPausedByUser(object? sender, EventArgs e)
+    {
+        if (!_isAudible)
+            return;
+
+        LogService.Info("RadioStatic", "PlaybackPausedByUser - cutting the current burst short");
+        RunDetached(() => StopCoreAsync(RadioStaticProfile.PauseFadeOutMs));
     }
 
     private void OnVolumeChanged(object? sender, double volume)
@@ -150,17 +176,22 @@ public sealed partial class RadioStaticService : IDisposable
             _volume!.Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.Volume);
             _whine?.Restart();
 
-            // Reversing a fade-out that is still in flight is supported, so this is also the right
-            // call when the static is already audible.
+            // The fade always starts from the current level, so this is also the right call when
+            // the static is already audible: a fade-out still in flight simply turns around.
+            bool wasAlreadyAudible = _isAudible;
             _fade!.BeginFadeIn(RadioStaticProfile.RampUpMs);
             _isAudible = true;
 
             if (_player!.PlaybackState != PlaybackState.Playing)
                 _player.Play();
+
+            LogService.Info("RadioStatic",
+                $"StartCoreAsync: fading in (generation={_generation}, wasAlreadyAudible={wasAlreadyAudible})");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[RadioStatic] Failed to start static: {ex.Message}");
+            LogService.Warn("RadioStatic", $"StartCoreAsync failed: {ex.Message}");
             DisposePlayer();
             _isAudible = false;
         }
@@ -170,7 +201,9 @@ public sealed partial class RadioStaticService : IDisposable
         }
     }
 
-    private async Task StopCoreAsync()
+    private Task StopCoreAsync() => StopCoreAsync(RadioStaticProfile.FadeOutMs);
+
+    private async Task StopCoreAsync(double fadeOutMs)
     {
         int generation;
 
@@ -178,10 +211,25 @@ public sealed partial class RadioStaticService : IDisposable
         try
         {
             if (_player is null || _fade is null)
+            {
+                LogService.Info("RadioStatic", "StopCoreAsync: no player/fade graph - nothing to stop");
                 return;
+            }
 
-            _fade.BeginFadeOut(RadioStaticProfile.FadeOutMs);
+            // The player lingers open for a while after a burst ends (see LingerThenReleaseAsync),
+            // so "stop" requests keep arriving while it is silent - every buffering=false tick, and
+            // the one a user pause raises. There is nothing to fade, and re-arming the fade-out
+            // here is what used to make a pause play a burst of static: the previous fade provider
+            // restarted every fade-out from full gain.
+            if (!_isAudible)
+            {
+                LogService.Info("RadioStatic", "StopCoreAsync: static already silent - nothing to stop");
+                return;
+            }
+
+            _fade.BeginFadeOut(fadeOutMs);
             generation = _generation;
+            LogService.Info("RadioStatic", $"StopCoreAsync: fading out over {fadeOutMs}ms (generation={generation})");
         }
         catch (Exception ex)
         {
@@ -194,7 +242,7 @@ public sealed partial class RadioStaticService : IDisposable
         }
 
         // Let the fade actually play out before declaring the static silent.
-        await Task.Delay(TimeSpan.FromMilliseconds(RadioStaticProfile.FadeOutMs));
+        await Task.Delay(TimeSpan.FromMilliseconds(fadeOutMs));
 
         await _gate.WaitAsync();
         try
@@ -287,7 +335,7 @@ public sealed partial class RadioStaticService : IDisposable
 
             // initiallySilent, so the very first buffer is already at zero and the ramp starts from
             // silence rather than snapping to full level.
-            FadeInOutSampleProvider fade = new(mixer, initiallySilent: true);
+            ContinuousFadeSampleProvider fade = new(mixer, initiallySilent: true);
             VolumeSampleProvider volume = new(fade)
             {
                 Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.Volume),
@@ -351,6 +399,7 @@ public sealed partial class RadioStaticService : IDisposable
         {
             RadioPlayerService.Instance.BufferingStateChanged -= OnBufferingStateChanged;
             RadioPlayerService.Instance.VolumeChanged -= OnVolumeChanged;
+            RadioPlayerService.Instance.PlaybackPausedByUser -= OnPlaybackPausedByUser;
             SettingsService.RadioStaticEnabledChanged -= OnRadioStaticEnabledChanged;
         }
 
