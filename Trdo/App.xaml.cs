@@ -86,6 +86,13 @@ public partial class App : Application
 
     public App()
     {
+        // Registered before anything else so a crash during startup is captured too. None of
+        // these mark the exception handled: the process still dies, but the log records why
+        // first (WER reports for a WinUI app carry an HRESULT and no managed stack).
+        UnhandledException += OnUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
         SettingsService.MigrateTrayClickActions();
         InitializeComponent();
@@ -108,6 +115,45 @@ public partial class App : Application
 
         // The tooltip names the button that plays/pauses, so it goes stale when that moves.
         SettingsService.TrayClickActionsChanged += (_, _) => UpdatePlayPauseCommandText();
+    }
+
+    private const string CrashLogComponent = "Crash";
+
+    /// <summary>Exceptions that escape XAML: event handlers, x:Bind getters, dispatcher callbacks.</summary>
+    private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        // e.Exception can be a bare COMException/AggregateException wrapper with the real type
+        // lost, so e.Message (which XAML fills from the original) is logged alongside it.
+        LogCrash("Unhandled XAML exception", e.Exception, e.Message);
+    }
+
+    /// <summary>Exceptions on non-UI threads (thread pool, LibVLC callbacks) that reach the runtime.</summary>
+    private void OnDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+    {
+        LogCrash(e.IsTerminating ? "Unhandled exception (terminating)" : "Unhandled exception",
+            e.ExceptionObject as Exception, e.ExceptionObject?.ToString());
+    }
+
+    /// <summary>Faulted tasks nobody awaited; not fatal, but worth a log line.</summary>
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        LogService.Error(CrashLogComponent, $"Unobserved task exception :: {e.Exception}");
+        e.SetObserved();
+    }
+
+    private static void LogCrash(string what, Exception? ex, string? message)
+    {
+        // Full ToString rather than LogService.Error's type+message: the stack is the point.
+        string detail = ex?.ToString() ?? message ?? "(no exception object)";
+        if (ex != null && !string.IsNullOrEmpty(message) && !detail.Contains(message))
+        {
+            detail = $"{message}{Environment.NewLine}{detail}";
+        }
+
+        LogService.Error(CrashLogComponent, $"{what} :: {detail}");
+
+        // The process is about to die; the background writer will not get another turn.
+        LogService.FlushToDisk(TimeSpan.FromSeconds(2));
     }
 
     /// <summary>Opens the mini player, creating it on first use, and brings it to the front.</summary>
