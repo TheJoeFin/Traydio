@@ -233,7 +233,9 @@ public sealed partial class MetadataPublishGate : IDisposable
             }
         }
 
-        if (publishNow is not null)
+        // A blank passes straight through and is not worth a line: the orchestrator already
+        // logs the change of state it represents, and stopping a stream drives one here anyway.
+        if (publishNow is not null && publishNow.HasMetadata)
             logLine = $"Publishing '{publishNow.DisplayText}' immediately";
 
         if (logLine is not null)

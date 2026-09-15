@@ -197,6 +197,16 @@
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
 
+  <!--
+    TagLibSharp resolves the file-type class for each track by MIME type and instantiates it
+    via Activator.CreateInstance, so nothing references those constructors statically and the
+    trimmer strips them - TagLib.File.Create then throws MissingMethodException in Release
+    builds only (the WER exception code was 0x80131513). Rooting the assembly keeps it intact.
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="TagLibSharp" />
+  </ItemGroup>
+
   <!-- Publish Properties -->
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>

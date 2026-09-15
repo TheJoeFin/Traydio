@@ -217,8 +217,10 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
         if (sameTrack && _currentMetadata.AlbumArtUrl == metadata.AlbumArtUrl)
         {
             // Worth recording: this is the point where a repeat is dropped, so a track that
-            // was seen once but never announced will never be offered again.
-            LogService.Info("StreamMetadata", $"{source} repeated '{metadata.DisplayText}'; ignoring");
+            // was seen once but never announced will never be offered again. A repeated blank
+            // is not - every local album and every station without titles starts with one.
+            if (metadata.HasMetadata)
+                LogService.Info("StreamMetadata", $"{source} repeated '{metadata.DisplayText}'; ignoring");
             return;
         }
 
