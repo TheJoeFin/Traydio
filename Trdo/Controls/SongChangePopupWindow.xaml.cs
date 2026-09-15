@@ -138,6 +138,9 @@ public sealed partial class SongChangePopupWindow : Window
         AlbumArtImage.Source = PlayerViewModel.Shared.CurrentAlbumArtImageSource;
         TrackIcon.Glyph = PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
         TrackIcon.Visibility = PlayerViewModel.Shared.CurrentAlbumArtPlaceholderVisibility;
+        FavoriteIcon.Visibility = PlayerViewModel.Shared.IsCurrentTrackFavorited
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
         // The window hugs its content, so the height has to be remeasured for
         // every song: a title that wraps to two lines needs a taller pill.
