@@ -806,17 +806,47 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>Track info delay</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>Left click: open Traydio, right click: play/pause</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Favorite the current song</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>Left click: play/pause, right click: open Traydio (Default)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Mute / unmute</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Do nothing</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Play / pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Open Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Show the now playing popup</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Show / hide the mini player</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>Choose whether the tray icon prioritizes playback controls or opening the player.</value>
+    <value>Choose what a left click and a right click on the tray icon do. One of them always opens Traydio, so you can get back to Settings.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>Tray icon click behavior</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Single clicks act instantly. Assigning a double-click makes that button's single click wait briefly, so Windows can tell the two apart.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Left click</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Left double-click</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Right click</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Right double-click</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>

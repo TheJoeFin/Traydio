@@ -806,17 +806,47 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>Titelinfo-Verzögerung</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>Linksklick: Traydio öffnen, Rechtsklick: Abspielen/Pause</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Aktuellen Song favorisieren</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>Linksklick: Abspielen/Pause, Rechtsklick: Traydio öffnen (Standard)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Stumm schalten / Ton an</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Nichts tun</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Abspielen / Pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Traydio öffnen</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>„Läuft gerade“-Popup anzeigen</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Mini-Player anzeigen / ausblenden</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>Wähle, ob das Taskleistensymbol die Wiedergabesteuerung oder das Öffnen des Players priorisiert.</value>
+    <value>Lege fest, was ein Linksklick und ein Rechtsklick auf das Taskleistensymbol tun. Einer von beiden öffnet immer Traydio, damit du zu den Einstellungen zurückkommst.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>Klickverhalten des Taskleistensymbols</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Einzelklicks wirken sofort. Wenn ein Doppelklick belegt ist, wartet der Einzelklick dieser Taste kurz, damit Windows beide unterscheiden kann.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Linksklick</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Linker Doppelklick</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Rechtsklick</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Rechter Doppelklick</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>

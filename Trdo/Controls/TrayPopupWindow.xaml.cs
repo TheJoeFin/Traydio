@@ -109,7 +109,12 @@ public sealed partial class TrayPopupWindow : WindowEx
     /// Shows the popup near the last captured pointer anchor, or hides it when
     /// it is already visible (or was just light-dismissed by the same click).
     /// </summary>
-    public void ToggleNearAnchor()
+    /// <param name="clickedAtUtc">
+    /// When the click that asked for this happened. Usually now, but a tray click that had to
+    /// wait out the double-click interval is older than that, and the "same click that
+    /// dismissed us" check has to be made against the click, not against when it was acted on.
+    /// </param>
+    public void ToggleNearAnchor(DateTime? clickedAtUtc = null)
     {
         if (_isPopupVisible)
         {
@@ -117,7 +122,7 @@ public sealed partial class TrayPopupWindow : WindowEx
             return;
         }
 
-        if (DateTime.UtcNow - _lastDismissedAtUtc < RecentDismissWindow)
+        if ((clickedAtUtc ?? DateTime.UtcNow) - _lastDismissedAtUtc < RecentDismissWindow)
             return;
 
         ShowNearAnchor();

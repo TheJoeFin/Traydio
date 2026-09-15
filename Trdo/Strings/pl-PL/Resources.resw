@@ -806,17 +806,47 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>Opóźnienie informacji o utworze</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>Lewy przycisk myszy: otwórz Traydio; prawy przycisk myszy: odtwarzaj/wstrzymaj</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Dodaj bieżący utwór do ulubionych</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>Lewy przycisk myszy: odtwarzaj/wstrzymaj, prawy przycisk myszy: otwórz Traydio (domyślnie)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Wycisz / włącz dźwięk</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Nic nie rób</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Odtwarzaj / wstrzymaj</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Otwórz Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Pokaż powiadomienie Teraz odtwarzane</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Pokaż / ukryj miniodtwarzacz</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>Wybierz, czy ikona w zasobniku systemowym ma w pierwszej kolejności sterować odtwarzaniem, czy otwierać odtwarzacz.</value>
+    <value>Wybierz, co robi kliknięcie lewym i prawym przyciskiem ikony w zasobniku. Jeden z nich zawsze otwiera Traydio, aby można było wrócić do Ustawień.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>Zachowanie ikony w zasobniku</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Pojedyncze kliknięcia działają natychmiast. Po przypisaniu dwukrotnego kliknięcia pojedyncze kliknięcie tym przyciskiem chwilę poczeka, aby Windows mógł je odróżnić.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Lewy przycisk</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Dwukrotne kliknięcie lewym</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Prawy przycisk</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Dwukrotne kliknięcie prawym</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>

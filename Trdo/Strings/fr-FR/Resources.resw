@@ -806,17 +806,47 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>Délai des infos de piste</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>Clic gauche : ouvrir Traydio, clic droit : lecture/pause</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Ajouter le titre en cours aux favoris</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>Clic gauche : lecture/pause, clic droit : ouvrir Traydio (Par défaut)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Couper / rétablir le son</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Ne rien faire</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Lecture / pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Ouvrir Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Afficher le popup En cours</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Afficher / masquer le mini lecteur</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>Choisissez si l&apos;icône de la barre d&apos;état privilégie les contrôles de lecture ou plutôt l&apos;ouverture du lecteur.</value>
+    <value>Choisissez ce que font un clic gauche et un clic droit sur l&apos;icône. L&apos;un des deux ouvre toujours Traydio, pour que vous puissiez revenir aux Paramètres.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>Comportement du clic sur l&apos;icône</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Les clics simples agissent immédiatement. Attribuer un double-clic fait patienter brièvement le clic simple de ce bouton, pour que Windows puisse les distinguer.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Clic gauche</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Double-clic gauche</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Clic droit</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Double-clic droit</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>

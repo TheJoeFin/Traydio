@@ -8,11 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Trdo.Controls;
+using Trdo.Models;
 using Trdo.Services;
 using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.UI.ViewManagement;
+using Windows.Win32;
 using WinUIEx;
 
 namespace Trdo;
@@ -23,6 +25,8 @@ namespace Trdo;
 public partial class App : Application
 {
     private TrayIcon? _trayIcon;
+    private TrayClickSequencer? _leftClickSequencer;
+    private TrayClickSequencer? _rightClickSequencer;
     private TrayPopupWindow? _trayPopupWindow;
     private MiniPlayerWindow? _miniPlayerWindow;
     private SongChangePopupWindow? _songChangePopupWindow;
@@ -83,6 +87,7 @@ public partial class App : Application
     public App()
     {
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
+        SettingsService.MigrateTrayClickActions();
         InitializeComponent();
         _playerVm.PropertyChanged += PlayerVmOnPropertyChanged;
 
@@ -100,11 +105,21 @@ public partial class App : Application
         _uiSettings.ColorValuesChanged += OnColorValuesChanged;
 
         SettingsService.SongChangePopupEnabledChanged += OnSongChangePopupEnabledChanged;
+
+        // The tooltip names the button that plays/pauses, so it goes stale when that moves.
+        SettingsService.TrayClickActionsChanged += (_, _) => UpdatePlayPauseCommandText();
     }
 
-    public void ShowMiniPlayerWindow()
+    /// <summary>Opens the mini player, creating it on first use, and brings it to the front.</summary>
+    /// <param name="captureAnchor">
+    /// Whether to place the window relative to the cursor. True from a button inside the app,
+    /// where the pointer position is meaningful; false from the tray icon, where placement
+    /// should come from the icon's rect instead.
+    /// </param>
+    public void ShowMiniPlayerWindow(bool captureAnchor = true)
     {
-        WindowPlacementService.CapturePointerAnchor();
+        if (captureAnchor)
+            WindowPlacementService.CapturePointerAnchor();
 
         if (_miniPlayerWindow is null)
         {
@@ -441,7 +456,13 @@ public partial class App : Application
         _trayIcon = new(0, "Assets/Radio.ico", "Traydio");
         _trayIcon.Selected += TrayIcon_Selected;
         _trayIcon.ContextMenu += TrayIcon_ContextMenu;
+        _trayIcon.LeftDoubleClick += TrayIcon_LeftDoubleClick;
+        _trayIcon.RightDoubleClick += TrayIcon_RightDoubleClick;
         _trayIcon.IsVisible = true;
+
+        DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
+        _leftClickSequencer ??= new TrayClickSequencer(dispatcher);
+        _rightClickSequencer ??= new TrayClickSequencer(dispatcher);
         WindowPlacementService.SetTrayIconSource(_trayIcon);
 
         // Only show tutorial window on first run
@@ -452,42 +473,206 @@ public partial class App : Application
         }
     }
 
-    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
-    {
-        if (SettingsService.TrayClickBehavior == 1)
-        {
-            // Swapped: right click plays/pauses (fall back to flyout if no station selected)
-            if (_playerVm.CanPlay)
-            {
-                TogglePlaybackFromTray();
-                return;
-            }
-        }
-
-        // Default: right click opens flyout; also fallback when no station is available
-        ShowFlyout(args);
-    }
-
     private void TrayIcon_Selected(TrayIcon sender, TrayIconEventArgs args)
     {
-        if (SettingsService.TrayClickBehavior == 1)
+        // Captured now, not when a deferred click finally runs: the flyout needs to know
+        // whether this is the click that light-dismissed it.
+        DateTime clickedAtUtc = DateTime.UtcNow;
+
+        _leftClickSequencer?.OnClick(
+            defer: TrayClickPolicy.ShouldDeferSingleClick(SettingsService.TrayLeftDoubleClickAction),
+            () => RunTrayAction(SettingsService.TrayLeftClickAction, clickedAtUtc));
+    }
+
+    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
+    {
+        DateTime clickedAtUtc = DateTime.UtcNow;
+
+        _rightClickSequencer?.OnClick(
+            defer: TrayClickPolicy.ShouldDeferSingleClick(SettingsService.TrayRightDoubleClickAction),
+            () => RunTrayAction(SettingsService.TrayRightClickAction, clickedAtUtc));
+    }
+
+    private void TrayIcon_LeftDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    {
+        TrayClickAction action = SettingsService.TrayLeftDoubleClickAction;
+
+        // Unassigned double-clicks are invisible: the two single clicks run exactly as they
+        // always have, rather than the second one being swallowed.
+        if (action == TrayClickAction.None)
+            return;
+
+        _leftClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    private void TrayIcon_RightDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    {
+        TrayClickAction action = SettingsService.TrayRightDoubleClickAction;
+
+        if (action == TrayClickAction.None)
+            return;
+
+        _rightClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    /// <summary>
+    /// Turns the raw single- and double-click events for one mouse button into at most one
+    /// action per gesture.
+    /// </summary>
+    /// <remarks>
+    /// Windows reports a double-click as <em>click, double-click, click</em>: the first
+    /// button-up arrives as an ordinary click before the system can know a second is coming,
+    /// and the second button-up arrives as another ordinary click afterwards. So while a
+    /// double-click action is assigned, a single click is held back for the system
+    /// double-click interval and dropped if the double-click lands in that time, and the
+    /// trailing click is dropped as part of the same gesture. When nothing is assigned to the
+    /// double-click, clicks run at once: the delay is the price of using a double-click on
+    /// that button, not of the feature existing - fast when it can be, slower only where the
+    /// user asked for more.
+    /// </remarks>
+    private sealed class TrayClickSequencer
+    {
+        private readonly DispatcherQueueTimer _timer;
+        private Action? _pendingSingleClick;
+        private DateTimeOffset _lastDoubleClickAtUtc = DateTimeOffset.MinValue;
+
+        public TrayClickSequencer(DispatcherQueue dispatcher)
         {
-            // Swapped: left click opens flyout
-            ShowFlyout(args);
+            _timer = dispatcher.CreateTimer();
+            _timer.IsRepeating = false;
+            _timer.Tick += (_, _) =>
+            {
+                Action? pending = _pendingSingleClick;
+                _pendingSingleClick = null;
+                pending?.Invoke();
+            };
+        }
+
+        /// <summary>
+        /// Read each time rather than cached: it is a user setting in Control Panel, and a
+        /// double-click that Windows has just recognised should match what the user set.
+        /// </summary>
+        private static TimeSpan DoubleClickInterval =>
+            TimeSpan.FromMilliseconds(PInvoke.GetDoubleClickTime());
+
+        public void OnClick(bool defer, Action singleClick)
+        {
+            // The second button-up of a double-click that already ran.
+            if (DateTimeOffset.UtcNow - _lastDoubleClickAtUtc < DoubleClickInterval)
+                return;
+
+            if (!defer)
+            {
+                singleClick();
+                return;
+            }
+
+            _pendingSingleClick = singleClick;
+            _timer.Interval = DoubleClickInterval;
+            _timer.Stop();
+            _timer.Start();
+        }
+
+        public void OnDoubleClick(Action doubleClick)
+        {
+            _timer.Stop();
+            _pendingSingleClick = null;
+            _lastDoubleClickAtUtc = DateTimeOffset.UtcNow;
+            doubleClick();
+        }
+    }
+
+    /// <summary>
+    /// Runs whichever action Settings has assigned to the button that was just clicked.
+    /// Anything that needs a station falls back to the flyout while there is none, so a
+    /// fresh install always lands the user on the "add a station" UI rather than on nothing.
+    /// </summary>
+    private void RunTrayAction(TrayClickAction configured, DateTime clickedAtUtc)
+    {
+        TrayClickAction action = TrayClickPolicy.Resolve(configured, _playerVm.CanPlay);
+
+        switch (action)
+        {
+            case TrayClickAction.None:
+                break;
+            case TrayClickAction.PlayPause:
+                TogglePlaybackFromTray();
+                break;
+            case TrayClickAction.ShowFlyout:
+                ShowFlyout(clickedAtUtc);
+                break;
+            case TrayClickAction.MuteUnmute:
+                _playerVm.ToggleMute();
+                break;
+            case TrayClickAction.FavoriteTrack:
+                FavoriteCurrentTrackFromTray(clickedAtUtc);
+                break;
+            case TrayClickAction.ShowTrackInfo:
+                ShowTrackInfoFromTray(clickedAtUtc);
+                break;
+            case TrayClickAction.ToggleMiniPlayer:
+                ToggleMiniPlayerFromTray();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Toggles the current track in Favorite Songs and re-shows the pill so the star it now
+    /// carries (or no longer carries) is the feedback for a click that otherwise changes
+    /// nothing visible. Shown regardless of the popup setting: the user asked for something
+    /// on this click, which is different from the unprompted announcements that setting governs.
+    /// </summary>
+    private void FavoriteCurrentTrackFromTray(DateTime clickedAtUtc)
+    {
+        if (!_playerVm.HasNowPlaying)
+        {
+            // Nothing identifiable to favorite; the flyout at least shows why.
+            ShowFlyout(clickedAtUtc);
             return;
         }
 
-        // Default: left click plays/pauses
-        // Check if we can play (have stations available and one selected)
-        if (!_playerVm.CanPlay)
+        _playerVm.ToggleCurrentTrackFavorite();
+        ShowTrackInfoFromTray(clickedAtUtc);
+    }
+
+    /// <summary>
+    /// Shows the now-playing pill on demand. Bypasses the popup's on/off setting for the same
+    /// reason the Settings demo does - this pill was explicitly asked for - and falls back to
+    /// the station name while the stream has not identified a track yet, so the click always
+    /// shows <em>something</em>.
+    /// </summary>
+    private void ShowTrackInfoFromTray(DateTime clickedAtUtc)
+    {
+        string displayText = _playerVm.NowPlaying.Trim();
+
+        if (displayText.Length == 0)
+            displayText = _playerVm.SelectedStation?.Name?.Trim() ?? string.Empty;
+
+        if (displayText.Length == 0)
         {
-            // No stations available, show the flyout to encourage user to add a station
-            ShowFlyout(args);
+            ShowFlyout(clickedAtUtc);
             return;
         }
 
-        // We have stations, toggle play/pause
-        TogglePlaybackFromTray();
+        ShowSongChangePopup(displayText);
+    }
+
+    /// <summary>
+    /// Opens the mini player, or closes it when it is already open. Placement comes from the
+    /// tray icon's own rect rather than the cursor, for the reasons given on
+    /// <see cref="ShowFlyout"/>.
+    /// </summary>
+    private void ToggleMiniPlayerFromTray()
+    {
+        if (_miniPlayerWindow is not null)
+        {
+            // Closed nulls the field.
+            _miniPlayerWindow.Close();
+            return;
+        }
+
+        WindowPlacementService.ClearPointerAnchor();
+        ShowMiniPlayerWindow(captureAnchor: false);
     }
 
     /// <summary>
@@ -539,7 +724,11 @@ public partial class App : Application
         ShowSongChangePopup(displayText);
     }
 
-    public void ShowFlyout(TrayIconEventArgs? args = null)
+    /// <param name="clickedAtUtc">
+    /// When the tray click behind this happened, if it was one; see
+    /// <see cref="TrayPopupWindow.ToggleNearAnchor"/>.
+    /// </param>
+    public void ShowFlyout(DateTime? clickedAtUtc = null)
     {
         // Unlike TryShowFlyout/ShowMiniPlayerWindow (invoked from a button
         // inside the app, where the pointer position is meaningful), this is
@@ -549,10 +738,10 @@ public partial class App : Application
         // icon — clear it so placement always derives from the icon's rect.
 
         WindowPlacementService.ClearPointerAnchor();
-        ShowTrayPopup();
+        ShowTrayPopup(clickedAtUtc);
     }
 
-    private void ShowTrayPopup()
+    private void ShowTrayPopup(DateTime? clickedAtUtc)
     {
         if (_trayPopupWindow is null)
         {
@@ -561,7 +750,7 @@ public partial class App : Application
             _trayPopupWindow.Closed += (_, _) => _trayPopupWindow = null;
         }
 
-        _trayPopupWindow.ToggleNearAnchor();
+        _trayPopupWindow.ToggleNearAnchor(clickedAtUtc);
     }
 
     private async Task UpdateTrayIconAsync()
@@ -645,9 +834,7 @@ public partial class App : Application
         }
         else if (_playerVm.IsPlaying)
         {
-            string playPauseClickHint = SettingsService.TrayClickBehavior == 1
-                ? LocalizationService.GetString("TrayIcon_RightClickToPause", "Right-click to pause")
-                : LocalizationService.GetString("TrayIcon_LeftClickToPause", "Left-click to pause");
+            string playPauseClickHint = GetPlayPauseClickHint(isPlaying: true);
 
             if (_playerVm.HasNowPlaying)
             {
@@ -672,9 +859,7 @@ public partial class App : Application
         }
         else
         {
-            string playPauseClickHint = SettingsService.TrayClickBehavior == 1
-                ? LocalizationService.GetString("TrayIcon_RightClickToPlay", "Right-click to play")
-                : LocalizationService.GetString("TrayIcon_LeftClickToPlay", "Left-click to play");
+            string playPauseClickHint = GetPlayPauseClickHint(isPlaying: false);
 
             string pausedFormat = LocalizationService.GetString(
                 "TrayIcon_Paused",
@@ -690,6 +875,27 @@ public partial class App : Application
         }
 
         SetTrayTooltip(tooltip, forceTooltip);
+    }
+
+    /// <summary>
+    /// The "click to play/pause" line of the tooltip for whichever button is assigned that
+    /// action, or an empty string when neither is. The format strings put the hint on its own
+    /// line, and <see cref="SetTrayTooltip"/> trims, so an empty hint simply drops the line.
+    /// </summary>
+    private static string GetPlayPauseClickHint(bool isPlaying)
+    {
+        TrayClickButton? button = TrayClickPolicy.PlayPauseButton(
+            SettingsService.TrayLeftClickAction,
+            SettingsService.TrayRightClickAction);
+
+        return (button, isPlaying) switch
+        {
+            (TrayClickButton.Left, true) => LocalizationService.GetString("TrayIcon_LeftClickToPause", "Left-click to pause"),
+            (TrayClickButton.Left, false) => LocalizationService.GetString("TrayIcon_LeftClickToPlay", "Left-click to play"),
+            (TrayClickButton.Right, true) => LocalizationService.GetString("TrayIcon_RightClickToPause", "Right-click to pause"),
+            (TrayClickButton.Right, false) => LocalizationService.GetString("TrayIcon_RightClickToPlay", "Right-click to play"),
+            _ => string.Empty
+        };
     }
 
     private void SetTrayTooltip(string? text, bool force = false)

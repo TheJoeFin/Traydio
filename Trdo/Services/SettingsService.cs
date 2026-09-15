@@ -1,6 +1,7 @@
 using System;
 using Trdo.Models;
 using Trdo.Services.Playback;
+using Windows.Foundation.Collections;
 using Windows.Storage;
 
 namespace Trdo.Services;
@@ -20,6 +21,10 @@ public static class SettingsService
     private const string IsYouTubeMusicEnabledKey = "IsYouTubeMusicEnabled";
     private const string IsBandcampEnabledKey = "IsBandcampEnabled";
     private const string TrayClickBehaviorKey = "TrayClickBehavior";
+    private const string TrayLeftClickActionKey = "TrayLeftClickAction";
+    private const string TrayRightClickActionKey = "TrayRightClickAction";
+    private const string TrayLeftDoubleClickActionKey = "TrayLeftDoubleClickAction";
+    private const string TrayRightDoubleClickActionKey = "TrayRightDoubleClickAction";
     private const string PlaybackEngineModeKey = "PlaybackEngineMode";
     private const string IsMiniPlayerVisualizerEnabledKey = "IsMiniPlayerVisualizerEnabled";
     private const string IsMiniPlayerTopmostKey = "IsMiniPlayerTopmost";
@@ -382,46 +387,172 @@ public static class SettingsService
     }
 
     /// <summary>
-    /// Gets or sets the tray icon click behavior.
-    /// 0 = left click plays/pauses, right click opens flyout (default).
-    /// 1 = left click opens flyout, right click plays/pauses.
+    /// Raised when either tray click assignment changes, so the tray tooltip can re-describe
+    /// which button plays and pauses.
     /// </summary>
-    public static int TrayClickBehavior
+    public static event EventHandler? TrayClickActionsChanged;
+
+    /// <summary>
+    /// Gets or sets what a left click on the tray icon does.
+    /// </summary>
+    /// <remarks>
+    /// Before 2.1 both buttons were governed by a single two-way <c>TrayClickBehavior</c>
+    /// switch. <see cref="MigrateTrayClickActions"/> turns that into per-button values once at
+    /// startup; the legacy-derived fallback here only matters if that could not run.
+    /// </remarks>
+    public static TrayClickAction TrayLeftClickAction
     {
-        get
+        get => GetTrayClickAction(TrayLeftClickActionKey, LegacyTrayClickActions().Left);
+        set => SetTrayClickAction(TrayLeftClickActionKey, value);
+    }
+
+    /// <summary>
+    /// Gets or sets what a right click on the tray icon does.
+    /// </summary>
+    /// <remarks><inheritdoc cref="TrayLeftClickAction" path="/remarks"/></remarks>
+    public static TrayClickAction TrayRightClickAction
+    {
+        get => GetTrayClickAction(TrayRightClickActionKey, LegacyTrayClickActions().Right);
+        set => SetTrayClickAction(TrayRightClickActionKey, value);
+    }
+
+    /// <summary>
+    /// Gets or sets what a left double-click on the tray icon does. Off by default: assigning
+    /// it makes that button's single click wait out the double-click interval before acting,
+    /// and users who never asked for that keep instant clicks. New in 2.1, so no migration.
+    /// </summary>
+    public static TrayClickAction TrayLeftDoubleClickAction
+    {
+        get => GetTrayClickAction(TrayLeftDoubleClickActionKey, TrayClickPolicy.DefaultDoubleClickAction);
+        set => SetTrayClickAction(TrayLeftDoubleClickActionKey, value);
+    }
+
+    /// <summary>Gets or sets what a right double-click on the tray icon does. See <see cref="TrayLeftDoubleClickAction"/>.</summary>
+    public static TrayClickAction TrayRightDoubleClickAction
+    {
+        get => GetTrayClickAction(TrayRightDoubleClickActionKey, TrayClickPolicy.DefaultDoubleClickAction);
+        set => SetTrayClickAction(TrayRightDoubleClickActionKey, value);
+    }
+
+    /// <summary>
+    /// One-shot upgrade of the pre-2.1 <c>TrayClickBehavior</c> switch into the per-button
+    /// keys. Runs at startup, before anything reads the tray settings.
+    /// </summary>
+    /// <remarks>
+    /// Both per-button keys are written together so the pair never half-exists: a user who
+    /// later changes only one button must not have the other silently fall back to a default
+    /// if the old key is ever cleaned up. A per-button key that already exists is kept - it is
+    /// newer than anything the old switch can say. The old key itself is left in place, and
+    /// <see cref="SetTrayClickAction"/> keeps it current, so a downgrade to a pre-2.1 build
+    /// still sees the nearest two-way equivalent of the current layout.
+    /// </remarks>
+    public static void MigrateTrayClickActions()
+    {
+        try
         {
-            try
+            IPropertySet values = ApplicationData.Current.LocalSettings.Values;
+            bool hasLeft = values.ContainsKey(TrayLeftClickActionKey);
+            bool hasRight = values.ContainsKey(TrayRightClickActionKey);
+            if (hasLeft && hasRight)
+                return;
+
+            (TrayClickAction legacyLeft, TrayClickAction legacyRight) = LegacyTrayClickActions();
+            TrayClickAction left = hasLeft ? GetTrayClickAction(TrayLeftClickActionKey, legacyLeft) : legacyLeft;
+            TrayClickAction right = hasRight ? GetTrayClickAction(TrayRightClickActionKey, legacyRight) : legacyRight;
+
+            // The old switch could only ever express layouts with a flyout on one side, so a
+            // migrated pair always passes this; it is here for the half-written case. The
+            // double-click slots are new in 2.1 and read as unassigned here, so only the two
+            // single-click buttons can satisfy or receive the flyout.
+            TrayClickAssignments migrated = TrayClickPolicy.EnsureFlyoutReachable(
+                TrayClickButton.Left,
+                new TrayClickAssignments(left, right, TrayClickPolicy.DefaultDoubleClickAction, TrayClickPolicy.DefaultDoubleClickAction));
+            (left, right) = (migrated.Left, migrated.Right);
+
+            values[TrayLeftClickActionKey] = (int)left;
+            values[TrayRightClickActionKey] = (int)right;
+
+            LogService.Info("Settings",
+                $"Migrated tray click behavior (legacy={ReadLegacyTrayClickBehavior()?.ToString() ?? "<unset>"}) " +
+                $"-> left={left}, right={right}");
+        }
+        catch (Exception ex)
+        {
+            // Nothing is lost: the getters keep deriving from the old key until this succeeds.
+            LogService.Warn("Settings", $"Tray click migration failed; using legacy fallback: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// The raw pre-2.1 value, or <see langword="null"/> when it was never set. Anything that
+    /// cannot be read as an integer counts as unset, matching how the old getter defaulted.
+    /// </summary>
+    private static int? ReadLegacyTrayClickBehavior()
+    {
+        try
+        {
+            if (ApplicationData.Current.LocalSettings.Values.TryGetValue(TrayClickBehaviorKey, out object? value))
             {
-                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(TrayClickBehaviorKey, out object? value))
+                return value switch
                 {
-                    return value switch
-                    {
-                        int i => i,
-                        string s when int.TryParse(s, out int i2) => i2,
-                        _ => 0
-                    };
-                }
-                return 0;
-            }
-            catch
-            {
-                return 0;
+                    int i => i,
+                    string s when int.TryParse(s, out int parsed) => parsed,
+                    _ => null
+                };
             }
         }
-        set
+        catch
         {
-            try
+            // Fall through to unset
+        }
+
+        return null;
+    }
+
+    private static (TrayClickAction Left, TrayClickAction Right) LegacyTrayClickActions() =>
+        TrayClickPolicy.FromLegacyBehavior(ReadLegacyTrayClickBehavior() ?? 0);
+
+    private static TrayClickAction GetTrayClickAction(string key, TrayClickAction fallback)
+    {
+        try
+        {
+            if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out object? value))
             {
-                // Only valid values are 0 (default) and 1 (swapped)
-                if (value < 0 || value > 1)
-                    value = 0;
-                ApplicationData.Current.LocalSettings.Values[TrayClickBehaviorKey] = value;
-            }
-            catch
-            {
-                // Silently fail if unable to save
+                return value switch
+                {
+                    int i => TrayClickPolicy.Parse(i, fallback),
+                    string s when int.TryParse(s, out int parsed) => TrayClickPolicy.Parse(parsed, fallback),
+                    _ => fallback
+                };
             }
         }
+        catch
+        {
+            // Fall through to the default
+        }
+
+        return fallback;
+    }
+
+    private static void SetTrayClickAction(string key, TrayClickAction value)
+    {
+        try
+        {
+            IPropertySet values = ApplicationData.Current.LocalSettings.Values;
+            values[key] = (int)value;
+
+            // Keep the pre-2.1 key describing the nearest two-way layout, so a downgrade does
+            // not land on a layout the user never chose.
+            values[TrayClickBehaviorKey] = TrayClickPolicy.ToLegacyBehavior(
+                TrayLeftClickAction,
+                TrayRightClickAction);
+        }
+        catch
+        {
+            // Silently fail if unable to save
+        }
+
+        TrayClickActionsChanged?.Invoke(null, EventArgs.Empty);
     }
 
     /// <summary>

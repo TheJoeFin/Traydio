@@ -806,17 +806,47 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>تأخير معلومات المقطوعة</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>النقر بالزر الأيسر: فتح Traydio، النقر بالزر الأيمن: تشغيل/إيقاف مؤقت</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>إضافة الأغنية الحالية إلى المفضلة</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>النقر بالزر الأيسر: تشغيل/إيقاف مؤقت، النقر بالزر الأيمن: فتح Traydio (افتراضي)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>كتم الصوت / إلغاء الكتم</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>لا شيء</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>تشغيل / إيقاف مؤقت</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>فتح Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>إظهار نافذة "قيد التشغيل الآن"</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>إظهار / إخفاء المشغّل المصغّر</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>اختر ما إذا كانت أيقونة علبة النظام تُولي الأولوية لعناصر تحكم التشغيل أو لفتح المشغّل.</value>
+    <value>اختر ما يفعله النقر بالزر الأيسر والنقر بالزر الأيمن على أيقونة علبة النظام. أحدهما يفتح Traydio دائمًا حتى تتمكن من العودة إلى الإعدادات.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>سلوك النقر على أيقونة علبة النظام</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>النقرات المفردة تعمل فورًا. عند تعيين نقر مزدوج، ينتظر النقر المفرد لهذا الزر لحظة قصيرة حتى يتمكن Windows من التمييز بينهما.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>النقر بالزر الأيسر</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>النقر المزدوج بالزر الأيسر</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>النقر بالزر الأيمن</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>النقر المزدوج بالزر الأيمن</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>
