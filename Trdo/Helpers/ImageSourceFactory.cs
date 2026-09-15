@@ -1,7 +1,9 @@
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Trdo.Services;
 using Windows.Storage.Streams;
@@ -13,10 +15,10 @@ namespace Trdo.Helpers;
 /// Must be called on the UI thread - the returned <see cref="BitmapImage"/> is a DependencyObject.
 /// </summary>
 /// <remarks>
-/// Only http(s) URIs are handed straight to <see cref="BitmapImage"/>. The two schemes local
-/// albums rely on are read into memory here and fed in via <see cref="BitmapImage.SetSourceAsync"/>
-/// instead, because XAML silently fails to load either from a URI - no exception, no
-/// ImageFailed from a source set in code, just a blank image:
+/// Nothing is handed to <see cref="BitmapImage"/> as a URI; every source is read into memory here
+/// and fed in via <see cref="BitmapImage.SetSourceAsync"/>, because XAML fails to load each of
+/// them from a URI in a way this app can neither log nor work around - no exception, and at
+/// most an ImageFailed on the bound control that nothing handles - leaving just a blank image:
 /// <list type="bullet">
 /// <item>A track's embedded ID3 art is a <c>data:</c> URI (see <see cref="Services.Metadata.Id3TagParser"/>),
 /// which <see cref="BitmapImage"/> does not support at all.</item>
@@ -25,6 +27,9 @@ namespace Trdo.Helpers;
 /// with a non-ASCII character in its name ("Ow ∞") is percent-encoded in the URI and XAML's
 /// file loader mangles the decoded path, so the cover never loads even though the SMTC
 /// thumbnail - which reads the same URI straight off disk - shows it fine.</item>
+/// <item>A station's http(s) favicon whose URL redirects - typically a plain-http URL from the
+/// station directory that the site now 301s to https. XAML's loader does not follow it, where
+/// HttpClient (and so the SMTC thumbnail) does.</item>
 /// </list>
 /// </remarks>
 internal static class ImageSourceFactory
@@ -50,6 +55,33 @@ internal static class ImageSourceFactory
 
     private static TimeSpan FileRetryDelay(int attempt) =>
         TimeSpan.FromMilliseconds(Math.Min(250 * Math.Pow(2, attempt), 5000));
+
+    /// <summary>
+    /// How many times an http(s) favicon download gets re-tried after a failure, with the same
+    /// backoff as a file. The concern is the same as <see cref="MaxFileRetries"/>: a station-list
+    /// row gets exactly one <see cref="Create"/> call, so a favicon that fails once because the
+    /// network was still coming up at launch would otherwise stay blank for the whole session.
+    /// </summary>
+    private const int MaxHttpRetries = 2;
+
+    /// <summary>
+    /// Follows redirects by default (AllowAutoRedirect), including the http -> https upgrade
+    /// that XAML's image loader refuses; see <see cref="Create"/>.
+    /// </summary>
+    private static readonly HttpClient Http = new()
+    {
+        Timeout = TimeSpan.FromSeconds(30)
+    };
+
+    /// <summary>
+    /// Downloaded favicon bytes by absolute URL, for the lifetime of the process. Every station
+    /// row, the now-playing card, the mini player and the popup each ask for the same URL, and
+    /// the station list asks again on every render; BitmapImage(uri) used to lean on XAML's
+    /// internal image cache for that, and this stands in for it. A failed download is evicted
+    /// (see <see cref="DownloadAsync"/>) so a later request tries again rather than replaying
+    /// the failure forever.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, Task<byte[]?>> DownloadCache = new(StringComparer.Ordinal);
 
     public static ImageSource? Create(string? url)
     {
@@ -83,9 +115,40 @@ internal static class ImageSourceFactory
             return LoadFromBytes(() => LocalCoverReader.ReadAsync(path), path, MaxFileRetries);
         }
 
-        // Not logged: every http favicon in the station list comes through here on each
-        // render, and XAML reports those loads via ImageFailed where it matters anyway.
-        return new BitmapImage(uri);
+        // Downloaded here rather than handed to BitmapImage as a URI: XAML's own loader does not
+        // follow an http -> https redirect, and a station's favicon URL from the directory is
+        // frequently the plain-http form that its site now 301s (WYMS, WTMJ). HttpClient follows
+        // the redirect, which is why the SMTC thumbnail - which always downloaded - showed the
+        // logo while every in-app Image stayed blank. Going through bytes also means a failure
+        // is logged instead of silently swallowed, since none of the bound Image controls
+        // handle ImageFailed.
+        return LoadFromBytes(() => DownloadAsync(uri), uri.AbsoluteUri, MaxHttpRetries);
+    }
+
+    /// <summary>
+    /// Fetches the image at <paramref name="uri"/>, sharing one in-flight download and one
+    /// cached result between every caller asking for the same URL. Only ever called on the UI
+    /// thread (see the class remarks), so the get-or-add needs no further coordination.
+    /// </summary>
+    private static Task<byte[]?> DownloadAsync(Uri uri)
+    {
+        string key = uri.AbsoluteUri;
+        return DownloadCache.GetOrAdd(key, static k => DownloadCoreAsync(k));
+    }
+
+    private static async Task<byte[]?> DownloadCoreAsync(string url)
+    {
+        try
+        {
+            return await Http.GetByteArrayAsync(url);
+        }
+        catch
+        {
+            // Let the caller's retry (and any later caller) start a fresh download rather than
+            // awaiting this same faulted task. The exception itself is logged by LoadAsync.
+            DownloadCache.TryRemove(url, out _);
+            throw;
+        }
     }
 
     private static byte[]? DecodeDataUri(string url)
