@@ -684,6 +684,11 @@ public sealed partial class PlayingPage : Page
         e.Handled = true;
     }
 
+    private void MuteButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ToggleMute();
+    }
+
     private void ToggleVolumeSlider_Click(object sender, RoutedEventArgs e)
     {
         SetVolumeSliderVisible(VolumeControlGrid.Visibility != Visibility.Visible);

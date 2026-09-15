@@ -398,7 +398,7 @@ public partial class App : Application
             // Update tray icon to show loading state
             _ = UpdateTrayIconAsync();
         }
-        else if (e.PropertyName == nameof(PlayerViewModel.CanPlay))
+        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted))
         {
             UpdatePlayPauseCommandText();
         }
@@ -680,6 +680,13 @@ public partial class App : Application
                 "TrayIcon_Paused",
                 "Traydio {0} (Paused)\n{1}");
             tooltip = string.Format(pausedFormat, station, playPauseClickHint);
+        }
+
+        if (_playerVm.CanPlay && _playerVm.IsMuted)
+        {
+            // Mute leaves no other trace on the icon, and silence with "(Playing)" above it
+            // would otherwise read as a broken stream.
+            tooltip = string.Concat(tooltip.TrimEnd(), "\n", LocalizationService.GetString("TrayIcon_Muted", "Muted"));
         }
 
         SetTrayTooltip(tooltip, forceTooltip);

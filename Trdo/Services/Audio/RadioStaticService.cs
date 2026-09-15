@@ -173,7 +173,7 @@ public sealed partial class RadioStaticService : IDisposable
             if (_player is null && !TryBuildGraph())
                 return;
 
-            _volume!.Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.Volume);
+            _volume!.Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.EffectiveVolume);
             _whine?.Restart();
 
             // The fade always starts from the current level, so this is also the right call when
@@ -338,7 +338,7 @@ public sealed partial class RadioStaticService : IDisposable
             ContinuousFadeSampleProvider fade = new(mixer, initiallySilent: true);
             VolumeSampleProvider volume = new(fade)
             {
-                Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.Volume),
+                Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.EffectiveVolume),
             };
 
             player.Init(new SampleToWaveProvider(volume));

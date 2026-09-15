@@ -25,6 +25,7 @@ public sealed partial class RadioPlayerService : IDisposable
     private readonly SystemMediaTransportControls? _systemMediaControls;
     private readonly HttpClient _httpClient;
     private double _volume = 1.0;
+    private bool _isMuted;
     private const string VolumeKey = "RadioVolume";
     private const string WatchdogEnabledKey = "WatchdogEnabled";
     private string? _streamUrl;
@@ -74,7 +75,12 @@ public sealed partial class RadioPlayerService : IDisposable
     public static RadioPlayerService Instance { get; } = new();
 
     public event EventHandler<bool>? PlaybackStateChanged;
+    /// <summary>
+    /// Raised with the level audio outputs actually receive - see <see cref="EffectiveVolume"/> -
+    /// whenever either the volume or the mute state changes.
+    /// </summary>
     public event EventHandler<double>? VolumeChanged;
+    public event EventHandler<bool>? MuteChanged;
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<StreamMetadata>? StreamMetadataChanged;
     public event EventHandler? LocalTrackChanged;
@@ -344,18 +350,50 @@ public sealed partial class RadioPlayerService : IDisposable
             if (Math.Abs(_volume - value) < 0.0001) return;
             Debug.WriteLine($"[RadioPlayerService] Setting Volume from {_volume} to {value}");
             _volume = value;
-            if (!_isVolumeFading)
-            {
-                SyncActiveBackendVolume();
-                _whiteNoiseEngine.SetVolume(_volume);
-            }
+            ApplyEffectiveVolume();
             try
             {
                 ApplicationData.Current.LocalSettings.Values[VolumeKey] = _volume;
             }
             catch { }
-            VolumeChanged?.Invoke(this, _volume);
+            VolumeChanged?.Invoke(this, EffectiveVolume);
         }
+    }
+
+    /// <summary>
+    /// Silences every output without touching <see cref="Volume"/>, so unmuting lands back on
+    /// exactly the level the user had. Deliberately not persisted: an app that started up
+    /// silent with the slider showing 80% would look broken rather than muted.
+    /// </summary>
+    public bool IsMuted
+    {
+        get => _isMuted;
+        set
+        {
+            if (_isMuted == value) return;
+            Debug.WriteLine($"[RadioPlayerService] Setting IsMuted to {value}");
+            _isMuted = value;
+            ApplyEffectiveVolume();
+            VolumeChanged?.Invoke(this, EffectiveVolume);
+            MuteChanged?.Invoke(this, _isMuted);
+        }
+    }
+
+    /// <summary>
+    /// The level audio outputs actually receive: <see cref="Volume"/>, or silence while
+    /// <see cref="IsMuted"/>. Everything that renders sound - the stream backends, white noise
+    /// and radio static - follows this rather than the raw volume.
+    /// </summary>
+    public double EffectiveVolume => _isMuted ? 0 : _volume;
+
+    private void ApplyEffectiveVolume()
+    {
+        // A fade in flight re-reads the target every step, so it picks the change up itself.
+        if (_isVolumeFading)
+            return;
+
+        SyncActiveBackendVolume();
+        _whiteNoiseEngine.SetVolume(EffectiveVolume);
     }
 
     public bool WatchdogEnabled
@@ -1038,7 +1076,7 @@ public sealed partial class RadioPlayerService : IDisposable
         Debug.WriteLine("[RadioPlayerService] Playing white noise");
 
         CancelPendingPlayAttempt();
-        _whiteNoiseEngine.Play(_whiteNoiseColor, _volume);
+        _whiteNoiseEngine.Play(_whiteNoiseColor, EffectiveVolume);
         _wasExternalPause = false;
 
         // The engine fails closed (no audio device, WASAPI busy) rather than throwing, so its

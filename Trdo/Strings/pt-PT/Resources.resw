@@ -518,6 +518,9 @@
   <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
     <value>Erro de reprodução</value>
   </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Silenciar / repor som</value>
+  </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Abrir mini-leitor</value>
   </data>
@@ -850,6 +853,9 @@
   </data>
   <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
     <value>Clique com o botão esquerdo para reproduzir</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>Silenciado</value>
   </data>
   <data name="TrayIcon_Paused" xml:space="preserve">
     <value>Traydio {0} (Em pausa)

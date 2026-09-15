@@ -563,11 +563,19 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <FontIcon
+            <Button
+                x:Uid="PlayingPage_MuteButton"
                 Grid.Column="0"
+                Width="32"
+                Height="32"
+                Padding="0"
                 VerticalAlignment="Center"
-                FontSize="20"
-                Glyph="&#xE767;" />
+                Background="Transparent"
+                BorderThickness="0"
+                Click="MuteButton_Click"
+                CornerRadius="16">
+                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.VolumeGlyph, Mode=OneWay}" />
+            </Button>
             <Slider
                 x:Name="VolumeSlider"
                 Grid.Column="1"

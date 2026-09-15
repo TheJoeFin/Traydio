@@ -518,6 +518,9 @@
   <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
     <value>播放错误</value>
   </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>静音 / 取消静音</value>
+  </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>打开迷你播放器</value>
   </data>
@@ -850,6 +853,9 @@
   </data>
   <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
     <value>左键单击播放</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>已静音</value>
   </data>
   <data name="TrayIcon_Paused" xml:space="preserve">
     <value>Traydio {0}（已暂停）

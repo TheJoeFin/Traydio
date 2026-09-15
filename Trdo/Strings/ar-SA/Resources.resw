@@ -518,6 +518,9 @@
   <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
     <value>خطأ في التشغيل</value>
   </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>كتم الصوت / إلغاء الكتم</value>
+  </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>فتح المشغّل المصغّر</value>
   </data>
@@ -850,6 +853,9 @@
   </data>
   <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
     <value>انقر بالزر الأيسر للتشغيل</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>الصوت مكتوم</value>
   </data>
   <data name="TrayIcon_Paused" xml:space="preserve">
     <value>Traydio {0} (متوقف مؤقتًا)

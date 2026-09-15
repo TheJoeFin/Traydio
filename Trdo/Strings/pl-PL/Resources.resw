@@ -518,6 +518,9 @@
   <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
     <value>Błąd odtwarzania</value>
   </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Wycisz / włącz dźwięk</value>
+  </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Otwórz miniodtwarzacz</value>
   </data>
@@ -850,6 +853,9 @@
   </data>
   <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
     <value>Lewy klik, aby odtwarzać</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>Wyciszono</value>
   </data>
   <data name="TrayIcon_Paused" xml:space="preserve">
     <value>Traydio {0} (Wstrzymano)

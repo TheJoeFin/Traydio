@@ -605,8 +605,8 @@ public sealed partial class RadioPlayerService
     private double GetActiveBackendTargetVolume()
     {
         return ActivePlaybackBackend == PlaybackBackendKind.Native
-            ? Math.Min(_volume, 1)
-            : _volume;
+            ? Math.Min(EffectiveVolume, 1)
+            : EffectiveVolume;
     }
 
     private void SetActiveBackendVolume(double volume)

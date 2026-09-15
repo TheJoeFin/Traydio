@@ -153,6 +153,11 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Volume));
             OnPropertyChanged(nameof(VolumePercent));
         };
+        _player.MuteChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsMuted));
+            OnPropertyChanged(nameof(VolumeGlyph));
+        };
         _player.LocalTrackChanged += (_, _) => RefreshLocalMusicTrackState();
         _player.LocalTrackListChanged += (_, _) =>
         {
@@ -805,6 +810,14 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         set
         {
             Debug.WriteLine($"[PlayerViewModel] Setting Volume to {value}");
+
+            // Reaching for the slider while muted means "I want to hear this": leaving the
+            // output silent as the thumb moves would read as the slider being broken. Guarded
+            // on an actual change because a two-way binding writes the current value straight
+            // back when its page loads, and opening the flyout must not unmute by itself.
+            if (Math.Abs(_player.Volume - value) > 0.0001)
+                _player.IsMuted = false;
+
             _player.Volume = value;
             OnPropertyChanged();
 
@@ -830,6 +843,21 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         get => _player.Volume * 100;
         set => Volume = value / 100;
     }
+
+    /// <summary>
+    /// Whether output is silenced. The saved volume is untouched, so the slider keeps showing
+    /// the level that comes back on unmute.
+    /// </summary>
+    public bool IsMuted
+    {
+        get => _player.IsMuted;
+        set => _player.IsMuted = value;
+    }
+
+    public void ToggleMute() => IsMuted = !IsMuted;
+
+    /// <summary>Speaker glyph for the volume row: crossed out while muted.</summary>
+    public string VolumeGlyph => IsMuted ? "" : "";
 
     /// <summary>
     /// Requests a debounced save of the station list, coalescing rapid volume
