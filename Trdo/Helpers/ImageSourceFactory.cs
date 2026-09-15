@@ -32,7 +32,7 @@ internal static class ImageSourceFactory
     private const string LogComponent = "AlbumArt";
 
     /// <summary>
-    /// How many times a local album cover gets re-scanned-for and re-decoded after a failure,
+    /// How many times a local album cover gets re-read and re-decoded after a failure,
     /// with exponential backoff (see <see cref="FileRetryDelay"/>) between attempts. A scanner or
     /// downloader can still be writing the file, or Explorer/antivirus/OneDrive can be holding a
     /// transient lock on it, right as this reads it.
@@ -67,7 +67,7 @@ internal static class ImageSourceFactory
                 return null;
             }
 
-            return LoadFromBytes(() => Task.FromResult(bytes), "embedded art");
+            return LoadFromBytes(() => Task.FromResult<byte[]?>(bytes), "embedded art");
         }
 
         if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
@@ -77,39 +77,15 @@ internal static class ImageSourceFactory
 
         if (uri.IsFile)
         {
+            // LocalCoverReader handles a cover that has been renamed or removed since the station
+            // was scanned; the retry budget here is for one that exists but can't be read yet.
             string path = uri.LocalPath;
-            return LoadFromBytes(CreateLocalCoverReader(path), path, MaxFileRetries);
+            return LoadFromBytes(() => LocalCoverReader.ReadAsync(path), path, MaxFileRetries);
         }
 
         // Not logged: every http favicon in the station list comes through here on each
         // render, and XAML reports those loads via ImageFailed where it matters anyway.
         return new BitmapImage(uri);
-    }
-
-    /// <summary>
-    /// Reads the bytes for a local cover image, re-scanning the containing folder for a cover
-    /// file on every call after the first instead of hammering the same path. The file this URI
-    /// pointed to was resolved by <see cref="LocalMusicFolderScanner.FindCoverImage"/> at scan
-    /// time and may since have been renamed, replaced with a different format, or removed
-    /// outright - a bare retry of the original path would just keep failing the same way, where
-    /// a fresh scan can pick up whatever cover file is actually there now.
-    /// </summary>
-    private static Func<Task<byte[]>> CreateLocalCoverReader(string path)
-    {
-        string? folderPath = Path.GetDirectoryName(path);
-        bool firstAttempt = true;
-
-        return () =>
-        {
-            string candidatePath = path;
-            if (!firstAttempt)
-            {
-                candidatePath = LocalMusicFolderScanner.FindCoverImage(folderPath) ?? path;
-            }
-
-            firstAttempt = false;
-            return File.ReadAllBytesAsync(candidatePath);
-        };
     }
 
     private static byte[]? DecodeDataUri(string url)
@@ -137,26 +113,35 @@ internal static class ImageSourceFactory
     /// later simply renders when it does. The read itself is awaited off the UI thread; the
     /// continuation lands back on it (DispatcherQueue synchronization context) for SetSourceAsync.
     /// </summary>
+    /// <param name="readBytes">
+    /// Produces the image bytes, or null to stop without an image when the reader has already
+    /// determined (and logged) that no retry can help.
+    /// </param>
     /// <param name="maxRetries">
     /// How many times to re-run <paramref name="readBytes"/> and the decode after a failure,
     /// waiting <see cref="FileRetryDelay"/> between attempts. Zero for sources that can't
     /// change out from under a failed read (an already-decoded <c>data:</c> payload); nonzero
     /// for a file on disk that may still be mid-write.
     /// </param>
-    private static BitmapImage LoadFromBytes(Func<Task<byte[]>> readBytes, string description, int maxRetries = 0)
+    private static BitmapImage LoadFromBytes(Func<Task<byte[]?>> readBytes, string description, int maxRetries = 0)
     {
         BitmapImage image = new();
         _ = LoadAsync(image, readBytes, description, maxRetries);
         return image;
     }
 
-    private static async Task LoadAsync(BitmapImage image, Func<Task<byte[]>> readBytes, string description, int maxRetries)
+    private static async Task LoadAsync(BitmapImage image, Func<Task<byte[]?>> readBytes, string description, int maxRetries)
     {
         for (int attempt = 0; ; attempt++)
         {
             try
             {
-                byte[] bytes = await readBytes();
+                byte[]? bytes = await readBytes();
+                if (bytes is null)
+                {
+                    return;
+                }
+
                 if (ImageFormat.DetectMime(bytes) is null)
                 {
                     LogService.Warn(LogComponent, $"UI image '{description}' is not a recognized image ({ImageFormat.Describe(bytes)}); the decoder will most likely show nothing");
@@ -172,15 +157,15 @@ internal static class ImageSourceFactory
             }
             catch (Exception ex)
             {
-                // A missing/unreadable file, a partially-written one the decoder rejects
-                // (COMException), or bytes that are just never going to decode. Below the retry
-                // budget, readBytes() re-checks after a short wait - for a local cover that means
-                // re-scanning the folder rather than hammering the same failed path, since the
-                // file may have been renamed, replaced, or removed since it was first resolved.
+                // A locked/unreadable file, a partially-written one the decoder rejects
+                // (COMException), or bytes that are just never going to decode. (A file that is
+                // outright missing never gets here: LocalCoverReader handles that itself, moving
+                // to a replacement or returning null.) Below the retry budget, readBytes()
+                // re-checks after a short wait; a cover renamed in the meantime is picked up
+                // then, since the re-read misses the old path and LocalCoverReader re-scans.
                 // Re-using the same BitmapImage means a later successful SetSourceAsync still
                 // updates whatever the bound Image control is already showing. Past the budget,
-                // nothing to surface: the image simply stays empty, as it would for a broken
-                // http URL.
+                // nothing to surface: the image simply stays empty.
                 if (attempt >= maxRetries)
                 {
                     LogService.Warn(LogComponent, $"UI image '{description}' failed to load: {ex.GetType().Name}: {ex.Message}");

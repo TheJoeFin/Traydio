@@ -2412,9 +2412,18 @@ public sealed partial class RadioPlayerService : IDisposable
             {
                 // A local album's favicon is the folder's own cover art on disk (see
                 // LocalMusicFolderScanner), not something HttpClient can dial - it throws
-                // NotSupportedException on a file:// scheme.
+                // NotSupportedException on a file:// scheme. Read through LocalCoverReader so a
+                // cover renamed since the scan is found the same way the UI finds it, rather
+                // than leaving the transport controls blank while the app shows the art.
                 Debug.WriteLine($"[RadioPlayerService] Reading album art from disk: {uri.LocalPath}");
-                imageData = await File.ReadAllBytesAsync(uri.LocalPath);
+                byte[]? coverBytes = await LocalCoverReader.ReadAsync(uri.LocalPath);
+                if (coverBytes is null)
+                {
+                    // Already logged by the reader; nothing on disk to show.
+                    return false;
+                }
+
+                imageData = coverBytes;
                 Debug.WriteLine($"[RadioPlayerService] Read {imageData.Length} bytes of album art from disk");
             }
             else
