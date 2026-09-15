@@ -432,6 +432,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CanPlay));
         OnPropertyChanged(nameof(SelectedStationFallbackIconVisibility));
         OnPropertyChanged(nameof(SelectedStationFaviconImageSource));
+        OnPropertyChanged(nameof(MiniPlayerActiveStationIconImageSource));
+        OnPropertyChanged(nameof(MiniPlayerActiveStationIconFallbackVisibility));
         OnPropertyChanged(nameof(SelectedStationDisplayName));
         OnPropertyChanged(nameof(IsLocalMusicActive));
         OnPropertyChanged(nameof(CurrentAlbumArtPlaceholderGlyph));
@@ -783,6 +785,20 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl);
 
     public Visibility SelectedStationFallbackIconVisibility => SelectedStationFaviconImageSource is null
+        ? Visibility.Visible
+        : Visibility.Collapsed;
+
+    /// <summary>
+    /// The station icon shown next to the station name in the mini player's active row. For a
+    /// local album this is the same picture <see cref="CurrentAlbumArtImageSource"/> already
+    /// shows larger just above it, so it's suppressed here in favor of the placeholder glyph
+    /// rather than showing the cover art twice.
+    /// </summary>
+    public ImageSource? MiniPlayerActiveStationIconImageSource => IsLocalMusicActive
+        ? null
+        : SelectedStationFaviconImageSource;
+
+    public Visibility MiniPlayerActiveStationIconFallbackVisibility => MiniPlayerActiveStationIconImageSource is null
         ? Visibility.Visible
         : Visibility.Collapsed;
 

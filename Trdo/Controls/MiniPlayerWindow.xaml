@@ -133,9 +133,9 @@
                                     FontSize="18"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
                                     Glyph="&#xE95A;"
-                                    Visibility="{x:Bind ViewModel.SelectedStationFallbackIconVisibility, Mode=OneWay}" />
+                                    Visibility="{x:Bind ViewModel.MiniPlayerActiveStationIconFallbackVisibility, Mode=OneWay}" />
                                 <Border CornerRadius="4">
-                                    <Image Source="{x:Bind ViewModel.SelectedStationFaviconImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                    <Image Source="{x:Bind ViewModel.MiniPlayerActiveStationIconImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                                 </Border>
                             </Grid>
                             <TextBlock
