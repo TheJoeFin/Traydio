@@ -311,6 +311,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Pokaż okno</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Przesyłaj</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Przesyłaj na urządzenie</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Obecnie przesyłane na {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Nie znaleziono jeszcze żadnych urządzeń. Upewnij się, że urządzenie jest włączone i podłączone do tej samej sieci co ten komputer.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>Nie udało się przesłać na {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Szukanie urządzeń w Twojej sieci…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Zatrzymaj przesyłanie</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>Przesyłanie nie jest dostępne na tym komputerze, ponieważ nie udało się załadować silnika odtwarzania LibVLC.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Stuknij ikonę gwiazdki przy ulubionych utworach, aby zapisać je w tym miejscu.</value>
   </data>
@@ -467,6 +494,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>Dodaj swoją pierwszą stację radiową</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Przesyłaj…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>Przesyłanie na {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>Usuń grupę</value>
   </data>
@@ -580,6 +613,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Stacje</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Zatrzymaj przesyłanie</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Pokaż utwory albumu</value>

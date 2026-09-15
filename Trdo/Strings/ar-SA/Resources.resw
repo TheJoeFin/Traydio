@@ -311,6 +311,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>إظهار النافذة</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>إرسال</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>الإرسال إلى جهاز</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>يتم الإرسال حاليًا إلى {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>لم يتم العثور على أجهزة بعد. تأكد من أن الجهاز قيد التشغيل ومتصل بنفس شبكة هذا الكمبيوتر.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>تعذر الإرسال إلى {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>جارٍ البحث عن أجهزة على شبكتك…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>إيقاف الإرسال</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>الإرسال غير متاح على هذا الكمبيوتر لأنه تعذر تحميل محرك التشغيل LibVLC.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>اضغط على أيقونة النجمة في الأغاني التي تحبها لحفظها هنا</value>
   </data>
@@ -467,6 +494,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>أضف محطتك الأولى</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>إرسال…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>جارٍ الإرسال إلى {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>حذف المجموعة</value>
   </data>
@@ -580,6 +613,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>المحطات</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>إيقاف الإرسال</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>عرض مقطوعات الألبوم</value>
