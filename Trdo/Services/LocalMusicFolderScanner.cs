@@ -20,7 +20,8 @@ internal static class LocalMusicFolderScanner
     // Checked in this order - "cover" and "folder" are by far the most common names left by
     // rips and downloads, "front"/"album" cover the rest seen in the wild.
     private static readonly string[] CoverFileBaseNames = ["cover", "folder", "front", "album"];
-    private static readonly string[] CoverFileExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly string[] CoverFileExtensionList = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly HashSet<string> CoverFileExtensions = new(CoverFileExtensionList, StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Returns the audio files directly inside <paramref name="folderPath"/> (not recursive -
@@ -70,8 +71,19 @@ internal static class LocalMusicFolderScanner
     }
 
     /// <summary>
-    /// A cover-art image file directly inside <paramref name="folderPath"/>, checked against
-    /// the common names album rips and downloads use, or <c>null</c> if none is found.
+    /// The best guess at a cover-art image file directly inside <paramref name="folderPath"/>,
+    /// or <c>null</c> if nothing plausible is there. Tried in order, each step falling through to
+    /// the next only if it finds nothing:
+    /// <list type="number">
+    /// <item>An exact "cover.jpg"-style name (see <see cref="CoverFileBaseNames"/>) wins outright -
+    /// that's a deliberate cover file, not a guess.</item>
+    /// <item>Otherwise, the largest image whose filename contains one of those same words, e.g.
+    /// "cover2.jpg" or "Front-large.png" - real-world rips number or suffix the cover when there's
+    /// more than one image, and the biggest is taken as the full-size art rather than a thumbnail
+    /// sitting next to it.</item>
+    /// <item>Otherwise, if the folder has exactly one image file at all, it's almost certainly the
+    /// album's cover sitting next to the tracks even though nothing about its name says so.</item>
+    /// </list>
     /// </summary>
     public static string? FindCoverImage(string? folderPath)
     {
@@ -82,19 +94,42 @@ internal static class LocalMusicFolderScanner
         {
             foreach (string baseName in CoverFileBaseNames)
             {
-                foreach (string extension in CoverFileExtensions)
+                foreach (string extension in CoverFileExtensionList)
                 {
                     string candidate = Path.Combine(folderPath, baseName + extension);
                     if (File.Exists(candidate))
                         return candidate;
                 }
             }
+
+            List<string> images = [.. Directory.EnumerateFiles(folderPath, "*", SearchOption.TopDirectoryOnly)
+                .Where(path => CoverFileExtensions.Contains(Path.GetExtension(path)))];
+
+            string? bestKeywordMatch = images
+                .Where(path => CoverFileBaseNames.Any(baseName =>
+                    Path.GetFileNameWithoutExtension(path).Contains(baseName, StringComparison.OrdinalIgnoreCase)))
+                .OrderByDescending(SafeFileLength)
+                .FirstOrDefault();
+            if (bestKeywordMatch is not null)
+                return bestKeywordMatch;
+
+            return images.Count == 1 ? images[0] : null;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             return null;
         }
+    }
 
-        return null;
+    private static long SafeFileLength(string path)
+    {
+        try
+        {
+            return new FileInfo(path).Length;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return 0;
+        }
     }
 }
