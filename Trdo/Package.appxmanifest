@@ -57,6 +57,11 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <Capability Name="internetClientServer" />
+    <!--
+      Casting: LibVLC discovers Chromecast-style renderers over mDNS multicast and then serves
+      the audio to the chosen device from a local HTTP endpoint, both on the private network.
+    -->
+    <Capability Name="privateNetworkClientServer" />
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
