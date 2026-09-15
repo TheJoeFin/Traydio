@@ -33,10 +33,15 @@
         </TitleBar>
 
         <Grid
+            x:Name="ContentCard"
             Grid.Row="1"
             Margin="8,4,8,8"
+            PointerCaptureLost="ContentCard_PointerCaptureLost"
             PointerEntered="WindowLayout_PointerEntered"
-            PointerExited="WindowLayout_PointerExited">
+            PointerExited="WindowLayout_PointerExited"
+            PointerMoved="ContentCard_PointerMoved"
+            PointerPressed="ContentCard_PointerPressed"
+            PointerReleased="ContentCard_PointerReleased">
             <Grid.ContextFlyout>
                 <MenuFlyout>
                     <ToggleMenuFlyoutItem
@@ -49,6 +54,10 @@
                         Click="TopmostToggleMenuItem_Click"
                         IsChecked="True"
                         Text="Always on Top" />
+                    <ToggleMenuFlyoutItem
+                        x:Name="HideTitleBarToggleMenuItem"
+                        Click="HideTitleBarToggleMenuItem_Click"
+                        Text="Hide Title Bar" />
                 </MenuFlyout>
             </Grid.ContextFlyout>
             <Border

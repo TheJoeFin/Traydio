@@ -28,6 +28,7 @@ public static class SettingsService
     private const string PlaybackEngineModeKey = "PlaybackEngineMode";
     private const string IsMiniPlayerVisualizerEnabledKey = "IsMiniPlayerVisualizerEnabled";
     private const string IsMiniPlayerTopmostKey = "IsMiniPlayerTopmost";
+    private const string IsMiniPlayerTitleBarHiddenKey = "IsMiniPlayerTitleBarHidden";
     private const string AllowSleepWhilePlayingKey = "AllowSleepWhilePlaying";
     private const string IsSongChangePopupEnabledKey = "IsSongChangePopupEnabled";
     private const string SongChangePopupDelaySecondsKey = "SongChangePopupDelaySeconds";
@@ -384,6 +385,17 @@ public static class SettingsService
     {
         get => GetBoolSetting(IsMiniPlayerTopmostKey, defaultValue: true);
         set => SetBoolSetting(IsMiniPlayerTopmostKey, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether the mini player's title/subtitle bar is hidden. The window's native
+    /// close button stays put either way - only the title text and icon go away.
+    /// Defaults to false when no saved value exists.
+    /// </summary>
+    public static bool IsMiniPlayerTitleBarHidden
+    {
+        get => GetBoolSetting(IsMiniPlayerTitleBarHiddenKey, defaultValue: false);
+        set => SetBoolSetting(IsMiniPlayerTitleBarHiddenKey, value);
     }
 
     /// <summary>
