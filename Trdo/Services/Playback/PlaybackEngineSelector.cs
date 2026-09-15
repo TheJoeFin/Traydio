@@ -36,6 +36,14 @@ public sealed partial class PlaybackEngineSelector : IDisposable
     /// <summary>Whether the LibVLC engine is available at all on this machine/architecture.</summary>
     public bool IsLibVlcAvailable => _libVlcBackend is not null;
 
+    /// <summary>
+    /// Pins playback to LibVLC regardless of the engine mode or the per-stream memory. Set
+    /// while a cast target is active: only LibVLC can send audio to a network renderer, so
+    /// falling back to the native engine would quietly move the sound back to this PC.
+    /// Ignored when LibVLC is unavailable, which the caller rules out before casting.
+    /// </summary>
+    public bool RequireLibVlc { get; set; }
+
     /// <summary>The per-stream engine memory, for diagnostics and the user-facing reset.</summary>
     public EngineHealthStore EngineHealth => _engineHealth;
 
@@ -57,6 +65,13 @@ public sealed partial class PlaybackEngineSelector : IDisposable
 
     public async Task<PlaybackPrepareResult> PrepareAsync(string streamUrl, CancellationToken cancellationToken = default)
     {
+        if (RequireLibVlc && _libVlcBackend is not null)
+        {
+            LogService.Info("PlaybackEngineSelector",
+                $"LibVLC required (casting) -> LibVLC only for {LogService.Redact(streamUrl)}");
+            return await PrepareWithBackendAsync(_libVlcBackend, streamUrl, usedFallback: false, cancellationToken);
+        }
+
         PlaybackEngineMode mode = GetEngineMode();
 
         if (mode == PlaybackEngineMode.NativeOnly || _libVlcBackend is null)
@@ -122,7 +137,9 @@ public sealed partial class PlaybackEngineSelector : IDisposable
             ? _nativeBackend
             : _libVlcBackend;
 
-        if (other is null || GetEngineMode() == PlaybackEngineMode.NativeOnly)
+        // While casting there is no other engine worth trying: re-preparing LibVLC is the
+        // only retry that keeps the audio on the renderer.
+        if (other is null || RequireLibVlc || GetEngineMode() == PlaybackEngineMode.NativeOnly)
         {
             return await PrepareAsync(streamUrl, cancellationToken);
         }

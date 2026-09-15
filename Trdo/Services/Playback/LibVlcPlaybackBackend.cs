@@ -20,6 +20,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     private Media? _currentMedia;
     private bool _isBuffering;
     private string? _currentStreamUrl;
+    private RendererItem? _renderer;
     private readonly object _eventChainLock = new();
     private Task _eventChain = Task.CompletedTask;
     private bool _isDisposed;
@@ -42,6 +43,12 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         player.EndReached += OnPlayerEndReached;
         player.Buffering += OnPlayerBuffering;
         player.EncounteredError += OnPlayerEncounteredError;
+
+        // A recycled player must keep casting where the one it replaces did.
+        if (_renderer is not null && !player.SetRenderer(_renderer))
+        {
+            LogService.Warn("LibVlcPlaybackBackend", "Could not re-apply the cast renderer to a fresh media player");
+        }
 
         return player;
     }
@@ -254,6 +261,35 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     /// </summary>
     public int EffectiveNetworkCachingMs =>
         NetworkCachingMs > 0 ? NetworkCachingMs : DefaultNetworkCachingMs;
+
+    /// <summary>
+    /// Sends the audio to a renderer LibVLC discovered on the network instead of the local
+    /// output, or back to the local output when null. LibVLC applies it to the next input it
+    /// opens, so callers with something already playing re-prepare afterwards rather than
+    /// expecting a live switch. The caller keeps ownership of the item; LibVLC holds its own
+    /// reference for as long as the player uses it.
+    /// </summary>
+    public bool SetRenderer(RendererItem? renderer)
+    {
+        _renderer = renderer;
+        bool applied = _mediaPlayer.SetRenderer(renderer);
+
+        if (applied)
+        {
+            LogService.Info("LibVlcPlaybackBackend", renderer is null
+                ? "Renderer cleared; audio goes to the local output"
+                : $"Renderer set to '{renderer.Name}' ({renderer.Type})");
+        }
+        else
+        {
+            LogService.Warn("LibVlcPlaybackBackend", "LibVLC refused to set the renderer");
+        }
+
+        return applied;
+    }
+
+    /// <summary>True while audio is routed to a network renderer rather than the local output.</summary>
+    public bool IsCasting => _renderer is not null;
 
     public PlaybackBackendKind Kind => PlaybackBackendKind.LibVlc;
 
