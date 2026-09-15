@@ -774,6 +774,30 @@
                 </StackPanel>
                 <Button.ContextFlyout>
                     <MenuFlyout>
+                        <!--
+                            Casting. The label is bound rather than x:Uid'd because it names the
+                            target while a cast is active; IsEnabled is OneTime since LibVLC either
+                            loaded at startup or didn't.
+                        -->
+                        <MenuFlyoutItem
+                            x:Name="CastMenuItem"
+                            Click="CastMenuItem_Click"
+                            IsEnabled="{x:Bind ViewModel.CanCast}"
+                            Text="{x:Bind ViewModel.CastMenuText, Mode=OneWay}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE7F4;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Name="StopCastingMenuItem"
+                            x:Uid="PlayingPage_StopCasting"
+                            Click="StopCastingMenuItem_Click"
+                            Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE711;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
                         <!--  Disabled item used as a plain label rather than a real command.  -->
                         <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
                         <MenuFlyoutItem

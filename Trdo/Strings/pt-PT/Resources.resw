@@ -311,6 +311,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Mostrar janela</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Transmitir</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Transmitir para um dispositivo</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>A transmitir para {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Ainda não foram encontrados dispositivos. Certifique-se de que o dispositivo está ligado e na mesma rede que este PC.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>Não foi possível transmitir para {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>A procurar dispositivos na sua rede…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Parar de transmitir</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>A transmissão não está disponível neste PC porque não foi possível carregar o motor de reprodução LibVLC.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Toque no ícone de estrela nas músicas de que gosta para as guardar aqui</value>
   </data>
@@ -467,6 +494,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>Adicione a sua primeira estação</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Transmitir…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>A transmitir para {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>Eliminar grupo</value>
   </data>
@@ -580,6 +613,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Estações</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Parar de transmitir</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Ver faixas do álbum</value>

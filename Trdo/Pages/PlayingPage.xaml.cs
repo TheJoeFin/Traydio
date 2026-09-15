@@ -44,6 +44,9 @@ public sealed partial class PlayingPage : Page
     /// </summary>
     private ContentDialog? _playbackErrorDialog;
 
+    /// <summary>The cast picker while it is open, so a second right-click doesn't stack another.</summary>
+    private CastDeviceDialog? _castDialog;
+
     /// <summary>
     /// Set while the page is pushing the view model's selection into the list, so the
     /// resulting <c>SelectionChanged</c> is not mistaken for the user picking a station.
@@ -230,6 +233,33 @@ public sealed partial class PlayingPage : Page
             ViewModel.StartSleepTimer(minutes);
         }
     }
+
+    private async void CastMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (_castDialog is not null)
+        {
+            return;
+        }
+
+        CastDeviceDialog dialog = new() { XamlRoot = XamlRoot };
+        _castDialog = dialog;
+        try
+        {
+            await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            // Only one ContentDialog can be up per root; a playback error already showing wins.
+            Debug.WriteLine($"[PlayingPage] EXCEPTION showing cast dialog: {ex.Message}");
+        }
+        finally
+        {
+            _castDialog = null;
+        }
+    }
+
+    private async void StopCastingMenuItem_Click(object sender, RoutedEventArgs e) =>
+        await ViewModel.StopCastingAsync();
 
     private void SleepTimerButton_Click(object sender, RoutedEventArgs e)
     {

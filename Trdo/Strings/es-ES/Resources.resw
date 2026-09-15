@@ -311,6 +311,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Mostrar ventana</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Enviar a un dispositivo</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Enviando actualmente a {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Aún no se han encontrado dispositivos. Asegúrate de que el dispositivo esté encendido y conectado a la misma red que este PC.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>No se pudo enviar a {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Buscando dispositivos en tu red…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Dejar de enviar</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>El envío no está disponible en este PC porque no se pudo cargar el motor de reproducción LibVLC.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Toca el icono de estrella en las canciones que te gusten para guardarlas aquí</value>
   </data>
@@ -467,6 +494,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>Añadir tu primera estación</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Enviar…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>Enviando a {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>Eliminar grupo</value>
   </data>
@@ -580,6 +613,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Estaciones</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Dejar de enviar</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Ver pistas del álbum</value>

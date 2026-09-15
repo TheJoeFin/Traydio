@@ -311,6 +311,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>显示窗口</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>投放</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>投放到设备</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>正在投放到 {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>尚未找到设备。请确保设备已开机并与此电脑连接到同一网络。</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>无法投放到 {0}：{1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>正在搜索网络中的设备…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>停止投放</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>此电脑无法投放，因为 LibVLC 播放引擎无法加载。</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>点击喜欢的歌曲上的星标图标即可保存到这里</value>
   </data>
@@ -467,6 +494,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>添加您的第一个电台</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>投放…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>正在投放到 {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>删除分组</value>
   </data>
@@ -580,6 +613,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>电台</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>停止投放</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>查看专辑曲目</value>

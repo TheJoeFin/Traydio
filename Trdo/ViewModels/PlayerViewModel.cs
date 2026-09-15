@@ -97,6 +97,12 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
         _player.NextStationRequested += (_, _) => SelectNextStation();
         _player.PreviousStationRequested += (_, _) => SelectPreviousStation();
+        _player.CastTargetChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsCasting));
+            OnPropertyChanged(nameof(CastTargetName));
+            OnPropertyChanged(nameof(CastMenuText));
+        };
 
         // Failures raised by the player go straight to PlaybackErrorService, which decides
         // whether they are still worth showing. Recorded here only so LastError reflects them.
@@ -969,6 +975,35 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
 
         Debug.WriteLine("=== Pause END ===");
+    }
+
+    /// <summary>Casting needs the LibVLC engine, so this is false where LibVLC failed to load.</summary>
+    public bool CanCast => _player.CanCast;
+
+    public bool IsCasting => _player.IsCasting;
+
+    public string? CastTargetName => _player.CastTargetName;
+
+    /// <summary>The play button's context-menu entry: "Cast…" or, while casting, the target's name.</summary>
+    public string CastMenuText => IsCasting
+        ? string.Format(LocalizationService.GetString("PlayingPage_CastingTo", "Casting to {0}…"), CastTargetName)
+        : LocalizationService.GetString("PlayingPage_Cast", "Cast…");
+
+    /// <summary>Brings the audio back to this PC. Failures go to the playback error service like any other.</summary>
+    public async Task StopCastingAsync()
+    {
+        try
+        {
+            await _player.SetCastTargetAsync(null, null);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PlayerViewModel] EXCEPTION in StopCastingAsync: {ex}");
+            PlaybackErrorService.Instance.Report(string.Format(
+                LocalizationService.GetString("CastDeviceDialog_Failed", "Couldn't cast to {0}: {1}"),
+                "this PC",
+                ex.Message));
+        }
     }
 
     /// <summary>True while a sleep timer is counting down toward pausing playback.</summary>
