@@ -359,6 +359,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         }
 
         ClearSource();
+        DetachMediaPlayer(_mediaPlayer);
         _mediaPlayer.Dispose();
     }
 }
