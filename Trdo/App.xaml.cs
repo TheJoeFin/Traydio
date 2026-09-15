@@ -195,10 +195,11 @@ public partial class App : Application
     /// </remarks>
     private void HandleSongChangePopup()
     {
+        // Not logged: blank metadata is the normal opening state of every station and local
+        // album, and the metadata pipeline's own log lines already show it arriving.
         string displayText = _playerVm.CurrentMetadata.DisplayText.Trim();
         if (displayText.Length == 0)
         {
-            LogService.Info("SongChangePopup", "Metadata observed but blank; ignoring");
             return;
         }
 
