@@ -10,6 +10,7 @@
     Title="Traydio"
     Width="400"
     Height="620"
+    Closed="WindowEx_Closed"
     IsMaximizable="False"
     IsMinimizable="False"
     mc:Ignorable="d">

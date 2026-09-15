@@ -232,8 +232,9 @@ internal static class HlsStreamHelper
             return (null, "Invalid stream URL");
         }
 
-        bool isHls = IsLikelyHlsUrl(streamUrl) ||
-                     await IsHlsContentTypeAsync(httpClient, uri, cancellationToken);
+        bool isHttp = uri.Scheme is "http" or "https";
+        bool isHls = isHttp &&
+                     (IsLikelyHlsUrl(streamUrl) || await IsHlsContentTypeAsync(httpClient, uri, cancellationToken));
 
         if (isHls)
         {

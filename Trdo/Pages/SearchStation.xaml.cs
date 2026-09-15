@@ -102,7 +102,7 @@ public sealed partial class SearchStation : Page
                 station.Favicon,
                 RadioPlayerService.Instance.Volume,
                 playAfterSwitch: true,
-                transitionCts.Token);
+                cancellationToken: transitionCts.Token);
         }
         catch (OperationCanceledException)
         {
@@ -175,7 +175,9 @@ public sealed partial class SearchStation : Page
                         selectedStation.FaviconUrl,
                         selectedStation.Volume,
                         playAfterSwitch: false,
-                        transitionCts.Token);
+                        sourceKind: selectedStation.SourceKind,
+                        whiteNoiseColor: selectedStation.WhiteNoiseColor,
+                        cancellationToken: transitionCts.Token);
                 }
                 else
                 {
@@ -267,6 +269,23 @@ public sealed partial class SearchStation : Page
         await StopPreviewAsync();
         // Open a pop-out window for manual station entry so the flyout closing doesn't clear the fields
         ManualStationWindow addWindow = new();
+        WindowHelper.Track(addWindow);
+        addWindow.Activate();
+    }
+
+    private async void AddWhiteNoiseButton_Click(object sender, RoutedEventArgs e)
+    {
+        await StopPreviewAsync();
+        _shellViewModel?.NavigateToAddWhiteNoisePage();
+    }
+
+    private async void AddLocalMusicButton_Click(object sender, RoutedEventArgs e)
+    {
+        await StopPreviewAsync();
+
+        // Pop-out window, not page navigation: picking a folder opens a system FolderPicker
+        // dialog, which a page hosted in the shell frame does not survive.
+        AddLocalMusicWindow addWindow = new();
         WindowHelper.Track(addWindow);
         addWindow.Activate();
     }

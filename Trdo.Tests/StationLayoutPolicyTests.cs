@@ -25,7 +25,22 @@ public sealed class StationLayoutPolicyTests
     {
         StationGroup group = new() { Id = name, Name = name, IsExpanded = expanded };
         foreach (object child in children)
+        {
             group.Children.Add(child);
+
+            // Mirrors what a real Flatten pass already did before any drag: GroupId is view
+            // state stamped on a node while it is drawn, and ApplyReorder reads it back to
+            // tell an established member of this group from one merely passing through.
+            switch (child)
+            {
+                case RadioStation station:
+                    station.GroupId = name;
+                    break;
+                case StationDivider divider:
+                    divider.GroupId = name;
+                    break;
+            }
+        }
         return group;
     }
 
@@ -316,7 +331,7 @@ public sealed class StationLayoutPolicyTests
         List<object> previous = [group, loose];
 
         // The user dragged "Loose" between "One" and "Two".
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, one, loose, two]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, one, loose, two], [loose]);
 
         Assert.HasCount(1, nodes);
         Assert.AreSequenceEqual([one, loose, two], ((StationGroup)nodes[0]).Children);
@@ -332,7 +347,8 @@ public sealed class StationLayoutPolicyTests
         StationGroup group = Group("Jazz", expanded: true, one);
         List<object> previous = [group, loose];
 
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, one, loose]);
+        // The user dragged "Loose" to the bottom of the folder.
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, one, loose], [loose]);
 
         Assert.HasCount(1, nodes);
         Assert.AreSequenceEqual([one, loose], ((StationGroup)nodes[0]).Children);
@@ -348,7 +364,7 @@ public sealed class StationLayoutPolicyTests
         StationGroup group = Group("News", expanded: false, hiddenA, hiddenB);
         List<object> previous = [group, dropped];
 
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, dropped]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, dropped], [dropped]);
 
         Assert.HasCount(1, nodes);
         Assert.AreSequenceEqual(
@@ -364,7 +380,7 @@ public sealed class StationLayoutPolicyTests
         List<object> previous = [group, loose];
 
         // The group was dragged below the loose station.
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [loose, group]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [loose, group], [group]);
 
         Assert.AreSequenceEqual([loose, group], nodes);
         Assert.AreSequenceEqual([hidden], group.Children);
@@ -379,7 +395,7 @@ public sealed class StationLayoutPolicyTests
         List<object> previous = [first, second];
 
         // "Second" was dropped between "First" and its child.
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [first, second, child]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [first, second, child], [second]);
 
         Assert.AreSequenceEqual([first, second], nodes);
         Assert.IsEmpty(first.Children);
@@ -393,7 +409,7 @@ public sealed class StationLayoutPolicyTests
         StationDivider divider = Divider("d1");
         List<object> previous = [a, b, divider];
 
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [divider, a, b]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [divider, a, b], [divider]);
 
         Assert.AreSequenceEqual([divider, a, b], nodes);
         Assert.IsNull(divider.GroupId);
@@ -407,7 +423,7 @@ public sealed class StationLayoutPolicyTests
         List<object> previous = [group];
 
         // Dragged above the folder header.
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [escaping, group, staying]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [escaping, group, staying], [escaping]);
 
         Assert.AreSequenceEqual([escaping, group], nodes);
         Assert.AreSequenceEqual([staying], group.Children);
@@ -420,8 +436,48 @@ public sealed class StationLayoutPolicyTests
         RadioStation a = Station("A"), b = Station("B"), c = Station("C"), d = Station("D");
         List<object> previous = [a, b, c, d];
 
-        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [d, a, b, c]);
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [d, a, b, c], [d]);
 
         Assert.AreSequenceEqual([d, a, b, c], nodes);
+    }
+
+    [TestMethod]
+    public void ApplyReorder_UnrelatedDragElsewhere_LeavesTrailingTopLevelStationsAlone()
+    {
+        // Regression test for the bug where completing any drag - even one nowhere near a
+        // folder - re-derived the whole arrangement from the display rows and, since nothing
+        // marked where a folder's run of rows ended, swallowed every ordinary station sitting
+        // below the bottom-most folder into it.
+        RadioStation inside = Station("Inside");
+        StationGroup group = Group("Jazz", expanded: true, inside);
+        RadioStation trailingA = Station("TrailingA"), trailingB = Station("TrailingB");
+        List<object> previous = [group, trailingA, trailingB];
+
+        // Nothing here moved; the display rows come back exactly as they went in, the way
+        // they would for a drag that only reordered rows elsewhere in a longer list.
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, inside, trailingA, trailingB], []);
+
+        Assert.AreSequenceEqual([group, trailingA, trailingB], nodes);
+        Assert.AreSequenceEqual([inside], group.Children);
+        Assert.IsNull(trailingA.GroupId);
+        Assert.IsNull(trailingB.GroupId);
+    }
+
+    [TestMethod]
+    public void ApplyReorder_StationDraggedPastATrailingTopLevelStation_EscapesTheFolder()
+    {
+        // There was previously no way to drag a station out of a folder at all - only
+        // "Move to group ▸ (None)" could do it. Dropping it past a station that is already
+        // unambiguously top-level is now the drag equivalent.
+        RadioStation escaping = Station("Escaping"), stays = Station("Stays");
+        RadioStation anchor = Station("Anchor");
+        StationGroup group = Group("Jazz", expanded: true, escaping, stays);
+        List<object> previous = [group, anchor];
+
+        List<object> nodes = StationLayoutPolicy.ApplyReorder(previous, [group, stays, anchor, escaping], [escaping]);
+
+        Assert.AreSequenceEqual([group, anchor, escaping], nodes);
+        Assert.AreSequenceEqual([stays], group.Children);
+        Assert.IsNull(escaping.GroupId);
     }
 }

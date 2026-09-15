@@ -32,10 +32,10 @@
             <StackPanel
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Spacing="12"
-                Visibility="{x:Bind ViewModel.IsPlaybackActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
                 animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
-                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}">
+                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}"
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.IsPlaybackActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
                 <FontIcon
                     HorizontalAlignment="Center"
                     FontSize="48"
@@ -59,9 +59,9 @@
             <!--  Track Info Display  -->
             <Grid
                 VerticalAlignment="Top"
-                Visibility="{x:Bind ViewModel.IsPlaybackActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                 animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
-                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}">
+                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}"
+                Visibility="{x:Bind ViewModel.IsPlaybackActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid
                     Padding="16"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -80,21 +80,31 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <FontIcon
-                                x:Name="TrackIcon"
+                            <Grid
                                 Grid.Column="0"
+                                Width="40"
+                                Height="40"
                                 Margin="0,0,12,0"
-                                VerticalAlignment="Center"
-                                FontSize="24"
-                                Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                Glyph="&#xE8D6;"
-                                animations:Connected.Key="NowPlayingTrackIcon" />
+                                VerticalAlignment="Center">
+                                <FontIcon
+                                    x:Name="TrackIcon"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    animations:Connected.Key="NowPlayingTrackIcon"
+                                    FontSize="24"
+                                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                    Glyph="{x:Bind ViewModel.AlbumArtPlaceholderGlyph, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.AlbumArtPlaceholderVisibility, Mode=OneWay}" />
+                                <Border CornerRadius="2">
+                                    <Image Source="{x:Bind ViewModel.AlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                </Border>
+                            </Grid>
 
                             <StackPanel
                                 Grid.Column="1"
                                 VerticalAlignment="Center"
-                                Spacing="4"
-                                animations:Connected.AnchorElement="{x:Bind TrackIcon}">
+                                animations:Connected.AnchorElement="{x:Bind TrackIcon}"
+                                Spacing="4">
                                 <StackPanel Spacing="2">
                                     <TextBlock
                                         x:Uid="NowPlayingPage_Label_Title"
@@ -128,10 +138,10 @@
                                 Margin="8,0,0,0"
                                 Padding="8"
                                 VerticalAlignment="Center"
+                                animations:Connected.AnchorElement="{x:Bind TrackIcon}"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Click="FavoriteCurrentTrack_Click"
-                                animations:Connected.AnchorElement="{x:Bind TrackIcon}">
+                                Click="FavoriteCurrentTrack_Click">
                                 <FontIcon
                                     FontSize="20"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
@@ -253,8 +263,11 @@
             </Grid>
         </Grid>
 
-        <!--  Playlist History Section  -->
-        <Grid Grid.Row="2" Padding="0,0,0,0">
+        <!--  Playlist History Section - hidden for local music, which shows its folder's track list instead  -->
+        <Grid
+            Grid.Row="2"
+            Padding="0,0,0,0"
+            Visibility="{x:Bind ViewModel.IsLocalMusicActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -265,22 +278,22 @@
                 x:Uid="NowPlayingPage_RecentTracks"
                 Grid.Row="0"
                 Margin="0,0,0,8"
+                animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
+                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}"
                 FontSize="14"
                 FontWeight="SemiBold"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Visibility="{x:Bind ViewModel.PlaylistHistory.Count, Mode=OneWay, Converter={StaticResource CountToHasItemsVisibilityConverter}}"
-                animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
-                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}" />
+                Visibility="{x:Bind ViewModel.PlaylistHistory.Count, Mode=OneWay, Converter={StaticResource CountToHasItemsVisibilityConverter}}" />
 
             <!--  History List  -->
             <ListView
                 Grid.Row="1"
                 Padding="0,0,12,0"
+                animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
+                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}"
                 ItemsSource="{x:Bind ViewModel.PlaylistHistory, Mode=OneWay}"
                 SelectionMode="None"
-                Visibility="{x:Bind ViewModel.PlaylistHistory.Count, Mode=OneWay, Converter={StaticResource CountToHasItemsVisibilityConverter}}"
-                animations:Implicit.HideAnimations="{StaticResource ImplicitCrossFadeHideAnimations}"
-                animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}">
+                Visibility="{x:Bind ViewModel.PlaylistHistory.Count, Mode=OneWay, Converter={StaticResource CountToHasItemsVisibilityConverter}}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -292,9 +305,9 @@
                     <DataTemplate x:DataType="models:PlaylistHistoryItem">
                         <Grid
                             Padding="10"
+                            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
                             Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-                            CornerRadius="6"
-                            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}">
+                            CornerRadius="6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -340,6 +353,95 @@
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
                                     Glyph="{x:Bind IsFavorited, Mode=OneWay, Converter={StaticResource BooleanToFavoriteGlyphConverter}}" />
                             </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--  Local Music Track List Section  -->
+        <Grid
+            Grid.Row="2"
+            Padding="0,0,0,0"
+            Visibility="{x:Bind ViewModel.IsLocalMusicActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                x:Uid="NowPlayingPage_TrackList"
+                Grid.Row="0"
+                Margin="0,0,0,8"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <!--
+                ItemClick, not SelectionChanged: browsing an album (see PlayingPage's "View
+                Album Tracks") lands here with track 0 already selected but not playing, and
+                SelectionChanged never fires for a click that does not change which row is
+                selected - clicking that same first row would then do nothing.
+            -->
+            <ListView
+                Grid.Row="1"
+                Padding="0,0,12,0"
+                IsItemClickEnabled="True"
+                ItemClick="LocalTrackList_ItemClick"
+                ItemsSource="{x:Bind ViewModel.LocalTrackList, Mode=OneWay}"
+                SelectedIndex="{x:Bind ViewModel.CurrentLocalTrackIndex, Mode=OneWay}"
+                SelectionMode="Single">
+                <ListView.Resources>
+                    <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="ListViewItemForegroundSelected" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0,4" />
+                        <Setter Property="MinHeight" Value="0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LocalTrackDisplayItem">
+                        <Grid
+                            Padding="6"
+                            Background="Transparent"
+                            PointerEntered="LocalTrackRow_PointerEntered"
+                            PointerExited="LocalTrackRow_PointerExited">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid
+                                Grid.Column="0"
+                                Width="12"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center">
+                                <!--  Currently-playing indicator  -->
+                                <FontIcon
+                                    FontSize="12"
+                                    Glyph="&#xE767;"
+                                    Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <!--  Shown on hover of a non-playing track, to indicate clicking plays it  -->
+                                <FontIcon
+                                    x:Name="HoverPlayIcon"
+                                    FontSize="12"
+                                    Glyph="&#xE768;"
+                                    Opacity="0"
+                                    Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                            </Grid>
+
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Text="{x:Bind DisplayTitle}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

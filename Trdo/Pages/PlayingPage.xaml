@@ -25,7 +25,17 @@
             before folders existed.
         -->
         <DataTemplate x:Key="StationRowTemplate" x:DataType="models:RadioStation">
-            <Grid ColumnDefinitions="Auto,Auto,*">
+            <!--
+                Background="Transparent" so the row is hit-testable across its empty stretches
+                too - otherwise hovering anywhere that is not already covered by the favicon or
+                the name text would never raise PointerEntered/Exited, and the chevron would
+                only ever appear over those two spots.
+            -->
+            <Grid
+                Background="Transparent"
+                ColumnDefinitions="Auto,Auto,*,Auto"
+                PointerEntered="StationRow_PointerEntered"
+                PointerExited="StationRow_PointerExited">
                 <Grid.ContextFlyout>
                     <!--
                         The three original commands stay first and in their original order:
@@ -33,7 +43,14 @@
                         than a tidier grouping.
                     -->
                     <MenuFlyout Opening="StationContextMenu_Opening">
+                        <!--
+                            Text and icon are rewritten in StationContextMenu_Opening for a
+                            local album - "Visit Website" makes no sense for one, and containers
+                            get recycled as the list scrolls, so the row-specific wording cannot
+                            just be set once here.
+                        -->
                         <MenuFlyoutItem
+                            x:Name="VisitWebsiteMenuItem"
                             x:Uid="PlayingPage_VisitWebsite"
                             Click="VisitSite_Click"
                             Tag="{x:Bind}">
@@ -85,7 +102,7 @@
                 <!--  Selection indicator  -->
                 <Border
                     x:Name="SelectionIndicator"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     Margin="-8,-6"
                     Background="{ThemeResource AccentAcrylicBackgroundFillColorDefaultBrush}"
                     CornerRadius="2"
@@ -99,15 +116,21 @@
                     Background="{ThemeResource DividerStrokeColorDefaultBrush}"
                     Visibility="{x:Bind GroupId, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}" />
 
-                <!--  Favicon  -->
+                <!--  Favicon - falls back to a placeholder icon per SourceKind when there's no cover art  -->
                 <Grid
                     Grid.Column="1"
                     Width="24"
                     Height="24"
                     Margin="0,0,12,0"
-                    VerticalAlignment="Center"
-                    Visibility="{x:Bind FaviconUrl, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}">
-                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="4">
+                    VerticalAlignment="Center">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                        Glyph="{x:Bind FaviconPlaceholderGlyph, Mode=OneWay}"
+                        Visibility="{x:Bind ShowsFaviconPlaceholder, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                    <Border CornerRadius="4">
                         <Image Source="{x:Bind FaviconUrl, Converter={StaticResource StringToImageSourceConverter}, Mode=OneWay}" Stretch="UniformToFill" />
                     </Border>
                 </Grid>
@@ -120,6 +143,26 @@
                     Text="{x:Bind Name, Mode=OneWay}"
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="NoWrap" />
+
+                <!--
+                    View album tracks - a local album only, since that is the only row kind
+                    with a track list behind it. Hidden until the row is hovered; see
+                    StationRow_PointerEntered/Exited.
+                -->
+                <Button
+                    x:Name="ViewAlbumTracksButton"
+                    x:Uid="PlayingPage_ViewAlbumTracks"
+                    Grid.Column="3"
+                    Padding="6"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="ViewAlbumTracks_Click"
+                    Opacity="0"
+                    Tag="{x:Bind}"
+                    Visibility="{x:Bind IsLocalAlbum, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                    <FontIcon FontSize="12" Glyph="&#xE76C;" />
+                </Button>
             </Grid>
         </DataTemplate>
 
@@ -279,7 +322,7 @@
         its gap on both sides of a row even when that row's content is Collapsed, which is what
         left a phantom gap above the playback buttons whenever the volume slider was hidden.
     -->
-    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto">
         <Grid.ContextFlyout>
             <MenuFlyout x:Name="PageContextMenu" Opening="PageContextMenu_Opening">
                 <MenuFlyoutItem
@@ -520,11 +563,19 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <FontIcon
+            <Button
+                x:Uid="PlayingPage_MuteButton"
                 Grid.Column="0"
+                Width="32"
+                Height="32"
+                Padding="0"
                 VerticalAlignment="Center"
-                FontSize="20"
-                Glyph="&#xE767;" />
+                Background="Transparent"
+                BorderThickness="0"
+                Click="MuteButton_Click"
+                CornerRadius="16">
+                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.VolumeGlyph, Mode=OneWay}" />
+            </Button>
             <Slider
                 x:Name="VolumeSlider"
                 Grid.Column="1"
@@ -567,13 +618,23 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <FontIcon
+                <Grid
                     Grid.Column="0"
-                    VerticalAlignment="Center"
-                    animations:Connected.Key="NowPlayingTrackIcon"
-                    FontSize="14"
-                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                    Glyph="&#xE8D6;" />
+                    Width="24"
+                    Height="24"
+                    VerticalAlignment="Center">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        animations:Connected.Key="NowPlayingTrackIcon"
+                        FontSize="14"
+                        Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                        Glyph="{x:Bind ViewModel.CurrentAlbumArtPlaceholderGlyph, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.CurrentAlbumArtPlaceholderVisibility, Mode=OneWay}" />
+                    <Border CornerRadius="2">
+                        <Image Source="{x:Bind ViewModel.CurrentAlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                    </Border>
+                </Grid>
                 <Grid
                     x:Name="NowPlayingTextHost"
                     Grid.Column="1"
@@ -626,14 +687,77 @@
             </Grid>
         </Button>
 
-        <!--  Playback Actions  -->
+        <!--  Local Music Scrub Bar  -->
         <Grid
             Grid.Row="5"
+            Margin="0,12,0,0"
+            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
+            ColumnSpacing="4"
+            Visibility="{x:Bind ViewModel.IsLocalMusicActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                x:Name="PreviousTrackButton"
+                Grid.Column="0"
+                Padding="8"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="PreviousTrackButton_Click"
+                IsEnabled="{x:Bind ViewModel.CanGoToPreviousLocalTrack, Mode=OneWay}">
+                <FontIcon FontSize="14" Glyph="&#xE892;" />
+            </Button>
+
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontSize="11"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.PositionDisplay, Mode=OneWay}" />
+
+            <Slider
+                x:Name="SeekSlider"
+                Grid.Column="2"
+                Maximum="100"
+                Minimum="0"
+                PointerCaptureLost="SeekSlider_PointerCaptureLost"
+                PointerPressed="SeekSlider_PointerPressed"
+                Value="{x:Bind ViewModel.SeekProgress, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="3"
+                VerticalAlignment="Center"
+                FontSize="11"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.DurationDisplay, Mode=OneWay}" />
+            <Button
+                x:Name="NextTrackButton"
+                Grid.Column="4"
+                Padding="8"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="NextTrackButton_Click"
+                IsEnabled="{x:Bind ViewModel.CanGoToNextLocalTrack, Mode=OneWay}">
+                <FontIcon FontSize="14" Glyph="&#xE893;" />
+            </Button>
+        </Grid>
+
+        <!--  Playback Actions  -->
+        <Grid
+            Grid.Row="6"
             Margin="0,12,0,0"
             animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
             ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
@@ -648,11 +772,93 @@
                     <FontIcon FontSize="16" Glyph="{x:Bind ViewModel.PlaybackButtonGlyph, Mode=OneWay}" />
                     <TextBlock FontSize="12" Text="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}" />
                 </StackPanel>
+                <Button.ContextFlyout>
+                    <MenuFlyout>
+                        <!--  Disabled item used as a plain label rather than a real command.  -->
+                        <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_SleepTimer15Minutes"
+                            Click="SleepTimerMenuItem_Click"
+                            Tag="15" />
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_SleepTimer20Minutes"
+                            Click="SleepTimerMenuItem_Click"
+                            Tag="20" />
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_SleepTimer30Minutes"
+                            Click="SleepTimerMenuItem_Click"
+                            Tag="30" />
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_SleepTimer45Minutes"
+                            Click="SleepTimerMenuItem_Click"
+                            Tag="45" />
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_SleepTimer50Minutes"
+                            Click="SleepTimerMenuItem_Click"
+                            Tag="50" />
+                    </MenuFlyout>
+                </Button.ContextFlyout>
+            </Button>
+
+            <!--
+                Sleep timer countdown. Only takes a column when active, at which point it
+                squeezes in between the play/pause button and the pop-out link - PlayButton's
+                column is "*" so the space it gives up comes straight out of that button rather
+                than the two HyperlinkButtons after it.
+            -->
+            <Button
+                x:Name="SleepTimerButton"
+                x:Uid="PlayingPage_CancelSleepTimer"
+                Grid.Column="1"
+                Width="32"
+                Height="32"
+                Padding="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="SleepTimerButton_Click"
+                CornerRadius="16"
+                PointerEntered="SleepTimerButton_PointerEntered"
+                PointerExited="SleepTimerButton_PointerExited"
+                Visibility="{x:Bind ViewModel.IsSleepTimerActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid Width="28" Height="28">
+                    <Grid x:Name="SleepTimerRingHost">
+                        <Ellipse
+                            Width="28"
+                            Height="28"
+                            Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
+                            StrokeThickness="2.5" />
+                        <Ellipse
+                            x:Name="SleepTimerRingProgress"
+                            Width="28"
+                            Height="28"
+                            RenderTransformOrigin="0.5,0.5"
+                            Stroke="{ThemeResource AccentFillColorDefaultBrush}"
+                            StrokeThickness="2.5">
+                            <Ellipse.RenderTransform>
+                                <RotateTransform Angle="-90" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="8.5"
+                            Text="{x:Bind ViewModel.SleepTimerDisplayText, Mode=OneWay}" />
+                    </Grid>
+                    <FontIcon
+                        x:Name="SleepTimerCancelIcon"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Glyph="&#xE711;"
+                        Opacity="0" />
+                </Grid>
             </Button>
 
             <HyperlinkButton
                 x:Uid="PlayingPage_PopOutButton"
-                Grid.Column="1"
+                Grid.Column="2"
                 VerticalAlignment="Center"
                 Click="PopOutButton_Click">
                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -662,7 +868,7 @@
 
             <HyperlinkButton
                 x:Uid="PlayingPage_QuitButton"
-                Grid.Column="2"
+                Grid.Column="3"
                 VerticalAlignment="Center"
                 Click="CloseButton_Click" />
         </Grid>

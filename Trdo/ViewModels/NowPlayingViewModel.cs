@@ -1,7 +1,11 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +64,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
 
     private void OnPlayerViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(PlayerViewModel.LocalTrackList) or nameof(PlayerViewModel.CurrentLocalTrackIndex))
+        {
+            Debug.WriteLine($"[NowPlayingViewModel] PlayerViewModel.{e.PropertyName} changed");
+        }
+
         if (e.PropertyName is nameof(PlayerViewModel.IsPlaybackActive)
             or nameof(PlayerViewModel.IsRefreshingMetadata)
             or nameof(PlayerViewModel.CanRefreshMetadata))
@@ -67,6 +76,45 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsPlaybackActive));
             OnPropertyChanged(nameof(IsRefreshingMetadata));
             OnPropertyChanged(nameof(CanRefreshMetadata));
+
+            // A track can stop being "playing" without its index changing - e.g. browsing a
+            // local album's tracks selects track 0 but does not play it, and pausing keeps the
+            // same track selected. Either way the row's speaker glyph needs to catch up.
+            if (e.PropertyName is nameof(PlayerViewModel.IsPlaybackActive))
+                UpdateLocalTrackPlayingFlags();
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.IsLocalMusicActive)
+            or nameof(PlayerViewModel.LocalTrackList)
+            or nameof(PlayerViewModel.CurrentLocalTrackIndex))
+        {
+            OnPropertyChanged(nameof(IsLocalMusicActive));
+            OnPropertyChanged(nameof(HasEnabledMusicServices));
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentAlbumArtPlaceholderGlyph))
+        {
+            OnPropertyChanged(nameof(AlbumArtPlaceholderGlyph));
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentAlbumArtPlaceholderVisibility))
+        {
+            OnPropertyChanged(nameof(AlbumArtPlaceholderVisibility));
+        }
+
+        // Kept separate from the block above: LocalTrackList rebuilds the whole displayed
+        // collection, which would reset the ListView's selection if raised on every track
+        // change - it only needs to fire when the folder's track list itself changes.
+        if (e.PropertyName is nameof(PlayerViewModel.IsLocalMusicActive)
+            or nameof(PlayerViewModel.LocalTrackList))
+        {
+            OnPropertyChanged(nameof(LocalTrackList));
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.CurrentLocalTrackIndex))
+        {
+            OnPropertyChanged(nameof(CurrentLocalTrackIndex));
+            UpdateLocalTrackPlayingFlags();
         }
     }
 
@@ -83,6 +131,8 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     private void OnStreamMetadataChanged(object? sender, StreamMetadata metadata)
     {
         OnPropertyChanged(nameof(CurrentMetadata));
+        OnPropertyChanged(nameof(AlbumArtImageSource));
+        OnPropertyChanged(nameof(AlbumArtPlaceholderVisibility));
         OnPropertyChanged(nameof(StreamTitle));
         OnPropertyChanged(nameof(Artist));
         OnPropertyChanged(nameof(Title));
@@ -141,6 +191,26 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     /// Gets the current stream metadata.
     /// </summary>
     public StreamMetadata CurrentMetadata => _player.CurrentMetadata;
+
+    /// <summary>
+    /// Gets the current track's album art, if any, to replace the music note icon with.
+    /// Reuses <see cref="PlayerViewModel"/>'s loading/validation so both surfaces agree on
+    /// what counts as displayable art.
+    /// </summary>
+    public ImageSource? AlbumArtImageSource => PlayerViewModel.Shared.CurrentAlbumArtImageSource;
+
+    /// <summary>
+    /// The icon shown behind <see cref="AlbumArtImageSource"/> while no art is loaded. Delegates
+    /// to <see cref="PlayerViewModel"/> for the same reason <see cref="AlbumArtImageSource"/>
+    /// does - so this screen and the transport bar always agree on which placeholder to show.
+    /// </summary>
+    public string AlbumArtPlaceholderGlyph => PlayerViewModel.Shared.CurrentAlbumArtPlaceholderGlyph;
+
+    /// <summary>
+    /// Whether <see cref="AlbumArtPlaceholderGlyph"/> should be shown instead of
+    /// <see cref="AlbumArtImageSource"/>. Delegates for the same reason the other two do.
+    /// </summary>
+    public Visibility AlbumArtPlaceholderVisibility => PlayerViewModel.Shared.CurrentAlbumArtPlaceholderVisibility;
 
     /// <summary>
     /// Gets the full stream title string.
@@ -346,14 +416,98 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     public bool IsBandcampEnabled => SettingsService.IsBandcampEnabled;
 
     /// <summary>
-    /// Gets whether at least one music service search link should be shown.
+    /// Gets whether at least one music service search link should be shown. Never shown for
+    /// local music - a locally-tagged filename has no guaranteed metadata match on any of
+    /// these services.
     /// </summary>
     public bool HasEnabledMusicServices =>
-        IsSpotifyEnabled ||
+        !IsLocalMusicActive &&
+        (IsSpotifyEnabled ||
         IsDiscogsEnabled ||
         IsAppleMusicEnabled ||
         IsYouTubeMusicEnabled ||
-        IsBandcampEnabled;
+        IsBandcampEnabled);
+
+    /// <summary>True when the selected station is a local music folder rather than radio/white noise.</summary>
+    public bool IsLocalMusicActive => PlayerViewModel.Shared.IsLocalMusicActive;
+
+    /// <summary>Gets the index of the local track that is currently playing.</summary>
+    public int CurrentLocalTrackIndex => PlayerViewModel.Shared.CurrentLocalTrackIndex;
+
+    // Cached alongside the source track list it was built from, keyed by reference: PlayerViewModel's
+    // LocalTrackList only changes identity when the folder is (re)scanned, so this lets the getter
+    // below hand back the same item instances across every other PropertyChanged (e.g. a track change),
+    // which in turn lets UpdateLocalTrackPlayingFlags mutate IsPlaying in place instead of swapping the
+    // ListView's ItemsSource and resetting its selection/scroll position.
+    private IReadOnlyList<string>? _localTrackListSource;
+    private List<LocalTrackDisplayItem>? _localTrackDisplayItems;
+
+    /// <summary>
+    /// The current folder's tracks, in order.
+    /// </summary>
+    public IReadOnlyList<LocalTrackDisplayItem> LocalTrackList
+    {
+        get
+        {
+            IReadOnlyList<string> tracks = PlayerViewModel.Shared.LocalTrackList;
+
+            if (_localTrackDisplayItems != null && ReferenceEquals(_localTrackListSource, tracks))
+            {
+                return _localTrackDisplayItems;
+            }
+
+            Debug.WriteLine($"[NowPlayingViewModel] LocalTrackList rebuilt ({tracks.Count} track(s)) - this swaps the ListView's ItemsSource");
+
+            int currentIndex = CurrentLocalTrackIndex;
+            List<LocalTrackDisplayItem> items = new(tracks.Count);
+            for (int i = 0; i < tracks.Count; i++)
+            {
+                using TagLib.File tfile = TagLib.File.Create(tracks[i]);
+
+                string trackTitle = tfile.Tag.Title;
+
+                // If no title tag, use the filename without extension
+                if (string.IsNullOrWhiteSpace(trackTitle))
+                    trackTitle = Path.GetFileNameWithoutExtension(tracks[i]);
+
+                items.Add(new LocalTrackDisplayItem
+                {
+                    Index = i,
+                    Path = tracks[i],
+                    DisplayTitle = trackTitle,
+                    IsPlaying = i == currentIndex && IsPlaybackActive,
+                });
+            }
+
+            _localTrackListSource = tracks;
+            _localTrackDisplayItems = items;
+            return items;
+        }
+    }
+
+    /// <summary>
+    /// Updates which cached <see cref="LocalTrackDisplayItem"/> reports <see cref="LocalTrackDisplayItem.IsPlaying"/>,
+    /// without rebuilding the list itself - see the caching note above <see cref="LocalTrackList"/>.
+    /// </summary>
+    private void UpdateLocalTrackPlayingFlags()
+    {
+        if (_localTrackDisplayItems == null)
+        {
+            return;
+        }
+
+        int currentIndex = CurrentLocalTrackIndex;
+        foreach (LocalTrackDisplayItem item in _localTrackDisplayItems)
+        {
+            item.IsPlaying = item.Index == currentIndex && IsPlaybackActive;
+        }
+    }
+
+    /// <summary>Plays a track tapped from <see cref="LocalTrackList"/>.</summary>
+    public async void PlayLocalTrackAtIndex(int index)
+    {
+        await PlayerViewModel.Shared.PlayLocalTrackAtIndexAsync(index);
+    }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

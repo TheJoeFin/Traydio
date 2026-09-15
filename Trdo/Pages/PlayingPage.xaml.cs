@@ -184,6 +184,69 @@ public sealed partial class PlayingPage : Page
         {
             UpdateNowPlayingMarqueeState();
         }
+
+        if (e.PropertyName is nameof(PlayerViewModel.SleepTimerProgress))
+        {
+            UpdateSleepTimerRing();
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.IsSleepTimerActive) && ViewModel.IsSleepTimerActive)
+        {
+            // Reset the hover state so a freshly-started timer shows the ring rather than
+            // whatever the pointer happened to be doing to the previous one.
+            SleepTimerRingHost.Opacity = 1;
+            SleepTimerCancelIcon.Opacity = 0;
+            UpdateSleepTimerRing();
+        }
+    }
+
+    private const double SleepTimerRingDiameter = 28;
+    private const double SleepTimerRingStrokeThickness = 2.5;
+
+    /// <summary>
+    /// Redraws the countdown ring's arc via Ellipse.StrokeDashArray. XAML expresses
+    /// dash lengths as multiples of the stroke thickness rather than device pixels, so the
+    /// circle's circumference has to be converted into that unit before it can be split into a
+    /// "time remaining" dash and a "time elapsed" gap.
+    /// </summary>
+    private void UpdateSleepTimerRing()
+    {
+        double progress = Math.Clamp(ViewModel.SleepTimerProgress, 0, 1);
+        double radius = (SleepTimerRingDiameter - SleepTimerRingStrokeThickness) / 2;
+        double circumferenceUnits = 2 * Math.PI * radius / SleepTimerRingStrokeThickness;
+
+        SleepTimerRingProgress.StrokeDashArray = new DoubleCollection
+        {
+            circumferenceUnits * progress,
+            circumferenceUnits
+        };
+    }
+
+    private void SleepTimerMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem { Tag: string minutesText } && int.TryParse(minutesText, out int minutes))
+        {
+            Debug.WriteLine($"[PlayingPage] Starting sleep timer: {minutes} minutes");
+            ViewModel.StartSleepTimer(minutes);
+        }
+    }
+
+    private void SleepTimerButton_Click(object sender, RoutedEventArgs e)
+    {
+        Debug.WriteLine("[PlayingPage] Sleep timer cancelled from countdown control");
+        ViewModel.CancelSleepTimer();
+    }
+
+    private void SleepTimerButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        SleepTimerRingHost.Opacity = 0;
+        SleepTimerCancelIcon.Opacity = 1;
+    }
+
+    private void SleepTimerButton_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        SleepTimerRingHost.Opacity = 1;
+        SleepTimerCancelIcon.Opacity = 0;
     }
 
     private void UpdateFavoriteButtonState()
@@ -209,7 +272,15 @@ public sealed partial class PlayingPage : Page
         ContentDialog dialog = new()
         {
             Title = LocalizationService.GetString("PlayingPage_PlaybackErrorTitle", "Playback Error"),
-            Content = errorMessage,
+            // A plain string Content renders as a TextBlock that can't be selected, which
+            // makes an error impossible to copy into a bug report. TextBlock supports
+            // selection directly - no need for a full TextBox just to allow copying.
+            Content = new TextBlock
+            {
+                Text = errorMessage,
+                TextWrapping = TextWrapping.Wrap,
+                IsTextSelectionEnabled = true,
+            },
             CloseButtonText = LocalizationService.GetString("PlayingPage_PlaybackErrorClose", "OK"),
             XamlRoot = this.XamlRoot
         };
@@ -310,7 +381,15 @@ public sealed partial class PlayingPage : Page
         Debug.WriteLine("[PlayingPage] Close button clicked");
         // Persist any pending per-station volume change before quitting.
         ViewModel.FlushStationsSave();
-        Application.Current.Exit();
+
+        if (Application.Current is App app)
+        {
+            app.ShutdownAndExit();
+        }
+        else
+        {
+            Application.Current.Exit();
+        }
     }
 
     private void AddStationButton_Click(object sender, RoutedEventArgs e)
@@ -392,9 +471,47 @@ public sealed partial class PlayingPage : Page
     {
         if (sender is MenuFlyoutItem menuItem && menuItem.Tag is RadioStation station)
         {
+            if (station.SourceKind == AudioSourceKind.Files)
+            {
+                Debug.WriteLine($"[PlayingPage] Open Folder clicked: {station.Name}");
+                _ = ViewModel.OpenLocalFolder(station);
+                return;
+            }
+
             Debug.WriteLine($"[PlayingPage] Visit Station Site clicked: {station.Name}");
-            // Navigate to AddStation page in edit mode with the station data
             _ = ViewModel.VisitWebsite(station);
+        }
+    }
+
+    private void ViewAlbumTracks_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: RadioStation station })
+        {
+            Debug.WriteLine($"[PlayingPage] View Album Tracks clicked: {station.Name}");
+
+            // Now Playing's local track list reflects whichever station is selected, not
+            // whichever row was clicked - selecting it first is what makes it that album's
+            // tracks the page shows. Browsing, not playing: it must not start the album even
+            // if something else already happened to be playing.
+            ViewModel.SelectStationToBrowse(station);
+            _shellViewModel?.NavigateToNowPlayingPage();
+        }
+    }
+
+    /// <summary>Reveals the hover "view album tracks" chevron - see <c>ViewAlbumTracksButton</c> in the row's DataTemplate.</summary>
+    private void StationRow_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("ViewAlbumTracksButton") is FrameworkElement button)
+        {
+            button.Opacity = 1;
+        }
+    }
+
+    private void StationRow_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement root && root.FindName("ViewAlbumTracksButton") is FrameworkElement button)
+        {
+            button.Opacity = 0;
         }
     }
 
@@ -403,6 +520,30 @@ public sealed partial class PlayingPage : Page
         if (sender is MenuFlyoutItem menuItem && menuItem.Tag is RadioStation station)
         {
             Debug.WriteLine($"[PlayingPage] Edit station clicked: {station.Name}");
+
+            switch (station.SourceKind)
+            {
+                case AudioSourceKind.WhiteNoise:
+                    // White noise has no stream URL, homepage or favicon to edit, so it gets
+                    // its own page rather than the generic manual-entry window.
+                    _shellViewModel?.NavigateToAddWhiteNoisePage(station);
+                    return;
+
+                case AudioSourceKind.Files:
+                    // Its own pop-out window, not page navigation: re-picking a folder opens a
+                    // system FolderPicker dialog, which a page hosted in the shell frame does
+                    // not survive.
+                    AddLocalMusicWindow editLocalMusicWindow = new();
+                    WindowHelper.Track(editLocalMusicWindow);
+                    editLocalMusicWindow.LoadStationForEdit(station);
+                    editLocalMusicWindow.Activate();
+                    return;
+
+                case AudioSourceKind.Radio:
+                default:
+                    break;
+            }
+
             // Open a pop-out window for editing so the flyout closing doesn't clear the fields
             ManualStationWindow editWindow = new();
             WindowHelper.Track(editWindow);
@@ -437,7 +578,11 @@ public sealed partial class PlayingPage : Page
         // The list control has already rewritten the rows; turn that back into the
         // arrangement, then save. Deliberately not SaveStations(): a reorder changes where a
         // station sits, not what it points at, and must not restart the stream.
-        ViewModel.ApplyDisplayReorder();
+        //
+        // args.Items is what was actually dragged - passing it through lets a folder tell a
+        // row that was just carried past it apart from one that genuinely belongs to it, so a
+        // station sitting below a folder is not swept into it by some unrelated drag.
+        ViewModel.ApplyDisplayReorder(args.Items);
         ViewModel.PersistStationList();
 
         // Re-save the selection so its stored position keeps up with the new order
@@ -511,12 +656,37 @@ public sealed partial class PlayingPage : Page
         }
     }
 
+    private void PreviousTrackButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.PreviousLocalTrack();
+    }
+
+    private void NextTrackButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.NextLocalTrack();
+    }
+
+    private void SeekSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        ViewModel.BeginSeekDrag();
+    }
+
+    private void SeekSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        ViewModel.EndSeekDrag();
+    }
+
     private void VolumeControl_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         int delta = e.GetCurrentPoint((UIElement)sender).Properties.MouseWheelDelta;
         double change = (delta / 120.0) * 0.02;
         ViewModel.Volume = Math.Clamp(ViewModel.Volume + change, 0, 2);
         e.Handled = true;
+    }
+
+    private void MuteButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ToggleMute();
     }
 
     private void ToggleVolumeSlider_Click(object sender, RoutedEventArgs e)
@@ -719,7 +889,12 @@ public sealed partial class PlayingPage : Page
         ContentDialog dialog = new()
         {
             Title = title,
-            Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+            Content = new TextBlock
+            {
+                Text = message,
+                TextWrapping = TextWrapping.Wrap,
+                IsTextSelectionEnabled = true,
+            },
             CloseButtonText = "OK",
             XamlRoot = this.XamlRoot
         };
@@ -840,8 +1015,9 @@ public sealed partial class PlayingPage : Page
     }
 
     /// <summary>
-    /// Fills in the "move to group" submenu, which can only be built once the folders are
-    /// known and has to be rebuilt each time in case they have changed.
+    /// Rewrites the "Visit Website"/"Open Folder" entry for the row's source kind, then fills
+    /// in the "move to group" submenu, which can only be built once the folders are known and
+    /// has to be rebuilt each time in case they have changed.
     /// </summary>
     private void StationContextMenu_Opening(object sender, object e)
     {
@@ -849,13 +1025,30 @@ public sealed partial class PlayingPage : Page
             return;
 
         RadioStation? station = null;
+        MenuFlyoutItem? visitWebsiteItem = null;
         foreach (MenuFlyoutItemBase item in flyout.Items)
         {
-            if (item is MenuFlyoutItem { Tag: RadioStation tagged })
+            if (item is MenuFlyoutItem { Tag: RadioStation tagged } menuItem)
             {
                 station = tagged;
-                break;
+                // x:Name inside a DataTemplate names the instance, not a field on this class -
+                // there is no VisitWebsiteMenuItem to nameof() here, so the literal is it.
+                if (menuItem.Name == "VisitWebsiteMenuItem")
+                    visitWebsiteItem = menuItem;
             }
+        }
+
+        // A local album has no website to visit, but it does have a folder worth revealing -
+        // same spot in the menu, same intent ("show me where this came from"), different
+        // destination.
+        if (visitWebsiteItem is not null && station is not null)
+        {
+            bool isLocalAlbum = station.SourceKind == AudioSourceKind.Files;
+            visitWebsiteItem.Text = isLocalAlbum
+                ? LocalizationService.GetString("PlayingPage_OpenFolder", "Open Folder")
+                : LocalizationService.GetString("PlayingPage_VisitWebsite.Text", "Visit Website");
+            if (visitWebsiteItem.Icon is FontIcon icon)
+                icon.Glyph = isLocalAlbum ? "\uE8B7" : "\uEB41";
         }
 
         MenuFlyoutSubItem? subItem = null;

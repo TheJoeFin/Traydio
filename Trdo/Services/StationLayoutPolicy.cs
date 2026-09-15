@@ -176,22 +176,36 @@ public static class StationLayoutPolicy
     /// </para>
     /// <para>
     /// Containment is read off the rows the same way the user reads it off the screen: a folder
-    /// header opens a run, and everything below it belongs to that folder until the next
-    /// top-level thing. That leaves one genuinely ambiguous position - the slot just after a
-    /// folder's last item is both "last inside" and "first after", and the two are
-    /// indistinguishable. It resolves as <em>inside</em>, and "Move to group ▸ (None)" is the
-    /// unambiguous way to get an item back out; that is the direction people actually want,
-    /// and the indentation rail makes the boundary visible while dragging.
+    /// header opens a run, and everything below it belongs to that folder until something
+    /// signals the run has ended. A row that was not part of this drag (it is not in
+    /// <paramref name="movedRows"/>) and was top-level before the drag is exactly that signal -
+    /// it closes the folder's run and goes back to being top-level itself, which is what stops
+    /// ordinary stations sitting after a folder from being swallowed by it every time some
+    /// unrelated row is dragged. A row that <em>was</em> dragged has no such anchor to check
+    /// against, so it simply joins whatever run it was dropped into; dropped right after a
+    /// folder's last child - the one genuinely ambiguous position, both "last inside" and
+    /// "first after" - that resolves as <em>inside</em>, and dropping it past the next
+    /// unmoved top-level row is the unambiguous way to carry it back out.
     /// </para>
     /// </summary>
     /// <param name="previousNodes">The arrangement before the drag.</param>
     /// <param name="newDisplayRows">The visible rows after the drop, in their new order.</param>
+    /// <param name="movedRows">
+    /// The row(s) the user actually dragged, e.g. from <c>DragItemsCompletedEventArgs.Items</c>.
+    /// Everything else is treated as having kept its old membership (read off its own
+    /// <c>GroupId</c>) unless a group header says otherwise.
+    /// </param>
     public static List<object> ApplyReorder(
         IReadOnlyList<object>? previousNodes,
-        IReadOnlyList<object>? newDisplayRows)
+        IReadOnlyList<object>? newDisplayRows,
+        IReadOnlyCollection<object>? movedRows = null)
     {
         if (newDisplayRows is null || newDisplayRows.Count == 0)
             return previousNodes is null ? [] : [.. previousNodes];
+
+        HashSet<object> moved = movedRows is null
+            ? new HashSet<object>(ReferenceEqualityComparer.Instance)
+            : new HashSet<object>(movedRows, ReferenceEqualityComparer.Instance);
 
         // Contents of folders that were collapsed during the drag, so they can be carried
         // across rather than lost.
@@ -228,6 +242,13 @@ public static class StationLayoutPolicy
                     break;
 
                 case RadioStation or StationDivider:
+                    // An untouched row that used to be top-level closes the run: it was never
+                    // part of this folder and dragging something else around it must not pull
+                    // it in. A row that was in some *other* folder is left alone here - folders
+                    // never nest, so a run it now sits in simply takes it over, same as before.
+                    if (currentGroup is not null && !moved.Contains(row) && GetGroupId(row) is null)
+                        currentGroup = null;
+
                     if (currentGroup is not null)
                     {
                         currentGroup.Children.Insert(Math.Min(insertAt, currentGroup.Children.Count), row);
@@ -503,4 +524,16 @@ public static class StationLayoutPolicy
                 break;
         }
     }
+
+    /// <summary>
+    /// Reads a row's <c>GroupId</c> as of the last flatten - its membership before this drag,
+    /// used by <see cref="ApplyReorder"/> to tell a row that belongs where it landed from one
+    /// that is only passing through.
+    /// </summary>
+    private static string? GetGroupId(object node) => node switch
+    {
+        RadioStation station => station.GroupId,
+        StationDivider divider => divider.GroupId,
+        _ => null
+    };
 }

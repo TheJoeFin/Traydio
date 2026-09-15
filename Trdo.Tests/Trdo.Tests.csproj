@@ -10,9 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="4.3.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="4.3.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.4.0" />
   </ItemGroup>
 
   <!--
@@ -28,7 +28,11 @@
     <Compile Include="..\Trdo\Services\Playback\StreamDiagnostics.cs" Link="Playback\StreamDiagnostics.cs" />
     <Compile Include="..\Trdo\Services\SongChangeAnnouncementPolicy.cs" Link="Services\SongChangeAnnouncementPolicy.cs" />
     <Compile Include="..\Trdo\Services\PlaybackErrorPolicy.cs" Link="Services\PlaybackErrorPolicy.cs" />
+    <Compile Include="..\Trdo\Services\LocalMusicPlaybackPolicy.cs" Link="Services\LocalMusicPlaybackPolicy.cs" />
+    <Compile Include="..\Trdo\Models\LocalMusicLoopMode.cs" Link="Models\LocalMusicLoopMode.cs" />
     <Compile Include="..\Trdo\Models\RadioStation.cs" Link="Models\RadioStation.cs" />
+    <Compile Include="..\Trdo\Models\WhiteNoiseColor.cs" Link="Models\WhiteNoiseColor.cs" />
+    <Compile Include="..\Trdo\Models\AudioSourceKind.cs" Link="Models\AudioSourceKind.cs" />
     <Compile Include="..\Trdo\Models\RadioBrowserStation.cs" Link="Models\RadioBrowserStation.cs" />
     <Compile Include="..\Trdo\Services\RadioStationJsonContext.cs" Link="Services\RadioStationJsonContext.cs" />
     <Compile Include="..\Trdo\Services\StationStorageFormat.cs" Link="Services\StationStorageFormat.cs" />
@@ -50,6 +54,10 @@
     <Compile Include="..\Trdo\Models\StreamMetadata.cs" Link="Models\StreamMetadata.cs" />
     <Compile Include="..\Trdo\Services\Metadata\MetadataPublishGate.cs" Link="Services\Metadata\MetadataPublishGate.cs" />
     <Compile Include="..\Trdo\Services\FavoriteTrackExportService.cs" Link="Services\FavoriteTrackExportService.cs" />
+    <Compile Include="..\Trdo\Services\Audio\RadioStaticProfile.cs" Link="Services\Audio\RadioStaticProfile.cs" />
+    <Compile Include="..\Trdo\Services\Audio\FadeEnvelope.cs" Link="Services\Audio\FadeEnvelope.cs" />
+    <Compile Include="..\Trdo\Models\TrayClickAction.cs" Link="Models\TrayClickAction.cs" />
+    <Compile Include="..\Trdo\Services\TrayClickPolicy.cs" Link="Services\TrayClickPolicy.cs" />
   </ItemGroup>
 
 </Project>

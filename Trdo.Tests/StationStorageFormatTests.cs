@@ -46,6 +46,8 @@ public sealed class StationStorageFormatTests
         Assert.IsNull(stations[0].Tags);
         Assert.IsNull(stations[0].Country);
         Assert.IsNull(stations[0].DateAdded);
+        Assert.AreEqual(AudioSourceKind.Radio, stations[0].SourceKind);
+        Assert.AreEqual(WhiteNoiseColor.White, stations[0].WhiteNoiseColor);
     }
 
     [TestMethod]
@@ -87,6 +89,96 @@ public sealed class StationStorageFormatTests
         Assert.AreEqual(original.Bitrate, copy.Bitrate);
         Assert.AreEqual(original.DateAdded, copy.DateAdded);
         Assert.AreEqual(original.MetadataRefreshedUtc, copy.MetadataRefreshedUtc);
+        Assert.AreEqual(original.SourceKind, copy.SourceKind);
+        Assert.AreEqual(original.WhiteNoiseColor, copy.WhiteNoiseColor);
+    }
+
+    [TestMethod]
+    public void RoundTrip_PreservesAWhiteNoiseStation()
+    {
+        RadioStation original = new()
+        {
+            Id = "fedcba9876543210fedcba9876543210",
+            Name = "Rain",
+            StreamUrl = RadioStation.WhiteNoiseStreamUrl,
+            SourceKind = AudioSourceKind.WhiteNoise,
+            WhiteNoiseColor = WhiteNoiseColor.Pink,
+            Volume = 0.6,
+        };
+
+        List<RadioStation> parsed = StationStorageFormat.ParseStations(
+            StationStorageFormat.SerializeStations([original]));
+
+        Assert.HasCount(1, parsed);
+        RadioStation copy = parsed[0];
+        Assert.AreEqual(RadioStation.WhiteNoiseStreamUrl, copy.StreamUrl);
+        Assert.AreEqual(AudioSourceKind.WhiteNoise, copy.SourceKind);
+        Assert.AreEqual(WhiteNoiseColor.Pink, copy.WhiteNoiseColor);
+        Assert.AreEqual(0.6, copy.Volume, 0.0001);
+    }
+
+    [TestMethod]
+    [DataRow(WhiteNoiseColor.White, 0)]
+    [DataRow(WhiteNoiseColor.Pink, 1)]
+    [DataRow(WhiteNoiseColor.Brown, 2)]
+    [DataRow(WhiteNoiseColor.Blue, 3)]
+    [DataRow(WhiteNoiseColor.Violet, 4)]
+    [DataRow(WhiteNoiseColor.Grey, 5)]
+    public void WhiteNoiseColor_OrdinalsAreStable(WhiteNoiseColor color, int expectedOrdinal)
+    {
+        // Persisted as a raw int (see RadioStationJsonContext), so a member's ordinal must
+        // never change once shipped - existing stations.json files depend on it.
+        Assert.AreEqual(expectedOrdinal, (int)color);
+    }
+
+    [TestMethod]
+    public void ParseStations_MigratesLegacyIsWhiteNoiseFlag()
+    {
+        // Exactly what the build before SourceKind existed wrote: no SourceKind field, and
+        // IsWhiteNoise instead. Without the migration this reads back as a Radio station
+        // pointed at the placeholder URL - which then fails to play as an "invalid URL".
+        const string legacyJson = """
+            [{"Name":"Rain","StreamUrl":"trdo-whitenoise://local","IsWhiteNoise":true,"WhiteNoiseColor":1,"Volume":0.6}]
+            """;
+
+        List<RadioStation> stations = StationStorageFormat.ParseStations(legacyJson);
+
+        Assert.HasCount(1, stations);
+        Assert.AreEqual(AudioSourceKind.WhiteNoise, stations[0].SourceKind);
+        Assert.AreEqual(WhiteNoiseColor.Pink, stations[0].WhiteNoiseColor);
+    }
+
+    [TestMethod]
+    public void ParseStations_SelfHealsSourceKindEvenWhenSavedAsRadio()
+    {
+        // Worse than the legacy shape above: this is what a build with a bug in whatever set
+        // SourceKind would have baked permanently into the file - "SourceKind":0 written
+        // explicitly, so there is no missing field left for the legacy shim to migrate. The
+        // placeholder stream URL is the only signal left that this was ever meant to be white
+        // noise, so that is what has to be trusted over the (wrong) SourceKind value itself.
+        const string poisonedJson = """
+            [{"Name":"White Noise","StreamUrl":"trdo-whitenoise://local","SourceKind":0,"WhiteNoiseColor":0,"Volume":1}]
+            """;
+
+        List<RadioStation> stations = StationStorageFormat.ParseStations(poisonedJson);
+
+        Assert.HasCount(1, stations);
+        Assert.AreEqual(AudioSourceKind.WhiteNoise, stations[0].SourceKind);
+    }
+
+    [TestMethod]
+    public void SerializeStations_NeverWritesBackTheLegacyIsWhiteNoiseFlag()
+    {
+        RadioStation station = new()
+        {
+            Name = "Rain",
+            StreamUrl = RadioStation.WhiteNoiseStreamUrl,
+            SourceKind = AudioSourceKind.WhiteNoise,
+        };
+
+        string json = StationStorageFormat.SerializeStations([station]);
+
+        Assert.DoesNotMatchRegex(new System.Text.RegularExpressions.Regex("IsWhiteNoise"), json);
     }
 
     [TestMethod]

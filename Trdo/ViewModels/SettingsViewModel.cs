@@ -28,6 +28,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     private string _youtubeMusicToggleText = LocalizationService.GetString("Toggle_On", "On");
     private string _bandcampToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _songChangePopupToggleText = LocalizationService.GetString("Toggle_Off", "Off");
+    private string _radioStaticToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private StartupTask? _startupTask;
     private bool _initDone;
     private bool _isLanguageRestartPending;
@@ -73,6 +74,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         YouTubeMusicToggleText = GetToggleText(SettingsService.IsYouTubeMusicEnabled);
         BandcampToggleText = GetToggleText(SettingsService.IsBandcampEnabled);
         SongChangePopupToggleText = GetToggleText(SettingsService.IsSongChangePopupEnabled);
+        RadioStaticToggleText = GetToggleText(SettingsService.IsRadioStaticEnabled);
 
         // Initialize startup task
         _ = InitializeStartupTaskAsync();
@@ -98,6 +100,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
             if (languageTag == SettingsService.AppLanguage) return;
 
+            LogService.Info("Localization", $"User changed language: '{SettingsService.AppLanguage}' -> '{languageTag}'");
             SettingsService.AppLanguage = languageTag;
             OnPropertyChanged();
 
@@ -315,19 +318,64 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Gets or sets the tray icon click behavior.
-    /// 0 = left click plays/pauses, right click opens flyout (default).
-    /// 1 = left click opens flyout, right click plays/pauses.
+    /// ComboBox index for what a left click on the tray icon does. The items are listed in
+    /// <see cref="TrayClickAction"/> order, so the index is the enum value.
     /// </summary>
-    public int TrayClickBehavior
+    public int TrayLeftClickActionIndex
     {
-        get => SettingsService.TrayClickBehavior;
-        set
-        {
-            if (value == SettingsService.TrayClickBehavior) return;
-            SettingsService.TrayClickBehavior = value;
-            OnPropertyChanged();
-        }
+        get => (int)SettingsService.TrayLeftClickAction;
+        set => SetTrayClickAction(TrayClickButton.Left, TrayClickPolicy.Parse(value, SettingsService.TrayLeftClickAction));
+    }
+
+    /// <summary>ComboBox index for what a right click on the tray icon does.</summary>
+    public int TrayRightClickActionIndex
+    {
+        get => (int)SettingsService.TrayRightClickAction;
+        set => SetTrayClickAction(TrayClickButton.Right, TrayClickPolicy.Parse(value, SettingsService.TrayRightClickAction));
+    }
+
+    /// <summary>ComboBox index for what a left double-click on the tray icon does.</summary>
+    public int TrayLeftDoubleClickActionIndex
+    {
+        get => (int)SettingsService.TrayLeftDoubleClickAction;
+        set => SetTrayClickAction(TrayClickButton.LeftDouble, TrayClickPolicy.Parse(value, SettingsService.TrayLeftDoubleClickAction));
+    }
+
+    /// <summary>ComboBox index for what a right double-click on the tray icon does.</summary>
+    public int TrayRightDoubleClickActionIndex
+    {
+        get => (int)SettingsService.TrayRightDoubleClickAction;
+        set => SetTrayClickAction(TrayClickButton.RightDouble, TrayClickPolicy.Parse(value, SettingsService.TrayRightDoubleClickAction));
+    }
+
+    private static TrayClickAssignments CurrentTrayClickAssignments => new(
+        SettingsService.TrayLeftClickAction,
+        SettingsService.TrayRightClickAction,
+        SettingsService.TrayLeftDoubleClickAction,
+        SettingsService.TrayRightDoubleClickAction);
+
+    /// <summary>
+    /// Applies one slot's new action and, if that would leave nothing opening Traydio - across
+    /// single and double-clicks alike - moves the flyout to another slot; see
+    /// <see cref="TrayClickPolicy.EnsureFlyoutReachable"/>. Every index is re-announced so
+    /// whichever ComboBox the guard touched catches up.
+    /// </summary>
+    private void SetTrayClickAction(TrayClickButton button, TrayClickAction action)
+    {
+        TrayClickAssignments before = CurrentTrayClickAssignments;
+        TrayClickAssignments after = TrayClickPolicy.EnsureFlyoutReachable(button, before.With(button, action));
+
+        if (after == before) return;
+
+        if (after.Left != before.Left) SettingsService.TrayLeftClickAction = after.Left;
+        if (after.Right != before.Right) SettingsService.TrayRightClickAction = after.Right;
+        if (after.LeftDouble != before.LeftDouble) SettingsService.TrayLeftDoubleClickAction = after.LeftDouble;
+        if (after.RightDouble != before.RightDouble) SettingsService.TrayRightDoubleClickAction = after.RightDouble;
+
+        OnPropertyChanged(nameof(TrayLeftClickActionIndex));
+        OnPropertyChanged(nameof(TrayRightClickActionIndex));
+        OnPropertyChanged(nameof(TrayLeftDoubleClickActionIndex));
+        OnPropertyChanged(nameof(TrayRightDoubleClickActionIndex));
     }
 
     /// <summary>
@@ -402,6 +450,32 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             if (value == _songChangePopupToggleText) return;
             _songChangePopupToggleText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Whether generated FM radio static plays while a stream buffers.
+    /// </summary>
+    public bool IsRadioStaticEnabled
+    {
+        get => SettingsService.IsRadioStaticEnabled;
+        set
+        {
+            if (value == SettingsService.IsRadioStaticEnabled) return;
+            SettingsService.IsRadioStaticEnabled = value;
+            OnPropertyChanged();
+            RadioStaticToggleText = GetToggleText(value);
+        }
+    }
+
+    public string RadioStaticToggleText
+    {
+        get => _radioStaticToggleText;
+        set
+        {
+            if (value == _radioStaticToggleText) return;
+            _radioStaticToggleText = value;
             OnPropertyChanged();
         }
     }

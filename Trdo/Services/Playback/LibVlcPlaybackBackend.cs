@@ -39,6 +39,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         player.Paused += OnPlayerStopped;
         player.Stopped += OnPlayerStopped;
         player.EndReached += OnPlayerStopped;
+        player.EndReached += OnPlayerEndReached;
         player.Buffering += OnPlayerBuffering;
         player.EncounteredError += OnPlayerEncounteredError;
 
@@ -51,6 +52,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         player.Paused -= OnPlayerStopped;
         player.Stopped -= OnPlayerStopped;
         player.EndReached -= OnPlayerStopped;
+        player.EndReached -= OnPlayerEndReached;
         player.Buffering -= OnPlayerBuffering;
         player.EncounteredError -= OnPlayerEncounteredError;
     }
@@ -62,9 +64,32 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 
     private void OnPlayerStopped(object? sender, EventArgs e) => RaiseStateChanged(isPlaying: false);
 
+    // Kept separate from OnPlayerStopped: that one must keep mapping EndReached onto
+    // PlaybackStateChanged(false) for radio (a dropped stream reads as "stopped"), while this
+    // is the one genuinely new signal - "the item finished on its own" - that local music's
+    // auto-advance needs and nothing else here provides.
+    private void OnPlayerEndReached(object? sender, EventArgs e) =>
+        RaiseOffVlcThread(() => PlaybackEnded?.Invoke(this, EventArgs.Empty));
+
     private void OnPlayerBuffering(object? sender, MediaPlayerBufferingEventArgs e)
     {
-        bool isBuffering = e.Cache < 100f;
+        // Cache genuinely dips below 100 under ordinary network jitter for a live stream even
+        // while audio keeps playing smoothly from what is already buffered - LibVLC reports the
+        // read-ahead fill level here, not whether anything audible is actually stalling. A cache
+        // dip only means the stream is really buffering (and radio static should react to it) if
+        // the player has actually left the Playing state; otherwise this fires many times a
+        // second throughout ordinary playback and reads as near-continuous static.
+        bool isBuffering = e.Cache < 100f && !_mediaPlayer.IsPlaying;
+
+        // LibVLC reports the cache percentage on nearly every read tick, not just when it
+        // actually changes - a jittery live stream can call this dozens of times a second even
+        // though the derived isBuffering value never moves. Without this guard, every one of
+        // those redundant ticks still spawns a dispatch and re-runs RadioStaticService's fade
+        // logic, which is needless overhead on a hot path and a plausible source of its own
+        // audio glitches. Only a genuine transition is worth telling anyone about.
+        if (_isBuffering == isBuffering)
+            return;
+
         _isBuffering = isBuffering;
         RaiseOffVlcThread(() => BufferingStateChanged?.Invoke(this, isBuffering));
     }
@@ -244,9 +269,13 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 
     public TimeSpan Position => TimeSpan.FromMilliseconds(_mediaPlayer.Time);
 
+    public TimeSpan? Duration =>
+        _mediaPlayer.Length > 0 ? TimeSpan.FromMilliseconds(_mediaPlayer.Length) : null;
+
     public event EventHandler<bool>? PlaybackStateChanged;
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<PlaybackFailureEventArgs>? PlaybackFailed;
+    public event EventHandler? PlaybackEnded;
 
     public IReadOnlyList<MediaTimeRange> GetBufferedRanges() => [];
 
@@ -307,6 +336,8 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 
     public void Pause() => _mediaPlayer.Pause();
 
+    public void Seek(TimeSpan position) => _mediaPlayer.Time = (long)position.TotalMilliseconds;
+
     public void ClearSource()
     {
         if (_mediaPlayer.IsPlaying)
@@ -328,6 +359,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         }
 
         ClearSource();
+        DetachMediaPlayer(_mediaPlayer);
         _mediaPlayer.Dispose();
     }
 }

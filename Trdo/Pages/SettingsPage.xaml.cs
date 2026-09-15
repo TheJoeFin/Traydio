@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using Trdo.Services;
+using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
@@ -45,6 +46,25 @@ public sealed partial class SettingsPage : Page
     {
         if (Application.Current is App app)
             app.ShowSongChangePopupDemo();
+    }
+
+    /// <summary>
+    /// Previews the buffering static so the user can hear what the toggle does without waiting
+    /// for a slow stream. Deliberately independent of the toggle - this is what it sounds like,
+    /// whether or not it is switched on.
+    /// </summary>
+    private async void RadioStaticTestButton_Click(object sender, RoutedEventArgs e)
+    {
+        RadioStaticTestButton.IsEnabled = false;
+
+        try
+        {
+            await RadioStaticService.Instance.PlayTestBurstAsync();
+        }
+        finally
+        {
+            RadioStaticTestButton.IsEnabled = true;
+        }
     }
 
     private void OnAudioLevelUpdated(float rms)
@@ -240,6 +260,28 @@ public sealed partial class SettingsPage : Page
                 ex.Message);
             DiagnosticsInfoBar.IsOpen = true;
         }
+    }
+
+    private void ResetLogsButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            LogService.ClearLogs();
+            LogService.Info("SettingsPage", "User reset the diagnostic logs");
+
+            DiagnosticsInfoBar.Severity = InfoBarSeverity.Success;
+            DiagnosticsInfoBar.Message = LocalizationService.GetString(
+                "SettingsPage_ResetLogsSuccess", "Cleared the log files.");
+        }
+        catch (Exception ex)
+        {
+            DiagnosticsInfoBar.Severity = InfoBarSeverity.Error;
+            DiagnosticsInfoBar.Message = string.Format(
+                LocalizationService.GetString("SettingsPage_ResetLogsFailed", "Couldn't reset the logs: {0}"),
+                ex.Message);
+        }
+
+        DiagnosticsInfoBar.IsOpen = true;
     }
 
     private void AutoPlayOnStartupToggle_Toggled(object sender, RoutedEventArgs e)

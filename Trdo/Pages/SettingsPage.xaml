@@ -151,11 +151,66 @@
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">
                         <TextBlock x:Uid="SettingsPage_TrayClickBehaviorTitle" Style="{StaticResource SettingTitleStyle}" />
-                        <TextBlock x:Uid="SettingsPage_TrayClickBehaviorDescription" Style="{StaticResource SettingDescriptionStyle}" />
-                        <ComboBox SelectedIndex="{x:Bind ViewModel.TrayClickBehavior, Mode=TwoWay}">
-                            <ComboBoxItem x:Uid="SettingsPage_TrayClickBehavior_Default" />
-                            <ComboBoxItem x:Uid="SettingsPage_TrayClickBehavior_Alternate" />
+                        <TextBlock
+                            x:Uid="SettingsPage_TrayClickBehaviorDescription"
+                            Style="{StaticResource SettingDescriptionStyle}"
+                            TextWrapping="Wrap" />
+                        <!--
+                            Items follow the TrayClickAction enum order; the view model maps
+                            index to value directly.
+                        -->
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayLeftClick"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayLeftClickActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PlayPause" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowFlyout" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_MuteUnmute" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
                         </ComboBox>
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayRightClick"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayRightClickActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PlayPause" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowFlyout" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_MuteUnmute" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                        </ComboBox>
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayLeftDoubleClick"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayLeftDoubleClickActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PlayPause" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowFlyout" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_MuteUnmute" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                        </ComboBox>
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayRightDoubleClick"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayRightDoubleClickActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PlayPause" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowFlyout" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_MuteUnmute" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                        </ComboBox>
+                        <TextBlock
+                            x:Uid="SettingsPage_TrayDoubleClickNote"
+                            Style="{StaticResource SettingDescriptionStyle}"
+                            TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 
@@ -555,6 +610,35 @@
 
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">
+                        <TextBlock x:Uid="SettingsPage_RadioStaticTitle" Style="{StaticResource SettingTitleStyle}" />
+                        <TextBlock x:Uid="SettingsPage_RadioStaticDescription" Style="{StaticResource SettingDescriptionStyle}" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <ToggleSwitch
+                                x:Name="RadioStaticToggle"
+                                x:Uid="SettingsPage_RadioStaticToggle"
+                                AutomationProperties.AutomationId="RadioStaticToggle"
+                                Grid.Column="0"
+                                MinWidth="0"
+                                IsOn="{x:Bind ViewModel.IsRadioStaticEnabled, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Style="{StaticResource SettingStatusStyle}"
+                                Text="{x:Bind ViewModel.RadioStaticToggleText, Mode=OneWay}" />
+                            <Button
+                                x:Name="RadioStaticTestButton"
+                                x:Uid="SettingsPage_RadioStaticTestButton"
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                AutomationProperties.AutomationId="RadioStaticTestButton"
+                                Click="RadioStaticTestButton_Click" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SettingCardStyle}">
+                    <StackPanel Spacing="10">
                         <TextBlock x:Uid="SettingsPage_AllowSleepTitle" Style="{StaticResource SettingTitleStyle}" />
                         <TextBlock x:Uid="SettingsPage_AllowSleepDescription" Style="{StaticResource SettingDescriptionStyle}" />
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -609,6 +693,10 @@
                                 x:Name="CopyDiagnosticsButton"
                                 x:Uid="SettingsPage_CopyDiagnostics"
                                 Click="CopyDiagnosticsButton_Click" />
+                            <Button
+                                x:Name="ResetLogsButton"
+                                x:Uid="SettingsPage_ResetLogs"
+                                Click="ResetLogsButton_Click" />
                         </StackPanel>
                         <InfoBar
                             x:Name="DiagnosticsInfoBar"

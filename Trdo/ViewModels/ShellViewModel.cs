@@ -73,6 +73,12 @@ public partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void NavigateToAddWhiteNoisePage(RadioStation? stationToEdit = null)
+    {
+        _navigationService.Navigate(typeof(AddWhiteNoise), stationToEdit);
+    }
+
+    [RelayCommand]
     public void NavigateToAboutPage()
     {
         _navigationService.Navigate(typeof(AboutPage));
