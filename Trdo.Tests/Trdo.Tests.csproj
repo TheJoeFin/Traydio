@@ -27,6 +27,7 @@
     <Compile Include="..\Trdo\Services\Playback\PlaybackBackendKind.cs" Link="Playback\PlaybackBackendKind.cs" />
     <Compile Include="..\Trdo\Services\Playback\StreamDiagnostics.cs" Link="Playback\StreamDiagnostics.cs" />
     <Compile Include="..\Trdo\Services\Playback\CastDevicePolicy.cs" Link="Playback\CastDevicePolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosPolicy.cs" Link="Playback\SonosPolicy.cs" />
     <Compile Include="..\Trdo\Services\SongChangeAnnouncementPolicy.cs" Link="Services\SongChangeAnnouncementPolicy.cs" />
     <Compile Include="..\Trdo\Services\PlaybackErrorPolicy.cs" Link="Services\PlaybackErrorPolicy.cs" />
     <Compile Include="..\Trdo\Services\LocalMusicPlaybackPolicy.cs" Link="Services\LocalMusicPlaybackPolicy.cs" />
