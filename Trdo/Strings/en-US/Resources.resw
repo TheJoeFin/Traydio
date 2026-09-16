@@ -336,7 +336,7 @@
     <value>Stop casting</value>
   </data>
   <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
-    <value>Casting isn't available on this PC because the LibVLC playback engine could not be loaded.</value>
+    <value>Casting isn't available on this PC: the LibVLC playback engine could not be loaded and no network connection is available to search for Sonos players.</value>
   </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Tap the star icon on songs you love to save them here</value>
