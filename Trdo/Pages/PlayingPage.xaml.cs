@@ -719,6 +719,19 @@ public sealed partial class PlayingPage : Page
         ViewModel.ToggleMute();
     }
 
+    private void SpeakerVolumeControl_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+        int delta = e.GetCurrentPoint((UIElement)sender).Properties.MouseWheelDelta;
+        double change = (delta / 120.0) * 2;
+        ViewModel.SpeakerVolume = Math.Clamp(ViewModel.SpeakerVolume + change, 0, 100);
+        e.Handled = true;
+    }
+
+    private void SpeakerMuteButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ToggleSpeakerMute();
+    }
+
     private void ToggleVolumeSlider_Click(object sender, RoutedEventArgs e)
     {
         SetVolumeSliderVisible(VolumeControlGrid.Visibility != Visibility.Visible);

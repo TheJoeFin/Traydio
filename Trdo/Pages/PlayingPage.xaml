@@ -322,7 +322,7 @@
         its gap on both sides of a row even when that row's content is Collapsed, which is what
         left a phantom gap above the playback buttons whenever the volume slider was hidden.
     -->
-    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto">
+    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto">
         <Grid.ContextFlyout>
             <MenuFlyout x:Name="PageContextMenu" Opening="PageContextMenu_Opening">
                 <MenuFlyoutItem
@@ -594,10 +594,64 @@
                 TextAlignment="Right" />
         </Grid>
 
+        <!--
+            Speaker Volume: the Sonos player's own level, shown only while casting to one.
+            A Sonos fetches the stream itself, so the stream volume above never reaches it;
+            this row is the only way to turn the room up or down from here. Not tied to the
+            Show/Hide Volume Slider setting - it appears with the cast and goes with it.
+        -->
+        <Grid
+            x:Name="SpeakerVolumeControlGrid"
+            Grid.Row="4"
+            Margin="0,4,0,0"
+            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
+            animations:Implicit.HideAnimations="{StaticResource ImplicitFadeHideAnimations}"
+            animations:Implicit.ShowAnimations="{StaticResource ImplicitFadeShowAnimations}"
+            Background="Transparent"
+            ColumnSpacing="8"
+            PointerWheelChanged="SpeakerVolumeControl_PointerWheelChanged"
+            ToolTipService.ToolTip="{x:Bind ViewModel.SpeakerVolumeToolTip, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.IsCastingToSonos, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button
+                x:Uid="PlayingPage_SpeakerMuteButton"
+                Grid.Column="0"
+                Width="32"
+                Height="32"
+                Padding="0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="SpeakerMuteButton_Click"
+                CornerRadius="16">
+                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
+            </Button>
+            <Slider
+                x:Name="SpeakerVolumeSlider"
+                Grid.Column="1"
+                Maximum="100"
+                Minimum="0"
+                SmallChange="1"
+                StepFrequency="1"
+                ThumbToolTipValueConverter="{StaticResource PercentStringConverter}"
+                Value="{x:Bind ViewModel.SpeakerVolume, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Column="2"
+                MinWidth="40"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.SpeakerVolume, Mode=OneWay, Converter={StaticResource PercentStringConverter}}"
+                TextAlignment="Right" />
+        </Grid>
+
         <!--  Now Playing Info  -->
         <Button
             x:Name="NowPlayingButton"
-            Grid.Row="4"
+            Grid.Row="5"
             Margin="0,12,0,0"
             Padding="8,4"
             HorizontalAlignment="Stretch"
@@ -689,7 +743,7 @@
 
         <!--  Local Music Scrub Bar  -->
         <Grid
-            Grid.Row="5"
+            Grid.Row="6"
             Margin="0,12,0,0"
             animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
             ColumnSpacing="4"
@@ -751,7 +805,7 @@
 
         <!--  Playback Actions  -->
         <Grid
-            Grid.Row="6"
+            Grid.Row="7"
             Margin="0,12,0,0"
             animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
             ColumnSpacing="12">
