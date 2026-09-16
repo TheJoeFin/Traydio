@@ -112,6 +112,13 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            // A speaker fetching the stream itself is the only thing that knows whether it
+            // is playing; the local engines are idle for the whole cast.
+            if (UsesSonosForActiveSource)
+            {
+                return _sonosState == SonosPlaybackState.Playing;
+            }
+
             switch (_activeSourceKind)
             {
                 case AudioSourceKind.WhiteNoise:
@@ -135,6 +142,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return _sonosState == SonosPlaybackState.Starting;
+            }
+
             switch (_activeSourceKind)
             {
                 case AudioSourceKind.WhiteNoise:
@@ -201,6 +213,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return SonosPosition;
+            }
+
             try
             {
                 return ActiveBackend.Position;
@@ -220,6 +237,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return SonosDuration;
+            }
+
             try
             {
                 return ActiveBackend.Duration;
@@ -234,6 +256,12 @@ public sealed partial class RadioPlayerService : IDisposable
     /// <summary>Seeks the active backend to <paramref name="position"/>. Meaningful only for <see cref="AudioSourceKind.Files"/>.</summary>
     public void Seek(TimeSpan position)
     {
+        if (UsesSonosForActiveSource)
+        {
+            SeekOnSonos(position);
+            return;
+        }
+
         try
         {
             ActiveBackend.Seek(position);
@@ -1059,6 +1087,15 @@ public sealed partial class RadioPlayerService : IDisposable
         CancelPendingPlayAttempt();
         _playAttemptCts = new CancellationTokenSource();
 
+        if (UsesSonosForActiveSource)
+        {
+            // The speaker fetches the stream itself; nothing here buffers or plays. See
+            // RadioPlayerService.Sonos.cs.
+            _ = PlayOnSonosAsync(_playAttemptCts.Token);
+            Debug.WriteLine($"=== Play END (sonos) ===");
+            return;
+        }
+
         // Always use buffer-aware playback to apply buffer settings
         // Fire and forget - PlayWithBufferAsync handles everything including buffering
         _ = PlayWithBufferInternalAsync(_playAttemptCts.Token);
@@ -1123,7 +1160,7 @@ public sealed partial class RadioPlayerService : IDisposable
     /// </para>
     /// </summary>
     private bool IsPlaybackWanted =>
-        ActiveBackend.IsPlaying || _playAttemptCts is { IsCancellationRequested: false };
+        IsPlaying || _playAttemptCts is { IsCancellationRequested: false };
 
     /// <summary>
     /// Cancels an in-flight play attempt started by Play(), if one is pending.
@@ -1443,6 +1480,14 @@ public sealed partial class RadioPlayerService : IDisposable
         {
             // See Play(): this is a caller with nothing to play yet, not a failure.
             Debug.WriteLine("[RadioPlayerService] PlayWithBufferAsync called with no stream URL set");
+            return false;
+        }
+
+        if (UsesSonosForActiveSource)
+        {
+            // Recovery and rebuild paths are about the local engines, which are idle while a
+            // speaker fetches the stream. Nothing here can help the speaker.
+            LogService.Info("RadioPlayerService", "PlayWithBufferAsync skipped: playback is on a Sonos speaker");
             return false;
         }
 
@@ -1946,6 +1991,13 @@ public sealed partial class RadioPlayerService : IDisposable
         {
             Debug.WriteLine("[RadioPlayerService] No stream URL set, nothing to pause");
             Debug.WriteLine($"=== Pause END (no URL) ===");
+            return;
+        }
+
+        if (UsesSonosForActiveSource)
+        {
+            PauseOnSonos();
+            Debug.WriteLine($"=== Pause END (sonos) ===");
             return;
         }
 

@@ -22,13 +22,17 @@ public sealed partial class RadioPlayerService
     /// </summary>
     public event EventHandler? CastTargetChanged;
 
-    /// <summary>Casting needs LibVLC; false on machines where it failed to load.</summary>
-    public bool CanCast => _libVlcBackend is not null;
+    /// <summary>
+    /// Whether the cast picker is worth opening. Chromecast needs LibVLC, but a Sonos player
+    /// is driven over plain HTTP, so there is always something to search for.
+    /// </summary>
+    public bool CanCast => true;
 
-    public bool IsCasting => _castRenderer is not null;
+    /// <summary>Whether audio is going to a network device of either kind: a LibVLC renderer or a Sonos player.</summary>
+    public bool IsCasting => _castRenderer is not null || _sonosDevice is not null;
 
-    /// <summary>Display name of the renderer receiving the audio, or null when playing locally.</summary>
-    public string? CastTargetName => _castTargetName;
+    /// <summary>Display name of the device receiving the audio, or null when playing locally.</summary>
+    public string? CastTargetName => _sonosDevice?.Name ?? _castTargetName;
 
     /// <summary>
     /// Routes playback to <paramref name="renderer"/>, or back to this PC's output when null.
@@ -40,7 +44,7 @@ public sealed partial class RadioPlayerService
     {
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
-            return SetCastTargetInternalAsync(renderer, displayName, cancellationToken);
+            return SetCastTargetInternalAsync(renderer, displayName, cancellationToken, resumePlayback: true);
         }
 
         TaskCompletionSource<bool> tcs = new();
@@ -48,7 +52,7 @@ public sealed partial class RadioPlayerService
         {
             try
             {
-                await SetCastTargetInternalAsync(renderer, displayName, cancellationToken);
+                await SetCastTargetInternalAsync(renderer, displayName, cancellationToken, resumePlayback: true);
                 tcs.SetResult(true);
             }
             catch (Exception ex)
@@ -59,10 +63,16 @@ public sealed partial class RadioPlayerService
         return tcs.Task;
     }
 
-    private async Task SetCastTargetInternalAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken)
+    private async Task SetCastTargetInternalAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken, bool resumePlayback)
     {
         if (renderer is null && _castRenderer is null)
         {
+            // "Stop casting" with a Sonos target set means that one.
+            if (_sonosDevice is not null)
+            {
+                await SetSonosTargetInternalAsync(null, cancellationToken, resumePlayback);
+            }
+
             return;
         }
 
@@ -80,6 +90,20 @@ public sealed partial class RadioPlayerService
             return;
         }
 
+        // Decided before a Sonos session is torn down, because IsPlaying reads the speaker
+        // while one is set and would read false once it is gone.
+        bool resume = resumePlayback &&
+                      IsPlaybackWanted &&
+                      _activeSourceKind != AudioSourceKind.WhiteNoise &&
+                      !string.IsNullOrWhiteSpace(_streamUrl);
+
+        if (renderer is not null && _sonosDevice is not null)
+        {
+            // A Sonos and a Chromecast cannot both be the target. The speaker is stopped
+            // here and the stream re-opened on LibVLC below, so no local resume in between.
+            await SetSonosTargetInternalAsync(null, cancellationToken, resumePlayback: false);
+        }
+
         RendererItem? previous = _castRenderer;
         string? name = renderer is null ? null : CastDevicePolicy.DisplayName(displayName ?? renderer.Name);
 
@@ -90,10 +114,6 @@ public sealed partial class RadioPlayerService
         _castRenderer = renderer;
         _castTargetName = name;
         _playbackEngineSelector.RequireLibVlc = renderer is not null;
-
-        bool resume = IsPlaybackWanted &&
-                      _activeSourceKind != AudioSourceKind.WhiteNoise &&
-                      !string.IsNullOrWhiteSpace(_streamUrl);
 
         try
         {
