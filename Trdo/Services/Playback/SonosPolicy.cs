@@ -6,6 +6,10 @@ using System.Text;
 using System.Xml.Linq;
 using Trdo.Models;
 
+// The Sonos implementation in Traydio was heavily influenced by RoomRelay by guicn555
+// (https://github.com/guicn555/RoomRelay, MIT): its SSDP discovery, UPnP SOAP control and
+// RenderingControl volume handling are the model for what follows.
+
 namespace Trdo.Services.Playback;
 
 /// <summary>What the speaker's AVTransport service reports it is doing.</summary>
