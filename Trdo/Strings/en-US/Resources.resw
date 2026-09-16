@@ -554,6 +554,15 @@
   <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Mute / unmute</value>
   </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} reported: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} did not start playing in time.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} stopped playing the stream.</value>
+  </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open mini player</value>
   </data>

@@ -910,6 +910,7 @@ public sealed partial class RadioPlayerService
 
         _playbackEngineSelector.Dispose();
         DisposeCastTarget();
+        DisposeSonosTarget();
         _metadataOrchestrator.Dispose();
         _publishGate.Dispose();
         _icyMetadataService.Dispose();
