@@ -28,20 +28,25 @@ public sealed class CastRendererDiscovery : IDisposable
     private CastDevice? _claimed;
     private bool _isDisposed;
 
-    private CastRendererDiscovery(LibVLC libVlc, DispatcherQueue uiQueue)
+    private CastRendererDiscovery(LibVLC libVlc, DispatcherQueue uiQueue, ObservableCollection<CastDevice> devices)
     {
         _libVlc = libVlc;
         _uiQueue = uiQueue;
+        Devices = devices;
     }
 
-    /// <summary>Devices found so far, sorted by name. Only ever changed on the UI thread.</summary>
-    public ObservableCollection<CastDevice> Devices { get; } = [];
+    /// <summary>
+    /// The picker's list, shared with <see cref="SonosDiscovery"/>. Only ever changed on the
+    /// UI thread. This discovery adds and removes only the rows it found itself.
+    /// </summary>
+    public ObservableCollection<CastDevice> Devices { get; }
 
     /// <summary>
-    /// Null when LibVLC failed to load on this machine, in which case there is no way to cast.
+    /// Null when LibVLC failed to load on this machine, in which case LibVLC renderers
+    /// (Chromecast) cannot be found or cast to. Sonos does not depend on it.
     /// </summary>
-    public static CastRendererDiscovery? TryCreate(DispatcherQueue uiQueue) =>
-        LibVlcHost.Instance is { } libVlc ? new CastRendererDiscovery(libVlc, uiQueue) : null;
+    public static CastRendererDiscovery? TryCreate(DispatcherQueue uiQueue, ObservableCollection<CastDevice> devices) =>
+        LibVlcHost.Instance is { } libVlc ? new CastRendererDiscovery(libVlc, uiQueue, devices) : null;
 
     /// <summary>
     /// Starts every discovery protocol this LibVLC build offers (mDNS for Chromecast on the
@@ -111,7 +116,7 @@ public sealed class CastRendererDiscovery : IDisposable
     public RendererItem Claim(CastDevice device)
     {
         _claimed = device;
-        return device.Item;
+        return device.Item ?? throw new InvalidOperationException("A Sonos row has no LibVLC handle to claim.");
     }
 
     // LibVLC raises these on its own thread. Everything that touches Devices is moved onto
@@ -177,7 +182,7 @@ public sealed class CastRendererDiscovery : IDisposable
 
             if (!ReferenceEquals(device, _claimed))
             {
-                device.Item.Dispose();
+                device.Item?.Dispose();
             }
         }
         finally
@@ -232,15 +237,21 @@ public sealed class CastRendererDiscovery : IDisposable
 
         _discoverers.Clear();
 
-        foreach (CastDevice device in Devices)
+        for (int i = Devices.Count - 1; i >= 0; i--)
         {
+            CastDevice device = Devices[i];
+            if (device.Item is null)
+            {
+                continue; // a Sonos row, owned by SonosDiscovery
+            }
+
             if (!ReferenceEquals(device, _claimed))
             {
                 device.Item.Dispose();
             }
-        }
 
-        Devices.Clear();
+            Devices.RemoveAt(i);
+        }
         LogService.Info(Component, "Renderer discovery stopped");
     }
 }

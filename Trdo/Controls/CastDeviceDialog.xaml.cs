@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using Trdo.Services;
@@ -11,12 +12,15 @@ using Trdo.Services.Playback;
 namespace Trdo.Controls;
 
 /// <summary>
-/// Picks a renderer on the local network to send the audio to, or brings it back to this PC.
+/// Picks a device on the local network to send the audio to, or brings it back to this PC.
+/// Two searches feed one list: LibVLC's renderer discovery (Chromecast) and the Sonos SSDP
+/// search, either of which may be unavailable on a given PC without stopping the other.
 /// <para>
-/// Device discovery lives exactly as long as the dialog: it starts in <c>Opened</c> and is
+/// Both discoveries live exactly as long as the dialog: they start in <c>Opened</c> and are
 /// disposed in <c>Closed</c>, so no socket or LibVLC object outlives the picker. The one
-/// exception is the item the user chose, which is claimed from the discovery and handed to
-/// <see cref="RadioPlayerService"/>, which owns it from then on.
+/// exception is a LibVLC item the user chose, which is claimed from its discovery and handed
+/// to <see cref="RadioPlayerService"/>, which owns it from then on. A Sonos row holds only
+/// addresses, so nothing needs claiming for it.
 /// </para>
 /// </summary>
 public sealed partial class CastDeviceDialog : ContentDialog
@@ -24,7 +28,9 @@ public sealed partial class CastDeviceDialog : ContentDialog
     private const string Component = "CastDeviceDialog";
 
     private readonly RadioPlayerService _player = RadioPlayerService.Instance;
-    private CastRendererDiscovery? _discovery;
+    private readonly ObservableCollection<CastDevice> _devices = [];
+    private CastRendererDiscovery? _rendererDiscovery;
+    private SonosDiscovery? _sonosDiscovery;
 
     public CastDeviceDialog()
     {
@@ -61,39 +67,60 @@ public sealed partial class CastDeviceDialog : ContentDialog
             SecondaryButtonText = LocalizationService.GetString("CastDeviceDialog_StopCasting", "Stop casting");
         }
 
-        _discovery = _player.CanCast ? CastRendererDiscovery.TryCreate(DispatcherQueue) : null;
-        if (_discovery is null || !_discovery.Start())
+        _rendererDiscovery = CastRendererDiscovery.TryCreate(DispatcherQueue, _devices);
+        if (_rendererDiscovery is not null && !_rendererDiscovery.Start())
         {
-            _discovery?.Dispose();
-            _discovery = null;
+            _rendererDiscovery.Dispose();
+            _rendererDiscovery = null;
+        }
+
+        SonosDiscovery sonosDiscovery = new(DispatcherQueue, _devices);
+        try
+        {
+            if (sonosDiscovery.Start())
+            {
+                _sonosDiscovery = sonosDiscovery;
+            }
+            else
+            {
+                sonosDiscovery.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Error(Component, "Sonos search could not start", ex);
+            sonosDiscovery.Dispose();
+        }
+
+        if (_rendererDiscovery is null && _sonosDiscovery is null)
+        {
             ScanningRow.Visibility = Visibility.Collapsed;
             UnavailableText.Visibility = Visibility.Visible;
             return;
         }
 
-        DeviceList.ItemsSource = _discovery.Devices;
-        _discovery.Devices.CollectionChanged += Devices_CollectionChanged;
+        DeviceList.ItemsSource = _devices;
+        _devices.CollectionChanged += Devices_CollectionChanged;
         UpdateEmptyState();
     }
 
     private void ContentDialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
     {
-        if (_discovery is null)
-        {
-            return;
-        }
-
-        _discovery.Devices.CollectionChanged -= Devices_CollectionChanged;
+        _devices.CollectionChanged -= Devices_CollectionChanged;
         DeviceList.ItemsSource = null;
-        _discovery.Dispose();
-        _discovery = null;
+
+        _rendererDiscovery?.Dispose();
+        _rendererDiscovery = null;
+        _sonosDiscovery?.Dispose();
+        _sonosDiscovery = null;
+        _devices.Clear();
     }
 
     private void Devices_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => UpdateEmptyState();
 
     private void UpdateEmptyState()
     {
-        bool hasDevices = _discovery is { Devices.Count: > 0 };
+        bool hasDevices = _devices.Count > 0;
         DeviceList.Visibility = hasDevices ? Visibility.Visible : Visibility.Collapsed;
         EmptyText.Visibility = hasDevices ? Visibility.Collapsed : Visibility.Visible;
     }
@@ -118,13 +145,24 @@ public sealed partial class CastDeviceDialog : ContentDialog
 
     private void CastToSelectedDevice()
     {
-        if (_discovery is null || DeviceList.SelectedItem is not CastDevice device)
+        if (DeviceList.SelectedItem is not CastDevice device)
+        {
+            return;
+        }
+
+        if (device.Sonos is { } sonos)
+        {
+            ChangeSonosTarget(sonos);
+            return;
+        }
+
+        if (_rendererDiscovery is null)
         {
             return;
         }
 
         // Claim before the dialog closes: Closed disposes every item the discovery still owns.
-        RendererItem item = _discovery.Claim(device);
+        RendererItem item = _rendererDiscovery.Claim(device);
         ChangeCastTarget(item, device.Name);
     }
 
@@ -136,12 +174,29 @@ public sealed partial class CastDeviceDialog : ContentDialog
         }
         catch (Exception ex)
         {
-            LogService.Error(Component, $"Changing the cast target to '{name ?? "this PC"}' failed", ex);
-            Debug.WriteLine($"[{Component}] Cast target change failed: {ex}");
-            PlaybackErrorService.Instance.Report(string.Format(
-                LocalizationService.GetString("CastDeviceDialog_Failed", "Couldn't cast to {0}: {1}"),
-                name ?? "this PC",
-                ex.Message));
+            ReportFailure(name, ex);
         }
+    }
+
+    private async void ChangeSonosTarget(SonosDevice device)
+    {
+        try
+        {
+            await _player.SetSonosTargetAsync(device);
+        }
+        catch (Exception ex)
+        {
+            ReportFailure(device.Name, ex);
+        }
+    }
+
+    private static void ReportFailure(string? name, Exception ex)
+    {
+        LogService.Error(Component, $"Changing the cast target to '{name ?? "this PC"}' failed", ex);
+        Debug.WriteLine($"[{Component}] Cast target change failed: {ex}");
+        PlaybackErrorService.Instance.Report(string.Format(
+            LocalizationService.GetString("CastDeviceDialog_Failed", "Couldn't cast to {0}: {1}"),
+            name ?? "this PC",
+            ex.Message));
     }
 }

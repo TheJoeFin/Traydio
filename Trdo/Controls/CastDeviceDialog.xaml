@@ -27,7 +27,7 @@
             TextWrapping="Wrap"
             Visibility="Collapsed" />
 
-        <!--  Search is continuous while open: mDNS answers arrive whenever a device wakes up  -->
+        <!--  Search is continuous while open: mDNS and SSDP answers arrive whenever a device wakes up  -->
         <StackPanel
             x:Name="ScanningRow"
             Orientation="Horizontal"
@@ -58,7 +58,7 @@
                         <FontIcon
                             VerticalAlignment="Center"
                             FontSize="18"
-                            Glyph="&#xE7F4;" />
+                            Glyph="{x:Bind Glyph}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
                             <TextBlock
