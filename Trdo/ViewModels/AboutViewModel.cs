@@ -56,6 +56,9 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public string CommunityToolkitUrl => "https://github.com/CommunityToolkit/dotnet";
     public string CommunityToolkitDisplayText => "CommunityToolkit.Mvvm";
 
+    public string RoomRelayUrl => "https://github.com/guicn555/RoomRelay";
+    public string RoomRelayDisplayText => "RoomRelay by guicn555";
+
     public string BuyMeACoffeeUrl => "https://buymeacoffee.com/thejoefin";
     public string BuyMeACoffeeDisplayText => "buymeacoffee.com/thejoefin";
 
@@ -89,6 +92,11 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public async Task OpenWinUIEx()
     {
         await Launcher.LaunchUriAsync(new Uri(WinUIExUrl));
+    }
+
+    public async Task OpenRoomRelay()
+    {
+        await Launcher.LaunchUriAsync(new Uri(RoomRelayUrl));
     }
 
     public async Task OpenCommunityToolkit()

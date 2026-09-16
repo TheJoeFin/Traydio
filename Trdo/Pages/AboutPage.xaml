@@ -354,6 +354,20 @@
                             </StackPanel>
                         </HyperlinkButton>
                     </StackPanel>
+
+                    <!--  Sonos casting owes its approach to RoomRelay; credit where it is due  -->
+                    <TextBlock
+                        x:Uid="AboutPage_SonosAcknowledgement"
+                        Margin="0,8,0,0"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextWrapping="Wrap" />
+
+                    <HyperlinkButton Padding="0,4" Click="RoomRelayButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE774;" />
+                            <TextBlock Text="{x:Bind ViewModel.RoomRelayDisplayText}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </HyperlinkButton>
                 </StackPanel>
 
                 <!--  Tutorial Section  -->

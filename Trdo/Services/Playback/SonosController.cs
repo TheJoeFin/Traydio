@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// The Sonos implementation in Traydio was heavily influenced by RoomRelay by guicn555
+// (https://github.com/guicn555/RoomRelay, MIT): its SSDP discovery, UPnP SOAP control and
+// RenderingControl volume handling are the model for what follows.
+
 namespace Trdo.Services.Playback;
 
 /// <summary>The speaker refused a UPnP action. <see cref="ErrorCode"/> is the UPnP error number when the reply carried one.</summary>

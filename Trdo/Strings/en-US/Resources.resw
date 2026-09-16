@@ -83,6 +83,9 @@
   <data name="AboutPage_BuiltWithOpenSourceTitle.Text" xml:space="preserve">
     <value>Built With Open Source</value>
   </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Sonos casting was heavily influenced by RoomRelay and its author, guicn555. Thank you!</value>
+  </data>
   <data name="AboutPage_ContactDeveloper.Text" xml:space="preserve">
     <value>Contact the Developer</value>
   </data>
