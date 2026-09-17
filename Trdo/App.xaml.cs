@@ -8,10 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Trdo.Controls;
+using Trdo.Models;
 using Trdo.Services;
+using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.UI.ViewManagement;
+using Windows.Win32;
 using WinUIEx;
 
 namespace Trdo;
@@ -22,6 +25,8 @@ namespace Trdo;
 public partial class App : Application
 {
     private TrayIcon? _trayIcon;
+    private TrayClickSequencer? _leftClickSequencer;
+    private TrayClickSequencer? _rightClickSequencer;
     private TrayPopupWindow? _trayPopupWindow;
     private MiniPlayerWindow? _miniPlayerWindow;
     private SongChangePopupWindow? _songChangePopupWindow;
@@ -81,7 +86,15 @@ public partial class App : Application
 
     public App()
     {
+        // Registered before anything else so a crash during startup is captured too. None of
+        // these mark the exception handled: the process still dies, but the log records why
+        // first (WER reports for a WinUI app carry an HRESULT and no managed stack).
+        UnhandledException += OnUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
+        SettingsService.MigrateTrayClickActions();
         InitializeComponent();
         _playerVm.PropertyChanged += PlayerVmOnPropertyChanged;
 
@@ -92,21 +105,67 @@ public partial class App : Application
         // failure, and it needs this (UI) thread's dispatcher for its review timer.
         PlaybackErrorService.EnsureInitialized();
 
+        // Radio static listens for buffering, which can start before any window is shown.
+        RadioStaticService.Instance.Initialize();
+
         // Subscribe to theme change events
         _uiSettings.ColorValuesChanged += OnColorValuesChanged;
 
         SettingsService.SongChangePopupEnabledChanged += OnSongChangePopupEnabledChanged;
+
+        // The tooltip names the button that plays/pauses, so it goes stale when that moves.
+        SettingsService.TrayClickActionsChanged += (_, _) => UpdatePlayPauseCommandText();
     }
 
-    public void TryShowFlyout()
+    private const string CrashLogComponent = "Crash";
+
+    /// <summary>Exceptions that escape XAML: event handlers, x:Bind getters, dispatcher callbacks.</summary>
+    private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        WindowPlacementService.CapturePointerAnchor();
-        ShowTrayPopup();
+        // e.Exception can be a bare COMException/AggregateException wrapper with the real type
+        // lost, so e.Message (which XAML fills from the original) is logged alongside it.
+        LogCrash("Unhandled XAML exception", e.Exception, e.Message);
     }
 
-    public void ShowMiniPlayerWindow()
+    /// <summary>Exceptions on non-UI threads (thread pool, LibVLC callbacks) that reach the runtime.</summary>
+    private void OnDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
     {
-        WindowPlacementService.CapturePointerAnchor();
+        LogCrash(e.IsTerminating ? "Unhandled exception (terminating)" : "Unhandled exception",
+            e.ExceptionObject as Exception, e.ExceptionObject?.ToString());
+    }
+
+    /// <summary>Faulted tasks nobody awaited; not fatal, but worth a log line.</summary>
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        LogService.Error(CrashLogComponent, $"Unobserved task exception :: {e.Exception}");
+        e.SetObserved();
+    }
+
+    private static void LogCrash(string what, Exception? ex, string? message)
+    {
+        // Full ToString rather than LogService.Error's type+message: the stack is the point.
+        string detail = ex?.ToString() ?? message ?? "(no exception object)";
+        if (ex != null && !string.IsNullOrEmpty(message) && !detail.Contains(message))
+        {
+            detail = $"{message}{Environment.NewLine}{detail}";
+        }
+
+        LogService.Error(CrashLogComponent, $"{what} :: {detail}");
+
+        // The process is about to die; the background writer will not get another turn.
+        LogService.FlushToDisk(TimeSpan.FromSeconds(2));
+    }
+
+    /// <summary>Opens the mini player, creating it on first use, and brings it to the front.</summary>
+    /// <param name="captureAnchor">
+    /// Whether to place the window relative to the cursor. True from a button inside the app,
+    /// where the pointer position is meaningful; false from the tray icon, where placement
+    /// should come from the icon's rect instead.
+    /// </param>
+    public void ShowMiniPlayerWindow(bool captureAnchor = true)
+    {
+        if (captureAnchor)
+            WindowPlacementService.CapturePointerAnchor();
 
         if (_miniPlayerWindow is null)
         {
@@ -136,10 +195,11 @@ public partial class App : Application
     /// </remarks>
     private void HandleSongChangePopup()
     {
+        // Not logged: blank metadata is the normal opening state of every station and local
+        // album, and the metadata pipeline's own log lines already show it arriving.
         string displayText = _playerVm.CurrentMetadata.DisplayText.Trim();
         if (displayText.Length == 0)
         {
-            LogService.Info("SongChangePopup", "Metadata observed but blank; ignoring");
             return;
         }
 
@@ -302,7 +362,7 @@ public partial class App : Application
                 }
 
                 // Exit this instance gracefully
-                Exit();
+                ShutdownAndExit();
                 return;
             }
         }
@@ -400,7 +460,7 @@ public partial class App : Application
             // Update tray icon to show loading state
             _ = UpdateTrayIconAsync();
         }
-        else if (e.PropertyName == nameof(PlayerViewModel.CanPlay))
+        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted))
         {
             UpdatePlayPauseCommandText();
         }
@@ -443,7 +503,13 @@ public partial class App : Application
         _trayIcon = new(0, "Assets/Radio.ico", "Traydio");
         _trayIcon.Selected += TrayIcon_Selected;
         _trayIcon.ContextMenu += TrayIcon_ContextMenu;
+        _trayIcon.LeftDoubleClick += TrayIcon_LeftDoubleClick;
+        _trayIcon.RightDoubleClick += TrayIcon_RightDoubleClick;
         _trayIcon.IsVisible = true;
+
+        DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
+        _leftClickSequencer ??= new TrayClickSequencer(dispatcher);
+        _rightClickSequencer ??= new TrayClickSequencer(dispatcher);
         WindowPlacementService.SetTrayIconSource(_trayIcon);
 
         // Only show tutorial window on first run
@@ -454,42 +520,206 @@ public partial class App : Application
         }
     }
 
-    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
-    {
-        if (SettingsService.TrayClickBehavior == 1)
-        {
-            // Swapped: right click plays/pauses (fall back to flyout if no station selected)
-            if (_playerVm.CanPlay)
-            {
-                TogglePlaybackFromTray();
-                return;
-            }
-        }
-
-        // Default: right click opens flyout; also fallback when no station is available
-        ShowFlyout(args);
-    }
-
     private void TrayIcon_Selected(TrayIcon sender, TrayIconEventArgs args)
     {
-        if (SettingsService.TrayClickBehavior == 1)
+        // Captured now, not when a deferred click finally runs: the flyout needs to know
+        // whether this is the click that light-dismissed it.
+        DateTime clickedAtUtc = DateTime.UtcNow;
+
+        _leftClickSequencer?.OnClick(
+            defer: TrayClickPolicy.ShouldDeferSingleClick(SettingsService.TrayLeftDoubleClickAction),
+            () => RunTrayAction(SettingsService.TrayLeftClickAction, clickedAtUtc));
+    }
+
+    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
+    {
+        DateTime clickedAtUtc = DateTime.UtcNow;
+
+        _rightClickSequencer?.OnClick(
+            defer: TrayClickPolicy.ShouldDeferSingleClick(SettingsService.TrayRightDoubleClickAction),
+            () => RunTrayAction(SettingsService.TrayRightClickAction, clickedAtUtc));
+    }
+
+    private void TrayIcon_LeftDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    {
+        TrayClickAction action = SettingsService.TrayLeftDoubleClickAction;
+
+        // Unassigned double-clicks are invisible: the two single clicks run exactly as they
+        // always have, rather than the second one being swallowed.
+        if (action == TrayClickAction.None)
+            return;
+
+        _leftClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    private void TrayIcon_RightDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    {
+        TrayClickAction action = SettingsService.TrayRightDoubleClickAction;
+
+        if (action == TrayClickAction.None)
+            return;
+
+        _rightClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    /// <summary>
+    /// Turns the raw single- and double-click events for one mouse button into at most one
+    /// action per gesture.
+    /// </summary>
+    /// <remarks>
+    /// Windows reports a double-click as <em>click, double-click, click</em>: the first
+    /// button-up arrives as an ordinary click before the system can know a second is coming,
+    /// and the second button-up arrives as another ordinary click afterwards. So while a
+    /// double-click action is assigned, a single click is held back for the system
+    /// double-click interval and dropped if the double-click lands in that time, and the
+    /// trailing click is dropped as part of the same gesture. When nothing is assigned to the
+    /// double-click, clicks run at once: the delay is the price of using a double-click on
+    /// that button, not of the feature existing - fast when it can be, slower only where the
+    /// user asked for more.
+    /// </remarks>
+    private sealed class TrayClickSequencer
+    {
+        private readonly DispatcherQueueTimer _timer;
+        private Action? _pendingSingleClick;
+        private DateTimeOffset _lastDoubleClickAtUtc = DateTimeOffset.MinValue;
+
+        public TrayClickSequencer(DispatcherQueue dispatcher)
         {
-            // Swapped: left click opens flyout
-            ShowFlyout(args);
+            _timer = dispatcher.CreateTimer();
+            _timer.IsRepeating = false;
+            _timer.Tick += (_, _) =>
+            {
+                Action? pending = _pendingSingleClick;
+                _pendingSingleClick = null;
+                pending?.Invoke();
+            };
+        }
+
+        /// <summary>
+        /// Read each time rather than cached: it is a user setting in Control Panel, and a
+        /// double-click that Windows has just recognised should match what the user set.
+        /// </summary>
+        private static TimeSpan DoubleClickInterval =>
+            TimeSpan.FromMilliseconds(PInvoke.GetDoubleClickTime());
+
+        public void OnClick(bool defer, Action singleClick)
+        {
+            // The second button-up of a double-click that already ran.
+            if (DateTimeOffset.UtcNow - _lastDoubleClickAtUtc < DoubleClickInterval)
+                return;
+
+            if (!defer)
+            {
+                singleClick();
+                return;
+            }
+
+            _pendingSingleClick = singleClick;
+            _timer.Interval = DoubleClickInterval;
+            _timer.Stop();
+            _timer.Start();
+        }
+
+        public void OnDoubleClick(Action doubleClick)
+        {
+            _timer.Stop();
+            _pendingSingleClick = null;
+            _lastDoubleClickAtUtc = DateTimeOffset.UtcNow;
+            doubleClick();
+        }
+    }
+
+    /// <summary>
+    /// Runs whichever action Settings has assigned to the button that was just clicked.
+    /// Anything that needs a station falls back to the flyout while there is none, so a
+    /// fresh install always lands the user on the "add a station" UI rather than on nothing.
+    /// </summary>
+    private void RunTrayAction(TrayClickAction configured, DateTime clickedAtUtc)
+    {
+        TrayClickAction action = TrayClickPolicy.Resolve(configured, _playerVm.CanPlay);
+
+        switch (action)
+        {
+            case TrayClickAction.None:
+                break;
+            case TrayClickAction.PlayPause:
+                TogglePlaybackFromTray();
+                break;
+            case TrayClickAction.ShowFlyout:
+                ShowFlyout(clickedAtUtc);
+                break;
+            case TrayClickAction.MuteUnmute:
+                _playerVm.ToggleMute();
+                break;
+            case TrayClickAction.FavoriteTrack:
+                FavoriteCurrentTrackFromTray(clickedAtUtc);
+                break;
+            case TrayClickAction.ShowTrackInfo:
+                ShowTrackInfoFromTray(clickedAtUtc);
+                break;
+            case TrayClickAction.ToggleMiniPlayer:
+                ToggleMiniPlayerFromTray();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Toggles the current track in Favorite Songs and re-shows the pill so the star it now
+    /// carries (or no longer carries) is the feedback for a click that otherwise changes
+    /// nothing visible. Shown regardless of the popup setting: the user asked for something
+    /// on this click, which is different from the unprompted announcements that setting governs.
+    /// </summary>
+    private void FavoriteCurrentTrackFromTray(DateTime clickedAtUtc)
+    {
+        if (!_playerVm.HasNowPlaying)
+        {
+            // Nothing identifiable to favorite; the flyout at least shows why.
+            ShowFlyout(clickedAtUtc);
             return;
         }
 
-        // Default: left click plays/pauses
-        // Check if we can play (have stations available and one selected)
-        if (!_playerVm.CanPlay)
+        _playerVm.ToggleCurrentTrackFavorite();
+        ShowTrackInfoFromTray(clickedAtUtc);
+    }
+
+    /// <summary>
+    /// Shows the now-playing pill on demand. Bypasses the popup's on/off setting for the same
+    /// reason the Settings demo does - this pill was explicitly asked for - and falls back to
+    /// the station name while the stream has not identified a track yet, so the click always
+    /// shows <em>something</em>.
+    /// </summary>
+    private void ShowTrackInfoFromTray(DateTime clickedAtUtc)
+    {
+        string displayText = _playerVm.NowPlaying.Trim();
+
+        if (displayText.Length == 0)
+            displayText = _playerVm.SelectedStation?.Name?.Trim() ?? string.Empty;
+
+        if (displayText.Length == 0)
         {
-            // No stations available, show the flyout to encourage user to add a station
-            ShowFlyout(args);
+            ShowFlyout(clickedAtUtc);
             return;
         }
 
-        // We have stations, toggle play/pause
-        TogglePlaybackFromTray();
+        ShowSongChangePopup(displayText);
+    }
+
+    /// <summary>
+    /// Opens the mini player, or closes it when it is already open. Placement comes from the
+    /// tray icon's own rect rather than the cursor, for the reasons given on
+    /// <see cref="ShowFlyout"/>.
+    /// </summary>
+    private void ToggleMiniPlayerFromTray()
+    {
+        if (_miniPlayerWindow is not null)
+        {
+            // Closed nulls the field.
+            _miniPlayerWindow.Close();
+            return;
+        }
+
+        WindowPlacementService.ClearPointerAnchor();
+        ShowMiniPlayerWindow(captureAnchor: false);
     }
 
     /// <summary>
@@ -541,7 +771,11 @@ public partial class App : Application
         ShowSongChangePopup(displayText);
     }
 
-    private void ShowFlyout(TrayIconEventArgs args)
+    /// <param name="clickedAtUtc">
+    /// When the tray click behind this happened, if it was one; see
+    /// <see cref="TrayPopupWindow.ToggleNearAnchor"/>.
+    /// </param>
+    public void ShowFlyout(DateTime? clickedAtUtc = null)
     {
         // Unlike TryShowFlyout/ShowMiniPlayerWindow (invoked from a button
         // inside the app, where the pointer position is meaningful), this is
@@ -549,11 +783,12 @@ public partial class App : Application
         // and pen taps don't move the hardware cursor, so capturing it here
         // can anchor the popup to a stale, unrelated position instead of the
         // icon — clear it so placement always derives from the icon's rect.
+
         WindowPlacementService.ClearPointerAnchor();
-        ShowTrayPopup();
+        ShowTrayPopup(clickedAtUtc);
     }
 
-    private void ShowTrayPopup()
+    private void ShowTrayPopup(DateTime? clickedAtUtc)
     {
         if (_trayPopupWindow is null)
         {
@@ -562,7 +797,7 @@ public partial class App : Application
             _trayPopupWindow.Closed += (_, _) => _trayPopupWindow = null;
         }
 
-        _trayPopupWindow.ToggleNearAnchor();
+        _trayPopupWindow.ToggleNearAnchor(clickedAtUtc);
     }
 
     private async Task UpdateTrayIconAsync()
@@ -646,9 +881,7 @@ public partial class App : Application
         }
         else if (_playerVm.IsPlaying)
         {
-            string playPauseClickHint = SettingsService.TrayClickBehavior == 1
-                ? LocalizationService.GetString("TrayIcon_RightClickToPause", "Right-click to pause")
-                : LocalizationService.GetString("TrayIcon_LeftClickToPause", "Left-click to pause");
+            string playPauseClickHint = GetPlayPauseClickHint(isPlaying: true);
 
             if (_playerVm.HasNowPlaying)
             {
@@ -673,9 +906,7 @@ public partial class App : Application
         }
         else
         {
-            string playPauseClickHint = SettingsService.TrayClickBehavior == 1
-                ? LocalizationService.GetString("TrayIcon_RightClickToPlay", "Right-click to play")
-                : LocalizationService.GetString("TrayIcon_LeftClickToPlay", "Left-click to play");
+            string playPauseClickHint = GetPlayPauseClickHint(isPlaying: false);
 
             string pausedFormat = LocalizationService.GetString(
                 "TrayIcon_Paused",
@@ -683,7 +914,35 @@ public partial class App : Application
             tooltip = string.Format(pausedFormat, station, playPauseClickHint);
         }
 
+        if (_playerVm.CanPlay && _playerVm.IsMuted)
+        {
+            // Mute leaves no other trace on the icon, and silence with "(Playing)" above it
+            // would otherwise read as a broken stream.
+            tooltip = string.Concat(tooltip.TrimEnd(), "\n", LocalizationService.GetString("TrayIcon_Muted", "Muted"));
+        }
+
         SetTrayTooltip(tooltip, forceTooltip);
+    }
+
+    /// <summary>
+    /// The "click to play/pause" line of the tooltip for whichever button is assigned that
+    /// action, or an empty string when neither is. The format strings put the hint on its own
+    /// line, and <see cref="SetTrayTooltip"/> trims, so an empty hint simply drops the line.
+    /// </summary>
+    private static string GetPlayPauseClickHint(bool isPlaying)
+    {
+        TrayClickButton? button = TrayClickPolicy.PlayPauseButton(
+            SettingsService.TrayLeftClickAction,
+            SettingsService.TrayRightClickAction);
+
+        return (button, isPlaying) switch
+        {
+            (TrayClickButton.Left, true) => LocalizationService.GetString("TrayIcon_LeftClickToPause", "Left-click to pause"),
+            (TrayClickButton.Left, false) => LocalizationService.GetString("TrayIcon_LeftClickToPlay", "Left-click to play"),
+            (TrayClickButton.Right, true) => LocalizationService.GetString("TrayIcon_RightClickToPause", "Right-click to pause"),
+            (TrayClickButton.Right, false) => LocalizationService.GetString("TrayIcon_RightClickToPlay", "Right-click to play"),
+            _ => string.Empty
+        };
     }
 
     private void SetTrayTooltip(string? text, bool force = false)
@@ -746,21 +1005,67 @@ public partial class App : Application
         }
     }
 
+    private bool _isShuttingDown;
+
     /// <summary>
-    /// Cleanup resources when the application exits
+    /// Tears down every long-lived service and native resource this app owns, then exits.
     /// </summary>
-    ~App()
+    /// <remarks>
+    /// This is the app's only real exit path (the Quit button and the duplicate-instance
+    /// early-out both route here) and must be called instead of <see cref="Application.Exit"/>
+    /// directly. A finalizer used to do this cleanup, but it never actually ran: <c>Exit()</c>
+    /// terminates the process without running finalizers, and <c>Application.Current</c> stays
+    /// GC-reachable for the app's whole life anyway, so it was never eligible for finalization
+    /// in the first place. That silently meant the radio player - its MediaPlayer, the LibVLC
+    /// engine, the watchdog's background monitor - was never disposed on quit.
+    /// </remarks>
+    internal void ShutdownAndExit()
     {
+        if (_isShuttingDown)
+            return;
+        _isShuttingDown = true;
+
+        Debug.WriteLine("[App] Shutting down");
+
         try
         {
+            _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
+            SettingsService.SongChangePopupEnabledChanged -= OnSongChangePopupEnabledChanged;
+
+            _trayPopupWindow?.Close();
+            _miniPlayerWindow?.Close();
+            _songChangePopupWindow?.Close();
+
+            if (_trayIcon is not null)
+            {
+                _trayIcon.IsVisible = false;
+                _trayIcon.Dispose();
+                _trayIcon = null;
+            }
+
+            // Order matters twice over: RadioStaticService unsubscribes from the player's events
+            // first, so nothing reacts to the source teardown below by starting static that would
+            // never fade out; then the player's Dispose() tears down the LibVlcPlaybackBackend
+            // (which owns a VlcMediaPlayer built on the shared native instance) before LibVlcHost
+            // frees that instance, since freeing it first would pull the native library out from
+            // under a still-live player.
+            RadioStaticService.Instance.Dispose();
+            RadioPlayerService.Instance.Dispose();
+            LibVlcHost.Dispose();
+
+            // Only ever owned when this instance created it (createdNew was true in
+            // OnLaunched) - the duplicate-instance path opens someone else's mutex and must not
+            // release it, but ReleaseMutex() on an unowned mutex just throws, which the catch
+            // below swallows.
             _singleInstanceMutex?.ReleaseMutex();
             _singleInstanceMutex?.Dispose();
             _trayIconRestoreEvent?.Dispose();
-            LibVlcHost.Dispose();
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore errors during cleanup
+            Debug.WriteLine($"[App] Error during shutdown: {ex.Message}");
         }
+
+        Exit();
     }
 }

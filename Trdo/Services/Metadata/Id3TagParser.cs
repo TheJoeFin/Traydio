@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Trdo.Helpers;
 using Trdo.Models;
 
 namespace Trdo.Services.Metadata;
@@ -9,6 +10,8 @@ namespace Trdo.Services.Metadata;
 /// </summary>
 internal static class Id3TagParser
 {
+    private const string LogComponent = "AlbumArt";
+    private static string? _lastLoggedApicSummary;
     private static readonly Encoding Latin1 = Encoding.GetEncoding("ISO-8859-1");
 
     public static StreamMetadata Parse(byte[] id3Data)
@@ -109,8 +112,9 @@ internal static class Id3TagParser
             return;
         }
 
+        // The description is in the frame's declared text encoding, same as APIC's.
         int index = 1;
-        string description = ReadNullTerminatedLatin1(frameData, ref index);
+        string description = ReadNullTerminatedString(frameData, frameData[0], ref index);
         string value = ReadRemainingUtf8OrLatin1(frameData, index);
 
         if (string.IsNullOrWhiteSpace(value))
@@ -132,6 +136,14 @@ internal static class Id3TagParser
         }
     }
 
+    /// <summary>
+    /// APIC layout: text encoding (1 byte), MIME type (null-terminated Latin-1), picture type
+    /// (1 byte), description (in the frame's text encoding, so a UTF-16 one ends in a
+    /// double-null), then the raw image bytes. Every field before the image has to be walked
+    /// exactly: a taggers' UTF-16 "cover" description read as single-null Latin-1 stops at the
+    /// first zero byte inside it and leaves half the description glued to the front of the
+    /// JPEG, which then decodes as nothing at all - in the app and in SMTC alike.
+    /// </summary>
     private static void ParseApicFrame(ReadOnlySpan<byte> frameData, StreamMetadata metadata)
     {
         if (frameData.Length < 5)
@@ -139,24 +151,44 @@ internal static class Id3TagParser
             return;
         }
 
-        int index = 1;
-        ReadNullTerminatedLatin1(frameData, ref index);
-        ReadNullTerminatedLatin1(frameData, ref index);
+        int index = 0;
+        byte encoding = frameData[index++];
+        string declaredMime = ReadNullTerminatedLatin1(frameData, ref index);
 
         if (index >= frameData.Length)
         {
             return;
         }
 
-        // APIC image bytes are embedded; expose via data URL for downstream SMTC handling.
-        byte[] imageBytes = frameData[index..].ToArray();
-        if (imageBytes.Length == 0)
+        byte pictureType = frameData[index++];
+        string description = ReadNullTerminatedString(frameData, encoding, ref index);
+
+        if (index >= frameData.Length)
         {
+            LogService.Warn(LogComponent, $"APIC frame (mime '{declaredMime}', type {pictureType}, description '{description}') has no image bytes after its header");
             return;
         }
 
-        string mime = DetectImageMime(imageBytes);
-        metadata.AlbumArtUrl = $"data:{mime};base64,{Convert.ToBase64String(imageBytes)}";
+        ReadOnlySpan<byte> imageSpan = frameData[index..];
+        string? mime = ImageFormat.DetectMime(imageSpan);
+        if (mime is null)
+        {
+            // Better no art (the station favicon then stands in) than a payload every decoder
+            // silently rejects, which would block that fallback.
+            LogService.Warn(LogComponent, $"APIC frame (encoding {encoding}, mime '{declaredMime}', type {pictureType}, description '{description}') skipped: {ImageFormat.Describe(imageSpan)}");
+            return;
+        }
+
+        // Logged once per distinct picture, not per parse: an HLS stream re-sends the same
+        // tag (art included) with every segment.
+        string summary = $"encoding {encoding}, mime '{declaredMime}', type {pictureType}, description '{description}', {ImageFormat.Describe(imageSpan)}";
+        if (summary != _lastLoggedApicSummary)
+        {
+            _lastLoggedApicSummary = summary;
+            LogService.Info(LogComponent, $"Embedded APIC art: {summary}");
+        }
+
+        metadata.AlbumArtUrl = $"data:{mime};base64,{Convert.ToBase64String(imageSpan)}";
     }
 
     private static string ReadTextFrame(ReadOnlySpan<byte> frameData)
@@ -193,14 +225,16 @@ internal static class Id3TagParser
 
         string text = encoding switch
         {
-            0 => Latin1.GetString(textSpan).TrimEnd('\0'),
-            1 => Encoding.Unicode.GetString(textSpan).TrimEnd('\0'),
-            2 => Encoding.BigEndianUnicode.GetString(textSpan).TrimEnd('\0'),
-            3 => Encoding.UTF8.GetString(textSpan).TrimEnd('\0'),
-            _ => Latin1.GetString(textSpan).TrimEnd('\0')
+            0 => Latin1.GetString(textSpan),
+            1 => Encoding.Unicode.GetString(textSpan),
+            2 => Encoding.BigEndianUnicode.GetString(textSpan),
+            3 => Encoding.UTF8.GetString(textSpan),
+            _ => Latin1.GetString(textSpan)
         };
 
-        return text.Trim();
+        // Encoding.Unicode keeps the BOM as U+FEFF, which then rode along as an invisible
+        // first character of every UTF-16 title and artist.
+        return text.TrimEnd('\0').Trim('\uFEFF').Trim();
     }
 
     private static string ReadNullTerminatedLatin1(ReadOnlySpan<byte> data, ref int index)
@@ -218,6 +252,43 @@ internal static class Id3TagParser
         }
 
         return value;
+    }
+
+    /// <summary>
+    /// Reads a string terminated the way its ID3 text encoding demands: a single zero byte for
+    /// Latin-1/UTF-8, a zero <i>pair</i> on a 2-byte boundary for either UTF-16 flavour.
+    /// Leaves <paramref name="index"/> just past the terminator.
+    /// </summary>
+    private static string ReadNullTerminatedString(ReadOnlySpan<byte> data, byte encoding, ref int index)
+    {
+        bool wide = encoding is 1 or 2;
+        int start = index;
+        if (wide)
+        {
+            while (index + 1 < data.Length && (data[index] != 0 || data[index + 1] != 0))
+            {
+                index += 2;
+            }
+        }
+        else
+        {
+            while (index < data.Length && data[index] != 0)
+            {
+                index++;
+            }
+        }
+
+        ReadOnlySpan<byte> textSpan = data[start..Math.Min(index, data.Length)];
+        string text = encoding switch
+        {
+            1 => Encoding.Unicode.GetString(textSpan),
+            2 => Encoding.BigEndianUnicode.GetString(textSpan),
+            3 => Encoding.UTF8.GetString(textSpan),
+            _ => Latin1.GetString(textSpan)
+        };
+
+        index = Math.Min(index + (wide ? 2 : 1), data.Length);
+        return text.Trim('\uFEFF').Trim();
     }
 
     private static string ReadRemainingUtf8OrLatin1(ReadOnlySpan<byte> data, int index)
@@ -250,27 +321,5 @@ internal static class Id3TagParser
                lower.Contains(".png") ||
                lower.Contains(".webp") ||
                lower.Contains(".gif");
-    }
-
-    private static string DetectImageMime(byte[] imageBytes)
-    {
-        if (imageBytes.Length >= 3 &&
-            imageBytes[0] == 0xFF &&
-            imageBytes[1] == 0xD8 &&
-            imageBytes[2] == 0xFF)
-        {
-            return "image/jpeg";
-        }
-
-        if (imageBytes.Length >= 8 &&
-            imageBytes[0] == 0x89 &&
-            imageBytes[1] == 0x50 &&
-            imageBytes[2] == 0x4E &&
-            imageBytes[3] == 0x47)
-        {
-            return "image/png";
-        }
-
-        return "image/jpeg";
     }
 }

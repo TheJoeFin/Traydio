@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Trdo.Models;
 using Trdo.Services.Metadata;
 using Trdo.Services.Playback;
 
@@ -67,6 +68,7 @@ public sealed partial class RadioPlayerService
 
         _nativeBackend = new NativePlaybackBackend(_player, _httpClient);
         _nativeBackend.PlaybackFailed += OnNativePlaybackFailed;
+        _nativeBackend.PlaybackEnded += OnBackendPlaybackEnded;
 
         if (LibVlcHost.TryInitialize() && LibVlcHost.Instance is not null)
         {
@@ -74,6 +76,7 @@ public sealed partial class RadioPlayerService
             _libVlcBackend.PlaybackStateChanged += OnLibVlcPlaybackStateChanged;
             _libVlcBackend.BufferingStateChanged += OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed += OnLibVlcPlaybackFailed;
+            _libVlcBackend.PlaybackEnded += OnBackendPlaybackEnded;
         }
 
         _playbackEngineSelector = new PlaybackEngineSelector(_nativeBackend, _libVlcBackend);
@@ -502,6 +505,19 @@ public sealed partial class RadioPlayerService
             return;
         }
 
+        // Local files have their own once-per-track tag read rather than the poll-based
+        // orchestrator, which routes to ICY/native-timed/HLS sources that don't apply here.
+        if (_activeSourceKind == AudioSourceKind.Files)
+        {
+            PublishLocalTrackMetadata();
+            return;
+        }
+
+        if (_activeSourceKind != AudioSourceKind.Radio)
+        {
+            return;
+        }
+
         _metadataOrchestrator.EnsureForPlayback(
             _streamUrl,
             _playbackEngineSelector.ActiveBackendKind,
@@ -509,17 +525,52 @@ public sealed partial class RadioPlayerService
             _libVlcBackend?.VlcMediaPlayer);
     }
 
+    private void PublishLocalTrackMetadata()
+    {
+        if (_localTrackIndex < 0 || _localTrackIndex >= _localTrackList.Count)
+        {
+            return;
+        }
+
+        string path = _localTrackList[_localTrackIndex];
+        _ = PublishLocalTrackMetadataAsync(path);
+    }
+
+    private async Task PublishLocalTrackMetadataAsync(string path)
+    {
+        try
+        {
+            StreamMetadata metadata = await LocalFileMetadataService.ReadAsync(path);
+            _publishGate.Submit(metadata);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[RadioPlayerService] Failed to read local track metadata: {ex.Message}");
+        }
+    }
+
     private void StopMetadata()
     {
-        // Order matters: StopAll drives a blank through the gate synchronously, and the reset
-        // has to arm the station-start flag after that blank rather than have it consumed by it.
+        // Order matters: the blank has to reach the gate before Reset arms the station-start
+        // flag, so it cannot be mistaken for that next station's opening track.
         _metadataOrchestrator.StopAll();
+
+        // Submitted directly rather than trusting StopAll's own push to survive the
+        // orchestrator's internal dedup: that dedup compares against the orchestrator's own
+        // "current metadata", which local music never updates (it feeds the gate straight,
+        // bypassing the orchestrator entirely). So leaving a local station's folder for a radio
+        // station the orchestrator still remembers as blank would have StopAll's push
+        // dropped as a no-op "repeat", leaving the local track's title on screen - looking like
+        // the radio station is playing it - until the new station's own metadata eventually
+        // arrives. A direct submit here always reaches the gate regardless of what the
+        // orchestrator last saw.
+        _publishGate.Submit(StreamMetadata.Empty);
         _publishGate.Reset();
     }
 
     public async Task RefreshMetadataAsync(CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_streamUrl))
+        if (string.IsNullOrWhiteSpace(_streamUrl) || _activeSourceKind != AudioSourceKind.Radio)
         {
             return;
         }
@@ -554,8 +605,8 @@ public sealed partial class RadioPlayerService
     private double GetActiveBackendTargetVolume()
     {
         return ActivePlaybackBackend == PlaybackBackendKind.Native
-            ? Math.Min(_volume, 1)
-            : _volume;
+            ? Math.Min(EffectiveVolume, 1)
+            : EffectiveVolume;
     }
 
     private void SetActiveBackendVolume(double volume)
@@ -757,8 +808,19 @@ public sealed partial class RadioPlayerService
 
     private void OnLibVlcBackendBufferingStateChanged(object? sender, bool isBuffering)
     {
+        LogService.Info("RadioPlayerService", $"LibVLC BufferingStateChanged received: isBuffering={isBuffering}, _isUserPaused={_isUserPaused}, _isManuallyBuffering={_isManuallyBuffering}");
+
         TryEnqueueOnUi(() =>
         {
+            // See _isUserPaused: a user pause's source teardown can read back as buffering
+            // even though nothing is actually searching for a signal.
+            if (_isUserPaused && isBuffering && !_isManuallyBuffering)
+            {
+                LogService.Info("RadioPlayerService", "LibVLC BufferingStateChanged: suppressed - _isUserPaused is set");
+                return;
+            }
+
+            LogService.Info("RadioPlayerService", $"LibVLC BufferingStateChanged: raising BufferingStateChanged({isBuffering || _isManuallyBuffering})");
             BufferingStateChanged?.Invoke(this, isBuffering || _isManuallyBuffering);
         });
     }
@@ -770,15 +832,58 @@ public sealed partial class RadioPlayerService
         HandleBackendFailure(e);
     }
 
+    /// <summary>
+    /// Auto-advances a local music station when its current track ends on its own. Both
+    /// backends are always subscribed regardless of which is active - only the active one has
+    /// media loaded, so only it can ever raise this - and the <see cref="AudioSourceKind.Files"/>
+    /// check keeps a radio stream's own end-of-media (rare, but possible on a VOD-style URL)
+    /// from being treated as a track change.
+    /// </summary>
+    private void OnBackendPlaybackEnded(object? sender, EventArgs e)
+    {
+        if (_activeSourceKind != AudioSourceKind.Files ||
+            Interlocked.CompareExchange(ref _localTrackCompletionGate, 1, 0) != 0)
+        {
+            return;
+        }
+
+        TryEnqueueOnUi(() => _ = HandleLocalTrackEndedAsync());
+    }
+
+    private async Task HandleLocalTrackEndedAsync()
+    {
+        try
+        {
+            LocalMusicTrackEndAction action = LocalMusicPlaybackPolicy.ResolveTrackEnd(
+                _localTrackIndex,
+                _localTrackList.Count,
+                SettingsService.LocalMusicLoopMode);
+
+            SetLocalTrackIndex(action.SelectedTrackIndex);
+            if (action.ShouldPlay)
+                await PlayLocalTrackAtIndexAsync(action.SelectedTrackIndex);
+            else if (action.SelectedTrackIndex == 0)
+            {
+                Seek(TimeSpan.Zero);
+            }
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _localTrackCompletionGate, 0);
+        }
+    }
+
     private void DisposePlaybackEngine()
     {
         _nativeBackend.PlaybackFailed -= OnNativePlaybackFailed;
+        _nativeBackend.PlaybackEnded -= OnBackendPlaybackEnded;
 
         if (_libVlcBackend is not null)
         {
             _libVlcBackend.PlaybackStateChanged -= OnLibVlcPlaybackStateChanged;
             _libVlcBackend.BufferingStateChanged -= OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed -= OnLibVlcPlaybackFailed;
+            _libVlcBackend.PlaybackEnded -= OnBackendPlaybackEnded;
         }
 
         _playbackEngineSelector.Dispose();

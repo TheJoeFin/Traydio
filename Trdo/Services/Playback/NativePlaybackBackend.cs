@@ -25,6 +25,7 @@ public sealed partial class NativePlaybackBackend : IPlaybackBackend
         _httpClient = httpClient;
 
         _player.MediaFailed += OnMediaFailed;
+        _player.MediaEnded += OnMediaEnded;
     }
 
     public PlaybackBackendKind Kind => PlaybackBackendKind.Native;
@@ -80,6 +81,22 @@ public sealed partial class NativePlaybackBackend : IPlaybackBackend
         }
     }
 
+    public TimeSpan? Duration
+    {
+        get
+        {
+            try
+            {
+                TimeSpan duration = _player.PlaybackSession.NaturalDuration;
+                return duration > TimeSpan.Zero ? duration : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
     // Required by IPlaybackBackend, but RadioPlayerService wires the native-backend case
     // directly to _player.PlaybackSession instead of these, so they're never raised here.
 #pragma warning disable CS0067
@@ -87,6 +104,7 @@ public sealed partial class NativePlaybackBackend : IPlaybackBackend
     public event EventHandler<bool>? BufferingStateChanged;
 #pragma warning restore CS0067
     public event EventHandler<PlaybackFailureEventArgs>? PlaybackFailed;
+    public event EventHandler? PlaybackEnded;
 
     public IReadOnlyList<MediaTimeRange> GetBufferedRanges()
     {
@@ -138,11 +156,29 @@ public sealed partial class NativePlaybackBackend : IPlaybackBackend
         _player.Pause();
     }
 
+    public void Seek(TimeSpan position)
+    {
+        try
+        {
+            _player.PlaybackSession.Position = position;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[NativePlaybackBackend] Seek failed: {ex.Message}");
+        }
+    }
+
     public void ClearSource()
     {
         MediaPlaybackItemHelper.DisposePlayerSource(_player.Source);
         _player.Source = null;
         _currentPlaybackItem = null;
+    }
+
+    private void OnMediaEnded(MediaPlayer sender, object args)
+    {
+        Debug.WriteLine("[NativePlaybackBackend] MediaEnded");
+        PlaybackEnded?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnMediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
@@ -188,6 +224,7 @@ public sealed partial class NativePlaybackBackend : IPlaybackBackend
     public void Dispose()
     {
         _player.MediaFailed -= OnMediaFailed;
+        _player.MediaEnded -= OnMediaEnded;
         ClearSource();
     }
 }

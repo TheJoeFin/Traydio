@@ -1,4 +1,5 @@
 using Microsoft.Windows.ApplicationModel.Resources;
+using System;
 using Windows.Globalization;
 
 namespace Trdo.Services;
@@ -59,14 +60,21 @@ public static class LocalizationService
         try
         {
             // An empty override tells the platform to use the OS-configured language.
-            ApplicationLanguages.PrimaryLanguageOverride =
-                string.IsNullOrWhiteSpace(languageTag) || languageTag == SystemLanguage
-                    ? string.Empty
-                    : languageTag;
+            string effectiveTag = string.IsNullOrWhiteSpace(languageTag) || languageTag == SystemLanguage
+                ? string.Empty
+                : languageTag;
+
+            ApplicationLanguages.PrimaryLanguageOverride = effectiveTag;
+
+            LogService.Info("Localization",
+                string.IsNullOrEmpty(effectiveTag)
+                    ? $"Applied language override: <none> (requested '{languageTag}', following OS language)"
+                    : $"Applied language override: '{effectiveTag}'");
         }
-        catch
+        catch (Exception ex)
         {
             // Ignore invalid culture tags and fall back to the system language.
+            LogService.Warn("Localization", $"Failed to apply language override '{languageTag}': {ex.Message}");
         }
     }
 }

@@ -9,6 +9,8 @@ using System.ComponentModel;
 using Trdo.Services;
 using Trdo.ViewModels;
 using Windows.Foundation;
+using Windows.Graphics;
+using Windows.Win32;
 using WinUIEx;
 
 namespace Trdo.Controls;
@@ -18,11 +20,18 @@ public sealed partial class MiniPlayerWindow : WindowEx
     private static readonly Duration OverlayFadeDuration = new(TimeSpan.FromMilliseconds(180));
     private static readonly Duration MorphDuration = new(TimeSpan.FromMilliseconds(280));
     private static readonly TimeSpan TouchOverlayDuration = TimeSpan.FromSeconds(1);
+    private static readonly Thickness ContentCardMarginWithTitleBar = new(8, 4, 8, 8);
+    private static readonly Thickness ContentCardMarginWithoutTitleBar = new(8);
+
     private readonly DispatcherQueueTimer _touchOverlayTimer;
     private Storyboard? _hoverControlsStoryboard;
     private Storyboard? _morphStoryboard;
     private bool? _lastContentState;
     private bool _isClosed;
+    private bool _isTitleBarHidden;
+    private bool _isDragging;
+    private PointInt32 _dragWindowStart;
+    private System.Drawing.Point _dragCursorStart;
 
     private const double LargeLogoSize = 72.0;
     private const double SmallIconSize = 24.0;
@@ -56,6 +65,11 @@ public sealed partial class MiniPlayerWindow : WindowEx
         TopmostToggleMenuItem.IsChecked = topmostEnabled;
         IsAlwaysOnTop = topmostEnabled;
         AppWindow.IsShownInSwitchers = !topmostEnabled;
+
+        // Apply saved title-bar-hidden preference.
+        bool titleBarHidden = SettingsService.IsMiniPlayerTitleBarHidden;
+        HideTitleBarToggleMenuItem.IsChecked = titleBarHidden;
+        ApplyTitleBarVisibility(titleBarHidden);
 
         // Set initial content state and subscribe to future changes.
         ApplyContentState(ViewModel.IsPlaybackActive, animate: false);
@@ -219,6 +233,82 @@ public sealed partial class MiniPlayerWindow : WindowEx
         SettingsService.IsMiniPlayerTopmost = enabled;
     }
 
+    private void HideTitleBarToggleMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        bool hidden = HideTitleBarToggleMenuItem.IsChecked;
+        ApplyTitleBarVisibility(hidden);
+        SettingsService.IsMiniPlayerTitleBarHidden = hidden;
+    }
+
+    private void ApplyTitleBarVisibility(bool hidden)
+    {
+        _isTitleBarHidden = hidden;
+        ModernTitlebar.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+        ContentCard.Margin = hidden ? ContentCardMarginWithoutTitleBar : ContentCardMarginWithTitleBar;
+
+        // ModernTitlebar only owns the icon/title text - the native caption buttons (including
+        // close) are drawn by Windows in the reserved corner regardless of that element's
+        // visibility, so removing them needs the presenter's own title bar turned off too. That
+        // also removes the OS drag handle, which ContentCard_PointerPressed replaces.
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.SetBorderAndTitleBar(true, !hidden);
+        }
+    }
+
+    // Drags the window by hand instead of handing off to the OS's non-client drag loop (the
+    // classic ReleaseCapture+WM_NCLBUTTONDOWN trick) - that loop re-enters the message pump
+    // synchronously and doesn't reliably hand control back to XAML afterwards in this app,
+    // which showed up as drags that silently failed to start or left the pointer looking
+    // stuck to the window. Tracking PointerMoved ourselves and calling AppWindow.Move avoids
+    // the nested loop entirely. Screen position comes from GetCursorPos rather than the
+    // pointer event's own coordinates, since those are relative to the window and become
+    // wrong mid-drag as the window itself moves out from under a screen-fixed cursor.
+    private void ContentCard_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (_isClosed || !_isTitleBarHidden) return;
+        if (e.Pointer.PointerDeviceType != Microsoft.UI.Input.PointerDeviceType.Mouse) return;
+
+        // Left button only - a right-click here should still open the context menu (RightTapped),
+        // not start a drag. And only when the press actually reaches us: a press that lands on
+        // one of the hover buttons (e.g. play/pause) is handled by that button instead, same as
+        // clicking a button embedded in a real title bar doesn't drag the window either.
+        if (!e.GetCurrentPoint(ContentCard).Properties.IsLeftButtonPressed) return;
+        if (!PInvoke.GetCursorPos(out System.Drawing.Point cursorPos)) return;
+
+        _isDragging = true;
+        _dragCursorStart = cursorPos;
+        _dragWindowStart = AppWindow.Position;
+        ((UIElement)sender).CapturePointer(e.Pointer);
+        e.Handled = true;
+
+        HideOverlayControls();
+    }
+
+    private void ContentCard_PointerMoved(object sender, PointerRoutedEventArgs e)
+    {
+        if (!_isDragging) return;
+        if (!PInvoke.GetCursorPos(out System.Drawing.Point cursorPos)) return;
+
+        int deltaX = cursorPos.X - _dragCursorStart.X;
+        int deltaY = cursorPos.Y - _dragCursorStart.Y;
+        AppWindow.Move(new PointInt32(_dragWindowStart.X + deltaX, _dragWindowStart.Y + deltaY));
+        e.Handled = true;
+    }
+
+    private void ContentCard_PointerReleased(object sender, PointerRoutedEventArgs e)
+    {
+        if (!_isDragging) return;
+        _isDragging = false;
+        ((UIElement)sender).ReleasePointerCapture(e.Pointer);
+        e.Handled = true;
+    }
+
+    private void ContentCard_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        _isDragging = false;
+    }
+
     private void PlayPauseButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.Toggle();
@@ -237,7 +327,7 @@ public sealed partial class MiniPlayerWindow : WindowEx
 
     private void WindowLayout_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (_isClosed) return;
+        if (_isClosed || _isDragging) return;
         if (e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Mouse)
         {
             ShowOverlayControls();
@@ -246,7 +336,7 @@ public sealed partial class MiniPlayerWindow : WindowEx
 
     private void WindowLayout_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        if (_isClosed) return;
+        if (_isClosed || _isDragging) return;
         if (e.Pointer.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
         {
             HideOverlayControls();

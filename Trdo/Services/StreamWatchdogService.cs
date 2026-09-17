@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Trdo.Models;
+using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Windows.Storage;
 
@@ -237,6 +239,10 @@ public sealed partial class StreamWatchdogService : IDisposable
         _silenceMonitor.SilenceDetected += OnSilenceDetected;
         _silenceMonitor.AudioLevelUpdated += OnAudioLevelFromMonitor;
 
+        // Radio static is our own noise on the output; without this the monitor would hear it and
+        // conclude a dead stream is still playing.
+        _silenceMonitor.ShouldIgnoreCapturedAudio = () => RadioStaticService.Instance.IsAudible;
+
         // Load settings
         LoadAutoBufferSettings();
         LoadSilenceTimeoutSetting();
@@ -431,6 +437,7 @@ public sealed partial class StreamWatchdogService : IDisposable
         try
         {
             bool isPlaying = false;
+            AudioSourceKind activeSourceKind = AudioSourceKind.Radio;
             TimeSpan currentPosition = TimeSpan.Zero;
             double currentBufferingProgress = 0;
 
@@ -440,6 +447,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 try
                 {
                     isPlaying = _playerService.IsPlaying;
+                    activeSourceKind = _playerService.ActiveSourceKind;
                     currentPosition = _playerService.Position;
                     currentBufferingProgress = _playerService.BufferingProgress;
                 }
@@ -448,6 +456,17 @@ public sealed partial class StreamWatchdogService : IDisposable
                     // Player might be disposed or in invalid state
                 }
             });
+
+            if (activeSourceKind != AudioSourceKind.Radio)
+            {
+                // Everything below is shaped around a network stream that can stall, drop, or
+                // need a buffer bump - none of which applies to a locally-generated source like
+                // white noise. The NAudio silence monitor (started by
+                // NotifyUserIntentionToPlay) is still the right thing watching its actual audio
+                // output, so this only skips the stream-recovery ladder, not that.
+                _lastStateCheck = DateTime.UtcNow;
+                return;
+            }
 
             // If stream is not playing, handle it as before
             if (!isPlaying)

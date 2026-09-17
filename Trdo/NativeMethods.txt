@@ -6,6 +6,7 @@ GetAncestor
 GetClientRect
 GetClassName
 GetCursorPos
+GetDoubleClickTime
 GetDpiForMonitor
 GetDpiForWindow
 GetForegroundWindow

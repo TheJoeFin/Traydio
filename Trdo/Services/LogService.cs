@@ -154,6 +154,63 @@ public static class LogService
     }
 
     /// <summary>
+    /// Deletes the current and previous log files and starts a fresh one, so a user who has
+    /// been reproducing an issue for a while can free the disk space without restarting the app.
+    /// </summary>
+    public static void ClearLogs()
+    {
+        EnsureStarted();
+
+        if (_disabled)
+        {
+            return;
+        }
+
+        // Drain the queue first so nothing logged moments ago reappears in the new file.
+        FlushToDisk();
+
+        lock (Gate)
+        {
+            try
+            {
+                _writer?.Flush();
+                _writer?.Dispose();
+            }
+            catch
+            {
+                // Best effort.
+            }
+            finally
+            {
+                _writer = null;
+            }
+
+            try
+            {
+                if (_logFilePath is not null && File.Exists(_logFilePath))
+                {
+                    File.Delete(_logFilePath);
+                }
+
+                if (_previousLogFilePath is not null && File.Exists(_previousLogFilePath))
+                {
+                    File.Delete(_previousLogFilePath);
+                }
+            }
+            catch
+            {
+                // Best effort — a file the OS won't let go of yet will just keep growing
+                // until it can be deleted on a later attempt.
+            }
+
+            _currentSize = 0;
+        }
+
+        // The writer thread reopens the file (via EnsureWriter) when it picks this line up.
+        TryQueue(BuildHeader());
+    }
+
+    /// <summary>
     /// Reduces a stream URL to <c>scheme://host</c> (dropping path, query and any
     /// embedded credentials/tokens) so logs never leak sensitive URL contents.
     /// </summary>

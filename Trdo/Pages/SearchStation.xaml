@@ -297,7 +297,19 @@
                     <HyperlinkButton
                         HorizontalAlignment="Center"
                         Click="ManualEntryButton_Click"
-                        Content="Or add station manually" />
+                        Content="Or add station manually">
+                        <!--
+                            White noise is a niche enough option that it doesn't deserve a
+                            second permanently-visible link next to the common case - right-click
+                            (or press-and-hold) the manual-entry link to reach it instead.
+                        -->
+                        <HyperlinkButton.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Click="AddWhiteNoiseButton_Click" Text="Add white noise..." />
+                                <MenuFlyoutItem Click="AddLocalMusicButton_Click" Text="Add local music..." />
+                            </MenuFlyout>
+                        </HyperlinkButton.ContextFlyout>
+                    </HyperlinkButton>
                 </StackPanel>
 
                 <!--  Results List  -->

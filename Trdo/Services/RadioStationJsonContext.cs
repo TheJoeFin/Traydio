@@ -10,6 +10,8 @@ namespace Trdo.Services;
 /// </summary>
 [JsonSerializable(typeof(List<RadioStation>))]
 [JsonSerializable(typeof(RadioStation))]
+[JsonSerializable(typeof(WhiteNoiseColor))]
+[JsonSerializable(typeof(AudioSourceKind))]
 [JsonSerializable(typeof(StationLayoutDocument))]
 [JsonSerializable(typeof(StationLayoutRow))]
 [JsonSerializable(typeof(List<StationLayoutRow>))]

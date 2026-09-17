@@ -33,10 +33,15 @@
         </TitleBar>
 
         <Grid
+            x:Name="ContentCard"
             Grid.Row="1"
             Margin="8,4,8,8"
+            PointerCaptureLost="ContentCard_PointerCaptureLost"
             PointerEntered="WindowLayout_PointerEntered"
-            PointerExited="WindowLayout_PointerExited">
+            PointerExited="WindowLayout_PointerExited"
+            PointerMoved="ContentCard_PointerMoved"
+            PointerPressed="ContentCard_PointerPressed"
+            PointerReleased="ContentCard_PointerReleased">
             <Grid.ContextFlyout>
                 <MenuFlyout>
                     <ToggleMenuFlyoutItem
@@ -49,6 +54,10 @@
                         Click="TopmostToggleMenuItem_Click"
                         IsChecked="True"
                         Text="Always on Top" />
+                    <ToggleMenuFlyoutItem
+                        x:Name="HideTitleBarToggleMenuItem"
+                        Click="HideTitleBarToggleMenuItem_Click"
+                        Text="Hide Title Bar" />
                 </MenuFlyout>
             </Grid.ContextFlyout>
             <Border
@@ -74,7 +83,8 @@
                                     VerticalAlignment="Center"
                                     FontSize="28"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                    Glyph="&#xE8D6;" />
+                                    Glyph="{x:Bind ViewModel.CurrentAlbumArtPlaceholderGlyph, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.CurrentAlbumArtPlaceholderVisibility, Mode=OneWay}" />
                                 <Border CornerRadius="{StaticResource OverlayCornerRadius}">
                                     <Image Source="{x:Bind ViewModel.CurrentAlbumArtImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                                 </Border>
@@ -132,9 +142,9 @@
                                     FontSize="18"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
                                     Glyph="&#xE95A;"
-                                    Visibility="{x:Bind ViewModel.SelectedStationFallbackIconVisibility, Mode=OneWay}" />
+                                    Visibility="{x:Bind ViewModel.MiniPlayerActiveStationIconFallbackVisibility, Mode=OneWay}" />
                                 <Border CornerRadius="4">
-                                    <Image Source="{x:Bind ViewModel.SelectedStationFaviconImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                    <Image Source="{x:Bind ViewModel.MiniPlayerActiveStationIconImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                                 </Border>
                             </Grid>
                             <TextBlock

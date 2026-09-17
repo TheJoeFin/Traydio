@@ -2,10 +2,13 @@ using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Trdo.Helpers;
 using Trdo.Models;
+using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Windows.Media;
 using Windows.Media.Playback;
@@ -22,6 +25,7 @@ public sealed partial class RadioPlayerService : IDisposable
     private readonly SystemMediaTransportControls? _systemMediaControls;
     private readonly HttpClient _httpClient;
     private double _volume = 1.0;
+    private bool _isMuted;
     private const string VolumeKey = "RadioVolume";
     private const string WatchdogEnabledKey = "WatchdogEnabled";
     private string? _streamUrl;
@@ -30,6 +34,13 @@ public sealed partial class RadioPlayerService : IDisposable
     private string? _currentAlbumArtUrl;
     private bool _isInternalStateChange;
     private bool _wasExternalPause;
+
+    // True from the moment a user pause finishes tearing down the source until the next play
+    // attempt begins. Clearing the native source on pause (see Pause()) makes the
+    // MediaPlaybackSession briefly read as Opening/Buffering, which is not a real "searching for
+    // signal" moment and must not make radio static play; a genuine start or station switch
+    // clears this before its own buffering begins, so that static is unaffected.
+    private volatile bool _isUserPaused;
     private Timer? _smtcUpdateTimer;
     private bool _smtcUpdatePending;
     private readonly Lock _smtcUpdateLock = new();
@@ -41,6 +52,17 @@ public sealed partial class RadioPlayerService : IDisposable
     private bool _isVolumeFading;
     private double _activeBackendVolume = 1.0;
     private bool _isStationCyclingEnabled;
+    private readonly WhiteNoisePlaybackEngine _whiteNoiseEngine = new();
+    private WhiteNoiseColor _whiteNoiseColor = WhiteNoiseColor.White;
+    private IReadOnlyList<string> _localTrackList = [];
+    private int _localTrackIndex = -1;
+    private int _localTrackCompletionGate;
+
+    // What the currently prepared source actually is. Stays Radio - the default - until a
+    // transition to a different kind actually lands, which is what keeps IsPlaying/IsBuffering
+    // and Play()/Pause() reading the OUTGOING source's kind for as long as it is still the one
+    // on screen; see the ordering comment in TransitionToStationAsync.
+    private AudioSourceKind _activeSourceKind = AudioSourceKind.Radio;
     private CancellationTokenSource? _playAttemptCts;
     private int _consecutivePlaybackFailures;
     private bool _hasReportedPlaybackFailure;
@@ -53,11 +75,27 @@ public sealed partial class RadioPlayerService : IDisposable
     public static RadioPlayerService Instance { get; } = new();
 
     public event EventHandler<bool>? PlaybackStateChanged;
+    /// <summary>
+    /// Raised with the level audio outputs actually receive - see <see cref="EffectiveVolume"/> -
+    /// whenever either the volume or the mute state changes.
+    /// </summary>
     public event EventHandler<double>? VolumeChanged;
+    public event EventHandler<bool>? MuteChanged;
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<StreamMetadata>? StreamMetadataChanged;
+    public event EventHandler? LocalTrackChanged;
+    public event EventHandler? LocalTrackListChanged;
     public event EventHandler? NextStationRequested;
     public event EventHandler? PreviousStationRequested;
+
+    /// <summary>
+    /// Raised the instant a radio pause is decided on, before any of its teardown runs. Lets
+    /// <see cref="Audio.RadioStaticService"/> cut short a static burst that is already ringing
+    /// (fading in or out) for an unrelated, legitimate buffering reason - a normal
+    /// <see cref="BufferingStateChanged"/>(false) only asks it to run its usual fade, which is
+    /// far too slow to feel like "stop now" when it lands moments before or after this.
+    /// </summary>
+    public event EventHandler? PlaybackPausedByUser;
 
     /// <summary>
     /// Raised when a play attempt cannot proceed or fails. The string payload is a
@@ -74,9 +112,22 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
-            bool isPlaying = ActiveBackend.IsPlaying;
-            Debug.WriteLine($"[RadioPlayerService] IsPlaying getter: {isPlaying}, Backend: {ActivePlaybackBackend}");
-            return isPlaying;
+            switch (_activeSourceKind)
+            {
+                case AudioSourceKind.WhiteNoise:
+                    return _whiteNoiseEngine.IsPlaying;
+
+                // Files isn't implemented yet - nothing can create a station of that kind, so it
+                // shares Radio's backend-based check rather than needing its own branch. Getters
+                // like this one are on hot, frequently-polled paths (bindings, the watchdog), so
+                // an unimplemented kind falls back to today's behaviour instead of throwing.
+                case AudioSourceKind.Radio:
+                case AudioSourceKind.Files:
+                default:
+                    bool isPlaying = ActiveBackend.IsPlaying;
+                    Debug.WriteLine($"[RadioPlayerService] IsPlaying getter: {isPlaying}, Backend: {ActivePlaybackBackend}");
+                    return isPlaying;
+            }
         }
     }
 
@@ -84,22 +135,32 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
-            try
+            switch (_activeSourceKind)
             {
-                if (ActivePlaybackBackend == PlaybackBackendKind.LibVlc)
-                {
-                    return ActiveBackend.IsBuffering || _isManuallyBuffering;
-                }
+                case AudioSourceKind.WhiteNoise:
+                    // Generated locally - there is nothing to wait on.
+                    return false;
 
-                MediaPlaybackState state = _player.PlaybackSession.PlaybackState;
-                bool isPlayerBuffering = state is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
-                bool isBuffering = isPlayerBuffering || _isManuallyBuffering;
-                Debug.WriteLine($"[RadioPlayerService] IsBuffering getter: {isBuffering} (Player: {isPlayerBuffering}, Manual: {_isManuallyBuffering}), PlaybackState: {state}");
-                return isBuffering;
-            }
-            catch
-            {
-                return _isManuallyBuffering;
+                case AudioSourceKind.Radio:
+                case AudioSourceKind.Files:
+                default:
+                    try
+                    {
+                        if (ActivePlaybackBackend == PlaybackBackendKind.LibVlc)
+                        {
+                            return ActiveBackend.IsBuffering || _isManuallyBuffering;
+                        }
+
+                        MediaPlaybackState state = _player.PlaybackSession.PlaybackState;
+                        bool isPlayerBuffering = state is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
+                        bool isBuffering = isPlayerBuffering || _isManuallyBuffering;
+                        Debug.WriteLine($"[RadioPlayerService] IsBuffering getter: {isBuffering} (Player: {isPlayerBuffering}, Manual: {_isManuallyBuffering}), PlaybackState: {state}");
+                        return isBuffering;
+                    }
+                    catch
+                    {
+                        return _isManuallyBuffering;
+                    }
             }
         }
     }
@@ -148,6 +209,38 @@ public sealed partial class RadioPlayerService : IDisposable
             {
                 return TimeSpan.Zero;
             }
+        }
+    }
+
+    /// <summary>
+    /// The current item's total duration, or <c>null</c> for a live radio stream (or nothing
+    /// prepared yet). Meaningful only for <see cref="AudioSourceKind.Files"/>.
+    /// </summary>
+    public TimeSpan? Duration
+    {
+        get
+        {
+            try
+            {
+                return ActiveBackend.Duration;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>Seeks the active backend to <paramref name="position"/>. Meaningful only for <see cref="AudioSourceKind.Files"/>.</summary>
+    public void Seek(TimeSpan position)
+    {
+        try
+        {
+            ActiveBackend.Seek(position);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[RadioPlayerService] Seek failed: {ex.Message}");
         }
     }
 
@@ -257,17 +350,50 @@ public sealed partial class RadioPlayerService : IDisposable
             if (Math.Abs(_volume - value) < 0.0001) return;
             Debug.WriteLine($"[RadioPlayerService] Setting Volume from {_volume} to {value}");
             _volume = value;
-            if (!_isVolumeFading)
-            {
-                SyncActiveBackendVolume();
-            }
+            ApplyEffectiveVolume();
             try
             {
                 ApplicationData.Current.LocalSettings.Values[VolumeKey] = _volume;
             }
             catch { }
-            VolumeChanged?.Invoke(this, _volume);
+            VolumeChanged?.Invoke(this, EffectiveVolume);
         }
+    }
+
+    /// <summary>
+    /// Silences every output without touching <see cref="Volume"/>, so unmuting lands back on
+    /// exactly the level the user had. Deliberately not persisted: an app that started up
+    /// silent with the slider showing 80% would look broken rather than muted.
+    /// </summary>
+    public bool IsMuted
+    {
+        get => _isMuted;
+        set
+        {
+            if (_isMuted == value) return;
+            Debug.WriteLine($"[RadioPlayerService] Setting IsMuted to {value}");
+            _isMuted = value;
+            ApplyEffectiveVolume();
+            VolumeChanged?.Invoke(this, EffectiveVolume);
+            MuteChanged?.Invoke(this, _isMuted);
+        }
+    }
+
+    /// <summary>
+    /// The level audio outputs actually receive: <see cref="Volume"/>, or silence while
+    /// <see cref="IsMuted"/>. Everything that renders sound - the stream backends, white noise
+    /// and radio static - follows this rather than the raw volume.
+    /// </summary>
+    public double EffectiveVolume => _isMuted ? 0 : _volume;
+
+    private void ApplyEffectiveVolume()
+    {
+        // A fade in flight re-reads the target every step, so it picks the change up itself.
+        if (_isVolumeFading)
+            return;
+
+        SyncActiveBackendVolume();
+        _whiteNoiseEngine.SetVolume(EffectiveVolume);
     }
 
     public bool WatchdogEnabled
@@ -331,7 +457,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 currentState = _player.PlaybackSession.PlaybackState;
                 isPlaying = currentState == MediaPlaybackState.Playing;
                 isBuffering = currentState is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
-                LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering})");
+                LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering}, _isUserPaused={_isUserPaused})");
                 Debug.WriteLine($"[RadioPlayerService] PlaybackStateChanged event: IsPlaying={isPlaying}, IsBuffering={isBuffering}, State={currentState}, IsInternalChange={_isInternalStateChange}");
 
                 // Reaching Playing means the current attempt succeeded - reset failure tracking.
@@ -406,7 +532,21 @@ public sealed partial class RadioPlayerService : IDisposable
             TryEnqueueOnUi(() =>
             {
                 PlaybackStateChanged?.Invoke(this, isPlaying);
-                BufferingStateChanged?.Invoke(this, isBuffering);
+
+                // Suppress the false "buffering" reading a user pause's source teardown
+                // produces - see _isUserPaused. A real start/switch clears the flag before
+                // its own buffering happens, so that signal still comes through untouched.
+                if (_isUserPaused && isBuffering)
+                {
+                    LogService.Info("RadioPlayerService",
+                        $"Suppressed BufferingStateChanged(true) from native state {currentState} - _isUserPaused is set");
+                }
+                else
+                {
+                    LogService.Info("RadioPlayerService", $"Raising BufferingStateChanged({isBuffering}) from native state {currentState}");
+                    BufferingStateChanged?.Invoke(this, isBuffering);
+                }
+
                 ScheduleSystemMediaTransportControlsUpdate();
             });
         };
@@ -611,22 +751,65 @@ public sealed partial class RadioPlayerService : IDisposable
         ScheduleSystemMediaTransportControlsUpdate();
     }
 
+    /// <summary>
+    /// Sets which noise spectrum a white noise station plays. Safe to call any time - it only
+    /// affects what <see cref="Play"/> picks up the next time it runs under
+    /// <see cref="AudioSourceKind.WhiteNoise"/>, not what is currently active.
+    /// </summary>
+    public void SetWhiteNoiseColor(WhiteNoiseColor color)
+    {
+        _whiteNoiseColor = color;
+        _whiteNoiseEngine.SetColor(color);
+    }
+
+    /// <summary>
+    /// Sets which kind of source is active outside of a transition - the app-startup path,
+    /// which calls <see cref="Initialize"/> and <see cref="Play"/> directly rather than going
+    /// through <see cref="TransitionToStationAsync"/>. Must be called before either of those,
+    /// since there is no outgoing source at startup for the ordering in
+    /// <see cref="TransitionToStationAsync"/> to protect.
+    /// </summary>
+    public void SetActiveSourceKind(AudioSourceKind kind)
+    {
+        _activeSourceKind = kind;
+    }
+
+    /// <summary>
+    /// What kind of source is currently active. <see cref="StreamWatchdogService"/> reads this
+    /// to skip its network/buffer-shaped recovery entirely for anything that isn't
+    /// <see cref="AudioSourceKind.Radio"/> - there is no stream to stall or reconnect.
+    /// </summary>
+    public AudioSourceKind ActiveSourceKind => _activeSourceKind;
+
     public async Task TransitionToStationAsync(
         string streamUrl,
         string stationName,
         string? faviconUrl,
         double volume,
         bool playAfterSwitch,
+        AudioSourceKind sourceKind = AudioSourceKind.Radio,
+        WhiteNoiseColor whiteNoiseColor = WhiteNoiseColor.White,
         CancellationToken cancellationToken = default)
     {
         try
         {
+            // IsPlaying/IsBuffering and the Pause() inside FadeOutAndPauseAsync must still see
+            // the OUTGOING source's kind here - switching to the new one first would make a
+            // playing radio stream read as "not playing" the moment a transition to white noise
+            // starts (IsPlaying would check the noise engine instead), so it would never be
+            // faded out or torn down.
             if (IsPlaying || IsBuffering)
             {
                 await FadeOutAndPauseAsync(cancellationToken);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            // Only now does the new source become "active" - everything above this line still
+            // reasoned about the old one, everything below reasons about the new one.
+            _activeSourceKind = sourceKind;
+            _whiteNoiseColor = whiteNoiseColor;
+            _whiteNoiseEngine.SetColor(whiteNoiseColor);
 
             SetStreamUrl(streamUrl);
             Volume = volume;
@@ -669,6 +852,111 @@ public sealed partial class RadioPlayerService : IDisposable
             throw;
         }
     }
+
+    /// <summary>The folder's tracks currently loaded for a <see cref="AudioSourceKind.Files"/> station.</summary>
+    public IReadOnlyList<string> CurrentLocalTrackList => _localTrackList;
+
+    /// <summary>Index into <see cref="CurrentLocalTrackList"/> of the track currently playing.</summary>
+    public int CurrentLocalTrackIndex => _localTrackIndex;
+
+    public bool CanGoToNextLocalTrack =>
+        _activeSourceKind == AudioSourceKind.Files && _localTrackIndex + 1 < _localTrackList.Count;
+
+    public bool CanGoToPreviousLocalTrack =>
+        _activeSourceKind == AudioSourceKind.Files && _localTrackList.Count > 0;
+
+    /// <summary>
+    /// Scans <see cref="RadioStation.LocalFolderPath"/> fresh and starts playing its first
+    /// track. The folder is rescanned live rather than trusting a cached list, so files added,
+    /// removed, or renamed since the station was last played are reflected immediately.
+    /// </summary>
+    public async Task PlayLocalMusicStationAsync(
+        RadioStation station,
+        bool playAfterSwitch,
+        CancellationToken cancellationToken = default)
+    {
+        _localTrackList = LocalMusicFolderScanner.ScanTracks(station.LocalFolderPath);
+        LogService.Info("RadioPlayerService", $"Local track list (re)scanned: {_localTrackList.Count} track(s) in {LogService.Redact(station.LocalFolderPath)}");
+        TryEnqueueOnUi(() => LocalTrackListChanged?.Invoke(this, EventArgs.Empty));
+        SetLocalTrackIndex(0);
+
+        if (_localTrackList.Count == 0)
+        {
+            LogService.Warn("RadioPlayerService",
+                $"Local music folder has no playable tracks: {LogService.Redact(station.LocalFolderPath)}");
+            ReportPlaybackFailure("This folder has no playable audio files.");
+            return;
+        }
+
+        await TransitionToStationAsync(
+            ToFileUri(_localTrackList[_localTrackIndex]),
+            station.Name,
+            station.FaviconUrl,
+            station.Volume,
+            playAfterSwitch,
+            sourceKind: AudioSourceKind.Files,
+            cancellationToken: cancellationToken);
+    }
+
+    /// <summary>Jumps to an arbitrary track in the folder currently loaded, e.g. from the details page's track list.</summary>
+    public async Task<bool> PlayLocalTrackAtIndexAsync(int index, CancellationToken cancellationToken = default)
+    {
+        if (_activeSourceKind != AudioSourceKind.Files || index < 0 || index >= _localTrackList.Count)
+        {
+            return false;
+        }
+
+        SetLocalTrackIndex(index);
+
+        await TransitionToStationAsync(
+            ToFileUri(_localTrackList[_localTrackIndex]),
+            _currentStationName ?? string.Empty,
+            _currentStationFaviconUrl,
+            _volume,
+            playAfterSwitch: true,
+            sourceKind: AudioSourceKind.Files,
+            cancellationToken: cancellationToken);
+
+        return true;
+    }
+
+    private void SetLocalTrackIndex(int index)
+    {
+        if (_localTrackIndex == index)
+        {
+            return;
+        }
+
+        LogService.Info("RadioPlayerService", $"Local track index changed: {_localTrackIndex} -> {index}");
+        _localTrackIndex = index;
+        TryEnqueueOnUi(() => LocalTrackChanged?.Invoke(this, EventArgs.Empty));
+    }
+
+    /// <summary>Advances to the next track in the folder, if there is one. No wraparound.</summary>
+    public Task<bool> NextLocalTrackAsync(CancellationToken cancellationToken = default) =>
+        PlayLocalTrackAtIndexAsync(_localTrackIndex + 1, cancellationToken);
+
+    /// <summary>How far into a track "previous" still counts as "go to the previous track" rather than restarting the current one.</summary>
+    private static readonly TimeSpan RestartTrackThreshold = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// Mimics standard media-player "previous" behavior: restarts the current track from the
+    /// beginning if it's more than a few seconds in, or if there's no earlier track to go back
+    /// to. Otherwise jumps to the previous track in the folder.
+    /// </summary>
+    public Task<bool> PreviousLocalTrackAsync(CancellationToken cancellationToken = default)
+    {
+        if (_activeSourceKind == AudioSourceKind.Files &&
+            (_localTrackIndex <= 0 || Position > RestartTrackThreshold))
+        {
+            Seek(TimeSpan.Zero);
+            return Task.FromResult(true);
+        }
+
+        return PlayLocalTrackAtIndexAsync(_localTrackIndex - 1, cancellationToken);
+    }
+
+    private static string ToFileUri(string path) => new Uri(path).AbsoluteUri;
 
     public void ClearPlaybackTarget()
     {
@@ -714,12 +1002,23 @@ public sealed partial class RadioPlayerService : IDisposable
 
         if (string.IsNullOrWhiteSpace(_streamUrl))
         {
-            Debug.WriteLine("[RadioPlayerService] ERROR: No stream URL set");
-            throw new InvalidOperationException("No stream URL set. Call SetStreamUrl first.");
+            // Nothing to play yet - reachable when a hardware/SMTC play command arrives before
+            // any station has ever been selected (the app can be running with a tray icon and
+            // no window open yet). Pause() already treats this as a harmless no-op rather than
+            // an error; Play() used to throw here instead, which surfaced a raw, meaningless
+            // "Call SetStreamUrl first" message to the user with nothing they could do about it.
+            Debug.WriteLine("[RadioPlayerService] Play called with no stream URL set - nothing to play yet");
+            Debug.WriteLine($"=== Play END (no URL) ===");
+            return;
         }
 
         LogService.Info("RadioPlayerService",
             $"Play requested for {LogService.Redact(_streamUrl)} (hasPlayedOnce={_hasPlayedOnce}, wasExternalPause={_wasExternalPause})");
+
+        // A real play attempt is starting, so any buffering it reports from here on is genuine
+        // and radio static should be allowed to react to it again - see _isUserPaused.
+        _isUserPaused = false;
+        LogService.Info("RadioPlayerService", "Play: _isUserPaused cleared");
 
         // Fresh user-initiated attempt: allow failures to be reported and retried again,
         // and give the recovery ladder a clean slate so a previous give-up doesn't stop
@@ -727,9 +1026,27 @@ public sealed partial class RadioPlayerService : IDisposable
         ResetPlaybackFailureTracking();
         _watchdog.ResetForStation();
 
+        switch (_activeSourceKind)
+        {
+            case AudioSourceKind.WhiteNoise:
+                PlayWhiteNoise();
+                Debug.WriteLine($"=== Play END (white noise) ===");
+                return;
+
+            // Files shares Radio's streaming path below: by the time Play() runs, _streamUrl
+            // is always the current track's real file URI (set by PlayLocalMusicStationAsync/
+            // PlayLocalTrackAtIndexAsync via TransitionToStationAsync), so the same
+            // IPlaybackBackend.PrepareAsync pipeline that opens a radio stream opens a local
+            // file just as well.
+            case AudioSourceKind.Radio:
+            case AudioSourceKind.Files:
+            default:
+                break;
+        }
+
         // Don't attempt to open a stream when the machine is offline - it would just
         // spin through prepare/fallback and fail. Tell the user instead.
-        if (!NetworkStatusService.IsInternetAvailable())
+        if (_activeSourceKind is AudioSourceKind.Radio && !NetworkStatusService.IsInternetAvailable())
         {
             LogService.Warn("RadioPlayerService", "No internet connection; aborting play attempt");
             Debug.WriteLine("[RadioPlayerService] No network available, aborting play attempt");
@@ -747,6 +1064,52 @@ public sealed partial class RadioPlayerService : IDisposable
         _ = PlayWithBufferInternalAsync(_playAttemptCts.Token);
 
         Debug.WriteLine($"=== Play END ===");
+    }
+
+    /// <summary>
+    /// Starts a white noise station. Bypasses the streaming pipeline entirely - there is no
+    /// network round trip, no backend to prepare and no buffer to wait out, so none of the
+    /// machinery <see cref="PlayWithBufferInternalAsync"/> exists for applies here.
+    /// </summary>
+    private void PlayWhiteNoise()
+    {
+        Debug.WriteLine("[RadioPlayerService] Playing white noise");
+
+        CancelPendingPlayAttempt();
+        _whiteNoiseEngine.Play(_whiteNoiseColor, EffectiveVolume);
+        _wasExternalPause = false;
+
+        // The engine fails closed (no audio device, WASAPI busy) rather than throwing, so its
+        // own IsPlaying is the only way to know whether this actually started. Reporting
+        // success regardless would leave the UI showing "Playing" over silence with nothing to
+        // ever correct it - exactly the kind of failure that reads as an error "persisting".
+        bool started = _whiteNoiseEngine.IsPlaying;
+        if (started)
+        {
+            // Genuine audio reaches the speakers for as long as this plays, so letting the
+            // watchdog's silence monitor run over it behaves exactly as it should for a real
+            // stream: it stays quiet unless the render device itself goes dead.
+            _watchdog.NotifyUserIntentionToPlay();
+        }
+        else
+        {
+            LogService.Warn("RadioPlayerService", "White noise failed to start - no usable audio output");
+        }
+
+        TryEnqueueOnUi(() =>
+        {
+            PlaybackStateChanged?.Invoke(this, started);
+            BufferingStateChanged?.Invoke(this, false);
+            ScheduleSystemMediaTransportControlsUpdate();
+
+            if (!started)
+            {
+                PlaybackFailed?.Invoke(this,
+                    LocalizationService.GetString(
+                        "PlaybackFailure_WhiteNoiseNoOutput",
+                        "Couldn't play white noise - no audio output device is available."));
+            }
+        });
     }
 
     /// <summary>
@@ -835,8 +1198,13 @@ public sealed partial class RadioPlayerService : IDisposable
                 Debug.WriteLine("[RadioPlayerService] Reusing existing playback source - resuming playback");
             }
 
+            // A local file opens near-instantly and has no "live edge" to wait for, so the
+            // buffer-then-wait dance below - built for a network stream - would only impose an
+            // artificial delay on every play/resume.
             bool useNativeBuffering = ActivePlaybackBackend == PlaybackBackendKind.Native;
-            bool needsBuffering = useNativeBuffering && RequiredBufferDuration > TimeSpan.Zero;
+            bool needsBuffering = useNativeBuffering &&
+                                   RequiredBufferDuration > TimeSpan.Zero &&
+                                   _activeSourceKind == AudioSourceKind.Radio;
 
             if (needsBuffering)
             {
@@ -1073,9 +1441,14 @@ public sealed partial class RadioPlayerService : IDisposable
 
         if (string.IsNullOrWhiteSpace(_streamUrl))
         {
-            Debug.WriteLine("[RadioPlayerService] ERROR: No stream URL set");
-            throw new InvalidOperationException("No stream URL set. Call SetStreamUrl first.");
+            // See Play(): this is a caller with nothing to play yet, not a failure.
+            Debug.WriteLine("[RadioPlayerService] PlayWithBufferAsync called with no stream URL set");
+            return false;
         }
+
+        // See Play(): a real play attempt is starting, so genuine buffering may play static again.
+        _isUserPaused = false;
+        LogService.Info("RadioPlayerService", "PlayWithBufferAsync: _isUserPaused cleared");
 
         bool needsBuffering;
 
@@ -1536,12 +1909,26 @@ public sealed partial class RadioPlayerService : IDisposable
         if (_isManuallyBuffering == isBuffering) return;
 
         Debug.WriteLine($"[RadioPlayerService] Manual buffering state changing from {_isManuallyBuffering} to {isBuffering}");
+        LogService.Info("RadioPlayerService", $"SetManualBuffering({isBuffering}) - was {_isManuallyBuffering}");
         _isManuallyBuffering = isBuffering;
 
         // Notify on UI thread
         TryEnqueueOnUi(() =>
         {
-            BufferingStateChanged?.Invoke(this, IsBuffering);
+            bool effectiveIsBuffering = IsBuffering;
+
+            // See _isUserPaused: while a user pause is in flight, the backend's own IsBuffering
+            // can still read true for a moment (Pause() hasn't fully settled, or the stream was
+            // mid-rebuffer at the instant it was paused) - not a real signal to react to.
+            if (_isUserPaused && effectiveIsBuffering)
+            {
+                LogService.Info("RadioPlayerService",
+                    $"SetManualBuffering: suppressed BufferingStateChanged(true) - _isUserPaused is set (effectiveIsBuffering={effectiveIsBuffering})");
+                return;
+            }
+
+            LogService.Info("RadioPlayerService", $"SetManualBuffering: raising BufferingStateChanged({effectiveIsBuffering})");
+            BufferingStateChanged?.Invoke(this, effectiveIsBuffering);
         });
     }
 
@@ -1562,6 +1949,33 @@ public sealed partial class RadioPlayerService : IDisposable
             return;
         }
 
+        switch (_activeSourceKind)
+        {
+            case AudioSourceKind.WhiteNoise:
+                PauseWhiteNoise();
+                Debug.WriteLine($"=== Pause END (white noise) ===");
+                return;
+
+            case AudioSourceKind.Files:
+                PauseLocalMusic();
+                Debug.WriteLine($"=== Pause END (local music) ===");
+                return;
+
+            case AudioSourceKind.Radio:
+            default:
+                break;
+        }
+
+        // Set before anything below runs: ActiveBackend.Pause() itself (not just the source
+        // teardown further down) can produce a stray Buffering/Opening reading if the stream
+        // happened to be mid-rebuffer at the moment of pausing, and SetManualBuffering(false)
+        // re-reads that same backend state a few lines down - see _isUserPaused.
+        _isUserPaused = true;
+        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true");
+
+        // Fired first, before any teardown: see PlaybackPausedByUser.
+        TryEnqueueOnUi(() => PlaybackPausedByUser?.Invoke(this, EventArgs.Empty));
+
         // Abort a still-buffering play attempt so it doesn't resume playback after this call
         CancelPendingPlayAttempt();
 
@@ -1571,6 +1985,7 @@ public sealed partial class RadioPlayerService : IDisposable
             SetInternalStateChange(true);
             ActiveBackend.Pause();
             Debug.WriteLine("[RadioPlayerService] ActiveBackend.Pause() called successfully");
+            LogService.Info("RadioPlayerService", "Pause: ActiveBackend.Pause() returned");
 
             // Clear manual buffering state when pausing
             SetManualBuffering(false);
@@ -1592,6 +2007,7 @@ public sealed partial class RadioPlayerService : IDisposable
             // _wasExternalPause is set (see above), so resuming re-opens a fresh connection.
             ClearActiveBackendSource();
             Debug.WriteLine("[RadioPlayerService] Cleared active backend source");
+            LogService.Info("RadioPlayerService", "Pause: cleared active backend source, pause path complete");
         }
         catch (Exception ex)
         {
@@ -1601,6 +2017,49 @@ public sealed partial class RadioPlayerService : IDisposable
         }
 
         Debug.WriteLine($"=== Pause END ===");
+    }
+
+    /// <summary>
+    /// Pauses a local music track. Deliberately does not set <see cref="_wasExternalPause"/> or
+    /// tear down the backend source the way the Radio pause path does - those exist to force a
+    /// fresh connection at the live edge on resume, which a local file has no equivalent of and
+    /// would otherwise reset it to position 0 on every pause/resume.
+    /// </summary>
+    private void PauseLocalMusic()
+    {
+        Debug.WriteLine("[RadioPlayerService] Pausing local music");
+
+        CancelPendingPlayAttempt();
+
+        try
+        {
+            SetInternalStateChange(true);
+            ActiveBackend.Pause();
+            SetManualBuffering(false);
+            _watchdog.NotifyUserIntentionToPause();
+        }
+        catch (Exception ex)
+        {
+            SetInternalStateChange(false);
+            Debug.WriteLine($"[RadioPlayerService] EXCEPTION in PauseLocalMusic: {ex.Message}");
+        }
+    }
+
+    /// <summary>Stops a white noise station. See <see cref="PlayWhiteNoise"/>.</summary>
+    private void PauseWhiteNoise()
+    {
+        Debug.WriteLine("[RadioPlayerService] Pausing white noise");
+
+        CancelPendingPlayAttempt();
+        _whiteNoiseEngine.Stop();
+        _watchdog.NotifyUserIntentionToPause();
+
+        TryEnqueueOnUi(() =>
+        {
+            PlaybackStateChanged?.Invoke(this, false);
+            BufferingStateChanged?.Invoke(this, false);
+            ScheduleSystemMediaTransportControlsUpdate();
+        });
     }
 
     /// <summary>
@@ -1664,11 +2123,25 @@ public sealed partial class RadioPlayerService : IDisposable
                     break;
                 case SystemMediaTransportControlsButton.Next:
                     Debug.WriteLine("[RadioPlayerService] Next button pressed from system controls");
-                    NextStationRequested?.Invoke(this, EventArgs.Empty);
+                    if (_activeSourceKind == AudioSourceKind.Files)
+                    {
+                        _ = NextLocalTrackAsync();
+                    }
+                    else
+                    {
+                        NextStationRequested?.Invoke(this, EventArgs.Empty);
+                    }
                     break;
                 case SystemMediaTransportControlsButton.Previous:
                     Debug.WriteLine("[RadioPlayerService] Previous button pressed from system controls");
-                    PreviousStationRequested?.Invoke(this, EventArgs.Empty);
+                    if (_activeSourceKind == AudioSourceKind.Files)
+                    {
+                        _ = PreviousLocalTrackAsync();
+                    }
+                    else
+                    {
+                        PreviousStationRequested?.Invoke(this, EventArgs.Empty);
+                    }
                     break;
                 default:
                     Debug.WriteLine($"[RadioPlayerService] Unhandled button: {args.Button}");
@@ -1769,8 +2242,12 @@ public sealed partial class RadioPlayerService : IDisposable
 
         try
         {
-            _systemMediaControls.IsNextEnabled = _isStationCyclingEnabled;
-            _systemMediaControls.IsPreviousEnabled = _isStationCyclingEnabled;
+            _systemMediaControls.IsNextEnabled = _activeSourceKind == AudioSourceKind.Files
+                ? CanGoToNextLocalTrack
+                : _isStationCyclingEnabled;
+            _systemMediaControls.IsPreviousEnabled = _activeSourceKind == AudioSourceKind.Files
+                ? CanGoToPreviousLocalTrack
+                : _isStationCyclingEnabled;
 
             // Get the display updater
             SystemMediaTransportControlsDisplayUpdater updater = _systemMediaControls.DisplayUpdater;
@@ -1847,10 +2324,12 @@ public sealed partial class RadioPlayerService : IDisposable
                         if (thumbnailSet)
                         {
                             _currentAlbumArtUrl = metadata.AlbumArtUrl;
+                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from track art: {ImageFormat.DescribeUrl(metadata.AlbumArtUrl)}");
                             Debug.WriteLine($"[RadioPlayerService] Successfully set album art from metadata");
                         }
                         else
                         {
+                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from track art: {ImageFormat.DescribeUrl(metadata.AlbumArtUrl)}; will try favicon");
                             Debug.WriteLine($"[RadioPlayerService] Failed to set album art from metadata, will try favicon");
                         }
                     }
@@ -1872,10 +2351,12 @@ public sealed partial class RadioPlayerService : IDisposable
                         if (thumbnailSet)
                         {
                             _currentAlbumArtUrl = _currentStationFaviconUrl;
+                            LogService.Info("RadioPlayerService", $"SMTC thumbnail set from station favicon: {_currentStationFaviconUrl}");
                             Debug.WriteLine($"[RadioPlayerService] Successfully set favicon as thumbnail");
                         }
                         else
                         {
+                            LogService.Info("RadioPlayerService", $"Failed to set SMTC thumbnail from station favicon: {_currentStationFaviconUrl}");
                             Debug.WriteLine($"[RadioPlayerService] Failed to set favicon as thumbnail");
                             _currentAlbumArtUrl = null; // Reset so we can retry later
                         }
@@ -1896,6 +2377,7 @@ public sealed partial class RadioPlayerService : IDisposable
                         {
                             _currentAlbumArtUrl = null;
                             updater.Thumbnail = null;
+                            LogService.Info("RadioPlayerService", "Cleared SMTC thumbnail (no track art or favicon available)");
                             Debug.WriteLine("[RadioPlayerService] Cleared album art");
                         }
                         updater.Update();
@@ -1926,11 +2408,38 @@ public sealed partial class RadioPlayerService : IDisposable
                 imageData = Convert.FromBase64String(base64);
                 Debug.WriteLine($"[RadioPlayerService] Decoded embedded album art ({imageData.Length} bytes)");
             }
+            else if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri) && uri.IsFile)
+            {
+                // A local album's favicon is the folder's own cover art on disk (see
+                // LocalMusicFolderScanner), not something HttpClient can dial - it throws
+                // NotSupportedException on a file:// scheme. Read through LocalCoverReader so a
+                // cover renamed since the scan is found the same way the UI finds it, rather
+                // than leaving the transport controls blank while the app shows the art.
+                Debug.WriteLine($"[RadioPlayerService] Reading album art from disk: {uri.LocalPath}");
+                byte[]? coverBytes = await LocalCoverReader.ReadAsync(uri.LocalPath);
+                if (coverBytes is null)
+                {
+                    // Already logged by the reader; nothing on disk to show.
+                    return false;
+                }
+
+                imageData = coverBytes;
+                Debug.WriteLine($"[RadioPlayerService] Read {imageData.Length} bytes of album art from disk");
+            }
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
                 imageData = await _httpClient.GetByteArrayAsync(imageUrl);
                 Debug.WriteLine($"[RadioPlayerService] Downloaded {imageData.Length} bytes of album art");
+            }
+
+            if (ImageFormat.DetectMime(imageData) is null)
+            {
+                // updater.Thumbnail accepts any stream; the shell only discovers it isn't an
+                // image when it decodes it later, and then just shows nothing. Report it here
+                // and let the caller fall through to the favicon instead.
+                LogService.Warn("AlbumArt", $"SMTC art is not a recognized image; skipping it: {ImageFormat.Describe(imageData)}");
+                return false;
             }
 
             // Create a random access stream from the image data
@@ -1948,37 +2457,55 @@ public sealed partial class RadioPlayerService : IDisposable
             // Create a RandomAccessStreamReference from the stream
             RandomAccessStreamReference thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
 
-            // Set the thumbnail on the UI thread
-            bool success = false;
-            TryEnqueueOnUi(() =>
+            // Set the thumbnail on the UI thread. This must actually be awaited: TryEnqueueOnUi
+            // only enqueues the action and returns immediately when called from this background
+            // thread, so a bare bool written inside the callback would always still read false
+            // here - which used to make every call look like a failure and fall through to the
+            // favicon, then to clearing the thumbnail entirely, even when the set had worked.
+            var tcs = new TaskCompletionSource<bool>();
+            void SetThumbnail()
             {
                 try
                 {
                     updater.Thumbnail = thumbnail;
                     updater.Update();
                     Debug.WriteLine("[RadioPlayerService] Album art set successfully");
-                    success = true;
+                    tcs.TrySetResult(true);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[RadioPlayerService] Failed to set album art thumbnail: {ex.Message}");
+                    LogService.Warn("AlbumArt", $"SMTC updater rejected the thumbnail: {ex.GetType().Name}: {ex.Message}");
+                    tcs.TrySetResult(false);
                 }
-                finally
-                {
-                    // Dispose the stream after setting the thumbnail
-                    stream?.Dispose();
-                }
-            });
-            return success;
+            }
+
+            if (_uiQueue is null || _uiQueue.HasThreadAccess)
+            {
+                SetThumbnail();
+            }
+            else if (!_uiQueue.TryEnqueue(SetThumbnail))
+            {
+                tcs.TrySetResult(false);
+            }
+
+            // Deliberately not disposing `stream` here: SMTC/Action Center reads the referenced
+            // stream lazily after Update() returns, not synchronously, so disposing it this soon
+            // risks the shell reading an already-closed stream and showing a blank/default icon
+            // instead of the art that was just "successfully" set. It's small and short-lived
+            // enough to leave for the GC once nothing references it anymore.
+            return await tcs.Task;
         }
         catch (HttpRequestException ex)
         {
             Debug.WriteLine($"[RadioPlayerService] Failed to download album art: {ex.Message}");
+            LogService.Warn("AlbumArt", $"SMTC art download failed for {imageUrl}: {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[RadioPlayerService] Error setting album art: {ex.Message}");
+            LogService.Warn("AlbumArt", $"SMTC art failed for {ImageFormat.DescribeUrl(imageUrl)}: {ex.GetType().Name}: {ex.Message}");
             return false;
         }
     }
@@ -2012,6 +2539,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         _watchdog.Dispose();
         DisposePlaybackEngine();
+        _whiteNoiseEngine.Dispose();
         _httpClient.Dispose();
 
         ClearActiveBackendSource();

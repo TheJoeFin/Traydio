@@ -194,6 +194,105 @@
   <data name="AddStation_UrlRequired" xml:space="preserve">
     <value>Stream URL is required.</value>
   </data>
+  <data name="AddLocalMusic_AddPageTitle" xml:space="preserve">
+    <value>Add Local Music</value>
+  </data>
+  <data name="AddLocalMusic_EditPageTitle" xml:space="preserve">
+    <value>Edit Local Music</value>
+  </data>
+  <data name="AddLocalMusic_StationNameLabel.Text" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="AddLocalMusic_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>e.g., My Music, Favorites</value>
+  </data>
+  <data name="AddLocalMusic_FolderLabel.Text" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="AddLocalMusic_BrowseButton.Content" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="AddLocalMusic_VolumeLabel.Text" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="AddLocalMusic_NoFolderSelected" xml:space="preserve">
+    <value>No folder selected</value>
+  </data>
+  <data name="AddLocalMusic_NoTracksFound" xml:space="preserve">
+    <value>No audio files found in this folder.</value>
+  </data>
+  <data name="AddLocalMusic_OneTrackFound" xml:space="preserve">
+    <value>1 track found.</value>
+  </data>
+  <data name="AddLocalMusic_TracksFound" xml:space="preserve">
+    <value>{0} tracks found.</value>
+  </data>
+  <data name="AddLocalMusic_OneAlbumFound" xml:space="preserve">
+    <value>1 subfolder with music found. It will become its own station inside a new folder.</value>
+  </data>
+  <data name="AddLocalMusic_AlbumsFound" xml:space="preserve">
+    <value>{0} subfolders with music found. Each will become its own station inside a new folder.</value>
+  </data>
+  <data name="AddWhiteNoise_AddPageTitle" xml:space="preserve">
+    <value>Add White Noise</value>
+  </data>
+  <data name="AddWhiteNoise_Blue.Content" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Blue" xml:space="preserve">
+    <value>Bright and weighted toward the high end.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Brown" xml:space="preserve">
+    <value>A deep, heavy rumble with almost no hiss. Good for relaxation.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Grey" xml:space="preserve">
+    <value>Shaped to sound equally loud at every frequency. Good for focus.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Pink" xml:space="preserve">
+    <value>Softer, weighted toward the low end, like rainfall. Good for sleep.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Violet" xml:space="preserve">
+    <value>Very bright, dominated by high frequencies.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_White" xml:space="preserve">
+    <value>Flat hiss across every frequency. Good for masking noise and testing.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorLabel.Text" xml:space="preserve">
+    <value>Noise color</value>
+  </data>
+  <data name="AddWhiteNoise_Brown.Content" xml:space="preserve">
+    <value>Brown</value>
+  </data>
+  <data name="AddWhiteNoise_DefaultName" xml:space="preserve">
+    <value>White Noise</value>
+  </data>
+  <data name="AddWhiteNoise_EditPageTitle" xml:space="preserve">
+    <value>Edit White Noise</value>
+  </data>
+  <data name="AddWhiteNoise_Grey.Content" xml:space="preserve">
+    <value>Grey</value>
+  </data>
+  <data name="AddWhiteNoise_PageTitle.Text" xml:space="preserve">
+    <value>Add White Noise</value>
+  </data>
+  <data name="AddWhiteNoise_Pink.Content" xml:space="preserve">
+    <value>Pink</value>
+  </data>
+  <data name="AddWhiteNoise_StationNameLabel.Text" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="AddWhiteNoise_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>e.g., Rain, Fan, Ocean waves</value>
+  </data>
+  <data name="AddWhiteNoise_Violet.Content" xml:space="preserve">
+    <value>Violet</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeLabel.Text" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="AddWhiteNoise_White.Content" xml:space="preserve">
+    <value>White</value>
+  </data>
   <data name="App_ExitApplicationCommand.Description" xml:space="preserve">
     <value>Exit Traydio</value>
   </data>
@@ -296,6 +395,9 @@
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Recent Tracks</value>
   </data>
+  <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
+    <value>Tracks</value>
+  </data>
   <data name="NowPlayingPage_Title.Text" xml:space="preserve">
     <value>Now Playing</value>
   </data>
@@ -319,6 +421,9 @@
   </data>
   <data name="PlaybackFailure_WithDetail" xml:space="preserve">
     <value>Couldn't play this station: {0}</value>
+  </data>
+  <data name="PlaybackFailure_WhiteNoiseNoOutput" xml:space="preserve">
+    <value>Couldn't play white noise - no audio output device is available.</value>
   </data>
   <data name="PlaybackFailure_WithSentenceDetail" xml:space="preserve">
     <value>Couldn't play this station. {0}</value>
@@ -404,11 +509,17 @@
   <data name="PlayingPage_NewGroup.Text" xml:space="preserve">
     <value>New Group</value>
   </data>
+  <data name="PlayingPage_OpenFolder" xml:space="preserve">
+    <value>Open Folder</value>
+  </data>
   <data name="PlayingPage_PlaybackErrorClose" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
     <value>Playback Error</value>
+  </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Mute / unmute</value>
   </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open mini player</value>
@@ -440,6 +551,27 @@
   <data name="PlayingPage_ShowVolume.Text" xml:space="preserve">
     <value>Show Volume Slider</value>
   </data>
+  <data name="PlayingPage_CancelSleepTimer.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Cancel sleep timer</value>
+  </data>
+  <data name="PlayingPage_SleepTimer.Text" xml:space="preserve">
+    <value>Sleep timer</value>
+  </data>
+  <data name="PlayingPage_SleepTimer15Minutes.Text" xml:space="preserve">
+    <value>15 minutes</value>
+  </data>
+  <data name="PlayingPage_SleepTimer20Minutes.Text" xml:space="preserve">
+    <value>20 minutes</value>
+  </data>
+  <data name="PlayingPage_SleepTimer30Minutes.Text" xml:space="preserve">
+    <value>30 minutes</value>
+  </data>
+  <data name="PlayingPage_SleepTimer45Minutes.Text" xml:space="preserve">
+    <value>45 minutes</value>
+  </data>
+  <data name="PlayingPage_SleepTimer50Minutes.Text" xml:space="preserve">
+    <value>50 minutes</value>
+  </data>
   <data name="PlayingPage_SortBy.Text" xml:space="preserve">
     <value>Sort by</value>
   </data>
@@ -448,6 +580,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Stations</value>
+  </data>
+  <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>View Album Tracks</value>
   </data>
   <data name="PlayingPage_VisitWebsite.Text" xml:space="preserve">
     <value>Visit Website</value>
@@ -608,8 +743,35 @@
   <data name="SettingsPage_PopupDwellSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>How long the song popup stays on screen, in seconds</value>
   </data>
+  <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
+    <value>Fill the silence while a station loads with gentle FM radio static. It swells in rather than snapping on, and fades back out as the station arrives.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Hear the radio static</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Play the static now, so you can hear what it sounds like</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.Content" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTitle.Text" xml:space="preserve">
+    <value>Radio static while buffering</value>
+  </data>
+  <data name="SettingsPage_RadioStaticToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Play radio static while buffering</value>
+  </data>
   <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
     <value>Couldn't reset remembered engines: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Reset logs</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Couldn't reset the logs: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Cleared the log files.</value>
   </data>
   <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
     <value>Reset remembered engines</value>
@@ -644,20 +806,53 @@
   <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
     <value>Track info delay</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Alternate.Content" xml:space="preserve">
-    <value>Left click: open Traydio, right click: play/pause</value>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Favorite the current song</value>
   </data>
-  <data name="SettingsPage_TrayClickBehavior_Default.Content" xml:space="preserve">
-    <value>Left click: play/pause, right click: open Traydio (Default)</value>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Mute / unmute</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Do nothing</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Play / pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Open Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Show the now playing popup</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Show / hide the mini player</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
-    <value>Choose whether the tray icon prioritizes playback controls or opening the player.</value>
+    <value>Choose what a left click and a right click on the tray icon do. One of them always opens Traydio, so you can get back to Settings.</value>
   </data>
   <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
     <value>Tray icon click behavior</value>
   </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Single clicks act instantly. Assigning a double-click makes that button's single click wait briefly, so Windows can tell the two apart.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Left click</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Left double-click</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Right click</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Right double-click</value>
+  </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>
+  </data>
+  <data name="SongChangePopup_FavoriteIcon.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Favorite song</value>
   </data>
   <data name="SongChangePopup_Surface.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Now playing</value>
@@ -691,6 +886,9 @@
   </data>
   <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
     <value>Left-click to play</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>Muted</value>
   </data>
   <data name="TrayIcon_Paused" xml:space="preserve">
     <value>Traydio {0} (Paused)
