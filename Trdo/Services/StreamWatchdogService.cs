@@ -745,6 +745,12 @@ public sealed partial class StreamWatchdogService : IDisposable
             StopSilenceMonitor();
 
             Debug.WriteLine("[Watchdog] NAudio silence detected - attempting stream recovery");
+
+            // The active engine's own state machine still thinks it is playing - nothing it
+            // raises will explain this on its own, so capture what it knows now, before the
+            // recovery below tears the source down and the evidence goes with it.
+            _playerService.DumpActiveBackendDiagnostics("NAudio detected silence while stream reported playing");
+
             RaiseStatusChanged("Stream is silent - refreshing", StreamWatchdogStatus.Recovering);
 
             // AttemptRecoveryAsync owns the recovery gate, so a health-poll recovery

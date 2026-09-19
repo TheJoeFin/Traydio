@@ -450,6 +450,23 @@ public sealed partial class RadioPlayerService
     }
 
     /// <summary>
+    /// Logs the active backend's state and, on LibVLC, its native log ring buffer. Meant for
+    /// call sites that have evidence something is wrong (the NAudio silence monitor, a stall)
+    /// but whose engine never raised its own failure event - the "reports playing, produces
+    /// nothing" case that <see cref="LibVlcPlaybackBackend.PlaybackFailed"/> does not cover,
+    /// because LibVLC's own state machine never left the Playing state.
+    /// </summary>
+    public void DumpActiveBackendDiagnostics(string context)
+    {
+        LogService.Warn("RadioPlayerService", $"{context} ({DescribeActiveBackendState()})");
+
+        if (ActivePlaybackBackend == PlaybackBackendKind.LibVlc)
+        {
+            _libVlcBackend?.DumpDiagnostics(context);
+        }
+    }
+
+    /// <summary>
     /// Works out why the current stream will not play and writes the full finding to the log,
     /// returning a short explanation suitable for showing the user.
     /// <para>
