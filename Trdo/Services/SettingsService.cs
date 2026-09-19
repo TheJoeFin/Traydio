@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Trdo.Models;
 using Trdo.Services.Playback;
 using Windows.Foundation.Collections;
@@ -39,6 +40,13 @@ public static class SettingsService
     private const string StationGroupByModeKey = "StationGroupByMode";
     private const string IsRadioStaticEnabledKey = "IsRadioStaticEnabled";
     private const string LocalMusicLoopModeKey = "LocalMusicLoopMode";
+    private const string RecentStationSearchesKey = "RecentStationSearches";
+
+    /// <summary>
+    /// Separates entries in <see cref="RecentStationSearches"/>. A control character rather than
+    /// a punctuation mark, so it can't collide with anything a search term could contain.
+    /// </summary>
+    private const char RecentStationSearchesSeparator = '\u001f';
 
     public static event EventHandler? MusicSearchServicesChanged;
 
@@ -858,6 +866,50 @@ public static class SettingsService
         try
         {
             ApplicationData.Current.LocalSettings.Values[IsFirstRunKey] = false;
+        }
+        catch
+        {
+            // Silently fail if unable to save
+        }
+    }
+
+    /// <summary>
+    /// The station search terms the user has typed, most recent first - what the search page's
+    /// "recent searches" chips are built from.
+    /// </summary>
+    public static IReadOnlyList<string> RecentStationSearches
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(RecentStationSearchesKey, out object? value) &&
+                    value is string raw &&
+                    raw.Length > 0)
+                {
+                    return raw.Split(RecentStationSearchesSeparator, StringSplitOptions.RemoveEmptyEntries);
+                }
+            }
+            catch
+            {
+                // Fall through to an empty list.
+            }
+
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Records a search term as the most recent one, de-duplicating and capping the list per
+    /// <see cref="RecentSearchesPolicy"/>.
+    /// </summary>
+    public static void AddRecentStationSearch(string term)
+    {
+        try
+        {
+            IReadOnlyList<string> updated = RecentSearchesPolicy.Add(RecentStationSearches, term);
+            ApplicationData.Current.LocalSettings.Values[RecentStationSearchesKey] =
+                string.Join(RecentStationSearchesSeparator, updated);
         }
         catch
         {

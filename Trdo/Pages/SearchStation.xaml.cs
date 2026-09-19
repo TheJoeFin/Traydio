@@ -42,11 +42,16 @@ public sealed partial class SearchStation : Page
         SearchTextBox.Focus(FocusState.Programmatic);
 
         RadioPlayerService.Instance.PlaybackStateChanged += OnPlaybackStateChanged;
+
+        // A quick trip away (e.g. to the edit page) keeps what's on screen; coming back after a
+        // while starts the page fresh instead.
+        ViewModel.ResetIfStale();
     }
 
     private async void SearchStation_Unloaded(object sender, RoutedEventArgs e)
     {
         RadioPlayerService.Instance.PlaybackStateChanged -= OnPlaybackStateChanged;
+        ViewModel.MarkLeft();
         await StopPreviewAsync();
     }
 
@@ -262,6 +267,19 @@ public sealed partial class SearchStation : Page
     private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.ClearFilters();
+    }
+
+    private void RecentSearchChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string term)
+        {
+            ViewModel.RecentSearchClicked(term);
+        }
+    }
+
+    private async void PopularNearYouButton_Click(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.ApplyPopularNearYouFilterAsync();
     }
 
     private async void ManualEntryButton_Click(object sender, RoutedEventArgs e)

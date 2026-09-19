@@ -36,6 +36,9 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     private CancellationTokenSource? _searchCancellationTokenSource;
     private bool _filterOptionsLoaded;
 
+    /// <summary>When the page was last navigated away from, for <see cref="ResetIfStale"/>.</summary>
+    private DateTimeOffset? _lastLeftUtc;
+
     private string _searchTerm = string.Empty;
     private bool _isSearching;
     private bool _hasError;
@@ -61,6 +64,11 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     public SearchStationViewModel()
     {
         _selectedSort = SortOptions[0];
+
+        foreach (string term in SettingsService.RecentStationSearches)
+        {
+            RecentSearches.Add(term);
+        }
     }
 
     // Results and filter option sources ---------------------------------
@@ -83,6 +91,12 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     /// <summary>What the filter picker is offering for the text typed into it.</summary>
     public ObservableCollection<StationFilterOption> FilterSuggestions { get; } = [];
+
+    /// <summary>
+    /// Past search terms, most recent first - shown as chips so the user can jump straight back
+    /// into a search instead of retyping it. Hidden once there's anything to search or show.
+    /// </summary>
+    public ObservableCollection<string> RecentSearches { get; } = [];
 
     public IReadOnlyList<CodecOption> Codecs { get; } =
     [
@@ -320,6 +334,12 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 !IsSearching &&
                 !HasError;
 
+    /// <summary>Whether the recent-searches chip row has anything to show.</summary>
+    public bool ShowRecentSearches => RecentSearches.Count > 0;
+
+    /// <summary>Whether Windows has a home region set, i.e. there's a "near you" to search for.</summary>
+    public bool ShowPopularNearYouOption => UserRegionService.CurrentRegionCode is not null;
+
     /// <summary>Results give up the screen while the filter panel is open.</summary>
     public bool AreResultsVisible => !IsFilterPanelOpen;
 
@@ -373,6 +393,117 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         {
             IsLoadingFilterOptions = false;
             RefreshSuggestions();
+        }
+    }
+
+    // Navigation lifetime: keep recent results on a quick trip away, start fresh after a while --
+
+    /// <summary>
+    /// Records that the page is being navigated away from, and banks the current search term as
+    /// a "recent search" chip for next time. Called from the page's Unloaded handler.
+    /// </summary>
+    public void MarkLeft()
+    {
+        _lastLeftUtc = DateTimeOffset.UtcNow;
+
+        string term = SearchTerm.Trim();
+        if (term.Length == 0 || string.Equals(RecentSearches.FirstOrDefault(), term, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        SettingsService.AddRecentStationSearch(term);
+
+        RecentSearches.Clear();
+        foreach (string recent in SettingsService.RecentStationSearches)
+        {
+            RecentSearches.Add(recent);
+        }
+
+        OnPropertyChanged(nameof(ShowRecentSearches));
+    }
+
+    /// <summary>
+    /// Clears the search back to its initial state if the page has been away for longer than
+    /// <see cref="SearchFreshnessPolicy.StaleAfter"/>. Called from the page's Loaded handler; a
+    /// quick round trip (e.g. to the edit page and back) leaves everything as it was.
+    /// </summary>
+    public void ResetIfStale()
+    {
+        DateTimeOffset? leftUtc = _lastLeftUtc;
+        _lastLeftUtc = null;
+
+        if (leftUtc is null || !SearchFreshnessPolicy.IsStale(leftUtc.Value, DateTimeOffset.UtcNow))
+        {
+            return;
+        }
+
+        _searchCancellationTokenSource?.Cancel();
+
+        _searchTerm = string.Empty;
+        _selectedCodec = null;
+        _selectedBitrate = null;
+        _hideBroken = false;
+        _selectedSort = SortOptions[0];
+        ActiveFilters.Clear();
+        SearchResultGroups.Clear();
+        FilterChips.Clear();
+        _hasError = false;
+        _errorMessage = string.Empty;
+        _isFilterPanelOpen = false;
+
+        OnPropertyChanged(nameof(SearchTerm));
+        OnPropertyChanged(nameof(SelectedCodec));
+        OnPropertyChanged(nameof(SelectedBitrate));
+        OnPropertyChanged(nameof(HideBroken));
+        OnPropertyChanged(nameof(SelectedSort));
+        OnPropertyChanged(nameof(HasError));
+        OnPropertyChanged(nameof(ErrorMessage));
+        OnPropertyChanged(nameof(IsFilterPanelOpen));
+        OnPropertyChanged(nameof(HasActiveFilters));
+        OnPropertyChanged(nameof(AreResultsVisible));
+        OnPropertyChanged(nameof(ShowInitialState));
+    }
+
+    /// <summary>Runs a past search again. Bound to a "recent searches" chip click.</summary>
+    public void RecentSearchClicked(string term)
+    {
+        SearchTerm = term;
+    }
+
+    // Popular near you: one click onto a regular, tweakable search rather than a display of --
+    // its own -------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Applies "this country" + "most popular" to the regular search, the same as picking them
+    /// by hand in the filter panel - so the result is an ordinary search with ordinary chips
+    /// the user can adjust or remove, not a separate experience of its own.
+    /// </summary>
+    public async Task ApplyPopularNearYouFilterAsync()
+    {
+        string? regionCode = UserRegionService.CurrentRegionCode;
+        if (regionCode is null)
+        {
+            return;
+        }
+
+        try
+        {
+            List<RadioBrowserCountry> countries = await _radioBrowserService.GetCountriesAsync();
+            RadioBrowserCountry? match = countries.FirstOrDefault(
+                country => string.Equals(country.CountryCode, regionCode, StringComparison.OrdinalIgnoreCase));
+
+            if (match is null)
+            {
+                return;
+            }
+
+            AddFilter(new StationFilterOption(StationFilterFacet.Country, match.Name, match.StationCount));
+            SelectedSort = SortOptions[1]; // "Most popular" (clickcount)
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SearchStationViewModel] Failed to apply popular-near-you filter: {ex.Message}");
         }
     }
 
