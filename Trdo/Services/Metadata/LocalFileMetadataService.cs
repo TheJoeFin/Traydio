@@ -19,11 +19,28 @@ internal static class LocalFileMetadataService
 
     public static async Task<StreamMetadata> ReadAsync(string filePath, CancellationToken cancellationToken = default)
     {
-        StreamMetadata metadata = await TryReadId3Async(filePath, cancellationToken);
+        bool isFlac = string.Equals(Path.GetExtension(filePath), ".flac", StringComparison.OrdinalIgnoreCase);
+        StreamMetadata metadata = isFlac
+            ? await TryReadFlacAsync(filePath, cancellationToken)
+            : await TryReadId3Async(filePath, cancellationToken);
+
         if (metadata.HasMetadata)
             return metadata;
 
         return BuildFallbackFromFileName(filePath);
+    }
+
+    private static async Task<StreamMetadata> TryReadFlacAsync(string filePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return await FlacMetadataReader.ReadAsync(stream, cancellationToken);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return StreamMetadata.Empty;
+        }
     }
 
     private static async Task<StreamMetadata> TryReadId3Async(string filePath, CancellationToken cancellationToken)
@@ -45,9 +62,10 @@ internal static class LocalFileMetadataService
     }
 
     /// <summary>
-    /// Falls back to the filename when no ID3 tag is present or usable - e.g. FLAC/OGG, which
-    /// use Vorbis comments rather than ID3 and so aren't covered by <see cref="Id3TagParser"/>.
-    /// A common ripped-filename convention, "Artist - Title", is split apart if present.
+    /// Falls back to the filename when no tag is present or usable - e.g. OGG, which uses
+    /// Vorbis comments in an Ogg container that neither <see cref="Id3TagParser"/> nor
+    /// <see cref="FlacMetadataReader"/> reads. A common ripped-filename convention,
+    /// "Artist - Title", is split apart if present.
     /// </summary>
     private static StreamMetadata BuildFallbackFromFileName(string filePath)
     {
