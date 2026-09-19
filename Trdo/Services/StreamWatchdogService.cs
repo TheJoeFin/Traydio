@@ -438,6 +438,7 @@ public sealed partial class StreamWatchdogService : IDisposable
         {
             bool isPlaying = false;
             AudioSourceKind activeSourceKind = AudioSourceKind.Radio;
+            bool isCastingToSonos = false;
             TimeSpan currentPosition = TimeSpan.Zero;
             double currentBufferingProgress = 0;
 
@@ -448,6 +449,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 {
                     isPlaying = _playerService.IsPlaying;
                     activeSourceKind = _playerService.ActiveSourceKind;
+                    isCastingToSonos = _playerService.IsCastingToSonos;
                     currentPosition = _playerService.Position;
                     currentBufferingProgress = _playerService.BufferingProgress;
                 }
@@ -457,7 +459,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 }
             });
 
-            if (activeSourceKind != AudioSourceKind.Radio)
+            if (activeSourceKind != AudioSourceKind.Radio || isCastingToSonos)
             {
                 // Everything below is shaped around a network stream that can stall, drop, or
                 // need a buffer bump - none of which applies to a locally-generated source like

@@ -97,6 +97,16 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
         _player.NextStationRequested += (_, _) => SelectNextStation();
         _player.PreviousStationRequested += (_, _) => SelectPreviousStation();
+        _player.CastTargetChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsCasting));
+            OnPropertyChanged(nameof(CastTargetName));
+            OnPropertyChanged(nameof(CastMenuText));
+            OnPropertyChanged(nameof(IsCastingToSonos));
+            OnPropertyChanged(nameof(SpeakerVolumeToolTip));
+            RaiseSpeakerVolumeChanged();
+        };
+        _player.SonosSpeakerVolumeChanged += (_, _) => RaiseSpeakerVolumeChanged();
 
         // Failures raised by the player go straight to PlaybackErrorService, which decides
         // whether they are still worth showing. Recorded here only so LastError reflects them.
@@ -969,6 +979,82 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
 
         Debug.WriteLine("=== Pause END ===");
+    }
+
+    /// <summary>Whether the cast picker can be opened. Sonos needs no LibVLC, so this is always true today.</summary>
+    public bool CanCast => _player.CanCast;
+
+    public bool IsCasting => _player.IsCasting;
+
+    public string? CastTargetName => _player.CastTargetName;
+
+    /// <summary>The play button's context-menu entry: "Cast…" or, while casting, the target's name.</summary>
+    public string CastMenuText => IsCasting
+        ? string.Format(LocalizationService.GetString("PlayingPage_CastingTo", "Casting to {0}…"), CastTargetName)
+        : LocalizationService.GetString("PlayingPage_Cast", "Cast…");
+
+    /// <summary>True while the audio goes to a Sonos player, which is when the speaker volume row is shown.</summary>
+    public bool IsCastingToSonos => _player.IsCastingToSonos;
+
+    /// <summary>
+    /// The Sonos player's own volume, 0–100. Distinct from <see cref="Volume"/>: a Sonos
+    /// fetches the stream itself, so the app's stream volume never reaches it.
+    /// </summary>
+    public double SpeakerVolume
+    {
+        get => _player.SonosSpeakerVolume;
+        set
+        {
+            int level = (int)Math.Round(Math.Clamp(value, 0, 100));
+            if (level == _player.SonosSpeakerVolume)
+                return;
+
+            // As with the stream slider: reaching for the volume while muted means "I want
+            // to hear this", and a muted Sonos stays muted when only its level changes.
+            _player.IsSonosSpeakerMuted = false;
+            _player.SonosSpeakerVolume = level;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsSpeakerMuted
+    {
+        get => _player.IsSonosSpeakerMuted;
+        set => _player.IsSonosSpeakerMuted = value;
+    }
+
+    public void ToggleSpeakerMute() => IsSpeakerMuted = !IsSpeakerMuted;
+
+    /// <summary>Speaker glyph for the Sonos volume row: a speaker cabinet, crossed out while the player is muted.</summary>
+    public string SpeakerVolumeGlyph => IsSpeakerMuted ? "" : "";
+
+    /// <summary>"Kitchen volume" - names the room so two sliders on one page are not mistaken for each other.</summary>
+    public string SpeakerVolumeToolTip => string.Format(
+        LocalizationService.GetString("PlayingPage_SpeakerVolume", "{0} volume"),
+        CastTargetName ?? "Speaker");
+
+    private void RaiseSpeakerVolumeChanged()
+    {
+        OnPropertyChanged(nameof(SpeakerVolume));
+        OnPropertyChanged(nameof(IsSpeakerMuted));
+        OnPropertyChanged(nameof(SpeakerVolumeGlyph));
+    }
+
+    /// <summary>Brings the audio back to this PC. Failures go to the playback error service like any other.</summary>
+    public async Task StopCastingAsync()
+    {
+        try
+        {
+            await _player.SetCastTargetAsync(null, null);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PlayerViewModel] EXCEPTION in StopCastingAsync: {ex}");
+            PlaybackErrorService.Instance.Report(string.Format(
+                LocalizationService.GetString("CastDeviceDialog_Failed", "Couldn't cast to {0}: {1}"),
+                "this PC",
+                ex.Message));
+        }
     }
 
     /// <summary>True while a sleep timer is counting down toward pausing playback.</summary>

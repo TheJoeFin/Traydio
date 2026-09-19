@@ -83,6 +83,9 @@
   <data name="AboutPage_BuiltWithOpenSourceTitle.Text" xml:space="preserve">
     <value>Built With Open Source</value>
   </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Sonos casting was heavily influenced by RoomRelay and its author, guicn555. Thank you!</value>
+  </data>
   <data name="AboutPage_ContactDeveloper.Text" xml:space="preserve">
     <value>Contact the Developer</value>
   </data>
@@ -311,6 +314,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Show Window</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Cast</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Cast to device</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Currently casting to {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>No devices found yet. Make sure the device is switched on and connected to the same network as this PC.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>Couldn't cast to {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Looking for devices on your network…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Stop casting</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>Casting isn't available on this PC: the LibVLC playback engine could not be loaded and no network connection is available to search for Sonos players.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Tap the star icon on songs you love to save them here</value>
   </data>
@@ -467,6 +497,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>Add Your First Station</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Cast…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>Casting to {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>Delete group</value>
   </data>
@@ -520,6 +556,21 @@
   </data>
   <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Mute / unmute</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Mute / unmute the speaker</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>{0} volume</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} reported: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} did not start playing in time.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} stopped playing the stream.</value>
   </data>
   <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Open mini player</value>
@@ -580,6 +631,9 @@
   </data>
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Stations</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Stop casting</value>
   </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>View Album Tracks</value>

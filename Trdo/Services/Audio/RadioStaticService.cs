@@ -80,11 +80,15 @@ public sealed partial class RadioStaticService : IDisposable
         // Static is the sound of an actual radio dial searching for a signal - white noise
         // never buffers, and a local file merely opening (which briefly reads as "buffering"
         // on some backends) has nothing to do with a signal being found.
-        if (RadioPlayerService.Instance.ActiveSourceKind != AudioSourceKind.Radio)
+        // While a Sonos player fetches the stream, "buffering" is the speaker connecting -
+        // static out of this PC's speakers would be the wrong room, and a signal it would
+        // then never hear the end of.
+        if (RadioPlayerService.Instance.ActiveSourceKind != AudioSourceKind.Radio ||
+            RadioPlayerService.Instance.IsCastingToSonos)
         {
             if (_isAudible)
             {
-                LogService.Info("RadioStatic", "Active source is not Radio - stopping static");
+                LogService.Info("RadioStatic", "Active source is not local radio - stopping static");
                 RunDetached(StopCoreAsync);
             }
 

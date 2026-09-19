@@ -91,6 +91,11 @@ public sealed partial class AboutPage : Page
         _ = ViewModel.OpenCommunityToolkit();
     }
 
+    private void RoomRelayButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = ViewModel.OpenRoomRelay();
+    }
+
     private void BuyMeACoffeeButton_Click(object sender, RoutedEventArgs e)
     {
         _ = ViewModel.OpenBuyMeACoffee();

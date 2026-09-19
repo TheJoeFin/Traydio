@@ -303,8 +303,14 @@ public sealed partial class StreamMetadataService : IDisposable
                 totalRead += bytesRead;
             }
 
-            // Parse metadata string (null-terminated, padded with zeros)
-            string metadataStr = Encoding.UTF8.GetString(metaBuffer).TrimEnd('\0');
+            // Parse metadata string (null-terminated, padded with zeros).
+            // ICY metadata has no charset signaling. Most stations send UTF-8, but many
+            // legacy Shoutcast/Icecast sources send whatever local codepage the broadcast
+            // software used, which is not valid UTF-8. Decoding those bytes as UTF-8 replaces
+            // every invalid sequence with U+FFFD, permanently destroying the original text.
+            // Falling back to Latin-1 (a 1:1 byte-to-codepoint mapping) at least preserves the
+            // original bytes losslessly instead of mangling them into '�'.
+            string metadataStr = DecodeIcyMetadata(metaBuffer).TrimEnd('\0');
             Debug.WriteLine($"[StreamMetadataService] Raw metadata: {metadataStr}");
 
             return ParseIcyMetadata(metadataStr);
@@ -313,6 +319,25 @@ public sealed partial class StreamMetadataService : IDisposable
         {
             Debug.WriteLine($"[StreamMetadataService] Error reading ICY metadata: {ex.Message}");
             return null;
+        }
+    }
+
+    private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+
+    /// <summary>
+    /// Decodes a raw ICY metadata block. Tries strict UTF-8 first (the common case); if the
+    /// bytes aren't valid UTF-8, falls back to Latin-1 so the original bytes are preserved
+    /// rather than replaced with U+FFFD.
+    /// </summary>
+    private static string DecodeIcyMetadata(byte[] metaBuffer)
+    {
+        try
+        {
+            return StrictUtf8.GetString(metaBuffer);
+        }
+        catch (DecoderFallbackException)
+        {
+            return Encoding.Latin1.GetString(metaBuffer);
         }
     }
 
