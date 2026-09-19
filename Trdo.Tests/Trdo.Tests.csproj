@@ -60,6 +60,10 @@
     <Compile Include="..\Trdo\Services\Audio\FadeEnvelope.cs" Link="Services\Audio\FadeEnvelope.cs" />
     <Compile Include="..\Trdo\Models\TrayClickAction.cs" Link="Models\TrayClickAction.cs" />
     <Compile Include="..\Trdo\Services\TrayClickPolicy.cs" Link="Services\TrayClickPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmSignature.cs" Link="Services\Lastfm\LastfmSignature.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmErrorCode.cs" Link="Services\Lastfm\LastfmErrorCode.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" Link="Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\ScrobbleTimingTracker.cs" Link="Services\Lastfm\ScrobbleTimingTracker.cs" />
   </ItemGroup>
 
 </Project>

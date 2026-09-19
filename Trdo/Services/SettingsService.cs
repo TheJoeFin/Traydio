@@ -20,6 +20,8 @@ public static class SettingsService
     private const string IsAppleMusicEnabledKey = "IsAppleMusicEnabled";
     private const string IsYouTubeMusicEnabledKey = "IsYouTubeMusicEnabled";
     private const string IsBandcampEnabledKey = "IsBandcampEnabled";
+    private const string IsLastfmScrobblingEnabledKey = "IsLastfmScrobblingEnabled";
+    private const string LastfmUsernameKey = "LastfmUsername";
     private const string TrayClickBehaviorKey = "TrayClickBehavior";
     private const string TrayLeftClickActionKey = "TrayLeftClickAction";
     private const string TrayRightClickActionKey = "TrayRightClickAction";
@@ -58,6 +60,13 @@ public static class SettingsService
     /// can be faded out the moment the user turns the feature off.
     /// </summary>
     public static event EventHandler? RadioStaticEnabledChanged;
+
+    /// <summary>
+    /// Raised whenever the connected Last.fm account (<see cref="LastfmUsername"/>) changes -
+    /// connected, disconnected, or a session Last.fm rejected was cleared - so Settings can
+    /// refresh its connection status without polling.
+    /// </summary>
+    public static event EventHandler? LastfmConnectionChanged;
 
     /// <summary>
     /// Gets or sets whether the app should automatically start playing the last selected station on startup.
@@ -222,6 +231,60 @@ public static class SettingsService
     {
         get => GetBoolSetting(IsBandcampEnabledKey, defaultValue: false);
         set => SetBoolSetting(IsBandcampEnabledKey, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether the app reports what is playing to the connected Last.fm account.
+    /// Defaults to false when no saved value exists: scrobbling must never start silently for a
+    /// user who has not opted in, even if they have connected an account.
+    /// </summary>
+    public static bool IsLastfmScrobblingEnabled
+    {
+        get => GetBoolSetting(IsLastfmScrobblingEnabledKey, defaultValue: false);
+        set => SetBoolSetting(IsLastfmScrobblingEnabledKey, value);
+    }
+
+    /// <summary>
+    /// The connected Last.fm account's display name, or <see langword="null"/> when not
+    /// connected. Not secret - the session key itself lives in Windows Credential Locker via
+    /// <see cref="Lastfm.LastfmAccountStore"/> - so this stays a plain setting for cheap,
+    /// synchronous reads from bindings.
+    /// </summary>
+    public static string? LastfmUsername
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(LastfmUsernameKey, out object? value) &&
+                    value is string username && !string.IsNullOrWhiteSpace(username))
+                {
+                    return username;
+                }
+            }
+            catch
+            {
+                // Fall through to "not connected"
+            }
+
+            return null;
+        }
+        set
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    ApplicationData.Current.LocalSettings.Values.Remove(LastfmUsernameKey);
+                else
+                    ApplicationData.Current.LocalSettings.Values[LastfmUsernameKey] = value;
+            }
+            catch
+            {
+                // Silently fail if unable to save
+            }
+
+            LastfmConnectionChanged?.Invoke(null, EventArgs.Empty);
+        }
     }
 
     /// <summary>

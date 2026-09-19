@@ -23,6 +23,7 @@
     <None Remove="Assets\apple_music.svg" />
     <None Remove="Assets\bandcamp.svg" />
     <None Remove="Assets\discogs.svg" />
+    <None Remove="Assets\LastFM.svg" />
     <None Remove="Assets\spotify.svg" />
     <None Remove="Assets\ytmusic.svg" />
     <None Remove="Assets\Tutorial.gif" />
@@ -34,6 +35,7 @@
     <None Remove="Pages\AddStation.xaml" />
     <None Remove="Pages\AddWhiteNoise.xaml" />
     <None Remove="Controls\AddLocalMusicWindow.xaml" />
+    <None Remove="Controls\LastfmAuthWindow.xaml" />
     <None Remove="Pages\FavoritesPage.xaml" />
     <None Remove="Pages\PlayingPage.xaml" />
     <None Remove="Pages\SettingsPage.xaml" />
@@ -107,6 +109,9 @@
     <Content Update="Assets\discogs.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\LastFM.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\spotify.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -144,6 +149,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\AddLocalMusicWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\LastfmAuthWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -205,6 +215,22 @@
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="TagLibSharp" />
+  </ItemGroup>
+
+  <!--
+    OAuth.resw holds this app's own Last.fm API credentials and is gitignored - every developer
+    fills in their own copy from OAuth.resw.example. It is a flat, non-localized credentials
+    file read directly as XML by LastfmCredentials, not a per-locale UI-string resource, so it is
+    explicitly kept out of the WinUI resource-index (PRIResource) pipeline that
+    Strings\<locale>\Resources.resw goes through, and only copied to the output/package when a
+    developer's local copy actually exists.
+  -->
+  <ItemGroup>
+    <PRIResource Remove="OAuth.resw" />
+    <None Remove="OAuth.resw" />
+    <Content Include="OAuth.resw" Condition="Exists('OAuth.resw')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <!-- Publish Properties -->

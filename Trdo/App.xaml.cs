@@ -11,6 +11,7 @@ using Trdo.Controls;
 using Trdo.Models;
 using Trdo.Services;
 using Trdo.Services.Audio;
+using Trdo.Services.Lastfm;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.UI.ViewManagement;
@@ -104,6 +105,10 @@ public partial class App : Application
         // Same for playback errors: the service has to be listening before the first
         // failure, and it needs this (UI) thread's dispatcher for its review timer.
         PlaybackErrorService.EnsureInitialized();
+
+        // Last.fm scrobbling: listens for the same metadata changes, so it has to be
+        // subscribed before the first track plays, same as PlaylistHistoryService above.
+        LastfmScrobbleService.EnsureInitialized();
 
         // Radio static listens for buffering, which can start before any window is shown.
         RadioStaticService.Instance.Initialize();
