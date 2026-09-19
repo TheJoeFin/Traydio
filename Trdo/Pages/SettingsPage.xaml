@@ -434,6 +434,55 @@
                     </StackPanel>
                 </Border>
 
+                <Border Style="{StaticResource SettingCardStyle}" Visibility="{x:Bind ViewModel.IsLastfmAvailable}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <Image
+                                Grid.Column="0"
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImageSource UriSource="ms-appx:///Assets/LastFM.svg" />
+                                </Image.Source>
+                            </Image>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                x:Uid="SettingsPage_LastfmTitle"
+                                Style="{StaticResource SettingTitleStyle}" />
+                            <ToggleSwitch
+                                Grid.Column="2"
+                                MinWidth="0"
+                                HorizontalAlignment="Right"
+                                IsOn="{x:Bind ViewModel.IsLastfmScrobblingEnabled, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                        </Grid>
+                        <TextBlock x:Uid="SettingsPage_LastfmDescription" Style="{StaticResource SettingDescriptionStyle}" />
+
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SettingStatusStyle}"
+                                Text="{x:Bind ViewModel.LastfmConnectionStatusText, Mode=OneWay}" />
+                            <Button
+                                x:Name="LastfmConnectButton"
+                                x:Uid="SettingsPage_LastfmConnectButton"
+                                Grid.Column="1"
+                                Click="LastfmConnectButton_Click"
+                                Visibility="{x:Bind ViewModel.IsLastfmNotConnected, Mode=OneWay}" />
+                            <Button
+                                x:Name="LastfmDisconnectButton"
+                                x:Uid="SettingsPage_LastfmDisconnectButton"
+                                Grid.Column="2"
+                                Click="LastfmDisconnectButton_Click"
+                                Visibility="{x:Bind ViewModel.IsLastfmConnected, Mode=OneWay}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">
                         <TextBlock x:Uid="SettingsPage_PlaybackEngineTitle" Style="{StaticResource SettingTitleStyle}" />

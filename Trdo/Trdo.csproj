@@ -23,6 +23,7 @@
     <None Remove="Assets\apple_music.svg" />
     <None Remove="Assets\bandcamp.svg" />
     <None Remove="Assets\discogs.svg" />
+    <None Remove="Assets\LastFM.svg" />
     <None Remove="Assets\spotify.svg" />
     <None Remove="Assets\ytmusic.svg" />
     <None Remove="Assets\Tutorial.gif" />
@@ -34,6 +35,7 @@
     <None Remove="Pages\AddStation.xaml" />
     <None Remove="Pages\AddWhiteNoise.xaml" />
     <None Remove="Controls\AddLocalMusicWindow.xaml" />
+    <None Remove="Controls\LastfmAuthWindow.xaml" />
     <None Remove="Pages\FavoritesPage.xaml" />
     <None Remove="Pages\PlayingPage.xaml" />
     <None Remove="Pages\SettingsPage.xaml" />
@@ -107,6 +109,9 @@
     <Content Update="Assets\discogs.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\LastFM.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\spotify.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -144,6 +149,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\AddLocalMusicWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\LastfmAuthWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

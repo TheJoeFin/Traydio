@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Trdo.Models;
 using Trdo.Services;
+using Trdo.Services.Lastfm;
 using Trdo.Services.Playback;
 using Windows.ApplicationModel;
 using Windows.Storage;
@@ -27,6 +28,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     private string _appleMusicToggleText = LocalizationService.GetString("Toggle_On", "On");
     private string _youtubeMusicToggleText = LocalizationService.GetString("Toggle_On", "On");
     private string _bandcampToggleText = LocalizationService.GetString("Toggle_Off", "Off");
+    private string _lastfmToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _songChangePopupToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _radioStaticToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private StartupTask? _startupTask;
@@ -38,6 +40,19 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     public SettingsViewModel()
     {
         _playerViewModel = PlayerViewModel.Shared;
+
+        // The connection status is read fresh on each access (IsLastfmConnected,
+        // LastfmConnectionStatusText); this only needs to tell bindings to re-read it.
+        // Connecting/disconnecting also flips IsLastfmScrobblingEnabled (see LastfmAccountStore),
+        // so refresh the toggle's bindings too.
+        SettingsService.LastfmConnectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsLastfmConnected));
+            OnPropertyChanged(nameof(IsLastfmNotConnected));
+            OnPropertyChanged(nameof(LastfmConnectionStatusText));
+            OnPropertyChanged(nameof(IsLastfmScrobblingEnabled));
+            LastfmToggleText = GetToggleText(SettingsService.IsLastfmScrobblingEnabled);
+        };
 
         // Subscribe to PlayerViewModel property changes
         _playerViewModel.PropertyChanged += (_, args) =>
@@ -73,6 +88,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         AppleMusicToggleText = GetToggleText(SettingsService.IsAppleMusicEnabled);
         YouTubeMusicToggleText = GetToggleText(SettingsService.IsYouTubeMusicEnabled);
         BandcampToggleText = GetToggleText(SettingsService.IsBandcampEnabled);
+        LastfmToggleText = GetToggleText(SettingsService.IsLastfmScrobblingEnabled);
         SongChangePopupToggleText = GetToggleText(SettingsService.IsSongChangePopupEnabled);
         RadioStaticToggleText = GetToggleText(SettingsService.IsRadioStaticEnabled);
 
@@ -315,6 +331,54 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             _bandcampToggleText = value;
             OnPropertyChanged();
         }
+    }
+
+    /// <summary>
+    /// Gets or sets whether Traydio reports what is playing to the connected Last.fm account.
+    /// </summary>
+    public bool IsLastfmScrobblingEnabled
+    {
+        get => SettingsService.IsLastfmScrobblingEnabled;
+        set
+        {
+            if (value == SettingsService.IsLastfmScrobblingEnabled) return;
+            SettingsService.IsLastfmScrobblingEnabled = value;
+            OnPropertyChanged();
+            LastfmToggleText = GetToggleText(value);
+        }
+    }
+
+    public string LastfmToggleText
+    {
+        get => _lastfmToggleText;
+        set
+        {
+            if (value == _lastfmToggleText) return;
+            _lastfmToggleText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>Whether a Last.fm account is currently connected (has a saved session).</summary>
+    public bool IsLastfmConnected => LastfmAccountStore.TryGetSession(out _, out _);
+
+    /// <summary>Inverse of <see cref="IsLastfmConnected"/> - x:Bind has no built-in "not" converter.</summary>
+    public bool IsLastfmNotConnected => !IsLastfmConnected;
+
+    /// <summary>Whether this build has Last.fm API credentials configured at all - see OAuth.resw.example.</summary>
+    public bool IsLastfmAvailable => LastfmAuthService.IsAvailable;
+
+    public string LastfmConnectionStatusText => IsLastfmConnected
+        ? string.Format(
+            LocalizationService.GetString("Lastfm_ConnectedAs", "Connected as {0}"),
+            SettingsService.LastfmUsername)
+        : LocalizationService.GetString("Lastfm_NotConnected", "Not connected");
+
+    /// <summary>Forgets the connected Last.fm account. Connecting is handled by LastfmAuthWindow instead,
+    /// since it needs a XamlRoot/browser launch the view model has no business owning.</summary>
+    public void DisconnectLastfm()
+    {
+        LastfmAccountStore.ClearSession();
     }
 
     /// <summary>
