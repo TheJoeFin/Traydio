@@ -65,7 +65,12 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     // Results and filter option sources ---------------------------------
 
-    public ObservableCollection<RadioBrowserStation> SearchResults { get; } = [];
+    /// <summary>
+    /// Search results grouped by station name - see <see cref="StationSearchGroupingPolicy"/>.
+    /// Mirrors of the same station (a relay, a backup feed, a second codec) collapse into one
+    /// card with several streams rather than several near-identical rows.
+    /// </summary>
+    public ObservableCollection<StationSearchResultGroup> SearchResultGroups { get; } = [];
 
     /// <summary>The country/language/genre filters currently narrowing the search.</summary>
     public ObservableCollection<StationFilterOption> ActiveFilters { get; } = [];
@@ -311,7 +316,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     public bool ShowInitialState => string.IsNullOrWhiteSpace(SearchTerm) &&
                 !HasActiveFilters &&
-                SearchResults.Count == 0 &&
+                SearchResultGroups.Count == 0 &&
                 !IsSearching &&
                 !HasError;
 
@@ -469,7 +474,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         // Nothing to search for: clear results and return to the initial state.
         if (query.IsEmpty)
         {
-            SearchResults.Clear();
+            SearchResultGroups.Clear();
             HasError = false;
             ErrorMessage = string.Empty;
             OnPropertyChanged(nameof(ShowInitialState));
@@ -486,14 +491,14 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 query,
                 _searchCancellationTokenSource.Token);
 
-            SearchResults.Clear();
-            foreach (RadioBrowserStation station in results)
+            SearchResultGroups.Clear();
+            foreach (StationSearchResultGroup group in StationSearchGroupingPolicy.Group(results))
             {
-                SearchResults.Add(station);
+                SearchResultGroups.Add(group);
             }
 
             OnPropertyChanged(nameof(ShowInitialState));
-            Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {SearchResults.Count} stations");
+            Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {results.Count} stations in {SearchResultGroups.Count} groups");
         }
         catch (TaskCanceledException)
         {

@@ -316,9 +316,9 @@
                 <ListView
                     Margin="0"
                     Padding="0"
-                    ItemsSource="{x:Bind ViewModel.SearchResults, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.SearchResultGroups, Mode=OneWay}"
                     SelectionMode="None"
-                    Visibility="{x:Bind ViewModel.SearchResults.Count, Mode=OneWay, Converter={StaticResource HasItemsVisibilityConverter}}">
+                    Visibility="{x:Bind ViewModel.SearchResultGroups.Count, Mode=OneWay, Converter={StaticResource HasItemsVisibilityConverter}}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="Padding" Value="0" />
@@ -326,7 +326,14 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:RadioBrowserStation">
+                        <!--
+                            One card per station name. Radio Browser lists the same station
+                            several times over when it has more than one stream (a relay, a
+                            backup feed, a second codec) - grouping by name keeps a popular
+                            station from filling the list with near-identical rows, and every
+                            stream still gets its own quality label and actions underneath.
+                        -->
+                        <DataTemplate x:DataType="models:StationSearchResultGroup">
                             <Border
                                 Margin="0,4"
                                 Padding="6"
@@ -334,79 +341,102 @@
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="1"
                                 CornerRadius="8">
-                                <Grid
-                                    ColumnDefinitions="Auto,*"
-                                    ColumnSpacing="12"
-                                    RowDefinitions="Auto,Auto,Auto"
-                                    RowSpacing="4">
+                                <Grid RowDefinitions="Auto,Auto" RowSpacing="6">
 
-                                    <!--  Favicon  -->
+                                    <!--  Header: favicon, name, country/tags, shared by every stream below  -->
                                     <Grid
                                         Grid.Row="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="0"
-                                        Width="40"
-                                        Height="40"
-                                        VerticalAlignment="Top"
-                                        Visibility="{x:Bind Favicon, Converter={StaticResource NullToVisibilityConverter}, Mode=OneTime}">
-                                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6">
-                                            <Image Source="{x:Bind Favicon, Converter={StaticResource StringToImageSourceConverter}, Mode=OneTime}" Stretch="UniformToFill" />
-                                        </Border>
+                                        ColumnDefinitions="Auto,*"
+                                        ColumnSpacing="12">
+                                        <Grid
+                                            Grid.Column="0"
+                                            Width="40"
+                                            Height="40"
+                                            VerticalAlignment="Top"
+                                            Visibility="{x:Bind Favicon, Converter={StaticResource NullToVisibilityConverter}, Mode=OneTime}">
+                                            <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6">
+                                                <Image Source="{x:Bind Favicon, Converter={StaticResource StringToImageSourceConverter}, Mode=OneTime}" Stretch="UniformToFill" />
+                                            </Border>
+                                        </Grid>
+
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    FontWeight="SemiBold"
+                                                    Text="{x:Bind Name}"
+                                                    TextWrapping="WrapWholeWords" />
+                                                <!--  How many streams this station has - hidden when there's just the one  -->
+                                                <Border
+                                                    Grid.Column="1"
+                                                    Padding="6,1"
+                                                    VerticalAlignment="Top"
+                                                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                    CornerRadius="8"
+                                                    Visibility="{x:Bind HasMultipleStreams, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneTime}">
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Text="{x:Bind StreamCountLabel}" />
+                                                </Border>
+                                            </Grid>
+                                            <TextBlock TextWrapping="WrapWholeWords">
+                                                <Run
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text="{x:Bind Country}" />
+                                                <Run
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text=" • " />
+                                                <Run
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text="{x:Bind Tags}" />
+                                            </TextBlock>
+                                        </StackPanel>
                                     </Grid>
 
-                                    <!--  Station Name  -->
-                                    <TextBlock
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        FontWeight="SemiBold"
-                                        Text="{x:Bind Name}"
-                                        TextWrapping="WrapWholeWords" />
-
-                                    <!--  Station Info  -->
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        TextWrapping="WrapWholeWords">
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind Country}" />
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text=" • " />
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind Tags}" />
-                                    </TextBlock>
-
-                                    <!--  Preview & Add Buttons  -->
-                                    <StackPanel
-                                        Grid.Row="2"
-                                        Grid.Column="0"
-                                        Grid.ColumnSpan="2"
-                                        Margin="0,4,0,0"
-                                        Orientation="Horizontal"
-                                        Spacing="8">
-                                        <Button
-                                            Click="PreviewButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Preview station">
-                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
-                                        </Button>
-                                        <Button
-                                            Click="EditStationButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Edit station details before adding">
-                                            <FontIcon FontSize="14" Glyph="&#xE70F;" />
-                                        </Button>
-                                        <Button
-                                            Click="AddStationButton_Click"
-                                            Content="Add Station"
-                                            Style="{StaticResource AccentButtonStyle}"
-                                            Tag="{x:Bind}" />
-                                    </StackPanel>
+                                    <!--  One row per stream: its codec/bitrate, and its own preview/edit/add  -->
+                                    <ItemsControl Grid.Row="1" ItemsSource="{x:Bind Streams}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:RadioBrowserStation">
+                                                <Grid
+                                                    Margin="0,4,0,0"
+                                                    ColumnDefinitions="*,Auto"
+                                                    ColumnSpacing="8">
+                                                    <TextBlock
+                                                        Grid.Column="0"
+                                                        VerticalAlignment="Center"
+                                                        FontSize="12"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Text="{x:Bind QualityLabel}" />
+                                                    <StackPanel
+                                                        Grid.Column="1"
+                                                        Orientation="Horizontal"
+                                                        Spacing="8">
+                                                        <Button
+                                                            Click="PreviewButton_Click"
+                                                            Tag="{x:Bind}"
+                                                            ToolTipService.ToolTip="Preview station">
+                                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                                        </Button>
+                                                        <Button
+                                                            Click="EditStationButton_Click"
+                                                            Tag="{x:Bind}"
+                                                            ToolTipService.ToolTip="Edit station details before adding">
+                                                            <FontIcon FontSize="14" Glyph="&#xE70F;" />
+                                                        </Button>
+                                                        <Button
+                                                            Click="AddStationButton_Click"
+                                                            Content="Add Station"
+                                                            Style="{StaticResource AccentButtonStyle}"
+                                                            Tag="{x:Bind}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </Grid>
                             </Border>
                         </DataTemplate>
