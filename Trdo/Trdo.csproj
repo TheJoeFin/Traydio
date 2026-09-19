@@ -207,6 +207,22 @@
     <TrimmerRootAssembly Include="TagLibSharp" />
   </ItemGroup>
 
+  <!--
+    OAuth.resw holds this app's own Last.fm API credentials and is gitignored - every developer
+    fills in their own copy from OAuth.resw.example. It is a flat, non-localized credentials
+    file read directly as XML by LastfmCredentials, not a per-locale UI-string resource, so it is
+    explicitly kept out of the WinUI resource-index (PRIResource) pipeline that
+    Strings\<locale>\Resources.resw goes through, and only copied to the output/package when a
+    developer's local copy actually exists.
+  -->
+  <ItemGroup>
+    <PRIResource Remove="OAuth.resw" />
+    <None Remove="OAuth.resw" />
+    <Content Include="OAuth.resw" Condition="Exists('OAuth.resw')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <!-- Publish Properties -->
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
