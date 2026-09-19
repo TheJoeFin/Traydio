@@ -545,6 +545,19 @@ public sealed partial class PlayingPage : Page
         }
     }
 
+    /// <summary>
+    /// Double-clicking (or double-tapping) a station starts it playing - the behaviour a
+    /// media player list is expected to have. A single click only selects the row, which was
+    /// reported as confusing since it otherwise looks like nothing happened.
+    /// </summary>
+    private void StationRow_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: RadioStation station })
+        {
+            ViewModel.PlayStation(station);
+        }
+    }
+
     private void EditStation_Click(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem menuItem && menuItem.Tag is RadioStation station)

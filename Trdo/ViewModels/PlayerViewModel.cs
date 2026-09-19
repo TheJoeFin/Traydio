@@ -406,6 +406,30 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         SetSelectedStation(station, forcePlayAfterSwitch: false);
     }
 
+    /// <summary>
+    /// Selects a station and starts it playing, regardless of whether anything was already
+    /// playing - what double-clicking a station in the list is expected to do. The
+    /// <see cref="SelectedStation"/> setter only resumes across a switch if something already
+    /// was, so double-clicking a station while playback is paused would otherwise just select
+    /// it and do nothing further.
+    /// </summary>
+    public void PlayStation(RadioStation station)
+    {
+        // Already the selected station: SetSelectedStation would no-op on the reference
+        // equality check below, so resume it explicitly instead.
+        if (ReferenceEquals(station, _selectedStation))
+        {
+            if (!IsPlaying && !IsBuffering)
+            {
+                Toggle();
+            }
+
+            return;
+        }
+
+        SetSelectedStation(station, forcePlayAfterSwitch: true);
+    }
+
     private void SetSelectedStation(RadioStation? value, bool? forcePlayAfterSwitch)
     {
         Debug.WriteLine($"=== SelectedStation SETTER START ===");
