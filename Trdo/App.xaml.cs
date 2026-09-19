@@ -63,6 +63,7 @@ public partial class App : Application
     private readonly UISettings _uiSettings = new();
     private Mutex? _singleInstanceMutex;
     private EventWaitHandle? _trayIconRestoreEvent;
+    private RegisteredWaitHandle? _trayIconRestoreRegisteredWait;
     private DispatcherQueue? _uiDispatcherQueue;
 #if DEBUG
     private DispatcherQueueTimer? _songChangePopupPreviewTimer;
@@ -354,7 +355,7 @@ public partial class App : Application
             if (!createdNew)
             {
                 // Another instance is already running
-                // Signal it to restore the tray icon before exiting
+                // Signal it to open its window before exiting
                 try
                 {
                     using EventWaitHandle restoreEvent = EventWaitHandle.OpenExisting(restoreEventName);
@@ -363,7 +364,7 @@ public partial class App : Application
                 catch
                 {
                     // Event handle doesn't exist or couldn't be opened
-                    // This is acceptable - the watchdog timer will eventually restore the icon
+                    // This is acceptable - the other instance just won't raise its window
                 }
 
                 // Exit this instance gracefully
@@ -377,15 +378,22 @@ public partial class App : Application
             // This could happen in restricted environments
         }
 
-        // Create the event handle for other instances to signal us
+        // Create the event handle for other instances to signal us, and listen for it so a
+        // second launch raises this instance's window instead of silently doing nothing.
         try
         {
             _trayIconRestoreEvent = new EventWaitHandle(false, EventResetMode.AutoReset, restoreEventName);
+            _trayIconRestoreRegisteredWait = ThreadPool.RegisterWaitForSingleObject(
+                _trayIconRestoreEvent,
+                (_, _) => OnSecondInstanceLaunchDetected(),
+                state: null,
+                timeout: Timeout.InfiniteTimeSpan,
+                executeOnlyOnce: false);
         }
         catch
         {
-            // If we can't create the event handle, continue without it
-            // The watchdog timer will still provide periodic restoration
+            // If we can't create the event handle, a second launch just exits quietly instead
+            // of raising this instance's window.
         }
 
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
@@ -805,6 +813,31 @@ public partial class App : Application
         _trayPopupWindow.ToggleNearAnchor(clickedAtUtc);
     }
 
+    /// <summary>
+    /// Fires on a thread pool thread when a second launch of the app signals
+    /// <see cref="_trayIconRestoreEvent"/> before exiting. Marshals to the UI thread and raises
+    /// the tray popup window, so re-launching the app (e.g. double-clicking the exe or a
+    /// shortcut again) surfaces the already-running instance instead of appearing to do nothing.
+    /// </summary>
+    private void OnSecondInstanceLaunchDetected()
+    {
+        _uiDispatcherQueue?.TryEnqueue(() =>
+        {
+            WindowPlacementService.ClearPointerAnchor();
+
+            if (_trayPopupWindow is null)
+            {
+                _trayPopupWindow = new TrayPopupWindow();
+                WindowHelper.Track(_trayPopupWindow);
+                _trayPopupWindow.Closed += (_, _) => _trayPopupWindow = null;
+            }
+
+            // Always shows rather than toggling: a relaunch means "let me see the app", never
+            // "close what's open".
+            _trayPopupWindow.ShowNearAnchor();
+        });
+    }
+
     private async Task UpdateTrayIconAsync()
     {
         if (_trayIcon is null)
@@ -1064,6 +1097,7 @@ public partial class App : Application
             // below swallows.
             _singleInstanceMutex?.ReleaseMutex();
             _singleInstanceMutex?.Dispose();
+            _trayIconRestoreRegisteredWait?.Unregister(null);
             _trayIconRestoreEvent?.Dispose();
         }
         catch (Exception ex)
