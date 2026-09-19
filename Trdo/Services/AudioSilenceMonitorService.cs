@@ -1,14 +1,27 @@
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Trdo.Services;
 
 /// <summary>
 /// Monitors the system audio output using WASAPI loopback capture to detect silence.
-/// When the captured audio RMS falls below a threshold for a configurable duration,
-/// raises a <see cref="SilenceDetected"/> event.
+/// When the captured audio has stayed below a threshold for a configurable duration - or the
+/// capture itself has gone quiet, which reads the same way to a listener - raises
+/// <see cref="SilenceDetected"/>.
 /// </summary>
+/// <remarks>
+/// Detection runs off an independent heartbeat timer rather than out of
+/// <see cref="OnDataAvailable"/> itself. WASAPI loopback capture on some devices simply stops
+/// delivering buffers after a run of true digital silence - without raising
+/// <see cref="WasapiLoopbackCapture.RecordingStopped"/> - which would silently disable any
+/// logic that only runs inside that callback, including the very silence detection this class
+/// exists to provide. The heartbeat notices the callback itself going stale and is what
+/// actually restarts the capture; <see cref="OnRecordingStopped"/> remains as a second path for
+/// the case where NAudio does raise a clean stop.
+/// </remarks>
 public sealed partial class AudioSilenceMonitorService : IDisposable
 {
     // WasapiLoopbackCapture is obsolete in favor of WasapiRecorderBuilder, but that API
@@ -18,9 +31,34 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
 #pragma warning restore CS0618
     private readonly object _lock = new();
     private volatile bool _isMonitoring;
-    private DateTime _silenceStartTime;
-    private volatile bool _isSilent;
     private double _silenceTimeoutSeconds = 5.0;
+
+    // Wall-clock bookkeeping the heartbeat evaluates - see the type remarks for why this can't
+    // just live inside OnDataAvailable.
+    private DateTime _lastDataAvailableUtc;
+    private DateTime _lastAudibleUtc;
+    private DateTime? _aboveThresholdSince;
+    private bool _silenceAlreadyFired;
+    private bool _stallAlreadyLogged;
+
+    // A single WASAPI buffer's worth of above-threshold audio (tens of milliseconds) is as
+    // likely to be a decode glitch or a stray click as it is the stream actually resuming - a
+    // dead/corrupted stream that occasionally emits one such blip would otherwise mark itself
+    // "audible" every time and never accumulate the continuous quiet run SilenceDetected needs.
+    private const double MinSustainedAudioMs = 300;
+
+    // How long the capture can go without a single DataAvailable callback before it is treated
+    // as stalled rather than merely reporting quiet audio.
+    private const double StallThresholdMs = 2000;
+
+    private Timer? _heartbeatTimer;
+    private const double HeartbeatIntervalMs = 1000;
+
+    // Counts restarts triggered by the capture failing on its own (stalled or a clean
+    // RecordingStopped), reset on every deliberate Start(). Bounds the retry storm if the
+    // device is persistently unusable, rather than hammering WASAPI forever.
+    private int _unexpectedStopRestartCount;
+    private const int MaxUnexpectedStopRestarts = 5;
 
     // RMS threshold below which audio is considered "silent".
     // 32-bit float samples: typical quiet system noise sits around 0.0001–0.001.
@@ -34,6 +72,12 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
 
     // Track the peak RMS between UI updates so short transients aren't lost
     private float _peakSinceLastUpdate;
+
+    // A coarse, always-on trace of what the capture actually sees, independent of the silence
+    // state machine - the only way to tell "genuinely silent" apart from "quiet enough to sound
+    // dead but just above SilenceRmsThreshold" from a log after the fact.
+    private DateTime _lastRmsTraceLog = DateTime.MinValue;
+    private const double RmsTraceIntervalMs = 4000;
 
     /// <summary>
     /// Raised when silence has been detected for longer than <see cref="SilenceTimeoutSeconds"/>.
@@ -92,16 +136,35 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
                 capture.DataAvailable += OnDataAvailable;
                 capture.RecordingStopped += OnRecordingStopped;
 
-                _isSilent = false;
+                DateTime now = DateTime.UtcNow;
+                _lastDataAvailableUtc = now;
+                _lastAudibleUtc = now; // grace period - don't declare silence before we've heard anything
+                _aboveThresholdSince = null;
+                _silenceAlreadyFired = false;
+                _stallAlreadyLogged = false;
                 _peakSinceLastUpdate = 0;
+                _unexpectedStopRestartCount = 0;
                 _capture = capture;
                 capture.StartRecording();
                 _isMonitoring = true;
-                Debug.WriteLine("[SilenceMonitor] Started monitoring audio output");
+
+                // Runs for the lifetime of the service rather than per Start()/Stop() cycle -
+                // it is a no-op whenever _isMonitoring is false, and recreating a Timer on every
+                // play/pause toggle would just be more places for a leak.
+                _heartbeatTimer ??= new Timer(OnHeartbeat, null, (int)HeartbeatIntervalMs, (int)HeartbeatIntervalMs);
+
+                // Silence detection is invisible from the log if this device never opened -
+                // the previous behaviour (Debug.WriteLine only) meant a WASAPI loopback
+                // failure looked identical to "nothing wrong happened yet" in every log a
+                // user could actually send us.
+                LogService.Info("SilenceMonitor",
+                    $"Started monitoring audio output ({capture.WaveFormat.SampleRate}Hz, " +
+                    $"{capture.WaveFormat.Channels}ch, {capture.WaveFormat.BitsPerSample}bit)");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[SilenceMonitor] Failed to start: {ex.Message}");
+                LogService.Warn("SilenceMonitor", $"Failed to start WASAPI loopback capture: {ex.Message}");
                 DisposeCapture();
             }
         }
@@ -117,7 +180,6 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
         {
             wasMonitoring = _isMonitoring;
             _isMonitoring = false;
-            _isSilent = false;
         }
 
         if (wasMonitoring)
@@ -131,6 +193,10 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
     {
         if (!_isMonitoring || e.BytesRecorded == 0) return;
 
+        DateTime now = DateTime.UtcNow;
+        _lastDataAvailableUtc = now;
+        _stallAlreadyLogged = false; // callbacks resumed - a future stall deserves its own log
+
         // App-generated static is not evidence the stream is alive - score it as silence.
         bool isAppGeneratedAudio = ShouldIgnoreCapturedAudio?.Invoke() == true;
         float rms = isAppGeneratedAudio ? 0f : CalculateRms(e.Buffer, e.BytesRecorded);
@@ -140,7 +206,6 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
             _peakSinceLastUpdate = rms;
 
         // Throttled level update for UI visualisation
-        DateTime now = DateTime.UtcNow;
         if ((now - _lastLevelUpdate).TotalMilliseconds >= LevelUpdateIntervalMs)
         {
             _lastLevelUpdate = now;
@@ -148,44 +213,130 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
             _peakSinceLastUpdate = 0;
         }
 
+        if ((now - _lastRmsTraceLog).TotalMilliseconds >= RmsTraceIntervalMs)
+        {
+            _lastRmsTraceLog = now;
+            LogService.Info("SilenceMonitor",
+                $"RMS trace: {rms:F6} (appGenerated={isAppGeneratedAudio}, " +
+                $"silenceFor={(now - _lastAudibleUtc).TotalSeconds:F1}s)");
+        }
+
         if (rms < SilenceRmsThreshold)
         {
-            if (!_isSilent)
+            // Any run of louder samples has broken, whether or not it lasted long enough to
+            // count as "resumed" below.
+            _aboveThresholdSince = null;
+            return;
+        }
+
+        _aboveThresholdSince ??= now;
+        if ((now - _aboveThresholdSince.Value).TotalMilliseconds >= MinSustainedAudioMs)
+        {
+            if (_silenceAlreadyFired)
             {
-                _isSilent = true;
-                _silenceStartTime = DateTime.UtcNow;
-                Debug.WriteLine($"[SilenceMonitor] Silence started (RMS: {rms:F6})");
+                double silenceDuration = (now - _lastAudibleUtc).TotalSeconds;
+                Debug.WriteLine($"[SilenceMonitor] Audio resumed after {silenceDuration:F1}s silence (RMS: {rms:F6})");
+                LogService.Info("SilenceMonitor", $"Audio resumed after {silenceDuration:F1}s silence (RMS={rms:F6})");
             }
 
-            double silenceDuration = (DateTime.UtcNow - _silenceStartTime).TotalSeconds;
-            if (silenceDuration >= _silenceTimeoutSeconds)
-            {
-                Debug.WriteLine($"[SilenceMonitor] Silence threshold exceeded: {silenceDuration:F1}s >= {_silenceTimeoutSeconds}s");
-                _isSilent = false; // Reset to avoid repeated triggers until audio resumes
-                SilenceDetected?.Invoke(this, EventArgs.Empty);
-            }
+            _lastAudibleUtc = now;
+            _silenceAlreadyFired = false;
         }
-        else
+    }
+
+    /// <summary>
+    /// Runs independently of <see cref="OnDataAvailable"/> so it keeps working even when that
+    /// callback itself has gone stale - see the type remarks. Evaluates two, separate things
+    /// that both read as "the user is hearing nothing": the capture not delivering any buffers
+    /// at all, and buffers that keep arriving but stay under the RMS threshold.
+    /// </summary>
+    private void OnHeartbeat(object? state)
+    {
+        if (!_isMonitoring) return;
+
+        DateTime now = DateTime.UtcNow;
+
+        double sinceLastCallback = (now - _lastDataAvailableUtc).TotalMilliseconds;
+        if (sinceLastCallback >= StallThresholdMs)
         {
-            if (_isSilent)
+            if (!_stallAlreadyLogged)
             {
-                double silenceDuration = (DateTime.UtcNow - _silenceStartTime).TotalSeconds;
-                Debug.WriteLine($"[SilenceMonitor] Audio resumed after {silenceDuration:F1}s silence (RMS: {rms:F6})");
+                _stallAlreadyLogged = true;
+                LogService.Warn("SilenceMonitor",
+                    $"WASAPI loopback capture has not delivered a buffer in {sinceLastCallback:F0}ms - " +
+                    "treating this as a stalled capture rather than just quiet audio, and restarting it");
             }
-            _isSilent = false;
+
+            RestartAfterFailure();
+            return;
+        }
+
+        double silenceDuration = (now - _lastAudibleUtc).TotalSeconds;
+        if (!_silenceAlreadyFired && silenceDuration >= _silenceTimeoutSeconds)
+        {
+            _silenceAlreadyFired = true;
+            Debug.WriteLine($"[SilenceMonitor] Silence threshold exceeded: {silenceDuration:F1}s >= {_silenceTimeoutSeconds}s");
+            LogService.Warn("SilenceMonitor", $"Silence threshold exceeded: {silenceDuration:F1}s >= {_silenceTimeoutSeconds}s");
+            SilenceDetected?.Invoke(this, EventArgs.Empty);
         }
     }
 
     private void OnRecordingStopped(object? sender, StoppedEventArgs e)
     {
-        if (e.Exception != null)
+        bool wasUnexpected;
+        lock (_lock)
         {
-            Debug.WriteLine($"[SilenceMonitor] Recording stopped with error: {e.Exception.Message}");
+            // DisposeCapture() detaches this handler before it calls StopRecording(), so a
+            // deliberate Stop() never reaches this event at all - every firing that does get
+            // here is the device reporting its own failure.
+            wasUnexpected = _isMonitoring;
+            _isMonitoring = false;
         }
-        else
+
+        if (!wasUnexpected)
         {
             Debug.WriteLine("[SilenceMonitor] Recording stopped");
+            return;
         }
+
+        string reason = e.Exception?.Message ?? "no exception given";
+        LogService.Warn("SilenceMonitor", $"WASAPI loopback capture stopped unexpectedly ({reason})");
+        RestartAfterFailure();
+    }
+
+    /// <summary>
+    /// Tears down the dead capture and restarts it after a short delay, bounded by
+    /// <see cref="MaxUnexpectedStopRestarts"/> so a persistently broken device doesn't spin
+    /// forever. Shared by the heartbeat's stall detection and a clean <see cref="OnRecordingStopped"/>.
+    /// </summary>
+    private void RestartAfterFailure()
+    {
+        lock (_lock)
+        {
+            _isMonitoring = false;
+        }
+
+        if (_unexpectedStopRestartCount >= MaxUnexpectedStopRestarts)
+        {
+            LogService.Error("SilenceMonitor",
+                $"WASAPI loopback capture has now failed {_unexpectedStopRestartCount} times in " +
+                "a row; giving up on silence detection for this session");
+            DisposeCapture();
+            return;
+        }
+
+        _unexpectedStopRestartCount++;
+        Debug.WriteLine($"[SilenceMonitor] Restarting capture (attempt {_unexpectedStopRestartCount}/{MaxUnexpectedStopRestarts})");
+        LogService.Warn("SilenceMonitor",
+            $"Restarting WASAPI loopback capture (attempt {_unexpectedStopRestartCount}/{MaxUnexpectedStopRestarts})");
+
+        DisposeCapture();
+
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(500);
+            Start();
+        });
     }
 
     /// <summary>
@@ -245,6 +396,8 @@ public sealed partial class AudioSilenceMonitorService : IDisposable
     public void Dispose()
     {
         _isMonitoring = false;
+        _heartbeatTimer?.Dispose();
+        _heartbeatTimer = null;
         DisposeCapture();
     }
 }
