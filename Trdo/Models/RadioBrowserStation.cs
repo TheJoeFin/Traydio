@@ -62,6 +62,27 @@ public class RadioBrowserStation
     }
 
     /// <summary>
+    /// Codec and bitrate as shown in search results, e.g. "AAC 128k". The directory
+    /// sometimes reports only one of the two, so this shows whichever is known rather than
+    /// printing a stray "0k". Empty when neither is known - a placeholder like "Unknown
+    /// quality" would just get clipped by the row's layout anyway, so there is no value in
+    /// showing it.
+    /// </summary>
+    public string QualityLabel
+    {
+        get
+        {
+            bool hasCodec = !string.IsNullOrWhiteSpace(Codec);
+            bool hasBitrate = Bitrate > 0;
+
+            if (hasCodec && hasBitrate) return $"{Codec} {Bitrate}k";
+            if (hasCodec) return Codec;
+            if (hasBitrate) return $"{Bitrate}k";
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
     /// Converts this RadioBrowserStation to a RadioStation for local storage.
     /// <para>
     /// This is the single projection from a directory result to a saved station - every add
