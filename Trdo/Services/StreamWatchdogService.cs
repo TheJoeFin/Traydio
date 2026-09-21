@@ -21,6 +21,16 @@ public sealed partial class StreamWatchdogService : IDisposable
     private readonly AudioSilenceMonitorService _silenceMonitor;
     private CancellationTokenSource? _cts;
     private Task? _monitoringTask;
+
+    // Set first thing in Dispose() and checked by every UI-dispatch helper below (both before
+    // enqueuing and again inside the enqueued action, since Dispose() can run in the gap between
+    // the two). CheckStreamHealthAsync reads _playerService.IsPlaying - an unguarded WinRT
+    // MediaPlayer.PlaybackSession touch - on a background poll loop that Stop()/Dispose() cancel
+    // without awaiting; a poll already past its cancellation check can still resume and dispatch
+    // to the UI thread after RadioPlayerService.Dispose() has released the MediaPlayer. Touching
+    // a released WinRT object that way doesn't throw a catchable exception - it fails fast
+    // natively (see RadioPlayerService's SMTC DisplayUpdater fix for the same pattern).
+    private volatile bool _isDisposed;
     private bool _isEnabled;
     private bool _userIntendedPlayback;
     private DateTime _lastStateCheck;
@@ -406,7 +416,7 @@ public sealed partial class StreamWatchdogService : IDisposable
     {
         Debug.WriteLine("[Watchdog] Monitoring started");
 
-        while (!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested && !_isDisposed)
         {
             try
             {
@@ -777,6 +787,12 @@ public sealed partial class StreamWatchdogService : IDisposable
     {
         TaskCompletionSource<bool> tcs = new();
 
+        if (_isDisposed)
+        {
+            tcs.SetResult(false);
+            return tcs.Task;
+        }
+
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
             try
@@ -791,8 +807,17 @@ public sealed partial class StreamWatchdogService : IDisposable
         }
         else
         {
+            // _isDisposed is re-checked inside the enqueued action, not just on entry above:
+            // Dispose() can run on the UI thread in the gap between this enqueue and the queue
+            // actually invoking it.
             _uiQueue.TryEnqueue(() =>
             {
+                if (_isDisposed)
+                {
+                    tcs.SetResult(false);
+                    return;
+                }
+
                 try
                 {
                     action();
@@ -827,6 +852,11 @@ public sealed partial class StreamWatchdogService : IDisposable
                 break;
         }
 
+        if (_isDisposed)
+        {
+            return;
+        }
+
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
             StreamStatusChanged?.Invoke(this, new StreamWatchdogEventArgs(message, status));
@@ -835,6 +865,11 @@ public sealed partial class StreamWatchdogService : IDisposable
         {
             _uiQueue.TryEnqueue(() =>
             {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
                 StreamStatusChanged?.Invoke(this, new StreamWatchdogEventArgs(message, status));
             });
         }
@@ -845,6 +880,11 @@ public sealed partial class StreamWatchdogService : IDisposable
         LogService.Warn("Watchdog", $"Stutter detected (bufferIncreased={args.BufferWasIncreased}, newLevel={args.NewBufferLevel})");
         Debug.WriteLine($"[Watchdog] Raising StutterDetected event - BufferIncreased: {args.BufferWasIncreased}, NewLevel: {args.NewBufferLevel}");
 
+        if (_isDisposed)
+        {
+            return;
+        }
+
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
             StutterDetected?.Invoke(this, args);
@@ -853,6 +893,11 @@ public sealed partial class StreamWatchdogService : IDisposable
         {
             _uiQueue.TryEnqueue(() =>
             {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
                 StutterDetected?.Invoke(this, args);
             });
         }
@@ -862,6 +907,11 @@ public sealed partial class StreamWatchdogService : IDisposable
     {
         Debug.WriteLine($"[Watchdog] Raising BufferLevelChanged event - NewLevel: {newLevel}");
 
+        if (_isDisposed)
+        {
+            return;
+        }
+
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
             BufferLevelChanged?.Invoke(this, newLevel);
@@ -870,6 +920,11 @@ public sealed partial class StreamWatchdogService : IDisposable
         {
             _uiQueue.TryEnqueue(() =>
             {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
                 BufferLevelChanged?.Invoke(this, newLevel);
             });
         }
@@ -877,6 +932,7 @@ public sealed partial class StreamWatchdogService : IDisposable
 
     public void Dispose()
     {
+        _isDisposed = true;
         Stop();
         _silenceMonitor.SilenceDetected -= OnSilenceDetected;
         _silenceMonitor.AudioLevelUpdated -= OnAudioLevelFromMonitor;

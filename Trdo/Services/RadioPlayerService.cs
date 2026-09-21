@@ -35,6 +35,16 @@ public sealed partial class RadioPlayerService : IDisposable
     private bool _isInternalStateChange;
     private bool _wasExternalPause;
 
+    // Set as the very first step of Dispose() and checked from every deferred UI-thread
+    // callback that touches WinRT objects (SMTC's DisplayUpdater in particular). Those
+    // callbacks are scheduled from background threads - an album art download in flight when
+    // Dispose() runs can still complete afterward - and Dispose() releases the MediaPlayer that
+    // owns SystemMediaTransportControls. A property set or Update() call on an SMTC object
+    // whose owner has already been released doesn't throw a catchable exception; it fails fast
+    // natively inside combase.dll and takes the whole process down. This flag lets those
+    // callbacks no-op instead of racing the teardown.
+    private volatile bool _isDisposed;
+
     // True from the moment a user pause finishes tearing down the source until the next play
     // attempt begins. Clearing the native source on pause (see Pause()) makes the
     // MediaPlaybackSession briefly read as Opening/Buffering, which is not a real "searching for
@@ -2141,6 +2151,11 @@ public sealed partial class RadioPlayerService : IDisposable
 
     private void TryEnqueueOnUi(DispatcherQueueHandler action)
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
         if (_uiQueue is null)
         {
             action();
@@ -2153,7 +2168,15 @@ public sealed partial class RadioPlayerService : IDisposable
         }
         else
         {
-            _uiQueue.TryEnqueue(action);
+            // Re-checked here, not just on entry: Dispose() can run on the UI thread between
+            // this enqueue and the queue actually invoking the action.
+            _uiQueue.TryEnqueue(() =>
+            {
+                if (!_isDisposed)
+                {
+                    action();
+                }
+            });
         }
     }
 
@@ -2517,6 +2540,17 @@ public sealed partial class RadioPlayerService : IDisposable
             var tcs = new TaskCompletionSource<bool>();
             void SetThumbnail()
             {
+                // Checked here rather than only before enqueuing below: this can run on the UI
+                // thread synchronously, or later via the dispatcher queue after Dispose() has
+                // already released the MediaPlayer (and with it this SystemMediaTransportControls
+                // and its DisplayUpdater). Touching a released SMTC object doesn't throw a
+                // catchable exception - it fails fast natively.
+                if (_isDisposed)
+                {
+                    tcs.TrySetResult(false);
+                    return;
+                }
+
                 try
                 {
                     updater.Thumbnail = thumbnail;
@@ -2565,6 +2599,11 @@ public sealed partial class RadioPlayerService : IDisposable
     public void Dispose()
     {
         Debug.WriteLine("[RadioPlayerService] Dispose called");
+
+        // Set first, before anything else: a background SMTC callback (see TryEnqueueOnUi and
+        // SetAlbumArtAsync's SetThumbnail) checks this to avoid touching the MediaPlayer/
+        // SystemMediaTransportControls this method releases below.
+        _isDisposed = true;
 
         CancelPendingPlayAttempt();
 
