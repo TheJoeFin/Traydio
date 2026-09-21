@@ -38,6 +38,15 @@ public sealed class PlaybackErrorService
     private bool _isPresented;
     private bool _isHostWindowVisible;
 
+    // Set by Shutdown(), which App.ShutdownAndExit() calls before disposing
+    // RadioPlayerService.Instance. This is a singleton that is never itself disposed, but its
+    // review timer ticks on the UI thread and BuildSignals() reads _player.IsPlaying/IsBuffering
+    // - unguarded WinRT MediaPlayer.PlaybackSession touches. Without this, a tick already queued
+    // on the dispatcher when the app quits could still fire after the MediaPlayer is released
+    // and fail fast natively instead of throwing a catchable exception (same class of bug as
+    // RadioPlayerService's SMTC DisplayUpdater fix).
+    private volatile bool _isShutDown;
+
     /// <summary>
     /// Ticks of the last loopback frame loud enough to count as audio, or 0 if there has
     /// never been one. Written from the NAudio capture thread, so accessed via
@@ -185,7 +194,7 @@ public sealed class PlaybackErrorService
     /// </summary>
     private void ReviewCore()
     {
-        if (_message is null)
+        if (_isShutDown || _message is null)
             return;
 
         PlaybackErrorSignals signals = BuildSignals();
@@ -275,14 +284,46 @@ public sealed class PlaybackErrorService
         _reviewTimer.Tick += (_, _) => ReviewCore();
     }
 
+    /// <summary>
+    /// Stops the review timer so it cannot tick again, called from App.ShutdownAndExit()
+    /// before RadioPlayerService.Instance is disposed. Runs regardless of _isShutDown/RunOnUi
+    /// so the stop itself is never skipped by the guard it is setting up.
+    /// </summary>
+    public void Shutdown()
+    {
+        _isShutDown = true;
+
+        if (_uiQueue is null || _uiQueue.HasThreadAccess)
+        {
+            _reviewTimer?.Stop();
+        }
+        else
+        {
+            _uiQueue.TryEnqueue(() => _reviewTimer?.Stop());
+        }
+    }
+
     private void RunOnUi(Action action)
     {
+        if (_isShutDown)
+        {
+            return;
+        }
+
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
             action();
             return;
         }
 
-        _uiQueue.TryEnqueue(() => action());
+        // _isShutDown is re-checked inside the enqueued action, not just on entry above:
+        // Shutdown() can run in the gap between this enqueue and the queue invoking it.
+        _uiQueue.TryEnqueue(() =>
+        {
+            if (!_isShutDown)
+            {
+                action();
+            }
+        });
     }
 }

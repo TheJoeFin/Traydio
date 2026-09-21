@@ -1043,6 +1043,13 @@ public partial class App : Application
                 _trayIcon = null;
             }
 
+            // Stopped before anything below touches RadioPlayerService: its review timer reads
+            // RadioPlayerService.Instance.IsPlaying/IsBuffering on every tick (unguarded WinRT
+            // MediaPlayer.PlaybackSession touches), and a tick already queued on the dispatcher
+            // when Dispose() below releases the MediaPlayer would fail fast natively rather than
+            // throw a catchable exception.
+            PlaybackErrorService.Instance.Shutdown();
+
             // Order matters twice over: RadioStaticService unsubscribes from the player's events
             // first, so nothing reacts to the source teardown below by starting static that would
             // never fade out; then the player's Dispose() tears down the LibVlcPlaybackBackend
