@@ -40,6 +40,13 @@ public static class LibVlcHost
             // callback actually receives the lines explaining a failed open. Debug level
             // (2) is far too chatty to run permanently on a live audio path.
             _instance = new LibVLC("--no-video", "--verbose=1");
+
+            // Without this, LibVLC's WASAPI output leaves its session display name unset,
+            // so Windows falls back to its own default ("VLC media player (LibVLC ...)")
+            // instead of grouping the session under Traydio - producing a second, oddly
+            // named entry in the volume mixer for what is really the same app (see issue #133).
+            _instance.SetUserAgent("Traydio", "Traydio");
+
             _logCapture = new LibVlcLogCapture(_instance);
 
             LogService.Info("LibVlcHost", $"LibVLC initialized (version {_instance.Version})");
