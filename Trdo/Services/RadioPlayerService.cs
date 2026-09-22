@@ -457,109 +457,7 @@ public sealed partial class RadioPlayerService : IDisposable
         };
         Debug.WriteLine($"[RadioPlayerService] MediaPlayer created with Volume={_volume}, AutoPlay=false");
 
-        _player.PlaybackSession.PlaybackStateChanged += (_, _) =>
-        {
-            bool isPlaying;
-            bool isBuffering;
-            MediaPlaybackState currentState;
-            try
-            {
-                currentState = _player.PlaybackSession.PlaybackState;
-                isPlaying = currentState == MediaPlaybackState.Playing;
-                isBuffering = currentState is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
-                LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering}, _isUserPaused={_isUserPaused})");
-                Debug.WriteLine($"[RadioPlayerService] PlaybackStateChanged event: IsPlaying={isPlaying}, IsBuffering={isBuffering}, State={currentState}, IsInternalChange={_isInternalStateChange}");
-
-                // Reaching Playing means the current attempt succeeded - reset failure tracking.
-                if (isPlaying)
-                {
-                    ResetPlaybackFailureTracking();
-                    ConfirmActiveBackendHealthy();
-                }
-
-                // If state change was not initiated internally (e.g., from hardware buttons),
-                // notify the watchdog of user intention
-                if (!_isInternalStateChange)
-                {
-                    Debug.WriteLine("[RadioPlayerService] External state change detected (likely hardware button)");
-                    if (currentState == MediaPlaybackState.Playing)
-                    {
-                        _watchdog?.NotifyUserIntentionToPlay();
-                        Debug.WriteLine("[RadioPlayerService] Notified watchdog of user intention to play (hardware button)");
-
-                        // Mark that an external play was triggered
-                        // The Play() method will handle MediaSource recreation if needed
-                        if (_wasExternalPause)
-                        {
-                            Debug.WriteLine("[RadioPlayerService] External play detected after external pause - will be handled by Play() method");
-                        }
-                    }
-                    else if (currentState == MediaPlaybackState.Paused)
-                    {
-                        if (_isManuallyBuffering)
-                        {
-                            Debug.WriteLine("[RadioPlayerService] Ignoring pause during manual buffering");
-                        }
-                        else
-                        {
-                            // Only notify pause intent if explicitly paused (not buffering, opening, or other states)
-                            _watchdog?.NotifyUserIntentionToPause();
-                            Debug.WriteLine("[RadioPlayerService] Notified watchdog of user intention to pause (hardware button)");
-
-                            // Mark that this was an external pause
-                            _wasExternalPause = true;
-                            Debug.WriteLine("[RadioPlayerService] Marked as external pause - will refresh stream on next play");
-
-                            // An external pause is the user asking for silence just as much as
-                            // Pause() is, so drop any in-flight play attempt with it. Otherwise
-                            // it stays live as evidence of intent and a later recovery restarts
-                            // audio the user had already stopped.
-                            CancelPendingPlayAttempt();
-
-                            // Stop metadata polling when paused
-                            StopMetadata();
-                            Debug.WriteLine("[RadioPlayerService] Stopped metadata after external pause");
-                        }
-                    }
-                    // For other states (Buffering, Opening, None), don't change watchdog intent
-                    // This allows the watchdog to recover if a stream stops unexpectedly
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[RadioPlayerService] EXCEPTION in PlaybackStateChanged: {ex.Message}");
-                return;
-            }
-            // Covers the states Pause() does not run through - a stream that ends or is
-            // stopped outright. Buffering and Opening are excluded: a stream stuttering
-            // mid-track is still playing that track, and dropping the held info there would
-            // mean the track never appeared at all.
-            if (!isPlaying && !isBuffering)
-            {
-                ResetTrackInfoHold();
-            }
-
-            TryEnqueueOnUi(() =>
-            {
-                PlaybackStateChanged?.Invoke(this, isPlaying);
-
-                // Suppress the false "buffering" reading a user pause's source teardown
-                // produces - see _isUserPaused. A real start/switch clears the flag before
-                // its own buffering happens, so that signal still comes through untouched.
-                if (_isUserPaused && isBuffering)
-                {
-                    LogService.Info("RadioPlayerService",
-                        $"Suppressed BufferingStateChanged(true) from native state {currentState} - _isUserPaused is set");
-                }
-                else
-                {
-                    LogService.Info("RadioPlayerService", $"Raising BufferingStateChanged({isBuffering}) from native state {currentState}");
-                    BufferingStateChanged?.Invoke(this, isBuffering);
-                }
-
-                ScheduleSystemMediaTransportControlsUpdate();
-            });
-        };
+        _player.PlaybackSession.PlaybackStateChanged += OnPlaybackSessionStateChanged;
 
         _watchdog = new StreamWatchdogService(this);
         Debug.WriteLine("[RadioPlayerService] StreamWatchdogService created");
@@ -619,6 +517,121 @@ public sealed partial class RadioPlayerService : IDisposable
         // next play (user or watchdog recovery) recreates the source at live.
         Debug.WriteLine("[RadioPlayerService] System suspending during playback - marking stream for recreation");
         _wasExternalPause = true;
+    }
+
+    // This native WinRT event can fire from a media-pipeline thread outside our control, so it
+    // can race Dispose(): _player.Dispose() runs on the UI thread while an event already queued
+    // or in flight calls back in here and touches _player.PlaybackSession. That call into a
+    // torn-down WinRT object doesn't throw a catchable exception - it fails fast natively (see
+    // _isDisposed) - so the guard has to run before anything else in the handler touches _player.
+    private void OnPlaybackSessionStateChanged(MediaPlaybackSession sender, object args)
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        bool isPlaying;
+        bool isBuffering;
+        MediaPlaybackState currentState;
+        try
+        {
+            currentState = _player.PlaybackSession.PlaybackState;
+            isPlaying = currentState == MediaPlaybackState.Playing;
+            isBuffering = currentState is MediaPlaybackState.Opening or MediaPlaybackState.Buffering;
+            LogService.Info("RadioPlayerService", $"Native state -> {currentState} (isPlaying={isPlaying}, isBuffering={isBuffering}, _isUserPaused={_isUserPaused})");
+            Debug.WriteLine($"[RadioPlayerService] PlaybackStateChanged event: IsPlaying={isPlaying}, IsBuffering={isBuffering}, State={currentState}, IsInternalChange={_isInternalStateChange}");
+
+            // Reaching Playing means the current attempt succeeded - reset failure tracking.
+            if (isPlaying)
+            {
+                ResetPlaybackFailureTracking();
+                ConfirmActiveBackendHealthy();
+            }
+
+            // If state change was not initiated internally (e.g., from hardware buttons),
+            // notify the watchdog of user intention
+            if (!_isInternalStateChange)
+            {
+                Debug.WriteLine("[RadioPlayerService] External state change detected (likely hardware button)");
+                if (currentState == MediaPlaybackState.Playing)
+                {
+                    _watchdog?.NotifyUserIntentionToPlay();
+                    Debug.WriteLine("[RadioPlayerService] Notified watchdog of user intention to play (hardware button)");
+
+                    // Mark that an external play was triggered
+                    // The Play() method will handle MediaSource recreation if needed
+                    if (_wasExternalPause)
+                    {
+                        Debug.WriteLine("[RadioPlayerService] External play detected after external pause - will be handled by Play() method");
+                    }
+                }
+                else if (currentState == MediaPlaybackState.Paused)
+                {
+                    if (_isManuallyBuffering)
+                    {
+                        Debug.WriteLine("[RadioPlayerService] Ignoring pause during manual buffering");
+                    }
+                    else
+                    {
+                        // Only notify pause intent if explicitly paused (not buffering, opening, or other states)
+                        _watchdog?.NotifyUserIntentionToPause();
+                        Debug.WriteLine("[RadioPlayerService] Notified watchdog of user intention to pause (hardware button)");
+
+                        // Mark that this was an external pause
+                        _wasExternalPause = true;
+                        Debug.WriteLine("[RadioPlayerService] Marked as external pause - will refresh stream on next play");
+
+                        // An external pause is the user asking for silence just as much as
+                        // Pause() is, so drop any in-flight play attempt with it. Otherwise
+                        // it stays live as evidence of intent and a later recovery restarts
+                        // audio the user had already stopped.
+                        CancelPendingPlayAttempt();
+
+                        // Stop metadata polling when paused
+                        StopMetadata();
+                        Debug.WriteLine("[RadioPlayerService] Stopped metadata after external pause");
+                    }
+                }
+                // For other states (Buffering, Opening, None), don't change watchdog intent
+                // This allows the watchdog to recover if a stream stops unexpectedly
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[RadioPlayerService] EXCEPTION in PlaybackStateChanged: {ex.Message}");
+            return;
+        }
+
+        // Covers the states Pause() does not run through - a stream that ends or is
+        // stopped outright. Buffering and Opening are excluded: a stream stuttering
+        // mid-track is still playing that track, and dropping the held info there would
+        // mean the track never appeared at all.
+        if (!isPlaying && !isBuffering)
+        {
+            ResetTrackInfoHold();
+        }
+
+        TryEnqueueOnUi(() =>
+        {
+            PlaybackStateChanged?.Invoke(this, isPlaying);
+
+            // Suppress the false "buffering" reading a user pause's source teardown
+            // produces - see _isUserPaused. A real start/switch clears the flag before
+            // its own buffering happens, so that signal still comes through untouched.
+            if (_isUserPaused && isBuffering)
+            {
+                LogService.Info("RadioPlayerService",
+                    $"Suppressed BufferingStateChanged(true) from native state {currentState} - _isUserPaused is set");
+            }
+            else
+            {
+                LogService.Info("RadioPlayerService", $"Raising BufferingStateChanged({isBuffering}) from native state {currentState}");
+                BufferingStateChanged?.Invoke(this, isBuffering);
+            }
+
+            ScheduleSystemMediaTransportControlsUpdate();
+        });
     }
 
     private void LoadSettings()
@@ -2582,6 +2595,17 @@ public sealed partial class RadioPlayerService : IDisposable
         _httpClient.Dispose();
 
         ClearActiveBackendSource();
+
+        // Stop new PlaybackStateChanged deliveries before the player is released, so the
+        // handler's _isDisposed check is the backstop rather than the only guard.
+        try
+        {
+            _player.PlaybackSession.PlaybackStateChanged -= OnPlaybackSessionStateChanged;
+        }
+        catch
+        {
+            // Ignore errors during cleanup
+        }
 
         _player.Dispose();
         Debug.WriteLine("[RadioPlayerService] Disposed");
