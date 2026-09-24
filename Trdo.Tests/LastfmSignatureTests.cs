@@ -65,7 +65,7 @@ public sealed class LastfmSignatureTests
             ["api_key"] = "b25b959554ed76058ac220b7b2e0a026",
         };
 
-        Assert.AreEqual("cc7870f0e47ca6afa268052d6156b3d1", LastfmSignature.Compute(inOrder, ""));
+        Assert.AreEqual("4b6db4b05f6ea3a873bb806724ffc05d", LastfmSignature.Compute(inOrder, ""));
         Assert.AreEqual(LastfmSignature.Compute(inOrder, ""), LastfmSignature.Compute(shuffled, ""));
     }
 

@@ -4,7 +4,7 @@ namespace Trdo.Services.Lastfm;
 /// The subset of Last.fm's documented API error codes this app acts on differently from one
 /// another. Values match the API spec so a raw <c>error</c> field can be cast directly.
 /// </summary>
-internal enum LastfmErrorCode
+public enum LastfmErrorCode
 {
     InvalidService = 2,
     InvalidMethod = 3,

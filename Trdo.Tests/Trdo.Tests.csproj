@@ -52,6 +52,8 @@
     <Compile Include="..\Trdo\Services\StationMetadataMergePolicy.cs" Link="Services\StationMetadataMergePolicy.cs" />
     <Compile Include="..\Trdo\Models\StationFilterOption.cs" Link="Models\StationFilterOption.cs" />
     <Compile Include="..\Trdo\Services\StationFilterSearchPolicy.cs" Link="Services\StationFilterSearchPolicy.cs" />
+    <Compile Include="..\Trdo\Services\RecentSearchesPolicy.cs" Link="Services\RecentSearchesPolicy.cs" />
+    <Compile Include="..\Trdo\Services\SearchFreshnessPolicy.cs" Link="Services\SearchFreshnessPolicy.cs" />
     <Compile Include="..\Trdo\Models\FavoriteTrack.cs" Link="Models\FavoriteTrack.cs" />
     <Compile Include="..\Trdo\Models\StreamMetadata.cs" Link="Models\StreamMetadata.cs" />
     <Compile Include="..\Trdo\Services\Metadata\MetadataPublishGate.cs" Link="Services\Metadata\MetadataPublishGate.cs" />

@@ -932,6 +932,8 @@ public sealed partial class RadioPlayerService
         // use-after-free access violation in LibVLCEventDetach.
         _metadataOrchestrator.Dispose();
         _playbackEngineSelector.Dispose();
+        DisposeCastTarget();
+        DisposeSonosTarget();
         _publishGate.Dispose();
         _icyMetadataService.Dispose();
         _hlsSegmentMetadataService.Dispose();
