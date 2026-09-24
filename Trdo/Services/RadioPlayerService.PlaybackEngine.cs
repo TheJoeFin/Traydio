@@ -925,10 +925,13 @@ public sealed partial class RadioPlayerService
             _libVlcBackend.PlaybackEnded -= OnBackendPlaybackEnded;
         }
 
-        _playbackEngineSelector.Dispose();
-        DisposeCastTarget();
-        DisposeSonosTarget();
+        // Must run before _playbackEngineSelector.Dispose(): the metadata orchestrator
+        // unsubscribes LibVlcMetadataProvider's event handlers from the LibVLC backend's
+        // native MediaPlayer, which must still be alive for that native detach call.
+        // Disposing the backend first frees the native player and turns the detach into a
+        // use-after-free access violation in LibVLCEventDetach.
         _metadataOrchestrator.Dispose();
+        _playbackEngineSelector.Dispose();
         _publishGate.Dispose();
         _icyMetadataService.Dispose();
         _hlsSegmentMetadataService.Dispose();
