@@ -36,7 +36,7 @@ internal readonly struct LastfmResult<T>
     public static LastfmResult<T> Success(T value) => new(true, value, null, null);
 
     public static LastfmResult<T> Failure(LastfmErrorCode? errorCode, string? errorMessage) =>
-        new(false, default, errorCode, errorMessage);
+        new(false, default!, errorCode, errorMessage);
 
     /// <summary>
     /// Whether this failure is worth retrying later. A transport-level failure (no error code at
