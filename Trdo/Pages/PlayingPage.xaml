@@ -630,6 +630,16 @@
                 Click="SpeakerMuteButton_Click"
                 CornerRadius="16">
                 <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
+                <!--  The row only exists while casting, so Stop Casting needs no visibility binding here  -->
+                <Button.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Uid="PlayingPage_StopCasting" Click="StopCastingMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE711;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.ContextFlyout>
             </Button>
             <Slider
                 x:Name="SpeakerVolumeSlider"
