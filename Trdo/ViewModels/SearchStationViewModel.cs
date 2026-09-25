@@ -42,6 +42,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     private string _searchTerm = string.Empty;
     private bool _isSearching;
     private bool _hasError;
+    private bool _hasCompletedSearch;
     private string _errorMessage = string.Empty;
     private bool _isLoadingFilterOptions;
 
@@ -136,7 +137,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _searchTerm) return;
             _searchTerm = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
             _ = PerformSearchAsync();
         }
     }
@@ -149,7 +150,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _isSearching) return;
             _isSearching = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
         }
     }
 
@@ -161,7 +162,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _hasError) return;
             _hasError = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
         }
     }
 
@@ -334,8 +335,27 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 !IsSearching &&
                 !HasError;
 
-    /// <summary>Whether the recent-searches chip row has anything to show.</summary>
-    public bool ShowRecentSearches => RecentSearches.Count > 0;
+    /// <summary>A search ran to completion and the directory had nothing matching it.</summary>
+    public bool ShowNoResults => _hasCompletedSearch &&
+                SearchResultGroups.Count == 0 &&
+                !IsSearching &&
+                !HasError;
+
+    /// <summary>
+    /// The prompt plus "popular near me" / "add manually" block, shared by the initial state and
+    /// the no-results state so a dead-end search still offers a way forward.
+    /// </summary>
+    public bool ShowEmptyState => ShowInitialState || ShowNoResults;
+
+    public string EmptyStateMessage => ShowNoResults
+        ? "No stations found"
+        : "Enter a search term to find stations...";
+
+    /// <summary>
+    /// Whether the recent-searches chip row has anything to show. Only before a search - under
+    /// "No stations found" it would read as suggestions for the failed search.
+    /// </summary>
+    public bool ShowRecentSearches => RecentSearches.Count > 0 && ShowInitialState;
 
     /// <summary>Whether Windows has a home region set, i.e. there's a "near you" to search for.</summary>
     public bool ShowPopularNearYouOption => UserRegionService.CurrentRegionCode is not null;
@@ -449,6 +469,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         SearchResultGroups.Clear();
         FilterChips.Clear();
         _hasError = false;
+        _hasCompletedSearch = false;
         _errorMessage = string.Empty;
         _isFilterPanelOpen = false;
 
@@ -462,7 +483,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsFilterPanelOpen));
         OnPropertyChanged(nameof(HasActiveFilters));
         OnPropertyChanged(nameof(AreResultsVisible));
-        OnPropertyChanged(nameof(ShowInitialState));
+        OnEmptyStateChanged();
     }
 
     /// <summary>Runs a past search again. Bound to a "recent searches" chip click.</summary>
@@ -552,7 +573,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     private void OnFiltersChanged()
     {
         OnPropertyChanged(nameof(HasActiveFilters));
-        OnPropertyChanged(nameof(ShowInitialState));
+        OnEmptyStateChanged();
         RefreshFilterChips();
         _ = PerformSearchAsync();
     }
@@ -605,10 +626,11 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         // Nothing to search for: clear results and return to the initial state.
         if (query.IsEmpty)
         {
+            _hasCompletedSearch = false;
             SearchResultGroups.Clear();
             HasError = false;
             ErrorMessage = string.Empty;
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
             return;
         }
 
@@ -628,7 +650,8 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 SearchResultGroups.Add(group);
             }
 
-            OnPropertyChanged(nameof(ShowInitialState));
+            _hasCompletedSearch = true;
+            OnEmptyStateChanged();
             Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {results.Count} stations in {SearchResultGroups.Count} groups");
         }
         catch (TaskCanceledException)
@@ -689,9 +712,18 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         field = value;
         OnPropertyChanged(propertyName);
         OnPropertyChanged(nameof(HasActiveFilters));
-        OnPropertyChanged(nameof(ShowInitialState));
+        OnEmptyStateChanged();
         RefreshFilterChips();
         _ = PerformSearchAsync();
+    }
+
+    private void OnEmptyStateChanged()
+    {
+        OnPropertyChanged(nameof(ShowInitialState));
+        OnPropertyChanged(nameof(ShowNoResults));
+        OnPropertyChanged(nameof(ShowEmptyState));
+        OnPropertyChanged(nameof(EmptyStateMessage));
+        OnPropertyChanged(nameof(ShowRecentSearches));
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

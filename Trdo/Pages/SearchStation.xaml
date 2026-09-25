@@ -413,8 +413,8 @@
             Margin="0,0,0,0"
             Visibility="{x:Bind ViewModel.AreResultsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Spacing="8">
-                <!--  Initial state  -->
-                <StackPanel Spacing="20" Visibility="{x:Bind ViewModel.ShowInitialState, Mode=OneWay}">
+                <!--  Initial / no-results state  -->
+                <StackPanel Spacing="20" Visibility="{x:Bind ViewModel.ShowEmptyState, Mode=OneWay}">
                     <!--
                         Recent searches, as a horizontally sliding chip row - a click re-runs
                         that search instead of retyping it. The label sits beside the row rather
@@ -462,7 +462,7 @@
                         <TextBlock
                             FontStyle="Italic"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Text="Enter a search term to find stations..."
+                            Text="{x:Bind ViewModel.EmptyStateMessage, Mode=OneWay}"
                             TextAlignment="Center" />
 
                         <!--
