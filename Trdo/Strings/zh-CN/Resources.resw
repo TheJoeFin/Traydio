@@ -917,6 +917,9 @@
   <data name="TrayIcon_AddStation" xml:space="preserve">
     <value>Traydio - 添加电台以开始收听</value>
   </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>在 {0} 上</value>
+  </data>
   <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
     <value>左键单击暂停</value>
   </data>

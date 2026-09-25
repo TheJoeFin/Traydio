@@ -473,7 +473,8 @@ public partial class App : Application
             // Update tray icon to show loading state
             _ = UpdateTrayIconAsync();
         }
-        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted))
+        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted)
+                 or nameof(PlayerViewModel.IsCasting) or nameof(PlayerViewModel.CastTargetName))
         {
             UpdatePlayPauseCommandText();
         }
@@ -950,6 +951,18 @@ public partial class App : Application
                 "TrayIcon_Paused",
                 "Traydio {0} (Paused)\n{1}");
             tooltip = string.Format(pausedFormat, station, playPauseClickHint);
+        }
+
+        if (_playerVm.CanPlay && _playerVm.IsCasting && !string.IsNullOrWhiteSpace(_playerVm.CastTargetName))
+        {
+            // Directly under the station line, since it qualifies where that station is playing.
+            string castingLine = string.Format(
+                LocalizationService.GetString("TrayIcon_CastingTo", "on {0}"),
+                _playerVm.CastTargetName);
+            int firstLineEnd = tooltip.IndexOf('\n');
+            tooltip = firstLineEnd < 0
+                ? string.Concat(tooltip, "\n", castingLine)
+                : tooltip.Insert(firstLineEnd, "\n" + castingLine);
         }
 
         if (_playerVm.CanPlay && _playerVm.IsMuted)

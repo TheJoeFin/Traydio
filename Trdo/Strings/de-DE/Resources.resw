@@ -917,6 +917,9 @@
   <data name="TrayIcon_AddStation" xml:space="preserve">
     <value>Traydio - Füge einen Sender hinzu, um mit dem Hören zu beginnen</value>
   </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>auf {0}</value>
+  </data>
   <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
     <value>Linksklick zum Pausieren</value>
   </data>
