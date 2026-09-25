@@ -519,6 +519,9 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 return;
             }
 
+            // From "No stations found" the typed term is what came up empty, so drop it rather
+            // than narrowing the popular list by it. Already empty from the initial state.
+            SearchTerm = string.Empty;
             AddFilter(new StationFilterOption(StationFilterFacet.Country, match.Name, match.StationCount));
             SelectedSort = SortOptions[1]; // "Most popular" (clickcount)
         }
