@@ -28,11 +28,6 @@ internal sealed class LastfmScrobbleQueueService
     private static readonly Lazy<LastfmScrobbleQueueService> _instance = new(() => new LastfmScrobbleQueueService());
     public static LastfmScrobbleQueueService Instance => _instance.Value;
 
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        TypeInfoResolver = LastfmScrobbleQueueJsonContext.Default
-    };
-
     private readonly object _lock = new();
     private readonly List<LastfmPendingScrobble> _pending;
     private readonly SemaphoreSlim _flushGate = new(1, 1);
@@ -168,7 +163,7 @@ internal sealed class LastfmScrobbleQueueService
     {
         try
         {
-            string json = JsonSerializer.Serialize(_pending, _jsonOptions);
+            string json = JsonSerializer.Serialize(_pending, LastfmScrobbleQueueJsonContext.Default.ListLastfmPendingScrobble);
             File.WriteAllText(_queueFilePath, json);
         }
         catch (Exception ex)
@@ -184,7 +179,7 @@ internal sealed class LastfmScrobbleQueueService
             if (File.Exists(_queueFilePath))
             {
                 string json = File.ReadAllText(_queueFilePath);
-                return JsonSerializer.Deserialize<List<LastfmPendingScrobble>>(json, _jsonOptions) ?? [];
+                return JsonSerializer.Deserialize(json, LastfmScrobbleQueueJsonContext.Default.ListLastfmPendingScrobble) ?? [];
             }
         }
         catch (Exception ex)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,12 +20,6 @@ internal sealed class LastfmApiClient
     private const string ApiRoot = "https://ws.audioscrobbler.com/2.0/";
 
     private static readonly HttpClient _httpClient = CreateHttpClient();
-
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        TypeInfoResolver = LastfmJsonContext.Default
-    };
 
     private readonly string _apiKey;
     private readonly string _sharedSecret;
@@ -63,6 +58,7 @@ internal sealed class LastfmApiClient
 
         return SendAsync<LastfmTokenResponse, string>(
             HttpMethod.Get,
+            LastfmJsonContext.Default.LastfmTokenResponse,
             parameters,
             response => string.IsNullOrWhiteSpace(response.Token)
                 ? LastfmResult<string>.Failure(null, "Response had no token")
@@ -82,6 +78,7 @@ internal sealed class LastfmApiClient
 
         return SendAsync<LastfmSessionEnvelope, (string Username, string SessionKey)>(
             HttpMethod.Get,
+            LastfmJsonContext.Default.LastfmSessionEnvelope,
             parameters,
             response => response.Session is { Name.Length: > 0, Key.Length: > 0 } session
                 ? LastfmResult<(string, string)>.Success((session.Name!, session.Key!))
@@ -113,6 +110,7 @@ internal sealed class LastfmApiClient
 
         return SendAsync<LastfmNowPlayingEnvelope, bool>(
             HttpMethod.Post,
+            LastfmJsonContext.Default.LastfmNowPlayingEnvelope,
             parameters,
             _ => LastfmResult<bool>.Success(true),
             cancellationToken);
@@ -151,6 +149,7 @@ internal sealed class LastfmApiClient
 
         return SendAsync<LastfmScrobbleEnvelope, (int Accepted, int Ignored)>(
             HttpMethod.Post,
+            LastfmJsonContext.Default.LastfmScrobbleEnvelope,
             parameters,
             response => response.Scrobbles?.Attr is { } attr
                 ? LastfmResult<(int, int)>.Success((attr.Accepted, attr.Ignored))
@@ -169,6 +168,7 @@ internal sealed class LastfmApiClient
 
     private async Task<LastfmResult<TOut>> SendAsync<TResponse, TOut>(
         HttpMethod method,
+        JsonTypeInfo<TResponse> responseTypeInfo,
         Dictionary<string, string> parameters,
         Func<TResponse, LastfmResult<TOut>> project,
         CancellationToken cancellationToken)
@@ -190,7 +190,7 @@ internal sealed class LastfmApiClient
 
             // Last.fm's JSON error envelope is authoritative regardless of HTTP status, so it is
             // always checked before trusting a success payload.
-            LastfmErrorEnvelope? errorEnvelope = TryDeserialize<LastfmErrorEnvelope>(content);
+            LastfmErrorEnvelope? errorEnvelope = TryDeserialize(content, LastfmJsonContext.Default.LastfmErrorEnvelope);
             if (errorEnvelope is { Error: > 0 })
             {
                 LastfmErrorCode? code = Enum.IsDefined(typeof(LastfmErrorCode), errorEnvelope.Error)
@@ -201,7 +201,7 @@ internal sealed class LastfmApiClient
                 return LastfmResult<TOut>.Failure(code, errorEnvelope.Message);
             }
 
-            TResponse? parsed = TryDeserialize<TResponse>(content);
+            TResponse? parsed = TryDeserialize(content, responseTypeInfo);
             if (parsed is null)
             {
                 LogService.Warn("Lastfm", $"{methodName}: could not parse response");
@@ -230,11 +230,11 @@ internal sealed class LastfmApiClient
         return "?" + string.Join('&', pairs);
     }
 
-    private static T? TryDeserialize<T>(string json) where T : class
+    private static T? TryDeserialize<T>(string json, JsonTypeInfo<T> typeInfo) where T : class
     {
         try
         {
-            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+            return JsonSerializer.Deserialize(json, typeInfo);
         }
         catch (JsonException)
         {

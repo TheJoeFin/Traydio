@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Trdo.Models;
@@ -45,13 +46,6 @@ public class StationSearchQuery
 public class RadioBrowserService
 {
     private static readonly HttpClient _httpClient = CreateHttpClient();
-
-    // Use source-generated JSON context to ensure trimming compatibility
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        TypeInfoResolver = RadioBrowserJsonContext.Default
-    };
 
     // Lookup lists rarely change, so fetch each one once and reuse it.
     private static List<RadioBrowserCountry>? _cachedCountries;
@@ -130,7 +124,7 @@ public class RadioBrowserService
             string content = await response.Content.ReadAsStringAsync(cancellationToken);
             Debug.WriteLine($"[RadioBrowserService] Received response, length: {content.Length}");
 
-            List<RadioBrowserStation>? stations = JsonSerializer.Deserialize<List<RadioBrowserStation>>(content, _jsonOptions);
+            List<RadioBrowserStation>? stations = JsonSerializer.Deserialize(content, RadioBrowserJsonContext.Default.ListRadioBrowserStation);
 
             Debug.WriteLine($"[RadioBrowserService] Found {stations?.Count ?? 0} stations");
 
@@ -170,7 +164,7 @@ public class RadioBrowserService
 
             string content = await response.Content.ReadAsStringAsync(cancellationToken);
             List<RadioBrowserStation>? stations =
-                JsonSerializer.Deserialize<List<RadioBrowserStation>>(content, _jsonOptions);
+                JsonSerializer.Deserialize(content, RadioBrowserJsonContext.Default.ListRadioBrowserStation);
 
             Debug.WriteLine($"[RadioBrowserService] byurl returned {stations?.Count ?? 0} candidates");
             return stations ?? [];
@@ -200,6 +194,7 @@ public class RadioBrowserService
 
         _cachedCountries = await GetListAsync<RadioBrowserCountry>(
             "json/countries?order=stationcount&reverse=true&hidebroken=true",
+            RadioBrowserJsonContext.Default.ListRadioBrowserCountry,
             cancellationToken);
         return _cachedCountries;
     }
@@ -216,6 +211,7 @@ public class RadioBrowserService
 
         _cachedLanguages = await GetListAsync<RadioBrowserLanguage>(
             "json/languages?order=stationcount&reverse=true&hidebroken=true",
+            RadioBrowserJsonContext.Default.ListRadioBrowserLanguage,
             cancellationToken);
         return _cachedLanguages;
     }
@@ -238,11 +234,12 @@ public class RadioBrowserService
 
         _cachedTags = await GetListAsync<RadioBrowserTag>(
             $"json/tags?order=stationcount&reverse=true&hidebroken=true&limit={limit}",
+            RadioBrowserJsonContext.Default.ListRadioBrowserTag,
             cancellationToken);
         return _cachedTags;
     }
 
-    private static async Task<List<T>> GetListAsync<T>(string url, CancellationToken cancellationToken)
+    private static async Task<List<T>> GetListAsync<T>(string url, JsonTypeInfo<List<T>> typeInfo, CancellationToken cancellationToken)
     {
         try
         {
@@ -252,7 +249,7 @@ public class RadioBrowserService
             response.EnsureSuccessStatusCode();
 
             string content = await response.Content.ReadAsStringAsync(cancellationToken);
-            List<T>? items = JsonSerializer.Deserialize<List<T>>(content, _jsonOptions);
+            List<T>? items = JsonSerializer.Deserialize(content, typeInfo);
 
             Debug.WriteLine($"[RadioBrowserService] Fetched {items?.Count ?? 0} items");
             return items ?? [];
