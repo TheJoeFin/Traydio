@@ -103,9 +103,7 @@ public sealed partial class PlayingPage : Page
         UpdateDragAvailability();
 
         // Restore volume slider visibility from persisted setting
-        VolumeControlGrid.Visibility = SettingsService.IsVolumeSliderVisible
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        UpdateVolumeSliderVisibility();
 
         // Find the ShellViewModel from the parent page
         _shellViewModel = FindShellViewModel();
@@ -186,6 +184,11 @@ public sealed partial class PlayingPage : Page
             (nameof(PlayerViewModel.HasNowPlaying)))
         {
             UpdateNowPlayingMarqueeState();
+        }
+
+        if (e.PropertyName is nameof(PlayerViewModel.IsCasting))
+        {
+            UpdateVolumeSliderVisibility();
         }
 
         if (e.PropertyName is nameof(PlayerViewModel.SleepTimerProgress))
@@ -747,13 +750,25 @@ public sealed partial class PlayingPage : Page
 
     private void ToggleVolumeSlider_Click(object sender, RoutedEventArgs e)
     {
-        SetVolumeSliderVisible(VolumeControlGrid.Visibility != Visibility.Visible);
+        SetVolumeSliderVisible(!SettingsService.IsVolumeSliderVisible);
     }
 
     private void SetVolumeSliderVisible(bool visible)
     {
-        VolumeControlGrid.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         SettingsService.IsVolumeSliderVisible = visible;
+        UpdateVolumeSliderVisibility();
+    }
+
+    /// <summary>
+    /// The stream volume only scales audio played on this PC; a cast target fetches the
+    /// stream itself and ignores it, so the slider steps aside while casting whatever the
+    /// saved preference says, and comes back with the preference intact afterwards.
+    /// </summary>
+    private void UpdateVolumeSliderVisibility()
+    {
+        VolumeControlGrid.Visibility = SettingsService.IsVolumeSliderVisible && !ViewModel.IsCasting
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private void PageContextMenu_Opening(object sender, object e)
@@ -761,9 +776,12 @@ public sealed partial class PlayingPage : Page
         // This used to hide the whole menu when the volume slider was already showing, which
         // worked while the menu held exactly one item. Now that it carries the list commands,
         // the volume entry just flips its own wording instead.
-        ShowVolumeMenuItem.Text = VolumeControlGrid.Visibility == Visibility.Visible
+        // Worded from the saved preference rather than the grid, which is also hidden while
+        // casting; the toggle is disabled then since flipping it would change nothing visible.
+        ShowVolumeMenuItem.Text = SettingsService.IsVolumeSliderVisible
             ? LocalizationService.GetString("PlayingPage_HideVolumeSlider", "Hide Volume Slider")
             : LocalizationService.GetString("PlayingPage_ShowVolume.Text", "Show Volume Slider");
+        ShowVolumeMenuItem.IsEnabled = !ViewModel.IsCasting;
 
         // A sorted or grouped list has no meaningful place to put a new folder or divider: the
         // user is not the one deciding positions while either is on.
