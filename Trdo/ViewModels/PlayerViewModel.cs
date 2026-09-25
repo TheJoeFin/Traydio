@@ -225,6 +225,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsDiscogsEnabled));
             OnPropertyChanged(nameof(IsAppleMusicEnabled));
             OnPropertyChanged(nameof(IsYouTubeMusicEnabled));
+            OnPropertyChanged(nameof(IsBandcampEnabled));
+            OnPropertyChanged(nameof(IsQobuzEnabled));
             OnPropertyChanged(nameof(HasEnabledMusicServices));
             OnPropertyChanged(nameof(ShowMiniPlayerSearchLinks));
         };
@@ -846,11 +848,17 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     public bool IsYouTubeMusicEnabled => SettingsService.IsYouTubeMusicEnabled;
 
+    public bool IsBandcampEnabled => SettingsService.IsBandcampEnabled;
+
+    public bool IsQobuzEnabled => SettingsService.IsQobuzEnabled;
+
     public bool HasEnabledMusicServices =>
         IsSpotifyEnabled ||
         IsDiscogsEnabled ||
         IsAppleMusicEnabled ||
-        IsYouTubeMusicEnabled;
+        IsYouTubeMusicEnabled ||
+        IsBandcampEnabled ||
+        IsQobuzEnabled;
 
     public bool ShowMiniPlayerSearchLinks => HasNowPlaying && HasEnabledMusicServices;
 
@@ -1359,6 +1367,15 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
         string query = Uri.EscapeDataString(NowPlaying);
         await Launcher.LaunchUriAsync(new Uri($"https://bandcamp.com/search?q={query}"));
+    }
+
+    public async Task SearchOnQobuz()
+    {
+        if (!HasNowPlaying)
+            return;
+
+        string query = Uri.EscapeDataString(NowPlaying);
+        await Launcher.LaunchUriAsync(new Uri($"https://www.qobuz.com/us-en/search?q={query}"));
     }
 
     public void RestoreSelectedStationPlaybackTarget()

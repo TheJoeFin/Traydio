@@ -28,6 +28,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     private string _appleMusicToggleText = LocalizationService.GetString("Toggle_On", "On");
     private string _youtubeMusicToggleText = LocalizationService.GetString("Toggle_On", "On");
     private string _bandcampToggleText = LocalizationService.GetString("Toggle_Off", "Off");
+    private string _qobuzToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _lastfmToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _songChangePopupToggleText = LocalizationService.GetString("Toggle_Off", "Off");
     private string _radioStaticToggleText = LocalizationService.GetString("Toggle_Off", "Off");
@@ -88,6 +89,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         AppleMusicToggleText = GetToggleText(SettingsService.IsAppleMusicEnabled);
         YouTubeMusicToggleText = GetToggleText(SettingsService.IsYouTubeMusicEnabled);
         BandcampToggleText = GetToggleText(SettingsService.IsBandcampEnabled);
+        QobuzToggleText = GetToggleText(SettingsService.IsQobuzEnabled);
         LastfmToggleText = GetToggleText(SettingsService.IsLastfmScrobblingEnabled);
         SongChangePopupToggleText = GetToggleText(SettingsService.IsSongChangePopupEnabled);
         RadioStaticToggleText = GetToggleText(SettingsService.IsRadioStaticEnabled);
@@ -329,6 +331,32 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             if (value == _bandcampToggleText) return;
             _bandcampToggleText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether Qobuz search links are shown in Now Playing and Favorites.
+    /// </summary>
+    public bool IsQobuzEnabled
+    {
+        get => SettingsService.IsQobuzEnabled;
+        set
+        {
+            if (value == SettingsService.IsQobuzEnabled) return;
+            SettingsService.IsQobuzEnabled = value;
+            OnPropertyChanged();
+            QobuzToggleText = GetToggleText(value);
+        }
+    }
+
+    public string QobuzToggleText
+    {
+        get => _qobuzToggleText;
+        set
+        {
+            if (value == _qobuzToggleText) return;
+            _qobuzToggleText = value;
             OnPropertyChanged();
         }
     }

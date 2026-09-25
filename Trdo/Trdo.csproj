@@ -24,6 +24,7 @@
     <None Remove="Assets\bandcamp.svg" />
     <None Remove="Assets\discogs.svg" />
     <None Remove="Assets\LastFM.svg" />
+    <None Remove="Assets\qobuz.svg" />
     <None Remove="Assets\spotify.svg" />
     <None Remove="Assets\ytmusic.svg" />
     <None Remove="Assets\Tutorial.gif" />
@@ -110,6 +111,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\LastFM.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\qobuz.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\spotify.svg">

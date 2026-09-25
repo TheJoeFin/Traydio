@@ -21,6 +21,7 @@ public static class SettingsService
     private const string IsAppleMusicEnabledKey = "IsAppleMusicEnabled";
     private const string IsYouTubeMusicEnabledKey = "IsYouTubeMusicEnabled";
     private const string IsBandcampEnabledKey = "IsBandcampEnabled";
+    private const string IsQobuzEnabledKey = "IsQobuzEnabled";
     private const string IsLastfmScrobblingEnabledKey = "IsLastfmScrobblingEnabled";
     private const string LastfmUsernameKey = "LastfmUsername";
     private const string TrayClickBehaviorKey = "TrayClickBehavior";
@@ -239,6 +240,16 @@ public static class SettingsService
     {
         get => GetBoolSetting(IsBandcampEnabledKey, defaultValue: false);
         set => SetBoolSetting(IsBandcampEnabledKey, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether Qobuz search links are shown.
+    /// Defaults to false when no saved value exists.
+    /// </summary>
+    public static bool IsQobuzEnabled
+    {
+        get => GetBoolSetting(IsQobuzEnabledKey, defaultValue: false);
+        set => SetBoolSetting(IsQobuzEnabledKey, value);
     }
 
     /// <summary>
@@ -765,7 +776,7 @@ public static class SettingsService
         try
         {
             ApplicationData.Current.LocalSettings.Values[key] = value;
-            if (key is IsSpotifyEnabledKey or IsDiscogsEnabledKey or IsAppleMusicEnabledKey or IsYouTubeMusicEnabledKey or IsBandcampEnabledKey)
+            if (key is IsSpotifyEnabledKey or IsDiscogsEnabledKey or IsAppleMusicEnabledKey or IsYouTubeMusicEnabledKey or IsBandcampEnabledKey or IsQobuzEnabledKey)
             {
                 MusicSearchServicesChanged?.Invoke(null, EventArgs.Empty);
             }

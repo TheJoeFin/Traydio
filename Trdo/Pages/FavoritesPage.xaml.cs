@@ -23,7 +23,8 @@ public sealed partial class FavoritesPage : Page
         SettingsService.IsDiscogsEnabled ||
         SettingsService.IsAppleMusicEnabled ||
         SettingsService.IsYouTubeMusicEnabled ||
-        SettingsService.IsBandcampEnabled;
+        SettingsService.IsBandcampEnabled ||
+        SettingsService.IsQobuzEnabled;
 
     public FavoritesViewModel ViewModel { get; }
 
@@ -274,6 +275,17 @@ public sealed partial class FavoritesPage : Page
         }
     }
 
+    private async void QobuzLink_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is HyperlinkButton button && button.Tag is FavoriteTrack track)
+        {
+            Debug.WriteLine($"[FavoritesPage] Qobuz search for: {track.DisplayText}");
+            string searchQuery = Uri.EscapeDataString(track.DisplayText);
+            string url = $"https://www.qobuz.com/us-en/search?q={searchQuery}";
+            await Launcher.LaunchUriAsync(new Uri(url));
+        }
+    }
+
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         Debug.WriteLine("[FavoritesPage] Music service settings button clicked");
@@ -306,6 +318,7 @@ public sealed partial class FavoritesPage : Page
         SetButtonVisibility(expandedContent, "AppleMusicButton", SettingsService.IsAppleMusicEnabled);
         SetButtonVisibility(expandedContent, "YouTubeMusicButton", SettingsService.IsYouTubeMusicEnabled);
         SetButtonVisibility(expandedContent, "BandcampButton", SettingsService.IsBandcampEnabled);
+        SetButtonVisibility(expandedContent, "QobuzButton", SettingsService.IsQobuzEnabled);
     }
 
     private T? FindDescendant<T>(DependencyObject parent, string name = "") where T : DependencyObject

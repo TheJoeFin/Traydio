@@ -242,6 +242,21 @@
                                                 <TextBlock FontSize="11" Text="Bandcamp" />
                                             </StackPanel>
                                         </HyperlinkButton>
+
+                                        <!--  Search on Qobuz  -->
+                                        <HyperlinkButton
+                                            Padding="6,4"
+                                            Click="QobuzLink_Click"
+                                            Visibility="{x:Bind ViewModel.IsQobuzEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <Image Width="16" Height="16">
+                                                    <Image.Source>
+                                                        <SvgImageSource UriSource="ms-appx:///Assets/qobuz.svg" />
+                                                    </Image.Source>
+                                                </Image>
+                                                <TextBlock FontSize="11" Text="Qobuz" />
+                                            </StackPanel>
+                                        </HyperlinkButton>
                                     </StackPanel>
                                 </ScrollViewer>
                             </Border>

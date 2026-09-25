@@ -83,6 +83,12 @@ public sealed partial class NowPlayingPage : Page
         await ViewModel.SearchOnBandcamp();
     }
 
+    private async void QobuzLink_Click(object sender, RoutedEventArgs e)
+    {
+        Debug.WriteLine("[NowPlayingPage] Qobuz link clicked");
+        await ViewModel.SearchOnQobuz();
+    }
+
     private void FavoriteCurrentTrack_Click(object sender, RoutedEventArgs e)
     {
         Debug.WriteLine("[NowPlayingPage] Favorite current track clicked");
