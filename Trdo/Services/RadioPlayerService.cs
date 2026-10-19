@@ -2484,7 +2484,19 @@ public sealed partial class RadioPlayerService : IDisposable
         try
         {
             byte[] imageData;
-            if (imageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            if (EmbeddedArtStore.IsEmbeddedUrl(imageUrl))
+            {
+                byte[]? stored = EmbeddedArtStore.TryGet(imageUrl);
+                if (stored is null)
+                {
+                    LogService.Warn("AlbumArt", "SMTC art is no longer available in the embedded art store");
+                    return false;
+                }
+
+                imageData = stored;
+                Debug.WriteLine($"[RadioPlayerService] Using embedded album art ({imageData.Length} bytes)");
+            }
+            else if (imageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             {
                 int commaIndex = imageUrl.IndexOf(',');
                 if (commaIndex < 0)
@@ -2517,7 +2529,14 @@ public sealed partial class RadioPlayerService : IDisposable
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
-                imageData = await _httpClient.GetByteArrayAsync(imageUrl);
+                byte[]? downloaded = await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
+                if (downloaded is null)
+                {
+                    // Over the size limit; already logged.
+                    return false;
+                }
+
+                imageData = downloaded;
                 Debug.WriteLine($"[RadioPlayerService] Downloaded {imageData.Length} bytes of album art");
             }
 
@@ -2529,6 +2548,9 @@ public sealed partial class RadioPlayerService : IDisposable
                 LogService.Warn("AlbumArt", $"SMTC art is not a recognized image; skipping it: {ImageFormat.Describe(imageData)}");
                 return false;
             }
+
+            // The shell shows this at well under 600 px; handing it a 3000 px cover only costs memory.
+            imageData = await ArtworkResizer.DownscaleAsync(imageData, ArtworkResizer.SmtcEdge);
 
             // Create a random access stream from the image data
             InMemoryRandomAccessStream stream = new();
