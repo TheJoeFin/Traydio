@@ -68,6 +68,7 @@
     <Compile Include="..\Trdo\Services\Lastfm\ScrobbleTimingTracker.cs" Link="Services\Lastfm\ScrobbleTimingTracker.cs" />
     <Compile Include="..\Trdo\Helpers\ImageFormat.cs" Link="Helpers\ImageFormat.cs" />
     <Compile Include="..\Trdo\Helpers\EmbeddedArtStore.cs" Link="Helpers\EmbeddedArtStore.cs" />
+    <Compile Include="..\Trdo\Services\Metadata\IcyTextDecoder.cs" Link="Services\Metadata\IcyTextDecoder.cs" />
   </ItemGroup>
 
 </Project>
