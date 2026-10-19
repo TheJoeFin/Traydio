@@ -66,6 +66,8 @@
     <Compile Include="..\Trdo\Services\Lastfm\LastfmErrorCode.cs" Link="Services\Lastfm\LastfmErrorCode.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" Link="Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\ScrobbleTimingTracker.cs" Link="Services\Lastfm\ScrobbleTimingTracker.cs" />
+    <Compile Include="..\Trdo\Helpers\ImageFormat.cs" Link="Helpers\ImageFormat.cs" />
+    <Compile Include="..\Trdo\Helpers\EmbeddedArtStore.cs" Link="Helpers\EmbeddedArtStore.cs" />
   </ItemGroup>
 
 </Project>
