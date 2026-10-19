@@ -65,6 +65,7 @@ public partial class App : Application
     private EventWaitHandle? _trayIconRestoreEvent;
     private RegisteredWaitHandle? _trayIconRestoreRegisteredWait;
     private DispatcherQueue? _uiDispatcherQueue;
+    private AudioSessionGroupingService? _audioSessionGrouping;
 #if DEBUG
     private DispatcherQueueTimer? _songChangePopupPreviewTimer;
 #endif
@@ -397,6 +398,7 @@ public partial class App : Application
         }
 
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        _audioSessionGrouping = new AudioSessionGroupingService();
 
         InitializeTrayIcon();
         await UpdateTrayIconAsync();
@@ -1100,6 +1102,8 @@ public partial class App : Application
             // when Dispose() below releases the MediaPlayer would fail fast natively rather than
             // throw a catchable exception.
             PlaybackErrorService.Instance.Shutdown();
+
+            _audioSessionGrouping?.Dispose();
 
             // Order matters twice over: RadioStaticService unsubscribes from the player's events
             // first, so nothing reacts to the source teardown below by starting static that would
