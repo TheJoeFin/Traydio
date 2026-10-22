@@ -1,3 +1,4 @@
+using Trdo.Services;
 using System;
 using System.Text.Json.Serialization;
 
@@ -55,7 +56,7 @@ public class FavoriteTrack
     /// </summary>
     [JsonIgnore]
     public string ExportedOnDisplay => ExportedAt is DateTime exportedAt
-        ? $"Exported on {exportedAt:MMM d, yyyy h:mm tt}"
+        ? LocalizedText.Format("Ui_FavoriteTrack_73edcbce18", "Exported on {0:MMM d, yyyy h:mm tt}", exportedAt)
         : string.Empty;
 
     /// <summary>

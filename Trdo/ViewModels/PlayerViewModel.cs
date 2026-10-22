@@ -691,8 +691,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         : Visibility.Collapsed;
 
     public string MiniPlayerFavoriteButtonText => IsCurrentTrackFavorited
-        ? "Remove favorite"
-        : "Favorite track";
+        ? LocalizedText.Get("Ui_PlayerViewModel_5bc0aa08d6", "Remove favorite")
+        : LocalizedText.Get("Ui_PlayerViewModel_ee96487389", "Favorite track");
 
     public string MiniPlayerFavoriteButtonGlyph => IsCurrentTrackFavorited
         ? "\uE735"
@@ -802,7 +802,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         ? Visibility.Visible
         : Visibility.Collapsed;
 
-    public string SelectedStationDisplayName => SelectedStation?.Name ?? "No station selected";
+    public string SelectedStationDisplayName => SelectedStation?.Name ?? LocalizedText.Get("Ui_PlayerViewModel_abdae1e25b", "No station selected");
 
     public bool IsSpotifyEnabled => SettingsService.IsSpotifyEnabled;
 
@@ -927,7 +927,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            string stationName = _selectedStation?.Name ?? "Unknown";
+            string stationName = _selectedStation?.Name ?? LocalizedText.Get("Ui_PlayerViewModel_b764cdc0ea", "Unknown");
             _lastError = string.Format(
                 LocalizationService.GetString("PlayerViewModel_FailedToPlay", "Failed to play {0}: {1}"),
                 stationName, ex.Message);
@@ -959,7 +959,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            string stationName = _selectedStation?.Name ?? "Unknown";
+            string stationName = _selectedStation?.Name ?? LocalizedText.Get("Ui_PlayerViewModel_b764cdc0ea", "Unknown");
             _lastError = string.Format(
                 LocalizationService.GetString("PlayerViewModel_FailedToPause", "Failed to pause {0}: {1}"),
                 stationName, ex.Message);
@@ -988,7 +988,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         : TimeSpan.Zero;
 
     /// <summary>The countdown control's label, rounded up so it reads "1m" until the timer actually elapses.</summary>
-    public string SleepTimerDisplayText => $"{Math.Max((int)Math.Ceiling(SleepTimerRemaining.TotalMinutes), 1)}m";
+    public string SleepTimerDisplayText => LocalizedText.Format("Ui_PlayerViewModel_7f5ea98385", "{0}m", Math.Max((int)Math.Ceiling(SleepTimerRemaining.TotalMinutes), 1));
 
     /// <summary>Fraction of the chosen duration still remaining, for the countdown ring.</summary>
     public double SleepTimerProgress => _sleepTimerDuration > TimeSpan.Zero
@@ -1189,7 +1189,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         if (CurrentMetadata?.HasMetadata != true)
             return;
 
-        string stationName = SelectedStation?.Name ?? "Unknown Station";
+        string stationName = SelectedStation?.Name ?? LocalizedText.Get("Ui_PlayerViewModel_c647094d1f", "Unknown Station");
         IsCurrentTrackFavorited = _favoritesService.ToggleFavorite(CurrentMetadata, stationName);
     }
 
@@ -1275,7 +1275,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            string stationName = _selectedStation?.Name ?? "Unknown";
+            string stationName = _selectedStation?.Name ?? LocalizedText.Get("Ui_PlayerViewModel_b764cdc0ea", "Unknown");
             _lastError = string.Format(
                 LocalizationService.GetString("PlayerViewModel_FailedToRestore", "Failed to restore {0}: {1}"),
                 stationName, ex.Message);
@@ -1345,7 +1345,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         StationGroup group = new()
         {
             Id = StationIdentityPolicy.NewId(),
-            Name = string.IsNullOrWhiteSpace(folderName) ? "New group" : folderName.Trim(),
+            Name = string.IsNullOrWhiteSpace(folderName) ? LocalizedText.Get("Ui_PlayerViewModel_df796c655f", "New group") : folderName.Trim(),
         };
 
         foreach (RadioStation station in stations)
@@ -1684,7 +1684,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         StationGroup group = new()
         {
             Id = StationIdentityPolicy.NewId(),
-            Name = string.IsNullOrWhiteSpace(name) ? "New group" : name.Trim()
+            Name = string.IsNullOrWhiteSpace(name) ? LocalizedText.Get("Ui_PlayerViewModel_df796c655f", "New group") : name.Trim()
         };
 
         InsertTopLevel(group, insertBefore);

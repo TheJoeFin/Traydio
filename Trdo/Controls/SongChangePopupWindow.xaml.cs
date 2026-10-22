@@ -129,7 +129,7 @@ public sealed partial class SongChangePopupWindow : Window
         EnsureConfigured();
 
         SongText.Text = displayText;
-        AutomationProperties.SetName(RootGrid, $"Now playing: {displayText}");
+        AutomationProperties.SetName(RootGrid, LocalizedText.Format("Ui_SongChangePopupWindow_xaml_38baf87674", "Now playing: {0}", displayText));
 
         // Same art PlayingPage/NowPlayingPage show - track art if the source has one, else the
         // station's own favicon/cover - and the same per-source-kind glyph behind it while that
@@ -287,8 +287,8 @@ public sealed partial class SongChangePopupWindow : Window
         double effective = SongChangeAnnouncementPolicy.ResolveDelaySeconds(stationDelay, globalDelay);
 
         string header = station is null
-            ? "Track info delay"
-            : $"Track info delay for {station.Name}";
+            ? LocalizedText.Get("Ui_SongChangePopupWindow_xaml_1e55749b3e", "Track info delay")
+            : LocalizedText.Format("Ui_SongChangePopupWindow_xaml_f51a37acea", "Track info delay for {0}", station.Name);
 
         flyout.Items.Add(new MenuFlyoutItem
         {
@@ -313,7 +313,7 @@ public sealed partial class SongChangePopupWindow : Window
 
             ToggleMenuFlyoutItem followApp = new()
             {
-                Text = $"Use app setting ({SongChangeAnnouncementPolicy.DescribeDelay(globalDelay)})",
+                Text = LocalizedText.Format("Ui_SongChangePopupWindow_xaml_5733d6a9e0", "Use app setting ({0})", SongChangeAnnouncementPolicy.DescribeDelay(globalDelay)),
                 IsChecked = stationDelay is null
             };
             followApp.Click += (_, _) => ApplyStationDelay(station, null);
@@ -325,12 +325,12 @@ public sealed partial class SongChangePopupWindow : Window
         {
             flyout.Items.Add(new MenuFlyoutItem
             {
-                Text = $"Currently {SongChangeAnnouncementPolicy.DescribeDelay(effective)} (no station selected)",
+                Text = LocalizedText.Format("Ui_SongChangePopupWindow_xaml_a133d8ce0e", "Currently {0} (no station selected)", SongChangeAnnouncementPolicy.DescribeDelay(effective)),
                 IsEnabled = false
             });
         }
 
-        MenuFlyoutItem turnOff = new() { Text = "Turn off song popups" };
+        MenuFlyoutItem turnOff = new() { Text = LocalizedText.Get("Ui_SongChangePopupWindow_xaml_16a1d60039", "Turn off song popups") };
         turnOff.Click += (_, _) =>
         {
             SettingsService.IsSongChangePopupEnabled = false;

@@ -960,4 +960,7 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>Bem-vindo ao Traydio!</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Русский</value>
+  </data>
 </root>

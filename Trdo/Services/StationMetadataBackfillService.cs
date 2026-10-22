@@ -267,10 +267,10 @@ public sealed class StationMetadataBackfillService
         if (!string.IsNullOrWhiteSpace(station.Language))
             parts.Add(station.Language!);
         if (station.Bitrate is int bitrate and > 0)
-            parts.Add(!string.IsNullOrWhiteSpace(station.Codec) ? $"{bitrate} kbps {station.Codec}" : $"{bitrate} kbps");
+            parts.Add(!string.IsNullOrWhiteSpace(station.Codec) ? LocalizedText.Format("Ui_StationMetadataBackfillService_8d05b3d678", "{0} kbps {1}", bitrate, station.Codec!) : LocalizedText.Format("Ui_StationMetadataBackfillService_b6b26412c5", "{0} kbps", bitrate));
         else if (!string.IsNullOrWhiteSpace(station.Codec))
             parts.Add(station.Codec!);
 
-        return parts.Count == 0 ? "No extra details were available." : string.Join(" · ", parts);
+        return parts.Count == 0 ? LocalizedText.Get("Ui_StationMetadataBackfillService_af714df177", "No extra details were available.") : string.Join(" · ", parts);
     }
 }

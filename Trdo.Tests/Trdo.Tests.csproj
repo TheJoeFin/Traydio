@@ -22,6 +22,7 @@
     ApplicationData, DispatcherQueue or a media player does not belong here.
   -->
   <ItemGroup>
+    <Compile Include="..\Trdo\Services\LocalizedText.cs" Link="Services\LocalizedText.cs" />
     <Compile Include="..\Trdo\Services\Playback\RecoveryPolicy.cs" Link="Playback\RecoveryPolicy.cs" />
     <Compile Include="..\Trdo\Services\Playback\EngineHealthStore.cs" Link="Playback\EngineHealthStore.cs" />
     <Compile Include="..\Trdo\Services\Playback\PlaybackBackendKind.cs" Link="Playback\PlaybackBackendKind.cs" />

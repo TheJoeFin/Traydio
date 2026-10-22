@@ -44,15 +44,15 @@
                 </Button>
                 <Button
                     x:Uid="FavoritesPage_Options"
-                    AutomationProperties.Name="More favorites options"
+
                     Padding="8">
                     <FontIcon FontSize="14" Glyph="&#xE712;" />
                     <Button.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem
+                            <MenuFlyoutItem x:Uid="Ui_FavoritesPage_483e617f50"
                                 Click="ClearExportHistory_Click"
                                 IsEnabled="{x:Bind ViewModel.HasArchivedFavorites, Mode=OneWay}"
-                                Text="Clear export history">
+                                >
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xE7A7;" />
                                 </MenuFlyoutItem.Icon>
@@ -319,7 +319,7 @@
                                     </ScrollViewer>
                                 </Border>
 
-                                <Button
+                                <Button x:Uid="Ui_FavoritesPage_e64193c5b7"
                                     Grid.Column="1"
                                     Padding="8"
                                     VerticalAlignment="Center"
@@ -328,7 +328,7 @@
                                     Click="SettingsButton_Click"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Tag="{x:Bind}"
-                                    ToolTipService.ToolTip="Music search settings">
+                                    >
                                     <FontIcon FontSize="14" Glyph="&#xE713;" />
                                 </Button>
                             </Grid>

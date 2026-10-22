@@ -223,14 +223,14 @@ public sealed partial class StreamWatchdogService : IDisposable
     /// </summary>
     public static string DescribeBufferLevel(double level) => level switch
     {
-        0 => "Default",
-        1 => "Medium",
-        2 => "Large",
-        3 => "Extra Large",
-        _ when level < 0.5 => "Default",
-        _ when level < 1.5 => "Medium",
-        _ when level < 2.5 => "Large",
-        _ => "Extra Large"
+        0 => LocalizedText.Get("Ui_StreamWatchdogService_21b111cbfe", "Default"),
+        1 => LocalizedText.Get("Ui_StreamWatchdogService_8e588cd187", "Medium"),
+        2 => LocalizedText.Get("Ui_StreamWatchdogService_ab80540d98", "Large"),
+        3 => LocalizedText.Get("Ui_StreamWatchdogService_f44f24c71f", "Extra Large"),
+        _ when level < 0.5 => LocalizedText.Get("Ui_StreamWatchdogService_21b111cbfe", "Default"),
+        _ when level < 1.5 => LocalizedText.Get("Ui_StreamWatchdogService_8e588cd187", "Medium"),
+        _ when level < 2.5 => LocalizedText.Get("Ui_StreamWatchdogService_ab80540d98", "Large"),
+        _ => LocalizedText.Get("Ui_StreamWatchdogService_f44f24c71f", "Extra Large")
     };
 
     public StreamWatchdogService(RadioPlayerService playerService)

@@ -1,3 +1,4 @@
+using Trdo.Services;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -29,7 +30,7 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public bool ShowContactDeveloper => SelectedRating > 0 && SelectedRating <= 3;
 
     public string AppName => "Traydio";
-    public string AppDescription => "A simple, elegant internet radio player for Windows";
+    public string AppDescription => LocalizedText.Get("Ui_AboutViewModel_9a48ce922c", "A simple, elegant internet radio player for Windows");
     public string Version
     {
         get
@@ -48,7 +49,7 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public string RadioBrowserName => "Radio Browser";
     public string RadioBrowserUrl => "https://www.radio-browser.info";
     public string RadioBrowserDisplayText => "radio-browser.info";
-    public string RadioBrowserDescription => "Community-driven internet radio database with thousands of stations worldwide";
+    public string RadioBrowserDescription => LocalizedText.Get("Ui_AboutViewModel_5c23df2250", "Community-driven internet radio database with thousands of stations worldwide");
 
     public string WinUIExUrl => "https://github.com/dotMorten/WinUIEx";
     public string WinUIExDisplayText => "WinUIEx";

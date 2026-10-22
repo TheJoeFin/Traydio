@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.ComponentModel;
@@ -238,8 +238,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     /// collapsed Advanced header so the setting is discoverable without expanding.
     /// </summary>
     public string BufferSummary => _hasBufferOverride
-        ? $"Buffer: {BufferLevelDescription} (this station)"
-        : $"Buffer: {StreamWatchdogService.DescribeBufferLevel(GlobalBufferLevel)} (app setting)";
+        ? LocalizedText.Format("Ui_AddStationViewModel_6782fbe204", "Buffer: {0} (this station)", BufferLevelDescription)
+        : LocalizedText.Format("Ui_AddStationViewModel_68753a79d1", "Buffer: {0} (app setting)", StreamWatchdogService.DescribeBufferLevel(GlobalBufferLevel));
 
     /// <summary>
     /// Whether this station overrides the app-wide track info delay. When false the
@@ -290,8 +290,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     /// header so the setting is discoverable without expanding.
     /// </summary>
     public string SongPopupDelaySummary => _hasSongPopupDelayOverride
-        ? $"Track info delay: {SongPopupDelayDescription} (this station)"
-        : $"Track info delay: {SongChangeAnnouncementPolicy.DescribeDelay(GlobalSongPopupDelaySeconds)} (app setting)";
+        ? LocalizedText.Format("Ui_AddStationViewModel_a3d6447529", "Track info delay: {0} (this station)", SongPopupDelayDescription)
+        : LocalizedText.Format("Ui_AddStationViewModel_758d997b51", "Track info delay: {0} (app setting)", SongChangeAnnouncementPolicy.DescribeDelay(GlobalSongPopupDelaySeconds));
 
     public bool HasValidationError
     {

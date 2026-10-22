@@ -516,9 +516,9 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     public string PlaybackEngineModeDescription =>
         SettingsService.PlaybackEngineMode switch
         {
-            PlaybackEngineMode.NativeOnly => "Windows Media Foundation only",
-            PlaybackEngineMode.NativePreferred => "Windows first, LibVLC fallback",
-            _ => "LibVLC first, Windows fallback"
+            PlaybackEngineMode.NativeOnly => LocalizedText.Get("Ui_SettingsViewModel_3a7c5faee8", "Windows Media Foundation only"),
+            PlaybackEngineMode.NativePreferred => LocalizedText.Get("Ui_SettingsViewModel_806ed9fe76", "Windows first, LibVLC fallback"),
+            _ => LocalizedText.Get("Ui_SettingsViewModel_fca8b53a50", "LibVLC first, Windows fallback")
         };
 
     public bool AllowSleepWhilePlaying
@@ -628,7 +628,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Gets a formatted display string for the current silence timeout value.
     /// </summary>
-    public string SilenceTimeoutDisplay => $"{SilenceTimeoutSeconds:0}s";
+    public string SilenceTimeoutDisplay => LocalizedText.Format("Ui_SettingsViewModel_2054bec45c", "{0:0}s", SilenceTimeoutSeconds);
 
     private async Task InitializeStartupTaskAsync()
     {

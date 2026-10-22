@@ -149,9 +149,7 @@ public static class SongChangeAnnouncementPolicy
     {
         double clamped = ClampDwell(seconds);
 
-        return Math.Abs(clamped - Math.Round(clamped)) < 0.05
-            ? $"{Math.Round(clamped):0} second{(Math.Round(clamped) == 1 ? "" : "s")}"
-            : $"{clamped:0.0} seconds";
+        return DescribeSeconds(clamped);
     }
 
     /// <summary>
@@ -180,15 +178,20 @@ public static class SongChangeAnnouncementPolicy
         double clamped = ClampDelay(seconds);
 
         if (clamped <= 0)
-            return "No delay";
+            return LocalizedText.Get("Ui_SongChangeAnnouncementPolicy_1eef43b1b6", "No delay");
 
         // The top of the range reads better as a minute than as 60 seconds.
         if (clamped >= MaxDelaySeconds)
-            return "1 minute";
+            return LocalizedText.Get("Ui_SongChangeAnnouncementPolicy_e67b6f61f5", "1 minute");
 
         // Whole seconds read better than "5.0s" for the common preset values.
-        return Math.Abs(clamped - Math.Round(clamped)) < 0.05
-            ? $"{Math.Round(clamped):0} second{(Math.Round(clamped) == 1 ? "" : "s")}"
-            : $"{clamped:0.0} seconds";
+        return DescribeSeconds(clamped);
+    }
+
+    private static string DescribeSeconds(double seconds)
+    {
+        if (Math.Abs(seconds - Math.Round(seconds)) < 0.05)
+            return Math.Round(seconds) == 1 ? LocalizedText.Get("Ui_SongChangeAnnouncementPolicy_db3b946b8d", "1 second") : LocalizedText.Format("Ui_SongChangeAnnouncementPolicy_8c48eeb893", "{0:0} seconds", Math.Round(seconds));
+        return LocalizedText.Format("Ui_SongChangeAnnouncementPolicy_c432fca10b", "{0:0.0} seconds", seconds);
     }
 }

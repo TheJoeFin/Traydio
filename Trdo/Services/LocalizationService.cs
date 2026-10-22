@@ -24,7 +24,7 @@ public static class LocalizationService
     /// the language picker on the settings page (excluding the "System" option).
     /// i.e. also add it (in the same order) in the ComboBox in Pages\SettingsPage.xaml
     /// </summary>
-    public static string[] SupportedLanguages { get; } = ["en-US", "es-ES", "fr-FR", "zh-CN", "de-DE", "pt-BR", "pt-PT", "ar-SA", "pl-PL"];
+    public static string[] SupportedLanguages { get; } = ["en-US", "es-ES", "fr-FR", "zh-CN", "de-DE", "pt-BR", "pt-PT", "ar-SA", "pl-PL", "ru-RU"];
 
     /// <summary>
     /// All selectable options in the settings page language picker, in display order: "System"
@@ -65,6 +65,7 @@ public static class LocalizationService
                 : languageTag;
 
             ApplicationLanguages.PrimaryLanguageOverride = effectiveTag;
+            LocalizedText.SetResolver(GetString);
 
             LogService.Info("Localization",
                 string.IsNullOrEmpty(effectiveTag)

@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ex="using:WinUIEx"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Traydio Mini Player"
+
     Width="320"
     Height="220"
     IsMaximizable="False"
@@ -44,20 +44,20 @@
             PointerReleased="ContentCard_PointerReleased">
             <Grid.ContextFlyout>
                 <MenuFlyout>
-                    <ToggleMenuFlyoutItem
+                    <ToggleMenuFlyoutItem x:Uid="Ui_MiniPlayerWindow_4b851eb47c"
                         x:Name="VisualizerToggleMenuItem"
                         Click="VisualizerToggleMenuItem_Click"
                         IsChecked="True"
-                        Text="Show Visualizer" />
-                    <ToggleMenuFlyoutItem
+                         />
+                    <ToggleMenuFlyoutItem x:Uid="Ui_MiniPlayerWindow_25b01bd53e"
                         x:Name="TopmostToggleMenuItem"
                         Click="TopmostToggleMenuItem_Click"
                         IsChecked="True"
-                        Text="Always on Top" />
-                    <ToggleMenuFlyoutItem
+                         />
+                    <ToggleMenuFlyoutItem x:Uid="Ui_MiniPlayerWindow_6a0a9f4059"
                         x:Name="HideTitleBarToggleMenuItem"
                         Click="HideTitleBarToggleMenuItem_Click"
-                        Text="Hide Title Bar" />
+                         />
                 </MenuFlyout>
             </Grid.ContextFlyout>
             <Border
