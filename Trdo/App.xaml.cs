@@ -58,7 +58,7 @@ public partial class App : Application
     /// therefore has to ask "has this track been shown?", not "is this track new?".
     /// </summary>
     private string? _lastAnnouncedDisplayText;
-    private readonly PlayerViewModel _playerVm = PlayerViewModel.Shared;
+    private readonly PlayerViewModel _playerVm;
     private readonly UISettings _uiSettings = new();
     private Mutex? _singleInstanceMutex;
     private EventWaitHandle? _trayIconRestoreEvent;
@@ -94,6 +94,8 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
+        // Build saved grouped views only after the resource resolver is ready.
+        _playerVm = PlayerViewModel.Shared;
         SettingsService.MigrateTrayClickActions();
         InitializeComponent();
         _playerVm.PropertyChanged += PlayerVmOnPropertyChanged;
