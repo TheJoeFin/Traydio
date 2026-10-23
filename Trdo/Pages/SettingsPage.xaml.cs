@@ -120,12 +120,12 @@ public sealed partial class SettingsPage : Page
             if (count > 0)
             {
                 ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = $"Imported {count} station{(count == 1 ? "" : "s")}.";
+                ImportExportInfoBar.Message = LocalizedText.Format("Ui_SettingsPage_xaml_a0030fbcf8", "Imported stations: {0}.", count);
             }
             else
             {
                 ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "No stations were imported.";
+                ImportExportInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_1bc4de1242", "No stations were imported.");
             }
 
             ImportExportInfoBar.IsOpen = true;
@@ -149,12 +149,12 @@ public sealed partial class SettingsPage : Page
             if (exported)
             {
                 ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = "Stations exported successfully.";
+                ImportExportInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_e8a4faf205", "Stations exported successfully.");
             }
             else
             {
                 ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "Export cancelled or no stations to export.";
+                ImportExportInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_56d7566dc6", "Export cancelled or no stations to export.");
             }
 
             ImportExportInfoBar.IsOpen = true;
@@ -176,7 +176,7 @@ public sealed partial class SettingsPage : Page
             if (string.IsNullOrEmpty(folder) || !System.IO.Directory.Exists(folder))
             {
                 DiagnosticsInfoBar.Severity = InfoBarSeverity.Informational;
-                DiagnosticsInfoBar.Message = "No logs have been written yet.";
+                DiagnosticsInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_b1140110b6", "No logs have been written yet.");
                 DiagnosticsInfoBar.IsOpen = true;
                 return;
             }
@@ -185,7 +185,7 @@ public sealed partial class SettingsPage : Page
             if (launched)
             {
                 DiagnosticsInfoBar.Severity = InfoBarSeverity.Success;
-                DiagnosticsInfoBar.Message = "Opened the logs folder.";
+                DiagnosticsInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_9fa6ebd966", "Opened the logs folder.");
             }
             else
             {
@@ -224,8 +224,8 @@ public sealed partial class SettingsPage : Page
 
             EngineMemoryInfoBar.Severity = InfoBarSeverity.Success;
             EngineMemoryInfoBar.Message = removed == 0
-                ? "There were no remembered engines to reset."
-                : $"Forgot the remembered engine for {removed} station{(removed == 1 ? string.Empty : "s")}.";
+                ? LocalizedText.Get("Ui_SettingsPage_xaml_eb1ba74d5e", "There were no remembered engines to reset.")
+                : LocalizedText.Format("Ui_SettingsPage_xaml_bc5fb9326a", "Reset the saved playback engine for {0} station(s).", removed);
         }
         catch (Exception ex)
         {
@@ -249,7 +249,7 @@ public sealed partial class SettingsPage : Page
             Clipboard.SetContent(package);
 
             DiagnosticsInfoBar.Severity = InfoBarSeverity.Success;
-            DiagnosticsInfoBar.Message = "Copied recent diagnostics to the clipboard.";
+            DiagnosticsInfoBar.Message = LocalizedText.Get("Ui_SettingsPage_xaml_0a218e3ba5", "Copied recent diagnostics to the clipboard.");
             DiagnosticsInfoBar.IsOpen = true;
         }
         catch (Exception ex)

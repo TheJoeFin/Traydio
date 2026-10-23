@@ -54,9 +54,9 @@
                 <StackPanel Spacing="4">
                     <TextBlock x:Uid="AddWhiteNoise_VolumeLabel" FontWeight="SemiBold" />
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                        <Slider
+                        <Slider x:Uid="Ui_AddWhiteNoise_b10fb966d7"
                             Grid.Column="0"
-                            AutomationProperties.Name="Volume"
+
                             Maximum="200"
                             Minimum="0"
                             StepFrequency="1"

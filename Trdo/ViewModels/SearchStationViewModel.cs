@@ -81,7 +81,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     public IReadOnlyList<CodecOption> Codecs { get; } =
     [
-        new("Any codec", string.Empty),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_30fb688956", "Any codec"), string.Empty),
         new("MP3", "MP3"),
         new("AAC", "AAC"),
         new("AAC+", "AAC+"),
@@ -91,20 +91,20 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     public IReadOnlyList<BitrateOption> Bitrates { get; } =
     [
-        new("Any bitrate", 0),
-        new("64 kbps+", 64),
-        new("128 kbps+", 128),
-        new("192 kbps+", 192),
-        new("256 kbps+", 256),
-        new("320 kbps+", 320),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_ad7098d679", "Any bitrate"), 0),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_1d74528823", "64 kbps+"), 64),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_8c36825952", "128 kbps+"), 128),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_085a07bf8e", "192 kbps+"), 192),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_b37b0bde4c", "256 kbps+"), 256),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_f0790b9846", "320 kbps+"), 320),
     ];
 
     public IReadOnlyList<SortOption> SortOptions { get; } =
     [
-        new("Most voted", "votes", true),
-        new("Most popular", "clickcount", true),
-        new("Name (A–Z)", "name", false),
-        new("Random", "random", false),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_e5a1fae87d", "Most voted"), "votes", true),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_ad2ea94850", "Most popular"), "clickcount", true),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_4e2d9e7be4", "Name (A–Z)"), "name", false),
+        new(LocalizedText.Get("Ui_SearchStationViewModel_67bc484430", "Random"), "random", false),
     ];
 
     // Search box and status ---------------------------------------------
@@ -436,16 +436,16 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         }
 
         if (!string.IsNullOrEmpty(SelectedCodec?.Value))
-            FilterChips.Add(new QualityFilterChip(QualityChipKind.Codec, $"Codec: {SelectedCodec!.Display}"));
+            FilterChips.Add(new QualityFilterChip(QualityChipKind.Codec, LocalizedText.Format("Ui_SearchStationViewModel_0c4d21bd30", "Codec: {0}", SelectedCodec!.Display)));
 
         if ((SelectedBitrate?.Value ?? 0) > 0)
-            FilterChips.Add(new QualityFilterChip(QualityChipKind.Bitrate, $"Bitrate: {SelectedBitrate!.Display}"));
+            FilterChips.Add(new QualityFilterChip(QualityChipKind.Bitrate, LocalizedText.Format("Ui_SearchStationViewModel_c18962622a", "Bitrate: {0}", SelectedBitrate!.Display)));
 
         if (!Equals(SelectedSort, SortOptions[0]))
-            FilterChips.Add(new QualityFilterChip(QualityChipKind.Sort, $"Sort: {SelectedSort.Display}"));
+            FilterChips.Add(new QualityFilterChip(QualityChipKind.Sort, LocalizedText.Format("Ui_SearchStationViewModel_4d9eaf057a", "Sort: {0}", SelectedSort.Display)));
 
         if (HideBroken)
-            FilterChips.Add(new QualityFilterChip(QualityChipKind.HideBroken, "Hide broken stations"));
+            FilterChips.Add(new QualityFilterChip(QualityChipKind.HideBroken, LocalizedText.Get("Ui_SearchStationViewModel_49803a994d", "Hide broken stations")));
     }
 
     private async Task PerformSearchAsync()
@@ -505,14 +505,14 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             Debug.WriteLine($"[SearchStationViewModel] Network error: {ex.Message}");
             HasError = true;
             ErrorMessage = ex.StatusCode.HasValue
-                ? $"Server error ({(int)ex.StatusCode}): The radio station service is temporarily unavailable. Please try again later."
-                : "Network error: Unable to reach the radio station service. Please check your internet connection.";
+                ? LocalizedText.Format("Ui_SearchStationViewModel_3c5849e57a", "Server error ({0}): The radio station service is temporarily unavailable. Please try again later.", (int)ex.StatusCode)
+                : LocalizedText.Get("Ui_SearchStationViewModel_5b669f84ab", "Network error: Unable to reach the radio station service. Please check your internet connection.");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[SearchStationViewModel] Search error: {ex.Message}");
             HasError = true;
-            ErrorMessage = $"An error occurred while searching: {ex.Message}";
+            ErrorMessage = LocalizedText.Format("Ui_SearchStationViewModel_df927f60b9", "An error occurred while searching: {0}", ex.Message);
         }
         finally
         {

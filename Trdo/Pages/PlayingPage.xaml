@@ -317,7 +317,7 @@
         Background="Transparent" so empty stretches of the grid (the Stations header, the
         space left when the volume slider is hidden) are hit-testable - a Grid with no
         background lets pointer input fall through it instead of reaching ContextFlyout below.
-        
+
         Row spacing is applied per-row via Margin rather than Grid.RowSpacing: RowSpacing adds
         its gap on both sides of a row even when that row's content is Collapsed, which is what
         left a phantom gap above the playback buttons whenever the volume slider was hidden.
@@ -595,7 +595,7 @@
         </Grid>
 
         <!--  Now Playing Info  -->
-        <Button
+        <Button x:Uid="Ui_PlayingPage_32947c4832"
             x:Name="NowPlayingButton"
             Grid.Row="4"
             Margin="0,12,0,0"
@@ -609,7 +609,7 @@
             BorderThickness="0"
             Click="NowPlayingInfo_Click"
             CornerRadius="4"
-            ToolTipService.ToolTip="Click for details"
+
             Visibility="{x:Bind ViewModel.HasNowPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid VerticalAlignment="Center" ColumnSpacing="6">
                 <Grid.ColumnDefinitions>
@@ -664,14 +664,14 @@
                         TextWrapping="NoWrap" />
                 </Grid>
                 <!--  Favorite Button  -->
-                <Button
+                <Button x:Uid="Ui_PlayingPage_c3dd5f530f"
                     x:Name="FavoriteButton"
                     Grid.Column="2"
                     VerticalAlignment="Center"
                     Background="Transparent"
                     BorderThickness="0"
                     Click="FavoriteButton_Click"
-                    ToolTipService.ToolTip="Favorite Song">
+                    >
                     <FontIcon
                         x:Name="FavoriteIcon"
                         FontSize="14"

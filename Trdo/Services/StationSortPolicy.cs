@@ -55,12 +55,12 @@ public static class StationSortPolicy
     /// <summary>The mode's name, as shown in the sort menu.</summary>
     public static string DisplayName(StationSortMode mode) => mode switch
     {
-        StationSortMode.Manual => "Manual",
-        StationSortMode.Name => "Name",
-        StationSortMode.Genre => "Genre",
-        StationSortMode.Country => "Country",
-        StationSortMode.RecentlyAdded => "Recently added",
-        _ => "Manual"
+        StationSortMode.Manual => LocalizedText.Get("Ui_StationSortPolicy_b0b9fe24ff", "Manual"),
+        StationSortMode.Name => LocalizedText.Get("Ui_StationSortPolicy_dcd1d5223f", "Name"),
+        StationSortMode.Genre => LocalizedText.Get("Ui_StationSortPolicy_6da795a866", "Genre"),
+        StationSortMode.Country => LocalizedText.Get("Ui_StationSortPolicy_701d021d08", "Country"),
+        StationSortMode.RecentlyAdded => LocalizedText.Get("Ui_StationSortPolicy_96ec5d338a", "Recently added"),
+        _ => LocalizedText.Get("Ui_StationSortPolicy_b0b9fe24ff", "Manual")
     };
 
     /// <summary>
@@ -71,7 +71,7 @@ public static class StationSortPolicy
     public static string HintText(StationSortMode mode) =>
         mode == StationSortMode.Manual
             ? string.Empty
-            : $"Sorted by {DisplayName(mode)} · groups hidden · reordering off";
+            : LocalizedText.Format("Ui_StationSortPolicy_724ef7b174", "Sorted by {0} · groups hidden · reordering off", DisplayName(mode));
 
     /// <summary>
     /// Sorts on a key that is often missing, keeping stations without one at the end. A

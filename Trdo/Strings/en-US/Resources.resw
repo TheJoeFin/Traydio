@@ -960,4 +960,541 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>Welcome to Traydio!</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="Ui_AddLocalMusicWindow_b10fb966d7.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="Ui_ManualStationWindow_25007918d8.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Station volume</value>
+  </data>
+  <data name="Ui_ManualStationWindow_8cd98d3873.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Station buffer level</value>
+  </data>
+  <data name="Ui_ManualStationWindow_7a2aa4f240.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Station track info delay in seconds</value>
+  </data>
+  <data name="Ui_ManualStationWindow_19766ed6cc.Text" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ui_ManualStationWindow_1509f561f2.Text" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Ui_MiniPlayerWindow_021543a6dc.Title" xml:space="preserve">
+    <value>Traydio Mini Player</value>
+  </data>
+  <data name="Ui_MiniPlayerWindow_4b851eb47c.Text" xml:space="preserve">
+    <value>Show Visualizer</value>
+  </data>
+  <data name="Ui_MiniPlayerWindow_25b01bd53e.Text" xml:space="preserve">
+    <value>Always on Top</value>
+  </data>
+  <data name="Ui_MiniPlayerWindow_6a0a9f4059.Text" xml:space="preserve">
+    <value>Hide Title Bar</value>
+  </data>
+  <data name="Ui_AddWhiteNoise_b10fb966d7.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More favorites options</value>
+  </data>
+  <data name="Ui_FavoritesPage_483e617f50.Text" xml:space="preserve">
+    <value>Clear export history</value>
+  </data>
+  <data name="Ui_FavoritesPage_e64193c5b7.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Music search settings</value>
+  </data>
+  <data name="Ui_NowPlayingPage_c3dd5f530f.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorite Song</value>
+  </data>
+  <data name="Ui_PlayingPage_32947c4832.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Click for details</value>
+  </data>
+  <data name="Ui_PlayingPage_c3dd5f530f.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorite Song</value>
+  </data>
+  <data name="Ui_SearchStation_0d59973b75.Text" xml:space="preserve">
+    <value>Search Radio Stations</value>
+  </data>
+  <data name="Ui_SearchStation_0a43892b83.PlaceholderText" xml:space="preserve">
+    <value>Search by name, or use filters...</value>
+  </data>
+  <data name="Ui_SearchStation_6ce20e12be.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Ui_SearchStation_6ce20e12be.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Ui_SearchStation_7b7141ee71.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove this filter</value>
+  </data>
+  <data name="Ui_SearchStation_e166cad7cc.Title" xml:space="preserve">
+    <value>Search Error</value>
+  </data>
+  <data name="Ui_SearchStation_27e3ff4e80.PlaceholderText" xml:space="preserve">
+    <value>Country, language or genre...</value>
+  </data>
+  <data name="Ui_SearchStation_27e3ff4e80.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find a country, language or genre</value>
+  </data>
+  <data name="Ui_SearchStation_f1a0f5218b.Text" xml:space="preserve">
+    <value>No country, language or genre matches that.</value>
+  </data>
+  <data name="Ui_SearchStation_16b53a0166.Text" xml:space="preserve">
+    <value>Quality and order</value>
+  </data>
+  <data name="Ui_SearchStation_e184853401.Text" xml:space="preserve">
+    <value>Codec</value>
+  </data>
+  <data name="Ui_SearchStation_425f6c95eb.Text" xml:space="preserve">
+    <value>Minimum bitrate</value>
+  </data>
+  <data name="Ui_SearchStation_c9129025bd.Text" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="Ui_SearchStation_49803a994d.Content" xml:space="preserve">
+    <value>Hide broken stations</value>
+  </data>
+  <data name="Ui_SearchStation_29a390f923.Content" xml:space="preserve">
+    <value>Clear all</value>
+  </data>
+  <data name="Ui_SearchStation_90efa191f9.Content" xml:space="preserve">
+    <value>Show results</value>
+  </data>
+  <data name="Ui_SearchStation_543e6b8f2d.Text" xml:space="preserve">
+    <value>Enter a search term to find stations...</value>
+  </data>
+  <data name="Ui_SearchStation_a68bac2362.Content" xml:space="preserve">
+    <value>Or add station manually</value>
+  </data>
+  <data name="Ui_SearchStation_c67b02d213.Text" xml:space="preserve">
+    <value>Add white noise...</value>
+  </data>
+  <data name="Ui_SearchStation_f021567e78.Text" xml:space="preserve">
+    <value>Add local music...</value>
+  </data>
+  <data name="Ui_SearchStation_a7f1d355fe.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Preview station</value>
+  </data>
+  <data name="Ui_SearchStation_7fcab14c41.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit station details before adding</value>
+  </data>
+  <data name="Ui_SearchStation_1af36b7a7a.Content" xml:space="preserve">
+    <value>Add Station</value>
+  </data>
+  <data name="Ui_SearchStation_19766ed6cc.Text" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ui_AboutViewModel_9a48ce922c" xml:space="preserve">
+    <value>A simple, elegant internet radio player for Windows</value>
+  </data>
+  <data name="Ui_AboutViewModel_5c23df2250" xml:space="preserve">
+    <value>Community-driven internet radio database with thousands of stations worldwide</value>
+  </data>
+  <data name="Ui_PlayerViewModel_abdae1e25b" xml:space="preserve">
+    <value>No station selected</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_30fb688956" xml:space="preserve">
+    <value>Any codec</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_ad7098d679" xml:space="preserve">
+    <value>Any bitrate</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_1d74528823" xml:space="preserve">
+    <value>64 kbps+</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_8c36825952" xml:space="preserve">
+    <value>128 kbps+</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_085a07bf8e" xml:space="preserve">
+    <value>192 kbps+</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_b37b0bde4c" xml:space="preserve">
+    <value>256 kbps+</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_f0790b9846" xml:space="preserve">
+    <value>320 kbps+</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_e5a1fae87d" xml:space="preserve">
+    <value>Most voted</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_ad2ea94850" xml:space="preserve">
+    <value>Most popular</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_4e2d9e7be4" xml:space="preserve">
+    <value>Name (A–Z)</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_67bc484430" xml:space="preserve">
+    <value>Random</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_49803a994d" xml:space="preserve">
+    <value>Hide broken stations</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_5b669f84ab" xml:space="preserve">
+    <value>Network error: Unable to reach the radio station service. Please check your internet connection.</value>
+  </data>
+  <data name="Ui_SettingsViewModel_3a7c5faee8" xml:space="preserve">
+    <value>Windows Media Foundation only</value>
+  </data>
+  <data name="Ui_SettingsViewModel_806ed9fe76" xml:space="preserve">
+    <value>Windows first, LibVLC fallback</value>
+  </data>
+  <data name="Ui_SettingsViewModel_fca8b53a50" xml:space="preserve">
+    <value>LibVLC first, Windows fallback</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_1bc4de1242" xml:space="preserve">
+    <value>No stations were imported.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_e8a4faf205" xml:space="preserve">
+    <value>Stations exported successfully.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_56d7566dc6" xml:space="preserve">
+    <value>Export cancelled or no stations to export.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_b1140110b6" xml:space="preserve">
+    <value>No logs have been written yet.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_9fa6ebd966" xml:space="preserve">
+    <value>Opened the logs folder.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_eb1ba74d5e" xml:space="preserve">
+    <value>There were no remembered engines to reset.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_0a218e3ba5" xml:space="preserve">
+    <value>Copied recent diagnostics to the clipboard.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_1af36b7a7a" xml:space="preserve">
+    <value>Add Station</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_9f25960d03" xml:space="preserve">
+    <value>Add station functionality coming soon!</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_565339bc4d" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_c647094d1f" xml:space="preserve">
+    <value>Unknown Station</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_6e2533c696" xml:space="preserve">
+    <value>No match found</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_752a0b5637" xml:space="preserve">
+    <value>Couldn't reach radio-browser.info</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_481859b689" xml:space="preserve">
+    <value>Check your connection and try again.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_e4165fbc15" xml:space="preserve">
+    <value>Also refresh stations that already have details</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_80c57b462f" xml:space="preserve">
+    <value>All your stations already have details. You can look them up again to pick up any changes.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_ef217997dc" xml:space="preserve">
+    <value>One station has no genre or country saved.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_83d5a5c8a2" xml:space="preserve">
+    <value>Look up station details</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_504101bcda" xml:space="preserve">
+    <value>Look up</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_19766ed6cc" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_76b8149773" xml:space="preserve">
+    <value>Nothing to look up</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_487baa8de3" xml:space="preserve">
+    <value>Every station has been checked recently. Try again in a few days.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_bbe5fc3b9e" xml:space="preserve">
+    <value>Starting…</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_82674944d2" xml:space="preserve">
+    <value>Looking up station details</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_47e1712839" xml:space="preserve">
+    <value>Finishing…</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_f6f0555baf" xml:space="preserve">
+    <value>Station details</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_fa60cc32aa" xml:space="preserve">
+    <value>Stopped early because radio-browser.info stopped responding.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_2bc9760eb3" xml:space="preserve">
+    <value>Stopped at your request. What was found so far has been saved.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_df796c655f" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_762ebb70ef" xml:space="preserve">
+    <value>Group name</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_7df60cafd5" xml:space="preserve">
+    <value>Label (optional)</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_0d3df1d942" xml:space="preserve">
+    <value>The station in this group will be removed as well. This cannot be undone.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_e2d0a54968" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_fd3032d65f" xml:space="preserve">
+    <value>Nothing to export</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_d7ce2eb1ae" xml:space="preserve">
+    <value>Favorite some songs first.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_bbb8178cea" xml:space="preserve">
+    <value>Export all favorites</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_ac91f43d6e" xml:space="preserve">
+    <value>Archive exported tracks</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_ed7378da02" xml:space="preserve">
+    <value>CSV works with playlist transfer services like Soundiiz or TuneMyMusic. </value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_e6c5d7bf20" xml:space="preserve">
+    <value>XSPF is a playlist file for players such as VLC. Pick the format when you save.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_dd3a540aaa" xml:space="preserve">
+    <value>Archived tracks stay in your favorites but are skipped by later exports.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_45655891f7" xml:space="preserve">
+    <value>Export favorites</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_3664895579" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_19766ed6cc" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_e3544aef93" xml:space="preserve">
+    <value>Nothing new to export</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_157b5987d2" xml:space="preserve">
+    <value>Every favorite has already been exported. Turn on "Export all favorites" or clear the export history.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_81f3f0a234" xml:space="preserve">
+    <value>Export complete</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_31ea8e04f8" xml:space="preserve">
+    <value>Export history cleared</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_1e55749b3e" xml:space="preserve">
+    <value>Track info delay</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_16a1d60039" xml:space="preserve">
+    <value>Turn off song popups</value>
+  </data>
+  <data name="Ui_StationFilterOption_701d021d08" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Ui_StationFilterOption_a4fe65264e" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Ui_StationFilterOption_6da795a866" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="Ui_StationFilterOption_85993e22a3" xml:space="preserve">
+    <value>1 station</value>
+  </data>
+  <data name="Ui_StationSortPolicy_b0b9fe24ff" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Ui_StationSortPolicy_dcd1d5223f" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Ui_StationSortPolicy_6da795a866" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="Ui_StationSortPolicy_701d021d08" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Ui_StationSortPolicy_96ec5d338a" xml:space="preserve">
+    <value>Recently added</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_baf5037fe9" xml:space="preserve">
+    <value>No genre</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_b702854184" xml:space="preserve">
+    <value>No country</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_b0b9fe24ff" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_6da795a866" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_701d021d08" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Ui_StreamWatchdogService_21b111cbfe" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Ui_StreamWatchdogService_8e588cd187" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Ui_StreamWatchdogService_ab80540d98" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="Ui_StreamWatchdogService_f44f24c71f" xml:space="preserve">
+    <value>Extra Large</value>
+  </data>
+  <data name="Ui_AddStationViewModel_6782fbe204" xml:space="preserve">
+    <value>Buffer: {0} (this station)</value>
+  </data>
+  <data name="Ui_AddStationViewModel_68753a79d1" xml:space="preserve">
+    <value>Buffer: {0} (app setting)</value>
+  </data>
+  <data name="Ui_AddStationViewModel_a3d6447529" xml:space="preserve">
+    <value>Track info delay: {0} (this station)</value>
+  </data>
+  <data name="Ui_AddStationViewModel_758d997b51" xml:space="preserve">
+    <value>Track info delay: {0} (app setting)</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_0c4d21bd30" xml:space="preserve">
+    <value>Codec: {0}</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_c18962622a" xml:space="preserve">
+    <value>Bitrate: {0}</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_4d9eaf057a" xml:space="preserve">
+    <value>Sort: {0}</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_3c5849e57a" xml:space="preserve">
+    <value>Server error ({0}): The radio station service is temporarily unavailable. Please try again later.</value>
+  </data>
+  <data name="Ui_SearchStationViewModel_df927f60b9" xml:space="preserve">
+    <value>An error occurred while searching: {0}</value>
+  </data>
+  <data name="Ui_SettingsViewModel_2054bec45c" xml:space="preserve">
+    <value>{0:0}s</value>
+  </data>
+  <data name="Ui_PlayerViewModel_7f5ea98385" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_a0030fbcf8" xml:space="preserve">
+    <value>Imported stations: {0}.</value>
+  </data>
+  <data name="Ui_SettingsPage_xaml_bc5fb9326a" xml:space="preserve">
+    <value>Reset the saved playback engine for {0} station(s).</value>
+  </data>
+  <data name="Ui_StationFilterOption_d088bdf306" xml:space="preserve">
+    <value>{0:N0} stations</value>
+  </data>
+  <data name="Ui_FavoriteTrack_73edcbce18" xml:space="preserve">
+    <value>Exported on {0:MMM d, yyyy h:mm tt}</value>
+  </data>
+  <data name="Ui_StationSortPolicy_724ef7b174" xml:space="preserve">
+    <value>Sorted by {0} · groups hidden · reordering off</value>
+  </data>
+  <data name="Ui_StationGroupingPolicy_237cb6f050" xml:space="preserve">
+    <value>Grouped by {0} · reordering off</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_38baf87674" xml:space="preserve">
+    <value>Now playing: {0}</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_f51a37acea" xml:space="preserve">
+    <value>Track info delay for {0}</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_5733d6a9e0" xml:space="preserve">
+    <value>Use app setting ({0})</value>
+  </data>
+  <data name="Ui_SongChangePopupWindow_xaml_a133d8ce0e" xml:space="preserve">
+    <value>Currently {0} (no station selected)</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_6405b9ceb1" xml:space="preserve">
+    <value>New only ({0} of {1})</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_3892c42005" xml:space="preserve">
+    <value>All favorites ({0})</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_2838dcc9ce" xml:space="preserve">
+    <value>Exported tracks: {0}. File: {1}.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_a924cdf246" xml:space="preserve">
+    <value> {0} archived and will be skipped next time.</value>
+  </data>
+  <data name="Ui_FavoritesPage_xaml_7ce23338b0" xml:space="preserve">
+    <value>Tracks included in the next export: {0}.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_ef16246b22" xml:space="preserve">
+    <value>radio-browser.info has no entry for this station's stream address, so there are no details to add.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_38a186bb32" xml:space="preserve">
+    <value>Updated {0}</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_87a03de24f" xml:space="preserve">
+    <value>{0} stations have no genre or country saved.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_729769e985" xml:space="preserve">
+    <value>{0} Traydio will ask radio-browser.info about them. Only each station's stream address is sent.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_a79ceaf330" xml:space="preserve">
+    <value>{0} of {1} · {2}</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_010b6d3033" xml:space="preserve">
+    <value>Updated {0} of {1} stations.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_c5a5d8fdb3" xml:space="preserve">
+    <value>{0} had no entry on radio-browser.info.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_ca0fcf0394" xml:space="preserve">
+    <value>{0} matched more than one entry; the closest was used.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_aba2861011" xml:space="preserve">
+    <value>{0} were left for next time to keep the request count reasonable.</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_d720be14fd" xml:space="preserve">
+    <value>Delete "{0}"?</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_8e57a5cea5" xml:space="preserve">
+    <value>All {0} stations in this group will be removed as well. This cannot be undone.</value>
+  </data>
+  <data name="Ui_SongChangeAnnouncementPolicy_1eef43b1b6" xml:space="preserve">
+    <value>No delay</value>
+  </data>
+  <data name="Ui_SongChangeAnnouncementPolicy_e67b6f61f5" xml:space="preserve">
+    <value>1 minute</value>
+  </data>
+  <data name="Ui_SongChangeAnnouncementPolicy_db3b946b8d" xml:space="preserve">
+    <value>1 second</value>
+  </data>
+  <data name="Ui_SongChangeAnnouncementPolicy_8c48eeb893" xml:space="preserve">
+    <value>{0:0} seconds</value>
+  </data>
+  <data name="Ui_SongChangeAnnouncementPolicy_c432fca10b" xml:space="preserve">
+    <value>{0:0.0} seconds</value>
+  </data>
+  <data name="Ui_PlayingPage_xaml_e5dea42d9c" xml:space="preserve">
+    <value>(None)</value>
+  </data>
+  <data name="Ui_PlayerViewModel_5bc0aa08d6" xml:space="preserve">
+    <value>Remove favorite</value>
+  </data>
+  <data name="Ui_PlayerViewModel_ee96487389" xml:space="preserve">
+    <value>Favorite track</value>
+  </data>
+  <data name="Ui_PlayerViewModel_df796c655f" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="Ui_PlayerViewModel_c647094d1f" xml:space="preserve">
+    <value>Unknown Station</value>
+  </data>
+  <data name="Ui_PlayerViewModel_b764cdc0ea" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Ui_StationMetadataBackfillService_af714df177" xml:space="preserve">
+    <value>No extra details were available.</value>
+  </data>
+  <data name="Ui_StationMetadataBackfillService_8d05b3d678" xml:space="preserve">
+    <value>{0} kbps {1}</value>
+  </data>
+  <data name="Ui_StationMetadataBackfillService_b6b26412c5" xml:space="preserve">
+    <value>{0} kbps</value>
+  </data>
 </root>

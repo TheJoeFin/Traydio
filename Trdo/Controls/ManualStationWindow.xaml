@@ -121,9 +121,9 @@
                                 Style="{StaticResource CaptionTextBlockStyle}"
                                 TextWrapping="Wrap" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                <Slider
+                                <Slider x:Uid="Ui_ManualStationWindow_25007918d8"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station volume"
+
                                     Maximum="200"
                                     Minimum="0"
                                     StepFrequency="1"
@@ -149,9 +149,9 @@
                                 Margin="0,4,0,0"
                                 IsOn="{x:Bind ViewModel.HasBufferOverride, Mode=TwoWay}" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                <Slider
+                                <Slider x:Uid="Ui_ManualStationWindow_8cd98d3873"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station buffer level"
+
                                     IsEnabled="{x:Bind ViewModel.HasBufferOverride, Mode=OneWay}"
                                     Maximum="3"
                                     Minimum="0"
@@ -179,9 +179,9 @@
                                 Margin="0,4,0,0"
                                 IsOn="{x:Bind ViewModel.HasSongPopupDelayOverride, Mode=TwoWay}" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                <Slider
+                                <Slider x:Uid="Ui_ManualStationWindow_7a2aa4f240"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station track info delay in seconds"
+
                                     IsEnabled="{x:Bind ViewModel.HasSongPopupDelayOverride, Mode=OneWay}"
                                     Maximum="{x:Bind ViewModel.MaxSongPopupDelaySeconds}"
                                     Minimum="0"
@@ -221,7 +221,7 @@
                     Click="CancelButton_Click">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="16" Glyph="&#xE711;" />
-                        <TextBlock Text="Cancel" />
+                        <TextBlock x:Uid="Ui_ManualStationWindow_19766ed6cc"  />
                     </StackPanel>
                 </Button>
 
@@ -233,7 +233,7 @@
                     Style="{StaticResource AccentButtonStyle}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="16" Glyph="&#xE74E;" />
-                        <TextBlock Text="Save" />
+                        <TextBlock x:Uid="Ui_ManualStationWindow_1509f561f2"  />
                     </StackPanel>
                 </Button>
             </Grid>

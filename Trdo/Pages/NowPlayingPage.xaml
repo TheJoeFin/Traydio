@@ -339,7 +339,7 @@
                             </StackPanel>
 
                             <!--  Favorite Toggle Button  -->
-                            <Button
+                            <Button x:Uid="Ui_NowPlayingPage_c3dd5f530f"
                                 Grid.Column="2"
                                 Padding="6"
                                 VerticalAlignment="Center"
@@ -347,7 +347,7 @@
                                 BorderThickness="0"
                                 Click="FavoriteHistoryItem_Click"
                                 Tag="{x:Bind}"
-                                ToolTipService.ToolTip="Favorite Song">
+                                >
                                 <FontIcon
                                     FontSize="14"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"

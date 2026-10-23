@@ -65,7 +65,7 @@ public sealed partial class FavoritesPage : Page
     {
         if (ViewModel.Favorites.Count == 0)
         {
-            ShowInfo(InfoBarSeverity.Informational, "Nothing to export", "Favorite some songs first.");
+            ShowInfo(InfoBarSeverity.Informational, LocalizedText.Get("Ui_FavoritesPage_xaml_fd3032d65f", "Nothing to export"), LocalizedText.Get("Ui_FavoritesPage_xaml_d7ce2eb1ae", "Favorite some songs first."));
             return;
         }
 
@@ -74,31 +74,31 @@ public sealed partial class FavoritesPage : Page
 
         ToggleSwitch exportAllToggle = new()
         {
-            Header = "Export all favorites",
-            OffContent = $"New only ({unarchived} of {total})",
-            OnContent = $"All favorites ({total})",
+            Header = LocalizedText.Get("Ui_FavoritesPage_xaml_bbb8178cea", "Export all favorites"),
+            OffContent = LocalizedText.Format("Ui_FavoritesPage_xaml_6405b9ceb1", "New only ({0} of {1})", unarchived, total),
+            OnContent = LocalizedText.Format("Ui_FavoritesPage_xaml_3892c42005", "All favorites ({0})", total),
             // Nothing new to send means the only useful export is a full one.
             IsOn = unarchived == 0,
         };
 
         CheckBox archiveCheckBox = new()
         {
-            Content = "Archive exported tracks",
+            Content = LocalizedText.Get("Ui_FavoritesPage_xaml_ac91f43d6e", "Archive exported tracks"),
             IsChecked = true,
         };
 
         StackPanel content = new() { Spacing = 12 };
         content.Children.Add(new TextBlock
         {
-            Text = "CSV works with playlist transfer services like Soundiiz or TuneMyMusic. "
-                 + "XSPF is a playlist file for players such as VLC. Pick the format when you save.",
+            Text = LocalizedText.Get("Ui_FavoritesPage_xaml_ed7378da02", "CSV works with playlist transfer services like Soundiiz or TuneMyMusic. ")
+                 + LocalizedText.Get("Ui_FavoritesPage_xaml_e6c5d7bf20", "XSPF is a playlist file for players such as VLC. Pick the format when you save."),
             TextWrapping = TextWrapping.Wrap,
         });
         content.Children.Add(exportAllToggle);
         content.Children.Add(archiveCheckBox);
         content.Children.Add(new TextBlock
         {
-            Text = "Archived tracks stay in your favorites but are skipped by later exports.",
+            Text = LocalizedText.Get("Ui_FavoritesPage_xaml_dd3a540aaa", "Archived tracks stay in your favorites but are skipped by later exports."),
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
             Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorTertiaryBrush"],
@@ -107,10 +107,10 @@ public sealed partial class FavoritesPage : Page
         ContentDialog dialog = new()
         {
             XamlRoot = XamlRoot,
-            Title = "Export favorites",
+            Title = LocalizedText.Get("Ui_FavoritesPage_xaml_45655891f7", "Export favorites"),
             Content = content,
-            PrimaryButtonText = "Export",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = LocalizedText.Get("Ui_FavoritesPage_xaml_3664895579", "Export"),
+            CloseButtonText = LocalizedText.Get("Ui_FavoritesPage_xaml_19766ed6cc", "Cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -122,8 +122,8 @@ public sealed partial class FavoritesPage : Page
 
         if (!exportAll && unarchived == 0)
         {
-            ShowInfo(InfoBarSeverity.Informational, "Nothing new to export",
-                "Every favorite has already been exported. Turn on \"Export all favorites\" or clear the export history.");
+            ShowInfo(InfoBarSeverity.Informational, LocalizedText.Get("Ui_FavoritesPage_xaml_e3544aef93", "Nothing new to export"),
+                LocalizedText.Get("Ui_FavoritesPage_xaml_157b5987d2", "Every favorite has already been exported. Turn on \"Export all favorites\" or clear the export history."));
             return;
         }
 
@@ -134,11 +134,11 @@ public sealed partial class FavoritesPage : Page
             if (!result.Succeeded)
                 return;
 
-            string message = $"Exported {result.ExportedCount} track{(result.ExportedCount == 1 ? "" : "s")} to {result.FileName}.";
+            string message = LocalizedText.Format("Ui_FavoritesPage_xaml_2838dcc9ce", "Exported tracks: {0}. File: {1}.", result.ExportedCount, result.FileName);
             if (result.ArchivedCount > 0)
-                message += $" {result.ArchivedCount} archived and will be skipped next time.";
+                message += LocalizedText.Format("Ui_FavoritesPage_xaml_a924cdf246", " {0} archived and will be skipped next time.", result.ArchivedCount);
 
-            ShowInfo(InfoBarSeverity.Success, "Export complete", message);
+            ShowInfo(InfoBarSeverity.Success, LocalizedText.Get("Ui_FavoritesPage_xaml_81f3f0a234", "Export complete"), message);
         }
         catch (Exception ex)
         {
@@ -150,8 +150,8 @@ public sealed partial class FavoritesPage : Page
     private void ClearExportHistory_Click(object sender, RoutedEventArgs e)
     {
         int cleared = ViewModel.ClearAllArchived();
-        ShowInfo(InfoBarSeverity.Informational, "Export history cleared",
-            $"{cleared} track{(cleared == 1 ? "" : "s")} will be included in the next export.");
+        ShowInfo(InfoBarSeverity.Informational, LocalizedText.Get("Ui_FavoritesPage_xaml_31ea8e04f8", "Export history cleared"),
+            LocalizedText.Format("Ui_FavoritesPage_xaml_7ce23338b0", "Tracks included in the next export: {0}.", cleared));
     }
 
     private void ClearArchivedForTrack_Click(object sender, RoutedEventArgs e)
