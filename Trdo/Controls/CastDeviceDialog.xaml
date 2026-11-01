@@ -17,6 +17,21 @@
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     mc:Ignorable="d">
 
+    <ContentDialog.SecondaryButtonStyle>
+        <Style TargetType="Button">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding}"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ContentDialog.SecondaryButtonStyle>
+
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
         <StackPanel Spacing="12">
             <!--  Shown only while already casting, above the list, so "Stop casting" has context  -->
