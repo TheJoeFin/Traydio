@@ -247,8 +247,24 @@ public sealed partial class PlayingPage : Page
 
         CastDeviceDialog dialog = new() { XamlRoot = XamlRoot };
         _castDialog = dialog;
+        TrayPopupWindow? popup = null;
+        foreach (Window window in WindowHelper.ActiveWindows())
+        {
+            if (window is TrayPopupWindow candidate && candidate.Content?.XamlRoot == XamlRoot)
+            {
+                popup = candidate;
+                break;
+            }
+        }
+
+        bool wasLightDismissEnabled = popup?.IsLightDismissEnabled ?? false;
         try
         {
+            // Discovery can raise a system network-permission prompt after it starts.
+            // Keep its host visible until the picker closes, even while that prompt has focus.
+            if (popup is not null)
+                popup.IsLightDismissEnabled = false;
+
             await dialog.ShowAsync();
         }
         catch (Exception ex)
@@ -259,6 +275,8 @@ public sealed partial class PlayingPage : Page
         finally
         {
             _castDialog = null;
+            if (popup is not null)
+                popup.IsLightDismissEnabled = wasLightDismissEnabled;
         }
     }
 

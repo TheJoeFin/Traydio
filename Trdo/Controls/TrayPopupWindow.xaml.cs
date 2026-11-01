@@ -61,6 +61,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     private ShellPage? _shellPage;
     private bool _isShowing;
     private bool _isPopupVisible;
+    private bool _isLightDismissEnabled = true;
     private DateTime _lastDismissedAtUtc = DateTime.MinValue;
 
     // Animation state, mirroring SongChangePopupWindow: _baseY is the popup's
@@ -104,6 +105,18 @@ public sealed partial class TrayPopupWindow : WindowEx
     }
 
     public bool IsPopupVisible => _isPopupVisible;
+
+    internal bool IsLightDismissEnabled
+    {
+        get => _isLightDismissEnabled;
+        set
+        {
+            _isLightDismissEnabled = value;
+            _hideTimer.Stop();
+            if (value && _isPopupVisible && !_isShowing)
+                _hideTimer.Start();
+        }
+    }
 
     /// <summary>
     /// Shows the popup near the last captured pointer anchor, or hides it when
@@ -325,7 +338,7 @@ public sealed partial class TrayPopupWindow : WindowEx
             return;
         }
 
-        if (_isShowing || !_isPopupVisible)
+        if (_isShowing || !_isPopupVisible || !_isLightDismissEnabled)
             return;
 
         _hideTimer.Stop();
@@ -336,7 +349,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     {
         _hideTimer.Stop();
 
-        if (!_isPopupVisible)
+        if (!_isPopupVisible || !_isLightDismissEnabled)
             return;
 
         HWND foreground = PInvoke.GetForegroundWindow();
