@@ -399,8 +399,8 @@ public partial class App : Application
 
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _audioSessionGrouping = new AudioSessionGroupingService();
-
         InitializeTrayIcon();
+        await CastingContextService.Instance.InitializeAsync(_uiDispatcherQueue);
         await UpdateTrayIconAsync();
         UpdatePlayPauseCommandText(forceTooltip: true);
 
@@ -1104,6 +1104,7 @@ public partial class App : Application
             PlaybackErrorService.Instance.Shutdown();
 
             _audioSessionGrouping?.Dispose();
+            CastingContextService.Instance.Shutdown();
 
             // Order matters twice over: RadioStaticService unsubscribes from the player's events
             // first, so nothing reacts to the source teardown below by starting static that would

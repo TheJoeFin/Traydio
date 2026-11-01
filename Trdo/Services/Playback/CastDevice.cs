@@ -42,6 +42,24 @@ public sealed class CastDevice
     /// <summary>Segoe Fluent glyph for the row: a speaker for Sonos, a generic device otherwise.</summary>
     public string Glyph => IsSonos ? "" : "";
 
+    internal CastHistoryDevice ToHistoryDevice() => Sonos is { } sonos
+        ? new CastHistoryDevice
+        {
+            Protocol = CastProtocol.Sonos,
+            Name = Name,
+            Kind = Kind,
+            Uuid = sonos.Uuid,
+            Address = sonos.Address.ToString(),
+            Port = sonos.Port,
+        }
+        : new CastHistoryDevice
+        {
+            Protocol = CastProtocol.Renderer,
+            Name = Name,
+            Kind = Kind,
+            RendererType = Item?.Type ?? string.Empty,
+        };
+
     /// <summary>
     /// Whether a later discovery report refers to this device. The native pointer is the
     /// reliable test; the name/type comparison catches a re-announcement on another interface.

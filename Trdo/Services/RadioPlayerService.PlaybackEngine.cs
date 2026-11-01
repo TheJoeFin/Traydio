@@ -74,6 +74,7 @@ public sealed partial class RadioPlayerService
         {
             _libVlcBackend = new LibVlcPlaybackBackend(LibVlcHost.Instance, LibVlcHost.LogCapture);
             _libVlcBackend.PlaybackStateChanged += OnLibVlcPlaybackStateChanged;
+            _libVlcBackend.RendererPlaybackStarted += OnRendererPlaybackStarted;
             _libVlcBackend.BufferingStateChanged += OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed += OnLibVlcPlaybackFailed;
             _libVlcBackend.PlaybackEnded += OnBackendPlaybackEnded;
@@ -920,6 +921,7 @@ public sealed partial class RadioPlayerService
         if (_libVlcBackend is not null)
         {
             _libVlcBackend.PlaybackStateChanged -= OnLibVlcPlaybackStateChanged;
+            _libVlcBackend.RendererPlaybackStarted -= OnRendererPlaybackStarted;
             _libVlcBackend.BufferingStateChanged -= OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed -= OnLibVlcPlaybackFailed;
             _libVlcBackend.PlaybackEnded -= OnBackendPlaybackEnded;

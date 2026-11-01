@@ -126,10 +126,15 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     private void RaiseStateChanged(bool isPlaying)
     {
         bool isBuffering = _isBuffering;
+        RendererItem? renderer = _renderer;
+        Media? media = _currentMedia;
         RaiseOffVlcThread(() =>
         {
             PlaybackStateChanged?.Invoke(this, isPlaying);
             BufferingStateChanged?.Invoke(this, isBuffering);
+            if (isPlaying && renderer is not null && media is not null &&
+                ReferenceEquals(renderer, _renderer) && ReferenceEquals(media, _currentMedia) && _mediaPlayer.IsPlaying)
+                RendererPlaybackStarted?.Invoke(this, renderer);
         });
     }
 
@@ -271,11 +276,11 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     /// </summary>
     public bool SetRenderer(RendererItem? renderer)
     {
-        _renderer = renderer;
         bool applied = _mediaPlayer.SetRenderer(renderer);
 
         if (applied)
         {
+            _renderer = renderer;
             LogService.Info("LibVlcPlaybackBackend", renderer is null
                 ? "Renderer cleared; audio goes to the local output"
                 : $"Renderer set to '{renderer.Name}' ({renderer.Type})");
@@ -309,6 +314,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         _mediaPlayer.Length > 0 ? TimeSpan.FromMilliseconds(_mediaPlayer.Length) : null;
 
     public event EventHandler<bool>? PlaybackStateChanged;
+    public event EventHandler<RendererItem>? RendererPlaybackStarted;
     public event EventHandler<bool>? BufferingStateChanged;
     public event EventHandler<PlaybackFailureEventArgs>? PlaybackFailed;
     public event EventHandler? PlaybackEnded;

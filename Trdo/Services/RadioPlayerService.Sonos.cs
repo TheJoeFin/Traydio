@@ -129,38 +129,43 @@ public sealed partial class RadioPlayerService
     /// something is playing it carries on at the new output; otherwise the change applies to
     /// the next play. Replaces a LibVLC cast target if one is set.
     /// </summary>
-    public Task SetSonosTargetAsync(SonosDevice? device, CancellationToken cancellationToken = default)
+    public Task SetSonosTargetAsync(SonosDevice? device, CancellationToken cancellationToken = default, CastAttempt? attempt = null)
     {
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
-            return SetSonosTargetInternalAsync(device, cancellationToken, resumePlayback: true);
+            return SetSonosTargetInternalAsync(device, cancellationToken, resumePlayback: true, attempt);
         }
 
         TaskCompletionSource<bool> tcs = new();
-        _uiQueue.TryEnqueue(async () =>
+        if (!_uiQueue.TryEnqueue(async () =>
         {
             try
             {
-                await SetSonosTargetInternalAsync(device, cancellationToken, resumePlayback: true);
+                await SetSonosTargetInternalAsync(device, cancellationToken, resumePlayback: true, attempt);
                 tcs.SetResult(true);
             }
             catch (Exception ex)
             {
                 tcs.SetException(ex);
             }
-        });
+        }))
+            tcs.SetException(new InvalidOperationException("The playback dispatcher is unavailable."));
         return tcs.Task;
     }
 
-    private async Task SetSonosTargetInternalAsync(SonosDevice? device, CancellationToken cancellationToken, bool resumePlayback)
+    private async Task SetSonosTargetInternalAsync(SonosDevice? device, CancellationToken cancellationToken, bool resumePlayback, CastAttempt? attempt = null)
     {
         if (device is null && _sonosDevice is null)
         {
             return;
         }
 
-        if (device is not null && device.SameTargetAs(_sonosDevice))
+        if (_sonosDevice is { } current && device is not null && device.SameTargetAs(current) &&
+            device.Address.Equals(current.Address) && device.Port == current.Port)
         {
+            _pendingCastAttempt = attempt;
+            if (UsesSonosForActiveSource && IsPlaying)
+                ConfirmCastPlayback(attempt);
             return;
         }
 
@@ -202,6 +207,7 @@ public sealed partial class RadioPlayerService
             }
 
             _sonosDevice = device;
+            _pendingCastAttempt = attempt;
             _sonosCurrentUri = null;
             _sonosStreamContent = null;
             _sonosDuration = null;
@@ -241,6 +247,7 @@ public sealed partial class RadioPlayerService
     {
         int session = Interlocked.Increment(ref _sonosSession);
         SonosDevice? device = _sonosDevice;
+        CastAttempt? attempt = _pendingCastAttempt;
         SonosController? controller = _sonosController;
         string? streamUrl = _streamUrl;
         AudioSourceKind kind = _activeSourceKind;
@@ -355,6 +362,8 @@ public sealed partial class RadioPlayerService
 
             TryEnqueueOnUi(() =>
             {
+                if (session == Volatile.Read(ref _sonosSession) && device.SameTargetAs(_sonosDevice))
+                    ConfirmCastPlayback(attempt);
                 if (_activeSourceKind == AudioSourceKind.Files)
                 {
                     // The once-per-track tag read works from the file, not the engine.

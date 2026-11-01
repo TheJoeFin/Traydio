@@ -16,11 +16,13 @@ public sealed partial class RadioPlayerService
 {
     private RendererItem? _castRenderer;
     private string? _castTargetName;
+    private CastAttempt? _pendingCastAttempt;
 
     /// <summary>
     /// Raised on the UI thread after the cast target changes, including back to local output.
     /// </summary>
     public event EventHandler? CastTargetChanged;
+    public event EventHandler<CastAttempt>? CastPlaybackConfirmed;
 
     /// <summary>
     /// Whether the cast picker is worth opening. Chromecast needs LibVLC, but a Sonos player
@@ -40,30 +42,48 @@ public sealed partial class RadioPlayerService
     /// otherwise the change simply applies to the next play. White noise is generated locally
     /// and is not affected.
     /// </summary>
-    public Task SetCastTargetAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken = default)
+    public Task SetCastTargetAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken = default, CastAttempt? attempt = null)
     {
         if (_uiQueue is null || _uiQueue.HasThreadAccess)
         {
-            return SetCastTargetInternalAsync(renderer, displayName, cancellationToken, resumePlayback: true);
+            return SetOwnedCastTargetAsync(renderer, displayName, cancellationToken, attempt);
         }
 
         TaskCompletionSource<bool> tcs = new();
-        _uiQueue.TryEnqueue(async () =>
+        if (!_uiQueue.TryEnqueue(async () =>
         {
             try
             {
-                await SetCastTargetInternalAsync(renderer, displayName, cancellationToken, resumePlayback: true);
+                await SetOwnedCastTargetAsync(renderer, displayName, cancellationToken, attempt);
                 tcs.SetResult(true);
             }
             catch (Exception ex)
             {
                 tcs.SetException(ex);
             }
-        });
+        }))
+        {
+            renderer?.Dispose();
+            tcs.SetException(new InvalidOperationException("The playback dispatcher is unavailable."));
+        }
         return tcs.Task;
     }
 
-    private async Task SetCastTargetInternalAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken, bool resumePlayback)
+    private async Task SetOwnedCastTargetAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken, CastAttempt? attempt)
+    {
+        try
+        {
+            await SetCastTargetInternalAsync(renderer, displayName, cancellationToken, resumePlayback: true, attempt);
+        }
+        catch
+        {
+            if (!ReferenceEquals(renderer, _castRenderer))
+                renderer?.Dispose();
+            throw;
+        }
+    }
+
+    private async Task SetCastTargetInternalAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken, bool resumePlayback, CastAttempt? attempt = null)
     {
         if (renderer is null && _castRenderer is null)
         {
@@ -78,7 +98,6 @@ public sealed partial class RadioPlayerService
 
         if (_libVlcBackend is null)
         {
-            renderer?.Dispose();
             throw new InvalidOperationException("Casting requires the LibVLC engine, which is not available on this machine.");
         }
 
@@ -87,6 +106,9 @@ public sealed partial class RadioPlayerService
         {
             // Same device picked again: nothing to change, and the duplicate handle is surplus.
             renderer.Dispose();
+            _pendingCastAttempt = attempt;
+            if (_libVlcBackend.IsPlaying)
+                ConfirmCastPlayback(attempt);
             return;
         }
 
@@ -105,6 +127,8 @@ public sealed partial class RadioPlayerService
         }
 
         RendererItem? previous = _castRenderer;
+        string? previousName = _castTargetName;
+        CastAttempt? previousAttempt = _pendingCastAttempt;
         string? name = renderer is null ? null : CastDevicePolicy.DisplayName(displayName ?? renderer.Name);
 
         LogService.Info("RadioPlayerService", renderer is null
@@ -113,7 +137,14 @@ public sealed partial class RadioPlayerService
 
         _castRenderer = renderer;
         _castTargetName = name;
+        _pendingCastAttempt = attempt;
         _playbackEngineSelector.RequireLibVlc = renderer is not null;
+        bool applied = false;
+        void ApplyRenderer()
+        {
+            ApplyCastRenderer();
+            applied = true;
+        }
 
         try
         {
@@ -122,14 +153,17 @@ public sealed partial class RadioPlayerService
                 // The rebuild applies the renderer while the player is idle and then re-opens
                 // the stream on LibVLC, so LibVLC never has to hot-swap outputs under a live
                 // input, and a stream that was on the native engine moves across.
-                await RebuildPlaybackPipelineInternalAsync(
+                bool started = await RebuildPlaybackPipelineInternalAsync(
                     recycleBackend: false,
                     cancellationToken,
-                    reconfigure: ApplyCastRenderer);
+                    reconfigure: ApplyRenderer);
+                if (!started)
+                    throw new InvalidOperationException(LocalizationService.GetString(
+                        "CastDeviceDialog_StartFailed", "The device did not start playing."));
             }
             else
             {
-                ApplyCastRenderer();
+                ApplyRenderer();
 
                 // Drop any prepared-but-paused source on either engine. The play path resumes
                 // an existing source as-is, which would keep a paused station on the old
@@ -140,11 +174,26 @@ public sealed partial class RadioPlayerService
                 _wasExternalPause = false;
             }
         }
+        catch
+        {
+            if (!applied)
+            {
+                _castRenderer = previous;
+                _castTargetName = previousName;
+                _pendingCastAttempt = previousAttempt;
+                _playbackEngineSelector.RequireLibVlc = previous is not null;
+            }
+            else
+            {
+                _pendingCastAttempt = null;
+            }
+            throw;
+        }
         finally
         {
-            // LibVLC holds its own reference to whatever renderer the player is using, so the
-            // previous wrapper can go regardless of how the switch went.
-            previous?.Dispose();
+            // A rejected setup keeps the previous target; a completed switch releases it.
+            if (!ReferenceEquals(previous, _castRenderer))
+                previous?.Dispose();
             TryEnqueueOnUi(() => CastTargetChanged?.Invoke(this, EventArgs.Empty));
         }
     }
@@ -155,7 +204,29 @@ public sealed partial class RadioPlayerService
         {
             LogService.Warn("RadioPlayerService",
                 $"LibVLC rejected the cast renderer '{_castTargetName ?? "(local output)"}'");
+            throw new InvalidOperationException(LocalizationService.GetString(
+                "CastDeviceDialog_RendererRejected", "The playback engine rejected the cast device."));
         }
+    }
+
+    private void ConfirmCastPlayback(CastAttempt? attempt)
+    {
+        if (attempt is null || !ReferenceEquals(attempt, _pendingCastAttempt) ||
+            _activeSourceKind == AudioSourceKind.WhiteNoise || !IsCasting)
+            return;
+
+        _pendingCastAttempt = null;
+        CastPlaybackConfirmed?.Invoke(this, attempt);
+    }
+
+    private void OnRendererPlaybackStarted(object? sender, RendererItem renderer)
+    {
+        CastAttempt? attempt = _pendingCastAttempt;
+        TryEnqueueOnUi(() =>
+        {
+            if (ReferenceEquals(renderer, _castRenderer))
+                ConfirmCastPlayback(attempt);
+        });
     }
 
     private void DisposeCastTarget()
@@ -163,5 +234,6 @@ public sealed partial class RadioPlayerService
         _castRenderer?.Dispose();
         _castRenderer = null;
         _castTargetName = null;
+        _pendingCastAttempt = null;
     }
 }

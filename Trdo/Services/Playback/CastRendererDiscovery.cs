@@ -25,7 +25,7 @@ public sealed class CastRendererDiscovery : IDisposable
     private readonly LibVLC _libVlc;
     private readonly DispatcherQueue _uiQueue;
     private readonly List<RendererDiscoverer> _discoverers = [];
-    private CastDevice? _claimed;
+    private readonly HashSet<CastDevice> _claimed = [];
     private bool _isDisposed;
 
     private CastRendererDiscovery(LibVLC libVlc, DispatcherQueue uiQueue, ObservableCollection<CastDevice> devices)
@@ -115,7 +115,10 @@ public sealed class CastRendererDiscovery : IDisposable
     /// </summary>
     public RendererItem Claim(CastDevice device)
     {
-        _claimed = device;
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (!Devices.Contains(device))
+            throw new InvalidOperationException("The renderer is no longer available.");
+        _claimed.Add(device);
         return device.Item ?? throw new InvalidOperationException("A Sonos row has no LibVLC handle to claim.");
     }
 
@@ -180,7 +183,7 @@ public sealed class CastRendererDiscovery : IDisposable
             Devices.RemoveAt(index);
             LogService.Info(Component, $"Renderer '{device.Name}' left the network");
 
-            if (!ReferenceEquals(device, _claimed))
+            if (!_claimed.Contains(device))
             {
                 device.Item?.Dispose();
             }
@@ -245,7 +248,7 @@ public sealed class CastRendererDiscovery : IDisposable
                 continue; // a Sonos row, owned by SonosDiscovery
             }
 
-            if (!ReferenceEquals(device, _claimed))
+            if (!_claimed.Contains(device))
             {
                 device.Item.Dispose();
             }
