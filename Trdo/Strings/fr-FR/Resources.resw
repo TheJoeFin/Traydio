@@ -999,4 +999,43 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>Bienvenue sur Traydio !</value>
   </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Vérification de la disponibilité...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>Indisponible</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Déjà utilisé - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} n&apos;est pas disponible sur ce réseau.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Connexion...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>L&apos;appareil n&apos;a pas démarré la lecture.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>Le moteur de lecture a refusé l&apos;appareil de diffusion.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>ce PC</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>Impossible d&apos;enregistrer votre préférence de diffusion : {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Masquer le bouton de diffusion sur ce Wi-Fi</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Afficher le bouton de diffusion sur ce Wi-Fi</value>
+  </data>
 </root>

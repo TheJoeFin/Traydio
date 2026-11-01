@@ -135,6 +135,7 @@ public sealed partial class PlayingPage : Page
 
     private void PlayingPage_Unloaded(object sender, RoutedEventArgs e)
     {
+        _castDialog?.Hide();
         _nowPlayingMarqueeDelayTimer.Stop();
         _nowPlayingMarqueeDelayTimer.Tick -= NowPlayingMarqueeDelayTimer_Tick;
         NowPlayingMarqueeText.MarqueeCompleted -= NowPlayingMarqueeText_MarqueeCompleted;
@@ -263,6 +264,12 @@ public sealed partial class PlayingPage : Page
 
     private async void StopCastingMenuItem_Click(object sender, RoutedEventArgs e) =>
         await ViewModel.StopCastingAsync();
+
+    private async void HideCastShortcut_Click(object sender, RoutedEventArgs e) =>
+        await ViewModel.SetCastShortcutHiddenAsync(true);
+
+    private async void CastShortcutPreference_Click(object sender, RoutedEventArgs e) =>
+        await ViewModel.SetCastShortcutHiddenAsync(ViewModel.IsCastShortcutVisible);
 
     private void SleepTimerButton_Click(object sender, RoutedEventArgs e)
     {

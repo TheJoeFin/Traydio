@@ -999,4 +999,43 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>Willkommen bei Traydio!</value>
   </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Verfügbar</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Verfügbarkeit wird geprüft...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>Nicht verfügbar</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Zuvor verwendet - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} ist in diesem Netzwerk nicht verfügbar.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Verbindung wird hergestellt...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>Das Gerät hat die Wiedergabe nicht gestartet.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>Die Wiedergabe-Engine hat das Übertragungsgerät abgelehnt.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>diesen PC</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>Die Übertragungseinstellung konnte nicht gespeichert werden: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Übertragungsschaltfläche in diesem WLAN ausblenden</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Übertragungsschaltfläche in diesem WLAN anzeigen</value>
+  </data>
 </root>

@@ -24,6 +24,7 @@ namespace Trdo.ViewModels;
 public sealed partial class PlayerViewModel : INotifyPropertyChanged
 {
     private readonly RadioPlayerService _player = RadioPlayerService.Instance;
+    private readonly CastingContextService _castingContext = CastingContextService.Instance;
     private readonly RadioStationService _stationService = RadioStationService.Instance;
     private readonly FavoritesService _favoritesService = FavoritesService.Instance;
     private string _watchdogStatus = string.Empty;
@@ -107,6 +108,11 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             RaiseSpeakerVolumeChanged();
         };
         _player.SonosSpeakerVolumeChanged += (_, _) => RaiseSpeakerVolumeChanged();
+        _castingContext.Changed += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsCastShortcutVisible));
+            OnPropertyChanged(nameof(HasCastShortcutPreference));
+        };
 
         // Failures raised by the player go straight to PlaybackErrorService, which decides
         // whether they are still worth showing. Recorded here only so LastError reflects them.
@@ -1015,6 +1021,22 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     /// <summary>Whether the cast picker can be opened. Sonos needs no LibVLC, so this is always true today.</summary>
     public bool CanCast => _player.CanCast;
+    public bool IsCastShortcutVisible => CanCast && _castingContext.IsShortcutVisible;
+    public bool HasCastShortcutPreference => _castingContext.HasRememberedDevices;
+
+    public async Task SetCastShortcutHiddenAsync(bool hidden)
+    {
+        try
+        {
+            await _castingContext.SetShortcutHiddenAsync(hidden);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            LogService.Error("PlayerViewModel", "Could not save the per-network cast shortcut preference", ex);
+            PlaybackErrorService.Instance.Report(string.Format(LocalizationService.GetString(
+                "PlayingPage_CastPreferenceSaveFailed", "Couldn't save your casting preference: {0}"), ex.Message));
+        }
+    }
 
     public bool IsCasting => _player.IsCasting;
 

@@ -999,4 +999,43 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>مرحبًا بك في Traydio!</value>
   </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>متاح</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>جارٍ التحقق من التوفر...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>غير متاح</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>استُخدم سابقًا - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} غير متاح على هذه الشبكة.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>جارٍ الاتصال...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>لم يبدأ الجهاز التشغيل.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>رفض محرك التشغيل جهاز البث.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>هذا الكمبيوتر</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>تعذر حفظ تفضيل البث: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>إخفاء زر البث على شبكة Wi-Fi هذه</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>إظهار زر البث على شبكة Wi-Fi هذه</value>
+  </data>
 </root>

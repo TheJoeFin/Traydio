@@ -826,68 +826,108 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button
-                x:Name="PlayButton"
-                Grid.Column="0"
-                HorizontalAlignment="Stretch"
-                Click="PlayButton_Click"
-                IsEnabled="{x:Bind ViewModel.CanPlay, Mode=OneWay}"
-                Style="{StaticResource AccentButtonStyle}">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <FontIcon FontSize="16" Glyph="{x:Bind ViewModel.PlaybackButtonGlyph, Mode=OneWay}" />
-                    <TextBlock FontSize="12" Text="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}" />
-                </StackPanel>
-                <Button.ContextFlyout>
-                    <MenuFlyout>
-                        <!--
-                            Casting. The label is bound rather than x:Uid'd because it names the
-                            target while a cast is active; IsEnabled is OneTime since LibVLC either
-                            loaded at startup or didn't.
-                        -->
-                        <MenuFlyoutItem
-                            x:Name="CastMenuItem"
-                            Click="CastMenuItem_Click"
-                            IsEnabled="{x:Bind ViewModel.CanCast}"
-                            Text="{x:Bind ViewModel.CastMenuText, Mode=OneWay}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE7F4;" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem
-                            x:Name="StopCastingMenuItem"
-                            x:Uid="PlayingPage_StopCasting"
-                            Click="StopCastingMenuItem_Click"
-                            Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE711;" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutSeparator />
-                        <!--  Disabled item used as a plain label rather than a real command.  -->
-                        <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer15Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="15" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer20Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="20" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer30Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="30" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer45Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="45" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer50Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="50" />
-                    </MenuFlyout>
-                </Button.ContextFlyout>
-            </Button>
+            <Grid ColumnDefinitions="*,Auto">
+                <Button
+                    x:Name="PlayButton"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    AutomationProperties.Name="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}"
+                    Click="PlayButton_Click"
+                    IsEnabled="{x:Bind ViewModel.CanPlay, Mode=OneWay}"
+                    Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon FontSize="16" Glyph="{x:Bind ViewModel.PlaybackButtonGlyph, Mode=OneWay}" />
+                        <TextBlock FontSize="12" Text="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}" />
+                    </StackPanel>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                x:Name="CastMenuItem"
+                                AutomationProperties.AutomationId="CastMenuItem"
+                                Click="CastMenuItem_Click"
+                                IsEnabled="{x:Bind ViewModel.CanCast}"
+                                Text="{x:Bind ViewModel.CastMenuText, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE7F4;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem
+                                x:Name="StopCastingMenuItem"
+                                x:Uid="PlayingPage_StopCasting"
+                                Click="StopCastingMenuItem_Click"
+                                Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE711;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <ToggleMenuFlyoutItem
+                                x:Uid="PlayingPage_ShowCastShortcut"
+                                AutomationProperties.AutomationId="CastShortcutPreference"
+                                Click="CastShortcutPreference_Click"
+                                IsChecked="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.HasCastShortcutPreference, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer15Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="15" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer20Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="20" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer30Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="30" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer45Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="45" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer50Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="50" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+
+                <Button
+                    x:Name="CastShortcutButton"
+                    Grid.Column="1"
+                    Width="32"
+                    Height="32"
+                    Margin="12,0,0,0"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.AutomationId="CastShortcutButton"
+                    AutomationProperties.Name="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="CastMenuItem_Click"
+                    CornerRadius="16"
+                    ToolTipService.ToolTip="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <FontIcon FontSize="18" Glyph="&#xE7F5;" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                            Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_HideCastShortcut"
+                                AutomationProperties.AutomationId="HideCastShortcut"
+                                Click="HideCastShortcut_Click" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+            </Grid>
 
             <!--
                 Sleep timer countdown. Only takes a column when active, at which point it

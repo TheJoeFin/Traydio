@@ -999,4 +999,43 @@
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>¡Bienvenido a Traydio!</value>
   </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Comprobando disponibilidad...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>No disponible</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Usado anteriormente - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} no está disponible en esta red.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Conectando...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>El dispositivo no inició la reproducción.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>El motor de reproducción rechazó el dispositivo de transmisión.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>este PC</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>No se pudo guardar tu preferencia de transmisión: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Ocultar botón de transmisión en esta Wi-Fi</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Mostrar botón de transmisión en esta Wi-Fi</value>
+  </data>
 </root>

@@ -8,6 +8,8 @@
     xmlns:playback="using:Trdo.Services.Playback"
     x:Uid="CastDeviceDialog"
     Closed="ContentDialog_Closed"
+    CloseButtonClick="ContentDialog_CloseButtonClick"
+    Closing="ContentDialog_Closing"
     DefaultButton="Primary"
     IsPrimaryButtonEnabled="False"
     Opened="ContentDialog_Opened"
@@ -15,73 +17,83 @@
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     mc:Ignorable="d">
 
-    <!--
-        Discovery is owned by the code-behind and only runs between Opened and Closed, so the
-        list here is live while the dialog is up and empty (and unsubscribed) once it goes.
-    -->
-    <StackPanel MinWidth="300" Spacing="12">
-        <!--  Shown only while already casting, above the list, so "Stop casting" has context  -->
-        <TextBlock
-            x:Name="CurrentTargetText"
-            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-            TextWrapping="Wrap"
-            Visibility="Collapsed" />
-
-        <!--  Search is continuous while open: mDNS and SSDP answers arrive whenever a device wakes up  -->
-        <StackPanel
-            x:Name="ScanningRow"
-            Orientation="Horizontal"
-            Spacing="8">
-            <ProgressRing
-                Width="16"
-                Height="16"
-                IsActive="True" />
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+        <StackPanel Spacing="12">
+            <!--  Shown only while already casting, above the list, so "Stop casting" has context  -->
             <TextBlock
-                x:Uid="CastDeviceDialog_Searching"
-                VerticalAlignment="Center"
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                x:Name="CurrentTargetText"
+                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                TextWrapping="Wrap"
+                Visibility="Collapsed" />
+
+            <!--  Search is continuous while open: mDNS and SSDP answers arrive whenever a device wakes up  -->
+            <StackPanel
+                x:Name="ScanningRow"
+                Orientation="Horizontal"
+                Spacing="8">
+                <ProgressRing
+                    Width="16"
+                    Height="16"
+                    IsActive="True" />
+                <TextBlock
+                    x:Uid="CastDeviceDialog_Searching"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <TextBlock
+                x:Name="EmptyText"
+                x:Uid="CastDeviceDialog_Empty"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                TextWrapping="Wrap"
+                Visibility="Collapsed" />
+
+            <TextBlock
+                x:Name="UnavailableText"
+                x:Uid="CastDeviceDialog_Unavailable"
+                TextWrapping="Wrap"
+                Visibility="Collapsed" />
         </StackPanel>
 
         <ListView
             x:Name="DeviceList"
+            Grid.Row="1"
+            AutomationProperties.AutomationId="CastDeviceList"
             MaxHeight="240"
             DoubleTapped="DeviceList_DoubleTapped"
             SelectionChanged="DeviceList_SelectionChanged"
             SelectionMode="Single"
             Visibility="Collapsed">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="playback:CastDevice">
+                <DataTemplate x:DataType="playback:CastDeviceEntry">
                     <Grid
                         Padding="0,6"
+                        AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"
                         ColumnDefinitions="Auto,*"
                         ColumnSpacing="12">
                         <FontIcon
                             VerticalAlignment="Center"
                             FontSize="18"
-                            Glyph="{x:Bind Glyph}" />
+                            Glyph="{x:Bind Glyph, Mode=OneWay}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
                             <TextBlock
                                 FontSize="12"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{x:Bind Kind}" />
+                                Text="{x:Bind Details, Mode=OneWay}"
+                                TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <TextBlock
-            x:Name="EmptyText"
-            x:Uid="CastDeviceDialog_Empty"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-            TextWrapping="Wrap"
-            Visibility="Collapsed" />
-
-        <TextBlock
-            x:Name="UnavailableText"
-            x:Uid="CastDeviceDialog_Unavailable"
-            TextWrapping="Wrap"
-            Visibility="Collapsed" />
-    </StackPanel>
+        <InfoBar
+            x:Name="CastError"
+            Grid.Row="2"
+            AutomationProperties.AutomationId="CastError"
+            IsClosable="True"
+            IsOpen="False"
+            Severity="Error" />
+    </Grid>
 </ContentDialog>
