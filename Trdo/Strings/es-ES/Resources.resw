@@ -1038,4 +1038,22 @@
   <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
     <value>Mostrar botón de transmisión en esta Wi-Fi</value>
   </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Finalizar la transmisión automáticamente</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Volver a este dispositivo cuando la reproducción lleve este tiempo pausada o detenida. La reproducción seguirá pausada.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Detener la transmisión tras inactividad</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Nunca</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} minutos</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>No se pudo detener la transmisión automáticamente. Prueba Detener transmisión.</value>
+  </data>
 </root>

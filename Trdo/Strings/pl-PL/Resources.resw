@@ -1038,4 +1038,22 @@
   <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
     <value>Pokaż przycisk przesyłania w tej sieci Wi-Fi</value>
   </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Automatycznie kończ przesyłanie</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Wróć do tego urządzenia, gdy odtwarzanie jest wstrzymane lub zatrzymane przez wybrany czas. Odtwarzanie pozostanie wstrzymane.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Zakończ przesyłanie po okresie bezczynności</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Nigdy</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Nie udało się automatycznie zakończyć przesyłania. Spróbuj wybrać Zatrzymaj przesyłanie.</value>
+  </data>
 </root>

@@ -30,6 +30,7 @@ public static class SettingsService
     private const string TrayLeftDoubleClickActionKey = "TrayLeftDoubleClickAction";
     private const string TrayRightDoubleClickActionKey = "TrayRightDoubleClickAction";
     private const string PlaybackEngineModeKey = "PlaybackEngineMode";
+    private const string CastIdleTimeoutMinutesKey = "CastIdleTimeoutMinutes";
     private const string IsMiniPlayerVisualizerEnabledKey = "IsMiniPlayerVisualizerEnabled";
     private const string IsMiniPlayerTopmostKey = "IsMiniPlayerTopmost";
     private const string IsMiniPlayerTitleBarHiddenKey = "IsMiniPlayerTitleBarHidden";
@@ -50,6 +51,44 @@ public static class SettingsService
     private const char RecentStationSearchesSeparator = '\u001f';
 
     public static event EventHandler? MusicSearchServicesChanged;
+    public static event EventHandler? CastIdleTimeoutChanged;
+
+    public static int CastIdleTimeoutMinutes
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(CastIdleTimeoutMinutesKey, out object? value))
+                {
+                    return value is int minutes && minutes >= 0
+                        ? minutes
+                        : throw new FormatException("Invalid saved casting timeout.");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.Warn("Settings", $"Could not read casting timeout; using 45 minutes: {ex.Message}");
+            }
+
+            return 45;
+        }
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(value);
+            try
+            {
+                ApplicationData.Current.LocalSettings.Values[CastIdleTimeoutMinutesKey] = value;
+            }
+            catch (Exception ex)
+            {
+                LogService.Error("Settings", "Could not save casting timeout", ex);
+                return;
+            }
+
+            CastIdleTimeoutChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
 
     /// <summary>
     /// Raised when <see cref="IsSongChangePopupEnabled"/> changes, so a popup

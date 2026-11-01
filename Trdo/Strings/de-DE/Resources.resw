@@ -1038,4 +1038,22 @@
   <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
     <value>Übertragungsschaltfläche in diesem WLAN anzeigen</value>
   </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Übertragung automatisch beenden</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Zu diesem Gerät zurückkehren, wenn die Wiedergabe so lange pausiert oder gestoppt ist. Die Wiedergabe bleibt pausiert.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Übertragung nach Inaktivität beenden</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Nie</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} Minuten</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Die Übertragung konnte nicht automatisch beendet werden. Versuchen Sie Übertragung beenden.</value>
+  </data>
 </root>

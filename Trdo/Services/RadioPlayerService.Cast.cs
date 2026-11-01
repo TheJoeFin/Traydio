@@ -17,6 +17,9 @@ public sealed partial class RadioPlayerService
     private RendererItem? _castRenderer;
     private string? _castTargetName;
     private CastAttempt? _pendingCastAttempt;
+    private readonly CastIdleTimeout _castIdleTimeout = new();
+    private Timer? _castIdleTimer;
+    private bool _isEndingIdleCast;
 
     /// <summary>
     /// Raised on the UI thread after the cast target changes, including back to local output.
@@ -229,8 +232,79 @@ public sealed partial class RadioPlayerService
         });
     }
 
+    private void InitializeCastIdleTimeout()
+    {
+        CastTargetChanged += OnCastTargetChangedForIdleTimeout;
+        PlaybackStateChanged += OnCastPlaybackActivityChanged;
+        BufferingStateChanged += OnCastPlaybackActivityChanged;
+        SettingsService.CastIdleTimeoutChanged += OnCastIdleTimeoutChanged;
+    }
+
+    private void OnCastTargetChangedForIdleTimeout(object? sender, EventArgs e)
+    {
+        _castIdleTimeout.Reset();
+        _ = CheckCastIdleTimeoutAsync();
+    }
+
+    private void OnCastPlaybackActivityChanged(object? sender, bool isActive) =>
+        _ = CheckCastIdleTimeoutAsync();
+
+    private void OnCastIdleTimeoutChanged(object? sender, EventArgs e) =>
+        TryEnqueueOnUi(() => _ = CheckCastIdleTimeoutAsync());
+
+    private async Task CheckCastIdleTimeoutAsync()
+    {
+        if (_isDisposed || _isEndingIdleCast)
+            return;
+
+        try
+        {
+            int minutes = SettingsService.CastIdleTimeoutMinutes;
+            if (IsCasting && minutes > 0)
+            {
+                _castIdleTimer ??= new Timer(
+                    state => TryEnqueueOnUi(() => _ = CheckCastIdleTimeoutAsync()),
+                    null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+            }
+            else
+            {
+                _castIdleTimer?.Dispose();
+                _castIdleTimer = null;
+            }
+
+            // A play token can outlive playback, including pauses from the speaker's own app.
+            bool isActive = UsesSonosForActiveSource
+                ? _sonosState is SonosPlaybackState.Playing or SonosPlaybackState.Starting
+                : IsPlaying || (!_isUserPaused && IsBuffering);
+            if (!_castIdleTimeout.ShouldEndCast(IsCasting, isActive, minutes, DateTimeOffset.UtcNow))
+                return;
+
+            _isEndingIdleCast = true;
+            LogService.Info("RadioPlayerService",
+                $"Ending cast to '{CastTargetName}' after {minutes} minutes without playback");
+            await SetCastTargetInternalAsync(null, null, CancellationToken.None, resumePlayback: false);
+        }
+        catch (Exception ex)
+        {
+            _castIdleTimeout.Reset();
+            LogService.Error("RadioPlayerService", "Could not end idle casting", ex);
+            TryEnqueueOnUi(() => PlaybackFailed?.Invoke(this, LocalizationService.GetString(
+                "CastIdleTimeout_EndFailed", "Couldn't stop casting automatically. Try Stop casting.")));
+        }
+        finally
+        {
+            _isEndingIdleCast = false;
+        }
+    }
+
     private void DisposeCastTarget()
     {
+        SettingsService.CastIdleTimeoutChanged -= OnCastIdleTimeoutChanged;
+        CastTargetChanged -= OnCastTargetChangedForIdleTimeout;
+        PlaybackStateChanged -= OnCastPlaybackActivityChanged;
+        BufferingStateChanged -= OnCastPlaybackActivityChanged;
+        _castIdleTimer?.Dispose();
+        _castIdleTimer = null;
         _castRenderer?.Dispose();
         _castRenderer = null;
         _castTargetName = null;

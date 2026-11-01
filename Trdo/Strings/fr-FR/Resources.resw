@@ -1038,4 +1038,22 @@
   <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
     <value>Afficher le bouton de diffusion sur ce Wi-Fi</value>
   </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Terminer automatiquement la diffusion</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Revenir à cet appareil lorsque la lecture reste en pause ou arrêtée pendant cette durée. La lecture reste en pause.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Arrêter la diffusion après une période d&apos;inactivité</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Jamais</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} minutes</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Impossible d&apos;arrêter automatiquement la diffusion. Essayez Arrêter la diffusion.</value>
+  </data>
 </root>

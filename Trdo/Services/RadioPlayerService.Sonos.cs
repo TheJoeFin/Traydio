@@ -183,7 +183,19 @@ public sealed partial class RadioPlayerService
         {
             if (_sonosDevice is not null)
             {
-                await StopSonosSessionAsync(stopSpeaker: true, cancellationToken);
+                Task stop = StopSonosSessionAsync(stopSpeaker: true, cancellationToken);
+                int session = Volatile.Read(ref _sonosSession);
+                await stop;
+                if (_isDisposed)
+                    return;
+
+                // A play or target change during the stop request supersedes this handoff.
+                if (session != Volatile.Read(ref _sonosSession))
+                {
+                    if (_sonosDevice is not null && _sonosPollCts is null)
+                        StartSonosPolling();
+                    return;
+                }
             }
             else if (resume)
             {

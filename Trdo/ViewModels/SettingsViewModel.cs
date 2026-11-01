@@ -35,6 +35,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     private StartupTask? _startupTask;
     private bool _initDone;
     private bool _isLanguageRestartPending;
+    private static readonly int[] CastIdleTimeoutOptions = [0, 5, 15, 30, 45, 60, 120];
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -612,6 +613,27 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             PlaybackEngineMode.NativePreferred => "Windows first, LibVLC fallback",
             _ => "LibVLC first, Windows fallback"
         };
+
+    public IReadOnlyList<string> CastIdleTimeoutLabels { get; } = Array.ConvertAll(
+        CastIdleTimeoutOptions, minutes => minutes == 0
+            ? LocalizationService.GetString("SettingsPage_CastIdleTimeout_Never", "Never")
+            : string.Format(LocalizationService.GetString(
+                "SettingsPage_CastIdleTimeout_Minutes", "{0} minutes"), minutes));
+
+    public int CastIdleTimeoutIndex
+    {
+        get => Array.IndexOf(CastIdleTimeoutOptions, SettingsService.CastIdleTimeoutMinutes);
+        set
+        {
+            if (value == -1) return;
+            ArgumentOutOfRangeException.ThrowIfNegative(value);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(value, CastIdleTimeoutOptions.Length);
+            int minutes = CastIdleTimeoutOptions[value];
+            if (minutes == SettingsService.CastIdleTimeoutMinutes) return;
+            SettingsService.CastIdleTimeoutMinutes = minutes;
+            OnPropertyChanged();
+        }
+    }
 
     public bool AllowSleepWhilePlaying
     {

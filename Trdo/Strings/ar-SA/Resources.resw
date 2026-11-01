@@ -1038,4 +1038,22 @@
   <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
     <value>إظهار زر البث على شبكة Wi-Fi هذه</value>
   </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>إنهاء البث تلقائيًا</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>العودة إلى هذا الجهاز بعد إيقاف التشغيل مؤقتًا أو كليًا لهذه المدة. سيظل التشغيل متوقفًا مؤقتًا.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>إيقاف البث بعد فترة من عدم النشاط</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>أبدًا</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} دقيقة</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>تعذر إيقاف البث تلقائيًا. جرّب إيقاف البث.</value>
+  </data>
 </root>

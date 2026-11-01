@@ -503,6 +503,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
 
         InitializePlaybackEngine();
+        InitializeCastIdleTimeout();
 
         // Initialize SystemMediaTransportControls
         try
@@ -1065,6 +1066,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         LogService.Info("RadioPlayerService",
             $"Play requested for {LogService.Redact(_streamUrl)} (hasPlayedOnce={_hasPlayedOnce}, wasExternalPause={_wasExternalPause})");
+        _castIdleTimeout.Reset();
 
         // A real play attempt is starting, so any buffering it reports from here on is genuine
         // and radio static should be allowed to react to it again - see _isUserPaused.

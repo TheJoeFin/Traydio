@@ -542,6 +542,19 @@
 
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">
+                        <TextBlock x:Uid="SettingsPage_CastIdleTimeoutTitle" Style="{StaticResource SettingTitleStyle}" />
+                        <TextBlock x:Uid="SettingsPage_CastIdleTimeoutDescription" Style="{StaticResource SettingDescriptionStyle}" />
+                        <ComboBox
+                            x:Uid="SettingsPage_CastIdleTimeout"
+                            HorizontalAlignment="Stretch"
+                            AutomationProperties.AutomationId="CastIdleTimeoutComboBox"
+                            ItemsSource="{x:Bind ViewModel.CastIdleTimeoutLabels}"
+                            SelectedIndex="{x:Bind ViewModel.CastIdleTimeoutIndex, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SettingCardStyle}">
+                    <StackPanel Spacing="10">
                         <TextBlock x:Uid="SettingsPage_AutoRecoverTitle" Style="{StaticResource SettingTitleStyle}" />
                         <TextBlock x:Uid="SettingsPage_AutoRecoverDescription" Style="{StaticResource SettingDescriptionStyle}" />
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
