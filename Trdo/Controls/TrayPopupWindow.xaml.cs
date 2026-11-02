@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using Trdo.Pages;
 using Trdo.Services;
 using Windows.Graphics;
@@ -61,7 +62,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     private ShellPage? _shellPage;
     private bool _isShowing;
     private bool _isPopupVisible;
-    private bool _isLightDismissEnabled = true;
+    private int _keepOpenCount;
     private DateTime _lastDismissedAtUtc = DateTime.MinValue;
 
     // Animation state, mirroring SongChangePopupWindow: _baseY is the popup's
@@ -106,16 +107,57 @@ public sealed partial class TrayPopupWindow : WindowEx
 
     public bool IsPopupVisible => _isPopupVisible;
 
-    internal bool IsLightDismissEnabled
+    /// <summary>The popup light-dismisses only while nothing is holding it open.</summary>
+    private bool IsLightDismissEnabled => _keepOpenCount == 0;
+
+    /// <summary>
+    /// Finds the popup hosting <paramref name="xamlRoot"/>, so a page inside it can ask for
+    /// <see cref="KeepOpen"/> without holding a reference to the window.
+    /// </summary>
+    internal static TrayPopupWindow? FromXamlRoot(XamlRoot? xamlRoot)
     {
-        get => _isLightDismissEnabled;
-        set
+        if (xamlRoot is null)
+            return null;
+
+        foreach (Window window in WindowHelper.ActiveWindows())
         {
-            _isLightDismissEnabled = value;
-            _hideTimer.Stop();
-            if (value && _isPopupVisible && !_isShowing)
-                _hideTimer.Start();
+            if (window is TrayPopupWindow popup && popup.Content?.XamlRoot == xamlRoot)
+                return popup;
         }
+        return null;
+    }
+
+    /// <summary>
+    /// Stops the popup from hiding when focus leaves it, until the returned handle is disposed.
+    /// For something interactive in progress that can pull focus away (a system permission
+    /// prompt, a picker). Holds nest; dismissal resumes when the last one is released.
+    /// </summary>
+    internal IDisposable KeepOpen()
+    {
+        _keepOpenCount++;
+        _hideTimer.Stop();
+        return new KeepOpenHandle(this);
+    }
+
+    private void ReleaseKeepOpen()
+    {
+        if (_keepOpenCount == 0)
+            return;
+
+        _keepOpenCount--;
+        if (_keepOpenCount == 0 && _isPopupVisible && !_isShowing)
+        {
+            // Focus may have left while held; check once now rather than waiting for the next deactivation.
+            _hideTimer.Stop();
+            _hideTimer.Start();
+        }
+    }
+
+    private sealed class KeepOpenHandle(TrayPopupWindow owner) : IDisposable
+    {
+        private TrayPopupWindow? _owner = owner;
+
+        public void Dispose() => Interlocked.Exchange(ref _owner, null)?.ReleaseKeepOpen();
     }
 
     /// <summary>
@@ -338,7 +380,7 @@ public sealed partial class TrayPopupWindow : WindowEx
             return;
         }
 
-        if (_isShowing || !_isPopupVisible || !_isLightDismissEnabled)
+        if (_isShowing || !_isPopupVisible || !IsLightDismissEnabled)
             return;
 
         _hideTimer.Stop();
@@ -349,7 +391,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     {
         _hideTimer.Stop();
 
-        if (!_isPopupVisible || !_isLightDismissEnabled)
+        if (!_isPopupVisible || !IsLightDismissEnabled)
             return;
 
         HWND foreground = PInvoke.GetForegroundWindow();

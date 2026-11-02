@@ -44,9 +44,6 @@ public sealed partial class PlayingPage : Page
     /// </summary>
     private ContentDialog? _playbackErrorDialog;
 
-    /// <summary>The cast picker while it is open, so a second right-click doesn't stack another.</summary>
-    private CastDeviceDialog? _castDialog;
-
     /// <summary>
     /// Set while the page is pushing the view model's selection into the list, so the
     /// resulting <c>SelectionChanged</c> is not mistaken for the user picking a station.
@@ -135,7 +132,6 @@ public sealed partial class PlayingPage : Page
 
     private void PlayingPage_Unloaded(object sender, RoutedEventArgs e)
     {
-        _castDialog?.Hide();
         _nowPlayingMarqueeDelayTimer.Stop();
         _nowPlayingMarqueeDelayTimer.Tick -= NowPlayingMarqueeDelayTimer_Tick;
         NowPlayingMarqueeText.MarqueeCompleted -= NowPlayingMarqueeText_MarqueeCompleted;
@@ -238,46 +234,12 @@ public sealed partial class PlayingPage : Page
         }
     }
 
-    private async void CastMenuItem_Click(object sender, RoutedEventArgs e)
+    private void CastMenuItem_Click(object sender, RoutedEventArgs e) => OpenCastPage();
+
+    private void OpenCastPage()
     {
-        if (_castDialog is not null)
-        {
-            return;
-        }
-
-        CastDeviceDialog dialog = new() { XamlRoot = XamlRoot };
-        _castDialog = dialog;
-        TrayPopupWindow? popup = null;
-        foreach (Window window in WindowHelper.ActiveWindows())
-        {
-            if (window is TrayPopupWindow candidate && candidate.Content?.XamlRoot == XamlRoot)
-            {
-                popup = candidate;
-                break;
-            }
-        }
-
-        bool wasLightDismissEnabled = popup?.IsLightDismissEnabled ?? false;
-        try
-        {
-            // Discovery can raise a system network-permission prompt after it starts.
-            // Keep its host visible until the picker closes, even while that prompt has focus.
-            if (popup is not null)
-                popup.IsLightDismissEnabled = false;
-
-            await dialog.ShowAsync();
-        }
-        catch (Exception ex)
-        {
-            // Only one ContentDialog can be up per root; a playback error already showing wins.
-            Debug.WriteLine($"[PlayingPage] EXCEPTION showing cast dialog: {ex.Message}");
-        }
-        finally
-        {
-            _castDialog = null;
-            if (popup is not null)
-                popup.IsLightDismissEnabled = wasLightDismissEnabled;
-        }
+        // The cast page keeps the tray popup open itself while it is showing.
+        (_shellViewModel ?? FindShellViewModel())?.NavigateToCastPage();
     }
 
     private async void StopCastingMenuItem_Click(object sender, RoutedEventArgs e) =>

@@ -1107,6 +1107,45 @@
   <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
     <value>this PC</value>
   </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>Add to group</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>Remove from group</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>Group speakers…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>Group speakers</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>Choose the speakers that should play together.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>Speakers you add stop what they are playing and follow the group.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>Group name</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>Not grouped</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>Playing with {0}</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>Grouping needs at least two Sonos speakers on this network.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>No Sonos speakers were found on this network.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>Couldn&apos;t change the group: {0}</value>
+  </data>
   <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
     <value>Couldn&apos;t save your casting preference: {0}</value>
   </data>

@@ -224,6 +224,89 @@ internal sealed class CastPickerSession : IDisposable
         }
     }
 
+    /// <summary>True once discovery (or a remembered-speaker check) has seen at least one Sonos speaker.</summary>
+    public bool HasSonos => _live.Any(device => device.Sonos is not null);
+
+    /// <summary>
+    /// The household's groups, asked of the first Sonos speaker discovery sees; any player answers
+    /// for all of them. Waits for one to appear, and times out if none does.
+    /// </summary>
+    public async Task<IReadOnlyList<SonosZoneGroup>> GetSonosHouseholdAsync(CancellationToken cancellationToken)
+    {
+        using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
+        timeout.CancelAfter(TimeSpan.FromSeconds(15));
+        try
+        {
+            while (true)
+            {
+                timeout.Token.ThrowIfCancellationRequested();
+                if (_live.FirstOrDefault(device => device.Sonos is not null)?.Sonos is { } sonos)
+                {
+                    string xml = await _probeController.GetZoneGroupStateAsync(sonos.ZoneGroupTopologyControlUrl, timeout.Token);
+                    return SonosPolicy.ParseZoneGroups(xml);
+                }
+                await _liveChanged.Task.WaitAsync(timeout.Token);
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_lifetime.IsCancellationRequested)
+        {
+            throw new TimeoutException(LocalizationService.GetString(
+                "GroupSpeakersPage_NoneFound", "No Sonos speakers were found on this network."));
+        }
+    }
+
+    /// <summary>Re-reads Sonos groupings now, so the list reflects a change this app just made.</summary>
+    public Task RefreshSonosAsync(CancellationToken cancellationToken) =>
+        _sonos?.RefreshAsync(cancellationToken) ?? Task.CompletedTask;
+
+    /// <summary>Runs a plan from <see cref="SonosGroupingPolicy"/>, stopping at the first room that can't be reached.</summary>
+    public async Task ApplySonosGroupingAsync(IReadOnlyList<SonosGroupingStep> steps, CancellationToken cancellationToken)
+    {
+        foreach (SonosGroupingStep step in steps)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            SonosDevice device = SonosDevice.FromRoom(step.Room)
+                ?? throw new InvalidOperationException($"Couldn't find the address of {step.Room.Name}.");
+            if (step.Action == SonosGroupingAction.Join)
+                await _probeController.JoinGroupAsync(device, step.CoordinatorUuid!, cancellationToken);
+            else
+                await _probeController.LeaveGroupAsync(device, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Points playback at <paramref name="entry"/>: waits for the device to be seen live,
+    /// then hands it to the player. A device that fails to connect is dropped from the live
+    /// set so it isn't offered as available again.
+    /// </summary>
+    public async Task CastToAsync(CastDeviceEntry entry, CancellationToken cancellationToken)
+    {
+        CastDevice? device = null;
+        try
+        {
+            await _context.RefreshAsync();
+            cancellationToken.ThrowIfCancellationRequested();
+            device = await ResolveAsync(entry, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            CastAttempt? attempt = _context.CreateAttempt(device);
+            if (device.Sonos is { } sonos)
+            {
+                await RadioPlayerService.Instance.SetSonosTargetAsync(sonos, cancellationToken, attempt);
+            }
+            else
+            {
+                RendererItem item = Claim(device);
+                await RadioPlayerService.Instance.SetCastTargetAsync(item, device.Name, cancellationToken, attempt);
+            }
+        }
+        catch (Exception ex) when (device is not null
+                                   && !(ex is OperationCanceledException && cancellationToken.IsCancellationRequested))
+        {
+            ForgetLiveDevice(device);
+            throw;
+        }
+    }
+
     public RendererItem Claim(CastDevice device) =>
         _renderers?.Claim(device) ?? throw new InvalidOperationException("Renderer discovery is unavailable.");
 

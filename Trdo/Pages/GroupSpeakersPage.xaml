@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Trdo.Pages.GroupSpeakersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:Trdo.Pages"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+
+        <TextBlock
+            x:Name="PageTitle"
+            FontSize="20"
+            FontWeight="SemiBold" />
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" RowSpacing="12">
+            <StackPanel Spacing="12">
+                <TextBlock
+                    x:Name="HintText"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
+
+                <StackPanel
+                    x:Name="LoadingRow"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <ProgressRing
+                        Width="16"
+                        Height="16"
+                        IsActive="True" />
+                    <TextBlock
+                        x:Uid="CastDeviceDialog_Searching"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <TextBlock
+                    x:Name="MessageText"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+            </StackPanel>
+
+            <ListView
+                x:Name="RoomList"
+                Grid.Row="1"
+                AutomationProperties.AutomationId="SonosRoomList"
+                SelectionChanged="RoomList_SelectionChanged"
+                SelectionMode="Multiple"
+                Visibility="Collapsed">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:SonosRoomItem">
+                        <StackPanel Padding="0,6" AutomationProperties.Name="{x:Bind AutomationName}">
+                            <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind Details}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackPanel Grid.Row="2" Spacing="8">
+                <!--  Only while two or more rooms are ticked: a single room is not a group to name  -->
+                <TextBox
+                    x:Name="GroupNameBox"
+                    AutomationProperties.AutomationId="GroupNameBox"
+                    TextChanged="GroupNameBox_TextChanged"
+                    Visibility="Collapsed" />
+                <TextBlock
+                    x:Name="WarningText"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+                <InfoBar
+                    x:Name="GroupError"
+                    AutomationProperties.AutomationId="GroupError"
+                    IsClosable="True"
+                    IsOpen="False"
+                    Severity="Error" />
+            </StackPanel>
+        </Grid>
+
+        <Button
+            x:Name="ApplyButton"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            AutomationProperties.AutomationId="ApplyGroupButton"
+            Click="ApplyButton_Click"
+            IsEnabled="False"
+            Style="{StaticResource AccentButtonStyle}">
+            <TextBlock x:Name="ApplyButtonText" />
+        </Button>
+    </Grid>
+</Page>
