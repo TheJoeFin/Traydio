@@ -931,7 +931,10 @@
                     ToolTipService.ToolTip="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
-                        <FontIcon FontSize="18" Glyph="&#xE7F5;" />
+                        <FontIcon
+                            FontSize="18"
+                            Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                            Glyph="&#xE7F5;" />
                         <Ellipse
                             Width="4"
                             Height="4"
