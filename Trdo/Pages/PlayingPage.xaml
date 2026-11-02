@@ -927,7 +927,6 @@
                     AutomationProperties.Name="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
                     Background="Transparent"
                     BorderThickness="0"
-                    Click="CastMenuItem_Click"
                     CornerRadius="16"
                     ToolTipService.ToolTip="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -941,6 +940,10 @@
                             Fill="{ThemeResource AccentFillColorDefaultBrush}"
                             Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
+                    <!--  Left click: speakers to cast to (filled in by CastSpeakerMenu). Opens upward, so its first item is the farthest from the button.  -->
+                    <Button.Flyout>
+                        <MenuFlyout x:Name="CastShortcutMenu" Placement="Top" />
+                    </Button.Flyout>
                     <Button.ContextFlyout>
                         <MenuFlyout>
                             <MenuFlyoutItem

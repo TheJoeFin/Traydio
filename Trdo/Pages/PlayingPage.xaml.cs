@@ -53,11 +53,15 @@ public sealed partial class PlayingPage : Page
     public PlayerViewModel ViewModel { get; }
     private ShellViewModel? _shellViewModel;
 
+    /// <summary>Populates the cast shortcut's flyout; held so its flyout event handlers stay alive.</summary>
+    private readonly CastSpeakerMenu _castSpeakerMenu;
+
     public PlayingPage()
     {
         Debug.WriteLine("=== PlayingPage Constructor START ===");
 
         InitializeComponent();
+        _castSpeakerMenu = new CastSpeakerMenu(CastShortcutMenu, CastShortcutButton, OpenCastPage);
         // Use shared instance so all pages reference the same ViewModel
         ViewModel = PlayerViewModel.Shared;
         DataContext = ViewModel;
