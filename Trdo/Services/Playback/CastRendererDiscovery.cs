@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Trdo.Services.Playback;
 
@@ -13,9 +15,10 @@ namespace Trdo.Services.Playback;
 /// <para>
 /// This is deliberately not a background service. An mDNS listener holds a multicast socket
 /// open and wakes on every announcement on the LAN, a poor trade for a tray app that casts
-/// rarely. The picker creates one of these when it opens, and disposing it stops every
-/// discoverer, closes the socket and releases every item it found, so nothing is left
-/// running or allocated once the dialog is gone.
+/// rarely. The shared picker session creates one of these while any picker is open (and
+/// briefly after), and disposing it stops every discoverer, closes the socket and releases
+/// every item it found. The player never receives the list's wrapper, only its own held
+/// copy from <see cref="Claim"/>, so disposing either side is independent of the other.
 /// </para>
 /// </summary>
 public sealed class CastRendererDiscovery : IDisposable
@@ -25,7 +28,6 @@ public sealed class CastRendererDiscovery : IDisposable
     private readonly LibVLC _libVlc;
     private readonly DispatcherQueue _uiQueue;
     private readonly List<RendererDiscoverer> _discoverers = [];
-    private readonly HashSet<CastDevice> _claimed = [];
     private bool _isDisposed;
 
     private CastRendererDiscovery(LibVLC libVlc, DispatcherQueue uiQueue, ObservableCollection<CastDevice> devices)
@@ -109,17 +111,32 @@ public sealed class CastRendererDiscovery : IDisposable
     }
 
     /// <summary>
-    /// Hands the device's LibVLC handle to the caller, who becomes responsible for disposing
-    /// it. The discovery stops treating it as its own, so disposing the discovery afterwards
-    /// leaves the item alive for the player.
+    /// Hands the caller a separate <see cref="RendererItem"/> wrapper for the device, with its
+    /// own native reference, so the caller disposes it without touching the wrapper kept in
+    /// <see cref="Devices"/> (which this discovery still owns and disposes itself). Both
+    /// wrappers share the same <see cref="RendererItem.NativeReference"/>.
     /// </summary>
     public RendererItem Claim(CastDevice device)
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (!Devices.Contains(device))
             throw new InvalidOperationException("The renderer is no longer available.");
-        _claimed.Add(device);
-        return device.Item ?? throw new InvalidOperationException("A Sonos row has no LibVLC handle to claim.");
+        RendererItem item = device.Item ?? throw new InvalidOperationException("A Sonos row has no LibVLC handle to claim.");
+        return HoldCopy(item);
+    }
+
+    private static ConstructorInfo? s_wrapperCtor;
+
+    // LibVLCSharp offers no public way to wrap another reference to an item. Its internal
+    // RendererItem(IntPtr) constructor calls libvlc_renderer_item_hold and Dispose releases
+    // it, so each wrapper owns exactly one reference.
+    [DynamicDependency(DynamicallyAccessedMemberTypes.NonPublicConstructors, typeof(RendererItem))]
+    private static RendererItem HoldCopy(RendererItem item)
+    {
+        ConstructorInfo ctor = s_wrapperCtor ??=typeof(RendererItem).GetConstructor(
+            BindingFlags.NonPublic | BindingFlags.Instance, null, [typeof(IntPtr)], null)
+            ?? throw new InvalidOperationException("LibVLCSharp's RendererItem(IntPtr) constructor was not found.");
+        return (RendererItem)ctor.Invoke([item.NativeReference]);
     }
 
     // LibVLC raises these on its own thread. Everything that touches Devices is moved onto
@@ -183,10 +200,7 @@ public sealed class CastRendererDiscovery : IDisposable
             Devices.RemoveAt(index);
             LogService.Info(Component, $"Renderer '{device.Name}' left the network");
 
-            if (!_claimed.Contains(device))
-            {
-                device.Item?.Dispose();
-            }
+            device.Item?.Dispose();
         }
         finally
         {
@@ -248,11 +262,7 @@ public sealed class CastRendererDiscovery : IDisposable
                 continue; // a Sonos row, owned by SonosDiscovery
             }
 
-            if (!_claimed.Contains(device))
-            {
-                device.Item.Dispose();
-            }
-
+            device.Item.Dispose();
             Devices.RemoveAt(i);
         }
         LogService.Info(Component, "Renderer discovery stopped");

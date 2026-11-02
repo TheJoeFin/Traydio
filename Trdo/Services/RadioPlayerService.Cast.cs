@@ -41,9 +41,10 @@ public sealed partial class RadioPlayerService
 
     /// <summary>
     /// Routes playback to <paramref name="renderer"/>, or back to this PC's output when null.
-    /// Takes ownership of the item. If something is playing it is re-opened on the new output;
-    /// otherwise the change simply applies to the next play. White noise is generated locally
-    /// and is not affected.
+    /// Takes ownership of the item, which must be a wrapper of its own (from
+    /// <see cref="CastRendererDiscovery.Claim"/>), never one still held by a discovery list.
+    /// If something is playing it is re-opened on the new output; otherwise the change simply
+    /// applies to the next play. White noise is generated locally and is not affected.
     /// </summary>
     public Task SetCastTargetAsync(RendererItem? renderer, string? displayName, CancellationToken cancellationToken = default, CastAttempt? attempt = null)
     {

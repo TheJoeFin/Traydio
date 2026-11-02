@@ -24,8 +24,9 @@ public sealed class CastDevice
     }
 
     /// <summary>
-    /// The LibVLC handle. Owned by the <see cref="CastRendererDiscovery"/> that found it until
-    /// the device is claimed, after which the player owns it. Null for a Sonos row.
+    /// The LibVLC handle. Always owned by the <see cref="CastRendererDiscovery"/> that found it,
+    /// which disposes it when the row leaves the list; <see cref="CastRendererDiscovery.Claim"/>
+    /// gives the player its own separate wrapper. Null for a Sonos row.
     /// </summary>
     internal RendererItem? Item { get; }
 
