@@ -1056,4 +1056,235 @@
   <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
     <value>Impossible d&apos;arrêter automatiquement la diffusion. Essayez Arrêter la diffusion.</value>
   </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Écouter un aperçu de la station</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Modifier les détails de la station avant de l&apos;ajouter</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>Ajouter une station</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>Rechercher des stations de radio</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Rechercher par nom ou utiliser les filtres...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filtres</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filtres</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Supprimer ce filtre</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>Erreur de recherche</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Rechercher un pays, une langue ou un genre</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>Pays, langue ou genre...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>Aucun pays, langue ou genre ne correspond.</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>Qualité et ordre</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>Codec</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>Débit minimal</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>Trier par</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>Masquer les stations défaillantes</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>Tout effacer</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>Afficher les résultats</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>Récent :</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>Afficher les stations populaires près de chez moi</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>Ou ajouter une station manuellement</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>Ajouter du bruit blanc...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>Ajouter de la musique locale...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>Mini-lecteur Traydio</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>Mini-lecteur</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>Afficher le visualiseur</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>Toujours au premier plan</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>Masquer la barre de titre</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume de la station</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Niveau de mémoire tampon de la station</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Délai des informations de titre de la station en secondes</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Plus d&apos;options des favoris</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>Effacer l&apos;historique d&apos;exportation</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Paramètres de recherche musicale</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Cliquer pour afficher les détails</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>La diffusion Sonos a été fortement inspirée par RoomRelay et son auteur, guicn555. Merci !</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>Continuer</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>Finalisation...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>Impossible de se connecter à Last.fm. Veuillez réessayer plus tard.</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>Last.fm n&apos;est pas configuré pour cette version.</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>Last.fm n&apos;a pas encore reçu votre approbation. Vérifiez que vous avez autorisé l&apos;accès dans le navigateur, puis sélectionnez à nouveau Continuer.</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>Connexion à Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>Connexion à Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>Se connecter à Last.fm</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>Autorisez l&apos;accès à votre compte Last.fm dans la fenêtre du navigateur qui vient de s&apos;ouvrir, puis revenez ici et sélectionnez Continuer.</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>Se connecter à Last.fm</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>Connecté en tant que {0}</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>Non connecté</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>Connecter</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>Enregistrez automatiquement (scrobble) ce que vous écoutez, à la radio et dans votre bibliothèque locale, sur votre compte Last.fm.</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>Déconnecter</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>Options de diffusion</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Couper / rétablir le son de l&apos;enceinte</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Couper / rétablir le son de l&apos;enceinte</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Options de diffusion</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Options de diffusion</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>Volume de {0}</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} a signalé : {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} n&apos;a pas démarré la lecture à temps.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} a arrêté la lecture du flux.</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>Ajouter au groupe</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>Retirer du groupe</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>Grouper les enceintes…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>Grouper les enceintes</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>Choisissez les enceintes qui doivent jouer ensemble.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>Les enceintes que vous ajoutez arrêtent leur lecture en cours et suivent le groupe.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>Nom du groupe</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>Non groupée</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>Lecture avec {0}</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>Le regroupement nécessite au moins deux enceintes Sonos sur ce réseau.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>Aucune enceinte Sonos n&apos;a été trouvée sur ce réseau.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>Impossible de modifier le groupe : {0}</value>
+  </data>
 </root>
