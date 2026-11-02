@@ -72,7 +72,7 @@ public sealed partial class CastPage : Page
             StopCastingButton.Visibility = Visibility.Visible;
         }
 
-        _session = new CastPickerSession(DispatcherQueue);
+        _session = CastPickerSession.Acquire(DispatcherQueue);
         _session.Changed += Session_Changed;
         _session.NetworkChanged += Session_NetworkChanged;
         DeviceList.ItemsSource = _session.Entries;

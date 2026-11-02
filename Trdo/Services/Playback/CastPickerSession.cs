@@ -32,7 +32,26 @@ internal sealed class CastPickerSession : IDisposable
     public event EventHandler? Changed;
     public event EventHandler? NetworkChanged;
 
-    public CastPickerSession(DispatcherQueue queue)
+    // One discovery session is shared by everything that wants cast devices (the speaker
+    // flyout, the cast page, the group page). Each consumer calls Acquire and later Dispose;
+    // the session only shuts down once nobody has held it for IdleGrace, so moving from the
+    // flyout to the cast page reuses what the flyout already found instead of rediscovering.
+    private static readonly TimeSpan IdleGrace = TimeSpan.FromSeconds(60);
+    private static CastPickerSession? s_shared;
+    private int _leases;
+    private CancellationTokenSource? _idle;
+
+    public static CastPickerSession Acquire(DispatcherQueue queue)
+    {
+        CastPickerSession session = s_shared is { _isDisposed: false } existing ? existing : s_shared = new CastPickerSession(queue);
+        session._idle?.Cancel();
+        session._idle?.Dispose();
+        session._idle = null;
+        session._leases++;
+        return session;
+    }
+
+    private CastPickerSession(DispatcherQueue queue)
     {
         _queue = queue;
         _live.CollectionChanged += Live_CollectionChanged;
@@ -312,11 +331,41 @@ internal sealed class CastPickerSession : IDisposable
 
     public void ForgetLiveDevice(CastDevice device) => _live.Remove(device);
 
+    /// <summary>Releases this consumer's hold; discovery keeps running for a grace period in case someone else picks it up.</summary>
     public void Dispose()
+    {
+        if (_isDisposed || _leases == 0)
+            return;
+
+        if (--_leases > 0)
+            return;
+
+        _idle = new CancellationTokenSource();
+        _ = ShutdownWhenIdleAsync(_idle.Token);
+    }
+
+    private async Task ShutdownWhenIdleAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(IdleGrace, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (_leases == 0)
+            Shutdown();
+    }
+
+    private void Shutdown()
     {
         if (_isDisposed)
             return;
 
+        if (ReferenceEquals(s_shared, this))
+            s_shared = null;
         _isDisposed = true;
         _context.Changed -= Context_Changed;
         _live.CollectionChanged -= Live_CollectionChanged;

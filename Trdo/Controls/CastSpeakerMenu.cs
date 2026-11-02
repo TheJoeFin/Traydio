@@ -41,7 +41,7 @@ internal sealed class CastSpeakerMenu
         _keepOpen = TrayPopupWindow.FromXamlRoot(_anchor.XamlRoot)?.KeepOpen();
 
         _signature = string.Empty;
-        _session = new CastPickerSession(_anchor.DispatcherQueue);
+        _session = CastPickerSession.Acquire(_anchor.DispatcherQueue);
         _session.Changed += Session_Changed;
         Rebuild();
     }

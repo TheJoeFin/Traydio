@@ -60,7 +60,7 @@ public sealed partial class GroupSpeakersPage : Page
 
         _keepOpen = TrayPopupWindow.FromXamlRoot(XamlRoot)?.KeepOpen();
         _operation = new CancellationTokenSource();
-        _session = new CastPickerSession(DispatcherQueue);
+        _session = CastPickerSession.Acquire(DispatcherQueue);
         _ = LoadAsync(_operation.Token);
     }
 
