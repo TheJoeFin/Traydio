@@ -54,11 +54,34 @@ public sealed partial class GroupSpeakersPage : Page
         GroupNameBox.MaxLength = SonosGroupNames.MaxLength;
     }
 
+    // XamlRoot may still be unset while the page is being navigated to, which would leave the
+    // popup unheld; in that case wait for Loaded. Never acquires twice.
+    private void AcquireKeepOpen()
+    {
+        if (_keepOpen is not null)
+            return;
+
+        if (TrayPopupWindow.FromXamlRoot(XamlRoot) is { } popup)
+        {
+            _keepOpen = popup.KeepOpen();
+            return;
+        }
+
+        Loaded -= Page_Loaded;
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= Page_Loaded;
+        AcquireKeepOpen();
+    }
+
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
 
-        _keepOpen = TrayPopupWindow.FromXamlRoot(XamlRoot)?.KeepOpen();
+        AcquireKeepOpen();
         _operation = new CancellationTokenSource();
         _session = CastPickerSession.Acquire(DispatcherQueue);
         _ = LoadAsync(_operation.Token);
@@ -68,6 +91,7 @@ public sealed partial class GroupSpeakersPage : Page
     {
         base.OnNavigatedFrom(e);
 
+        Loaded -= Page_Loaded;
         _operation?.Cancel();
         _session?.Dispose();
         _session = null;

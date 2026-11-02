@@ -57,11 +57,34 @@ public sealed partial class CastPage : Page
 
     private static string GetText(string key, string fallback) => LocalizationService.GetString(key, fallback);
 
+    // XamlRoot may still be unset while the page is being navigated to, which would leave the
+    // popup unheld; in that case wait for Loaded. Never acquires twice.
+    private void AcquireKeepOpen()
+    {
+        if (_keepOpen is not null)
+            return;
+
+        if (TrayPopupWindow.FromXamlRoot(XamlRoot) is { } popup)
+        {
+            _keepOpen = popup.KeepOpen();
+            return;
+        }
+
+        Loaded -= Page_Loaded;
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= Page_Loaded;
+        AcquireKeepOpen();
+    }
+
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
 
-        _keepOpen = TrayPopupWindow.FromXamlRoot(XamlRoot)?.KeepOpen();
+        AcquireKeepOpen();
 
         if (_player.IsCasting)
         {
@@ -84,6 +107,7 @@ public sealed partial class CastPage : Page
     {
         base.OnNavigatedFrom(e);
 
+        Loaded -= Page_Loaded;
         _operation?.Cancel();
         if (_session is not null)
         {
