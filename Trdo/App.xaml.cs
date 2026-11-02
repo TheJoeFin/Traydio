@@ -400,13 +400,27 @@ public partial class App : Application
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _audioSessionGrouping = new AudioSessionGroupingService();
         InitializeTrayIcon();
-        await CastingContextService.Instance.InitializeAsync(_uiDispatcherQueue);
         await UpdateTrayIconAsync();
         UpdatePlayPauseCommandText(forceTooltip: true);
+
+        // Casting history is optional; the tray must not wait on it or fail because of it.
+        _ = InitializeCastingContextAsync(_uiDispatcherQueue);
 
 #if DEBUG
         StartSongChangePopupPreviewIfRequested();
 #endif
+    }
+
+    private static async Task InitializeCastingContextAsync(DispatcherQueue queue)
+    {
+        try
+        {
+            await CastingContextService.Instance.InitializeAsync(queue);
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("App", "Casting context failed to initialize; cast history is unavailable", ex);
+        }
     }
 
 #if DEBUG

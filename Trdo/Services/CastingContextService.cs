@@ -30,6 +30,7 @@ public sealed class CastingContextService
     private int _refreshRevision;
     private int _networkNotificationRevision;
     private int _processedNetworkNotificationRevision;
+    private Task? _initialization;
     private bool _isRunning;
 
     public event EventHandler? Changed;
@@ -46,7 +47,14 @@ public sealed class CastingContextService
     {
     }
 
-    public async Task InitializeAsync(DispatcherQueue queue)
+    /// <summary>
+    /// Safe to call and await more than once; every caller shares one initialization. Until it
+    /// completes there is no network key, so nothing is remembered or offered, and <see cref="Changed"/>
+    /// fires when the first network read lands so listeners refresh.
+    /// </summary>
+    public Task InitializeAsync(DispatcherQueue queue) => _initialization ??= InitializeCoreAsync(queue);
+
+    private async Task InitializeCoreAsync(DispatcherQueue queue)
     {
         _queue = queue;
         try
