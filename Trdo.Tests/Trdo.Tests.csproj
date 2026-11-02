@@ -33,6 +33,8 @@
     <Compile Include="..\Trdo\Services\Playback\CastHistoryJsonContext.cs" Link="Playback\CastHistoryJsonContext.cs" />
     <Compile Include="..\Trdo\Services\Playback\CastHistoryStore.cs" Link="Playback\CastHistoryStore.cs" />
     <Compile Include="..\Trdo\Services\Playback\SonosPolicy.cs" Link="Playback\SonosPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosGroupingPolicy.cs" Link="Playback\SonosGroupingPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosGroupNames.cs" Link="Playback\SonosGroupNames.cs" />
     <Compile Include="..\Trdo\Services\SongChangeAnnouncementPolicy.cs" Link="Services\SongChangeAnnouncementPolicy.cs" />
     <Compile Include="..\Trdo\Services\PlaybackErrorPolicy.cs" Link="Services\PlaybackErrorPolicy.cs" />
     <Compile Include="..\Trdo\Services\LocalMusicPlaybackPolicy.cs" Link="Services\LocalMusicPlaybackPolicy.cs" />
