@@ -110,6 +110,73 @@ public sealed class CastHistoryTests
         Assert.IsFalse(rows[2].IsRemembered);
     }
 
+    private static CastHistoryDevice SonosGroup(string coordinator, string name, params string[] roomUuids) =>
+        Sonos(coordinator, name) with { Rooms = [.. name.Split(" + ")], RoomUuids = roomUuids };
+
+    [TestMethod]
+    public void Merge_ResolvesARememberedSpeakerToTheGroupItHasJoined()
+    {
+        CastHistoryDevice kitchen = Sonos("RINCON_K") with { LastUsedUtc = Earlier };
+        List<CastHistoryRow> rows = CastHistoryPolicy.Merge([kitchen],
+            [SonosGroup("RINCON_L", "Living Room + Kitchen", "RINCON_L", "RINCON_K")]);
+
+        Assert.HasCount(1, rows);
+        Assert.AreEqual("Living Room + Kitchen", rows[0].Device.Name);
+        Assert.IsTrue(rows[0].IsRemembered && rows[0].IsAvailable);
+        Assert.AreEqual(Earlier, rows[0].Device.LastUsedUtc);
+    }
+
+    [TestMethod]
+    public void Merge_FoldsSeveralRememberedRoomsInOneGroupIntoOneRowWithTheLatestUse()
+    {
+        CastHistoryDevice kitchen = Sonos("RINCON_K") with { LastUsedUtc = Earlier };
+        CastHistoryDevice office = Sonos("RINCON_O", "Office") with { LastUsedUtc = Earlier.AddHours(2) };
+        List<CastHistoryRow> rows = CastHistoryPolicy.Merge([kitchen, office],
+            [SonosGroup("RINCON_L", "Living Room + Kitchen + Office", "RINCON_L", "RINCON_K", "RINCON_O")]);
+
+        Assert.HasCount(1, rows);
+        Assert.IsTrue(rows[0].IsAvailable);
+        Assert.AreEqual(Earlier.AddHours(2), rows[0].Device.LastUsedUtc);
+    }
+
+    [TestMethod]
+    public void Merge_LeavesARememberedSpeakerAloneWhenNoLiveGroupContainsIt()
+    {
+        CastHistoryDevice kitchen = Sonos("RINCON_K") with { LastUsedUtc = Earlier };
+        List<CastHistoryRow> rows = CastHistoryPolicy.Merge([kitchen],
+            [SonosGroup("RINCON_L", "Living Room + Den", "RINCON_L", "RINCON_D")]);
+
+        Assert.HasCount(2, rows);
+        Assert.AreEqual("Kitchen", rows[0].Device.Name);
+        Assert.IsFalse(rows[0].IsAvailable);
+        Assert.IsFalse(rows[1].IsRemembered);
+    }
+
+    [TestMethod]
+    public void Resolves_IsLooserThanMatchesSoCastingToAGroupKeepsTheSoloEntry()
+    {
+        CastHistoryDevice kitchen = Sonos("RINCON_K");
+        CastHistoryDevice group = SonosGroup("RINCON_L", "Living Room + Kitchen", "RINCON_L", "RINCON_K");
+        Assert.IsTrue(CastHistoryPolicy.Resolves(kitchen, group));
+        Assert.IsFalse(CastHistoryPolicy.Matches(kitchen, group));
+
+        CastHistoryDocument document = CastHistoryPolicy.CreateDocument();
+        CastHistoryPolicy.RecordSuccess(document, new CastAttempt("home", 1, kitchen), Earlier);
+        CastHistoryPolicy.RecordSuccess(document, new CastAttempt("home", 1, group), Earlier.AddHours(1));
+        Assert.HasCount(2, CastHistoryPolicy.FindNetwork(document, "home")!.Devices);
+    }
+
+    [TestMethod]
+    public void RoomsAreNotPersisted()
+    {
+        CastHistoryDocument document = CastHistoryPolicy.CreateDocument();
+        CastHistoryPolicy.RecordSuccess(document,
+            new CastAttempt("home", 1, SonosGroup("RINCON_L", "Living Room + Kitchen", "RINCON_L", "RINCON_K")), Earlier);
+        string json = CastHistoryStorageFormat.Serialize(document);
+        Assert.DoesNotContain("RINCON_K", json);
+        Assert.IsEmpty(CastHistoryStorageFormat.Parse(json).Networks[0].Devices[0].RoomUuids);
+    }
+
     [TestMethod]
     public void Merge_DeduplicatesRendererReannouncementsButNotDifferentProtocols()
     {

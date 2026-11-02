@@ -283,7 +283,8 @@ public sealed class SonosDiscovery : IDisposable
             if (match is null ||
                 !string.Equals(match.Name, existing.Name, StringComparison.Ordinal) ||
                 !match.Address.Equals(existing.Address) ||
-                match.Port != existing.Port)
+                match.Port != existing.Port ||
+                !match.RoomUuids.SequenceEqual(existing.RoomUuids, StringComparer.OrdinalIgnoreCase))
             {
                 LogService.Info(Component, $"Sonos '{existing.Name}' {(match is null ? "left the network" : "changed")}");
                 _devices.RemoveAt(i);

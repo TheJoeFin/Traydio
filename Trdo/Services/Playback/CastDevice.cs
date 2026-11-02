@@ -51,6 +51,8 @@ public sealed class CastDevice
             Uuid = sonos.Uuid,
             Address = sonos.Address.ToString(),
             Port = sonos.Port,
+            Rooms = sonos.Rooms,
+            RoomUuids = sonos.RoomUuids,
         }
         : new CastHistoryDevice
         {

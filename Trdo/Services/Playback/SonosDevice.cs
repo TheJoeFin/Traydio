@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Trdo.Services.Playback;
@@ -9,14 +10,32 @@ namespace Trdo.Services.Playback;
 /// </summary>
 public sealed class SonosDevice
 {
-    public SonosDevice(string uuid, string name, string kind, IPAddress address, int port)
+    public SonosDevice(
+        string uuid,
+        string name,
+        string kind,
+        IPAddress address,
+        int port,
+        IReadOnlyList<string>? rooms = null,
+        IReadOnlyList<string>? roomUuids = null)
     {
         Uuid = uuid;
         Name = name;
         Kind = kind;
         Address = address;
         Port = port;
+        Rooms = rooms ?? [];
+        RoomUuids = roomUuids ?? new[] { uuid };
     }
+
+    /// <summary>The rooms playing together under this target. Empty when only a name is known.</summary>
+    public IReadOnlyList<string> Rooms { get; }
+
+    /// <summary>
+    /// UUIDs of every visible room in the group, the coordinator included. A speaker that was
+    /// cast to on its own is now reached through whichever group it has since been put into.
+    /// </summary>
+    public IReadOnlyList<string> RoomUuids { get; }
 
     /// <summary>The RINCON_… identifier of the coordinating player, without the "uuid:" prefix.</summary>
     public string Uuid { get; }
@@ -56,7 +75,22 @@ public sealed class SonosDevice
             SonosPolicy.GroupDisplayName(group.RoomNames),
             SonosPolicy.GroupKind(group.RoomNames.Count),
             address,
-            location.Port);
+            location.Port,
+            group.RoomNames,
+            group.RoomUuids);
+    }
+
+    /// <summary>Builds a device for one room from the address a topology report gives for it, or null if unreadable.</summary>
+    public static SonosDevice? FromRoom(SonosRoom room)
+    {
+        if (!Uri.TryCreate(room.Location, UriKind.Absolute, out Uri? location) ||
+            !IPAddress.TryParse(location.Host, out IPAddress? address))
+        {
+            return null;
+        }
+
+        return new SonosDevice(room.Uuid, room.Name, "Sonos", address, location.Port,
+            new[] { room.Name }, new[] { room.Uuid });
     }
 
     public bool SameTargetAs(SonosDevice? other) =>

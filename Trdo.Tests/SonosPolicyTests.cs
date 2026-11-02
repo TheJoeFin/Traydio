@@ -129,6 +129,7 @@ public sealed class SonosPolicyTests
         Assert.AreEqual("RINCON_A", groups[0].CoordinatorUuid);
         Assert.AreEqual("http://192.168.1.20:1400/xml/device_description.xml", groups[0].CoordinatorLocation);
         CollectionAssert.AreEqual(new[] { "Kitchen", "Living Room" }, groups[0].RoomNames.ToArray());
+        CollectionAssert.AreEqual(new[] { "RINCON_A", "RINCON_B" }, groups[0].RoomUuids.ToArray());
         Assert.AreEqual("RINCON_D", groups[1].CoordinatorUuid);
         Assert.AreEqual("Kitchen + Living Room", SonosPolicy.GroupDisplayName(groups[0].RoomNames));
         Assert.AreEqual("Sonos group", SonosPolicy.GroupKind(groups[0].RoomNames.Count));

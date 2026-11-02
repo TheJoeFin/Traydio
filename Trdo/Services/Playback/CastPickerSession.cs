@@ -134,9 +134,12 @@ internal sealed class CastPickerSession : IDisposable
                 if (SonosDevice.FromZoneGroup(group) is not { } device)
                     continue;
 
-                if (string.Equals(device.Uuid, remembered.Uuid, StringComparison.OrdinalIgnoreCase))
+                // The speaker itself, or the group it has since been put into.
+                if (CastHistoryPolicy.Resolves(remembered, new CastDevice(device).ToHistoryDevice()))
                 {
-                    _live.Add(new CastDevice(device));
+                    // Discovery or another remembered room in this group may have added it already.
+                    if (!_live.Any(existing => existing.Sonos?.SameTargetAs(device) == true))
+                        _live.Add(new CastDevice(device));
                     break;
                 }
             }

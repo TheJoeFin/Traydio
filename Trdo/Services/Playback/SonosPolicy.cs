@@ -27,7 +27,15 @@ public enum SonosTransportState
 public sealed record SonosZoneGroup(
     string CoordinatorUuid,
     string CoordinatorLocation,
-    IReadOnlyList<string> RoomNames);
+    IReadOnlyList<SonosRoom> Members)
+{
+    public IReadOnlyList<string> RoomNames => Members.Select(room => room.Name).ToArray();
+
+    public IReadOnlyList<string> RoomUuids => Members.Select(room => room.Uuid).ToArray();
+}
+
+/// <summary>One visible room in a household: who it is and where to reach it.</summary>
+public sealed record SonosRoom(string Uuid, string Name, string Location);
 
 /// <summary>A snapshot of the speaker's position report for the current track.</summary>
 public sealed record SonosPositionInfo(
@@ -251,7 +259,7 @@ public static class SonosPolicy
 
             string? coordinatorLocation = null;
             bool coordinatorInvisible = false;
-            List<string> rooms = [];
+            List<SonosRoom> rooms = [];
             foreach (XElement member in group.Elements("ZoneGroupMember"))
             {
                 string uuid = (string?)member.Attribute("UUID") ?? string.Empty;
@@ -265,9 +273,9 @@ public static class SonosPolicy
                 }
 
                 if (!invisible && !string.IsNullOrWhiteSpace(zoneName) &&
-                    !rooms.Contains(zoneName, StringComparer.OrdinalIgnoreCase))
+                    !rooms.Exists(room => room.Name.Equals(zoneName.Trim(), StringComparison.OrdinalIgnoreCase)))
                 {
-                    rooms.Add(zoneName.Trim());
+                    rooms.Add(new SonosRoom(uuid, zoneName.Trim(), (string?)member.Attribute("Location") ?? string.Empty));
                 }
             }
 

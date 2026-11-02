@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Trdo.Services.Playback;
 
@@ -19,6 +20,17 @@ public sealed record CastHistoryDevice
     public string? Address { get; init; }
     public int Port { get; init; }
     public DateTimeOffset LastUsedUtc { get; init; }
+
+    /// <summary>
+    /// Rooms in a live Sonos target, for display. Not saved: it describes how the household is
+    /// grouped right now, which is stale the moment someone regroups.
+    /// </summary>
+    [JsonIgnore]
+    public IReadOnlyList<string> Rooms { get; init; } = [];
+
+    /// <summary>UUIDs of those rooms. Not saved, for the same reason as <see cref="Rooms"/>.</summary>
+    [JsonIgnore]
+    public IReadOnlyList<string> RoomUuids { get; init; } = [];
 }
 
 public sealed class NetworkCastHistory
