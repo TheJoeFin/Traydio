@@ -89,10 +89,14 @@ public sealed class CastingContextService
             return;
 
         _processedNetworkNotificationRevision = notificationRevision;
-        if (snapshot.Signature == _network.Signature)
+        bool sameNetwork = snapshot.Signature == _network.Signature;
+
+        // Host addresses can change without the network changing (DHCP renewal, IPv6 privacy
+        // rotation); keep them current for Sonos checks but don't bump the generation.
+        _network = snapshot;
+        if (sameNetwork)
             return;
 
-        _network = snapshot;
         NetworkGeneration++;
         Changed?.Invoke(this, EventArgs.Empty);
         LogService.Info("CastingContextService", $"Wi-Fi context changed (identified={NetworkKey is not null}, remembered={HasRememberedDevices})");
@@ -211,6 +215,8 @@ public sealed class CastingContextService
             Guid adapterId = profile.NetworkAdapter.NetworkAdapterId;
             HashSet<IPAddress> addresses = [];
             bool hasOtherLan = false;
+            List<string> subnets = [];
+            List<string> gateways = [];
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (adapter.OperationalStatus != OperationalStatus.Up ||
@@ -218,18 +224,40 @@ public sealed class CastingContextService
                     continue;
 
                 bool isWifi = Guid.TryParse(adapter.Id, out Guid id) && id == adapterId;
-                foreach (UnicastIPAddressInformation address in adapter.GetIPProperties().UnicastAddresses)
+                IPInterfaceProperties properties = adapter.GetIPProperties();
+                bool hasGateway = false;
+                foreach (GatewayIPAddressInformation gateway in properties.GatewayAddresses)
+                {
+                    if (!NetworkContextPolicy.IsUsableGateway(gateway.Address))
+                        continue;
+                    hasGateway = true;
+                    if (isWifi)
+                        gateways.Add(gateway.Address.ToString());
+                }
+
+                bool hasRoutableIpv4 = false;
+                foreach (UnicastIPAddressInformation address in properties.UnicastAddresses)
                 {
                     if (IPAddress.IsLoopback(address.Address))
                         continue;
-                    if (isWifi)
-                        addresses.Add(address.Address);
-                    else
-                        hasOtherLan = true;
+                    bool routableIpv4 = NetworkContextPolicy.IsRoutableIpv4(address.Address);
+                    hasRoutableIpv4 |= routableIpv4;
+                    if (!isWifi)
+                        continue;
+
+                    // Every address is kept for "is this Sonos on my Wi-Fi" checks, but only IPv4
+                    // subnets identify the network (see BuildSignature).
+                    addresses.Add(address.Address);
+                    if (routableIpv4)
+                        subnets.Add(NetworkContextPolicy.Ipv4Subnet(address.Address, address.PrefixLength));
                 }
+
+                if (!isWifi && NetworkContextPolicy.CountsAsOtherLan(adapter.NetworkInterfaceType, adapter.Name,
+                        adapter.Description, hasGateway, hasRoutableIpv4))
+                    hasOtherLan = true;
             }
 
-            string signature = $"{key}:{adapterId}:{hasOtherLan}:{string.Join(",", addresses.Select(address => address.ToString()).Order(StringComparer.Ordinal))}";
+            string signature = NetworkContextPolicy.BuildSignature(key, adapterId, hasOtherLan, subnets, gateways);
             return new NetworkSnapshot(key, signature, addresses, hasOtherLan);
         }
         catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or NetworkInformationException

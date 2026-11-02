@@ -32,6 +32,7 @@
     <Compile Include="..\Trdo\Services\Playback\CastHistoryPolicy.cs" Link="Playback\CastHistoryPolicy.cs" />
     <Compile Include="..\Trdo\Services\Playback\CastHistoryJsonContext.cs" Link="Playback\CastHistoryJsonContext.cs" />
     <Compile Include="..\Trdo\Services\Playback\CastHistoryStore.cs" Link="Playback\CastHistoryStore.cs" />
+    <Compile Include="..\Trdo\Services\Playback\NetworkContextPolicy.cs" Link="Playback\NetworkContextPolicy.cs" />
     <Compile Include="..\Trdo\Services\Playback\SonosPolicy.cs" Link="Playback\SonosPolicy.cs" />
     <Compile Include="..\Trdo\Services\Playback\SonosGroupingPolicy.cs" Link="Playback\SonosGroupingPolicy.cs" />
     <Compile Include="..\Trdo\Services\Playback\SonosGroupNames.cs" Link="Playback\SonosGroupNames.cs" />
