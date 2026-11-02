@@ -722,6 +722,9 @@
   <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
     <value>Polonês</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Russo</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>Escolha o idioma usado em todo o aplicativo.</value>
   </data>

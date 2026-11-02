@@ -1,0 +1,1293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="1" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutPage_BuiltWithOpenSourceBody.Text" xml:space="preserve">
+    <value>Это приложение использует следующие библиотеки с открытым исходным кодом:</value>
+  </data>
+  <data name="AboutPage_BuiltWithOpenSourceTitle.Text" xml:space="preserve">
+    <value>Создано на открытом ПО</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Трансляция на Sonos создана под сильным влиянием RoomRelay и его автора guicn555. Спасибо!</value>
+  </data>
+  <data name="AboutPage_ContactDeveloper.Text" xml:space="preserve">
+    <value>Связаться с разработчиком</value>
+  </data>
+  <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
+    <value>Разработчик</value>
+  </data>
+  <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
+    <value>Нравится Traydio?</value>
+  </data>
+  <data name="AboutPage_Feature_MultiStations.Text" xml:space="preserve">
+    <value>Поддержка множества радиостанций</value>
+  </data>
+  <data name="AboutPage_Feature_StartWithWindows.Text" xml:space="preserve">
+    <value>Автозапуск вместе с Windows</value>
+  </data>
+  <data name="AboutPage_Feature_SystemTray.Text" xml:space="preserve">
+    <value>Интеграция с областью уведомлений для быстрого доступа</value>
+  </data>
+  <data name="AboutPage_Feature_Watchdog.Text" xml:space="preserve">
+    <value>Контроль потока с автоматическим переподключением</value>
+  </data>
+  <data name="AboutPage_FeaturesTitle.Text" xml:space="preserve">
+    <value>Возможности</value>
+  </data>
+  <data name="AboutPage_Formerly.Text" xml:space="preserve">
+    <value>Ранее Trdo</value>
+  </data>
+  <data name="AboutPage_HelpBody.Text" xml:space="preserve">
+    <value>Посмотрите обучение ещё раз, чтобы узнать, как пользоваться Traydio.</value>
+  </data>
+  <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
+    <value>Нужна помощь?</value>
+  </data>
+  <data name="AboutPage_IssuePrompt.Text" xml:space="preserve">
+    <value>Столкнулись с проблемой или есть предложение?</value>
+  </data>
+  <data name="AboutPage_OpenSourceBody.Text" xml:space="preserve">
+    <value>Это приложение с открытым исходным кодом, доступное на GitHub.</value>
+  </data>
+  <data name="AboutPage_OpenSourceTitle.Text" xml:space="preserve">
+    <value>Открытый исходный код</value>
+  </data>
+  <data name="AboutPage_RadioDatabaseTitle.Text" xml:space="preserve">
+    <value>База радиостанций</value>
+  </data>
+  <data name="AboutPage_RateLabel.Text" xml:space="preserve">
+    <value>Оцените приложение:</value>
+  </data>
+  <data name="AboutPage_SupportBody.Text" xml:space="preserve">
+    <value>Если вам нравится Traydio, угостите меня кофе!</value>
+  </data>
+  <data name="AboutPage_SupportTitle.Text" xml:space="preserve">
+    <value>Поддержать разработчика</value>
+  </data>
+  <data name="AboutPage_Title.Text" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="AboutPage_ViewTutorial.Text" xml:space="preserve">
+    <value>Посмотреть обучение</value>
+  </data>
+  <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
+    <value>Перейти на GitHub разработчика</value>
+  </data>
+  <data name="Action_Cancel.Text" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Action_Save.Text" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="AddStation_AddPageTitle" xml:space="preserve">
+    <value>Добавить радиостанцию</value>
+  </data>
+  <data name="AddStation_EditPageTitle" xml:space="preserve">
+    <value>Изменить радиостанцию</value>
+  </data>
+  <data name="AddStation_HomepageLabel.Text" xml:space="preserve">
+    <value>Сайт (необязательно)</value>
+  </data>
+  <data name="AddStation_HomepagePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., https://example.com</value>
+  </data>
+  <data name="AddStation_LogoUrlLabel.Text" xml:space="preserve">
+    <value>URL логотипа/значка станции (необязательно)</value>
+  </data>
+  <data name="AddStation_LogoUrlPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., https://example.com/logo.png</value>
+  </data>
+  <data name="AddStation_InvalidUrl" xml:space="preserve">
+    <value>Введите корректный URL с протоколом HTTP или HTTPS.</value>
+  </data>
+  <data name="AddStation_NameRequired" xml:space="preserve">
+    <value>Укажите название станции.</value>
+  </data>
+  <data name="AddStation_PageTitle.Text" xml:space="preserve">
+    <value>Добавить станцию</value>
+  </data>
+  <data name="AddStation_StationNameLabel.Text" xml:space="preserve">
+    <value>Название станции</value>
+  </data>
+  <data name="AddStation_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., Радио Рекорд</value>
+  </data>
+  <data name="AddStation_StreamUrlLabel.Text" xml:space="preserve">
+    <value>URL потока</value>
+  </data>
+  <data name="AddStation_StreamUrlPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., https://example.com/stream</value>
+  </data>
+  <data name="AddStation_UrlRequired" xml:space="preserve">
+    <value>Укажите URL потока.</value>
+  </data>
+  <data name="AddLocalMusic_AddPageTitle" xml:space="preserve">
+    <value>Добавить локальную музыку</value>
+  </data>
+  <data name="AddLocalMusic_EditPageTitle" xml:space="preserve">
+    <value>Изменить локальную музыку</value>
+  </data>
+  <data name="AddLocalMusic_StationNameLabel.Text" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="AddLocalMusic_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., Моя музыка, Избранное</value>
+  </data>
+  <data name="AddLocalMusic_FolderLabel.Text" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="AddLocalMusic_BrowseButton.Content" xml:space="preserve">
+    <value>Обзор...</value>
+  </data>
+  <data name="AddLocalMusic_VolumeLabel.Text" xml:space="preserve">
+    <value>Громкость</value>
+  </data>
+  <data name="AddLocalMusic_NoFolderSelected" xml:space="preserve">
+    <value>Папка не выбрана</value>
+  </data>
+  <data name="AddLocalMusic_NoTracksFound" xml:space="preserve">
+    <value>В этой папке нет аудиофайлов.</value>
+  </data>
+  <data name="AddLocalMusic_OneTrackFound" xml:space="preserve">
+    <value>Найден 1 трек.</value>
+  </data>
+  <data name="AddLocalMusic_TracksFound" xml:space="preserve">
+    <value>Найдено треков: {0}.</value>
+  </data>
+  <data name="AddLocalMusic_OneAlbumFound" xml:space="preserve">
+    <value>Найдена 1 вложенная папка с музыкой. Она станет отдельной станцией в новой папке.</value>
+  </data>
+  <data name="AddLocalMusic_AlbumsFound" xml:space="preserve">
+    <value>Найдено вложенных папок с музыкой: {0}. Каждая станет отдельной станцией в новой папке.</value>
+  </data>
+  <data name="AddWhiteNoise_AddPageTitle" xml:space="preserve">
+    <value>Добавить белый шум</value>
+  </data>
+  <data name="AddWhiteNoise_Blue.Content" xml:space="preserve">
+    <value>Голубой</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Blue" xml:space="preserve">
+    <value>Яркий, с уклоном в область высоких частот.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Brown" xml:space="preserve">
+    <value>Глубокий, тяжёлый гул почти без шипения. Подходит для расслабления.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Grey" xml:space="preserve">
+    <value>Звучит одинаково громко на всех частотах. Подходит для концентрации.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Pink" xml:space="preserve">
+    <value>Мягче, с уклоном в область низких частот, как шум дождя. Подходит для сна.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Violet" xml:space="preserve">
+    <value>Очень яркий, с преобладанием высоких частот.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_White" xml:space="preserve">
+    <value>Ровное шипение на всех частотах. Подходит для маскировки посторонних звуков и для тестирования.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorLabel.Text" xml:space="preserve">
+    <value>Цвет шума</value>
+  </data>
+  <data name="AddWhiteNoise_Brown.Content" xml:space="preserve">
+    <value>Коричневый</value>
+  </data>
+  <data name="AddWhiteNoise_DefaultName" xml:space="preserve">
+    <value>Белый шум</value>
+  </data>
+  <data name="AddWhiteNoise_EditPageTitle" xml:space="preserve">
+    <value>Изменить белый шум</value>
+  </data>
+  <data name="AddWhiteNoise_Grey.Content" xml:space="preserve">
+    <value>Серый</value>
+  </data>
+  <data name="AddWhiteNoise_PageTitle.Text" xml:space="preserve">
+    <value>Добавить белый шум</value>
+  </data>
+  <data name="AddWhiteNoise_Pink.Content" xml:space="preserve">
+    <value>Розовый</value>
+  </data>
+  <data name="AddWhiteNoise_StationNameLabel.Text" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="AddWhiteNoise_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>напр., Дождь, Вентилятор, Шум океана</value>
+  </data>
+  <data name="AddWhiteNoise_Violet.Content" xml:space="preserve">
+    <value>Фиолетовый</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeLabel.Text" xml:space="preserve">
+    <value>Громкость</value>
+  </data>
+  <data name="AddWhiteNoise_White.Content" xml:space="preserve">
+    <value>Белый</value>
+  </data>
+  <data name="App_ExitApplicationCommand.Description" xml:space="preserve">
+    <value>Выйти из Traydio</value>
+  </data>
+  <data name="App_ExitApplicationCommand.Label" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="App_PlayPauseCommand.Description" xml:space="preserve">
+    <value>Воспроизвести радио или поставить на паузу</value>
+  </data>
+  <data name="App_PlayPauseCommand.Label" xml:space="preserve">
+    <value>Воспроизвести</value>
+  </data>
+  <data name="App_ShowHideWindowCommand.Description" xml:space="preserve">
+    <value>Показать или скрыть главное окно</value>
+  </data>
+  <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
+    <value>Показать окно</value>
+  </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Транслировать</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Трансляция на устройство</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Сейчас идёт трансляция на {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Устройства пока не найдены. Убедитесь, что устройство включено и подключено к той же сети, что и этот компьютер.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>Не удалось начать трансляцию на {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Поиск устройств в вашей сети…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Остановить трансляцию</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>Трансляция недоступна на этом компьютере: не удалось загрузить модуль воспроизведения LibVLC, а сетевое подключение для поиска проигрывателей Sonos отсутствует.</value>
+  </data>
+  <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
+    <value>Нажмите на значок звезды у понравившихся песен, чтобы сохранить их здесь</value>
+  </data>
+  <data name="FavoritesPage_EmptyTitle.Text" xml:space="preserve">
+    <value>Избранных песен пока нет</value>
+  </data>
+  <data name="FavoritesPage_Export.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Экспортировать избранное в файл плейлиста</value>
+  </data>
+  <data name="FavoritesPage_ExportFailed" xml:space="preserve">
+    <value>Не удалось выполнить экспорт</value>
+  </data>
+  <data name="FavoritesPage_ExportLabel.Text" xml:space="preserve">
+    <value>Экспорт…</value>
+  </data>
+  <data name="FavoritesPage_IncludeInNextExport.Text" xml:space="preserve">
+    <value>Включить в следующий экспорт</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Дополнительные параметры</value>
+  </data>
+  <data name="FavoritesPage_Remove.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Удалить из избранного</value>
+  </data>
+  <data name="FavoritesPage_Title.Text" xml:space="preserve">
+    <value>Избранные песни</value>
+  </data>
+  <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
+    <value>Дополнительно</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
+    <value>Размер буфера</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelDescription.Text" xml:space="preserve">
+    <value>Больший буфер помогает при нестабильном соединении, но немного увеличивает задержку воспроизведения. Меняйте это значение только для станции, которой это действительно нужно.</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Переопределить размер буфера для этой станции</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.OffContent" xml:space="preserve">
+    <value>Как в настройках приложения</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.OnContent" xml:space="preserve">
+    <value>Своё значение для этой станции</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelay.Text" xml:space="preserve">
+    <value>Задержка информации о треке</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>Завершение...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>Не удалось подключиться к Last.fm. Повторите попытку позже.</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>Last.fm не настроен в этой сборке.</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>Last.fm пока не получил ваше подтверждение. Убедитесь, что вы разрешили доступ в браузере, и снова нажмите «Продолжить».</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>Подключение к Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>Подключение к Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>Подключение к Last.fm</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>Разрешите доступ к своей учётной записи Last.fm в только что открывшемся окне браузера, затем вернитесь сюда и нажмите «Продолжить».</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>Подключение к Last.fm</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>Подключено как {0}</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>Не подключено</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>Подключить</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>Автоматически скробблить всё, что вы слушаете, — по радио и в локальной библиотеке — в вашу учётную запись Last.fm.</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>Отключить</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayDescription.Text" xml:space="preserve">
+    <value>Некоторые станции объявляют следующий трек раньше, чем он действительно начинается. Задержите информацию о треке, чтобы она менялась в тот момент, когда вы слышите песню. Насколько станция опережает звук, зависит от её кодировщика, поэтому настраивайте это отдельно для каждой станции.</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Переопределить задержку информации о треке для этой станции</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.OffContent" xml:space="preserve">
+    <value>Как в настройках приложения</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
+    <value>Своё значение для этой станции</value>
+  </data>
+  <data name="ManualStationWindow_Title" xml:space="preserve">
+    <value>Traydio — добавить станцию</value>
+  </data>
+  <data name="ManualStationWindow_Volume.Text" xml:space="preserve">
+    <value>Громкость</value>
+  </data>
+  <data name="ManualStationWindow_VolumeDescription.Text" xml:space="preserve">
+    <value>Запоминается для этой станции, поэтому уровень сохраняется, когда вы переключаетесь на другую станцию и обратно.</value>
+  </data>
+  <data name="NowPlayingPage_IdleSubtitle.Text" xml:space="preserve">
+    <value>Запустите воспроизведение, чтобы увидеть название и исполнителя</value>
+  </data>
+  <data name="NowPlayingPage_IdleTitle.Text" xml:space="preserve">
+    <value>Ни одна станция не играет</value>
+  </data>
+  <data name="NowPlayingPage_Label_Artist.Text" xml:space="preserve">
+    <value>Исполнитель</value>
+  </data>
+  <data name="NowPlayingPage_Label_Title.Text" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
+    <value>Недавние треки</value>
+  </data>
+  <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
+    <value>Треки</value>
+  </data>
+  <data name="NowPlayingPage_Title.Text" xml:space="preserve">
+    <value>Сейчас играет</value>
+  </data>
+  <data name="NowPlayingPage_Tooltip_Favorite.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Добавить песню в избранное</value>
+  </data>
+  <data name="NowPlayingPage_Tooltip_SearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Настройки поиска музыки</value>
+  </data>
+  <data name="PlaybackFailure_NoDetail" xml:space="preserve">
+    <value>Не удалось воспроизвести эту станцию. Возможно, поток недоступен или URL указан неверно.</value>
+  </data>
+  <data name="PlaybackFailure_NoNetwork" xml:space="preserve">
+    <value>Нет подключения к интернету. Подключитесь к сети и повторите попытку.</value>
+  </data>
+  <data name="PlaybackFailure_TooManyAttemptsNoDetail" xml:space="preserve">
+    <value>Не удалось воспроизвести эту станцию после нескольких попыток. Возможно, поток отключён или URL указан неверно.</value>
+  </data>
+  <data name="PlaybackFailure_TooManyAttemptsWithDetail" xml:space="preserve">
+    <value>Не удалось воспроизвести эту станцию после нескольких попыток ({0}). Возможно, поток отключён или URL указан неверно.</value>
+  </data>
+  <data name="PlaybackFailure_WithDetail" xml:space="preserve">
+    <value>Не удалось воспроизвести эту станцию: {0}</value>
+  </data>
+  <data name="PlaybackFailure_WhiteNoiseNoOutput" xml:space="preserve">
+    <value>Не удалось воспроизвести белый шум — нет доступного устройства вывода звука.</value>
+  </data>
+  <data name="PlaybackFailure_WithSentenceDetail" xml:space="preserve">
+    <value>Не удалось воспроизвести эту станцию. {0}</value>
+  </data>
+  <data name="PlayerViewModel_Buffering" xml:space="preserve">
+    <value>Буферизация</value>
+  </data>
+  <data name="PlayerViewModel_FailedToInitializeStream" xml:space="preserve">
+    <value>Не удалось инициализировать поток: {0}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToPause" xml:space="preserve">
+    <value>Не удалось поставить на паузу {0}: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToPlay" xml:space="preserve">
+    <value>Не удалось воспроизвести {0}: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToRestore" xml:space="preserve">
+    <value>Не удалось восстановить {0}: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToSwitch" xml:space="preserve">
+    <value>Не удалось переключиться на {0}: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToUpdateStream" xml:space="preserve">
+    <value>Не удалось обновить поток: {0}</value>
+  </data>
+  <data name="PlayerViewModel_InvalidStreamUrl" xml:space="preserve">
+    <value>Недопустимый URL потока для {0}</value>
+  </data>
+  <data name="PlayerViewModel_Pause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="PlayerViewModel_PauseAndClose" xml:space="preserve">
+    <value>Пауза и закрыть</value>
+  </data>
+  <data name="PlayerViewModel_Play" xml:space="preserve">
+    <value>Воспроизвести</value>
+  </data>
+  <data name="PlayingPage_About.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>О Traydio</value>
+  </data>
+  <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
+    <value>Добавьте первую станцию</value>
+  </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Трансляция…</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>Параметры трансляции</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>Трансляция на {0}…</value>
+  </data>
+  <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
+    <value>Удалить группу</value>
+  </data>
+  <data name="PlayingPage_DeleteGroupAndStations.Text" xml:space="preserve">
+    <value>Удалить группу и её станции</value>
+  </data>
+  <data name="PlayingPage_Edit.Text" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="PlayingPage_EditLabel.Text" xml:space="preserve">
+    <value>Изменить метку</value>
+  </data>
+  <data name="PlayingPage_EmptySubtitle.Text" xml:space="preserve">
+    <value>Добавьте любимую радиостанцию, чтобы начать слушать.</value>
+  </data>
+  <data name="PlayingPage_EmptyTitle.Text" xml:space="preserve">
+    <value>Станций пока нет</value>
+  </data>
+  <data name="PlayingPage_Favorites.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Избранные песни</value>
+  </data>
+  <data name="PlayingPage_GroupBy.Text" xml:space="preserve">
+    <value>Группировать по</value>
+  </data>
+  <data name="PlayingPage_HideVolumeSlider" xml:space="preserve">
+    <value>Скрыть регулятор громкости</value>
+  </data>
+  <data name="PlayingPage_InsertDividerAbove.Text" xml:space="preserve">
+    <value>Вставить разделитель выше</value>
+  </data>
+  <data name="PlayingPage_Manual.Content" xml:space="preserve">
+    <value>Вручную</value>
+  </data>
+  <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
+    <value>Переместить в группу</value>
+  </data>
+  <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
+    <value>Новый разделитель</value>
+  </data>
+  <data name="PlayingPage_NewGroup.Text" xml:space="preserve">
+    <value>Новая группа</value>
+  </data>
+  <data name="PlayingPage_OpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="PlayingPage_PlaybackErrorClose" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
+    <value>Ошибка воспроизведения</value>
+  </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Выключить / включить звук</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Выключить / включить звук колонки</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Выключить / включить звук колонки</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Параметры трансляции</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Параметры трансляции</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>Громкость: {0}</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} сообщает: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} не начал воспроизведение вовремя.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} прекратил воспроизведение потока.</value>
+  </data>
+  <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Открыть мини-плеер</value>
+  </data>
+  <data name="PlayingPage_QuitButton.Content" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="PlayingPage_QuitButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Выйти из Traydio</value>
+  </data>
+  <data name="PlayingPage_RefreshAllInfo.Text" xml:space="preserve">
+    <value>Обновить сведения обо всех станциях</value>
+  </data>
+  <data name="PlayingPage_RefreshStationInfo.Text" xml:space="preserve">
+    <value>Обновить сведения о станции</value>
+  </data>
+  <data name="PlayingPage_Remove.Text" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="PlayingPage_RemoveDivider.Text" xml:space="preserve">
+    <value>Удалить разделитель</value>
+  </data>
+  <data name="PlayingPage_Rename.Text" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="PlayingPage_Settings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="PlayingPage_ShowVolume.Text" xml:space="preserve">
+    <value>Показать регулятор громкости</value>
+  </data>
+  <data name="PlayingPage_CancelSleepTimer.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Отменить таймер сна</value>
+  </data>
+  <data name="PlayingPage_SleepTimer.Text" xml:space="preserve">
+    <value>Таймер сна</value>
+  </data>
+  <data name="PlayingPage_SleepTimer15Minutes.Text" xml:space="preserve">
+    <value>15 минут</value>
+  </data>
+  <data name="PlayingPage_SleepTimer20Minutes.Text" xml:space="preserve">
+    <value>20 минут</value>
+  </data>
+  <data name="PlayingPage_SleepTimer30Minutes.Text" xml:space="preserve">
+    <value>30 минут</value>
+  </data>
+  <data name="PlayingPage_SleepTimer45Minutes.Text" xml:space="preserve">
+    <value>45 минут</value>
+  </data>
+  <data name="PlayingPage_SleepTimer50Minutes.Text" xml:space="preserve">
+    <value>50 минут</value>
+  </data>
+  <data name="PlayingPage_SortBy.Text" xml:space="preserve">
+    <value>Сортировать по</value>
+  </data>
+  <data name="PlayingPage_StationButton.Text" xml:space="preserve">
+    <value>Станция</value>
+  </data>
+  <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
+    <value>Станции</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Остановить трансляцию</value>
+  </data>
+  <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Показать треки альбома</value>
+  </data>
+  <data name="PlayingPage_VisitWebsite.Text" xml:space="preserve">
+    <value>Перейти на сайт</value>
+  </data>
+  <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
+    <value>Разрешить компьютеру переходить в спящий режим по обычному расписанию во время воспроизведения радио. Учтите, что сама Windows может не давать компьютеру уснуть, пока воспроизводится любой звук.</value>
+  </data>
+  <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
+    <value>Разрешить спящий режим</value>
+  </data>
+  <data name="SettingsPage_AutoIncreaseBufferDescription.Text" xml:space="preserve">
+    <value>Позволить Traydio автоматически увеличивать буфер, когда поток воспроизводится с перебоями.</value>
+  </data>
+  <data name="SettingsPage_AutoIncreaseBufferTitle.Text" xml:space="preserve">
+    <value>Автоматически увеличивать буфер при подтормаживании</value>
+  </data>
+  <data name="SettingsPage_AutoPlayWarning.Message" xml:space="preserve">
+    <value>Это значит, что звук начнёт воспроизводиться сразу при запуске Traydio. Это может мешать. Вы уверены, что хотите включить эту функцию?</value>
+  </data>
+  <data name="SettingsPage_AutoRecoverDescription.Text" xml:space="preserve">
+    <value>Следить за воспроизведением и автоматически пытаться восстановить его, если поток зависает, прерывается или пропадает звук.</value>
+  </data>
+  <data name="SettingsPage_AutoRecoverTitle.Text" xml:space="preserve">
+    <value>Автовосстановление</value>
+  </data>
+  <data name="SettingsPage_BufferLevelDescription.Text" xml:space="preserve">
+    <value>Больший буфер помогает при нестабильном соединении, но может немного увеличить задержку воспроизведения.</value>
+  </data>
+  <data name="SettingsPage_BufferLevelTitle.Text" xml:space="preserve">
+    <value>Размер буфера</value>
+  </data>
+  <data name="SettingsPage_CopyDiagnostics.Content" xml:space="preserve">
+    <value>Копировать диагностику</value>
+  </data>
+  <data name="SettingsPage_CopyDiagnosticsFailed" xml:space="preserve">
+    <value>Не удалось скопировать диагностику: {0}</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Показать пример всплывающего уведомления о смене песни</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Показать уведомление сейчас, чтобы увидеть, как оно выглядит</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.Content" xml:space="preserve">
+    <value>Показать пример</value>
+  </data>
+  <data name="SettingsPage_DiagnosticsDescription.Text" xml:space="preserve">
+    <value>Traydio ведёт журнал воспроизведения (какой модуль использовался, состояние потока и ошибки). Откройте папку журналов или скопируйте последние данные диагностики, чтобы приложить их к сообщению о проблеме.</value>
+  </data>
+  <data name="SettingsPage_DiagnosticsTitle.Text" xml:space="preserve">
+    <value>Диагностика</value>
+  </data>
+  <data name="SettingsPage_Enable.Content" xml:space="preserve">
+    <value>Включить</value>
+  </data>
+  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+    <value>Не удалось выполнить экспорт: {0}</value>
+  </data>
+  <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
+    <value>Экспортировать станции</value>
+  </data>
+  <data name="SettingsPage_ImportExportDescription.Text" xml:space="preserve">
+    <value>Создайте резервную копию списка станций или перенесите его на другое устройство с помощью плейлистов M3U и PLS.</value>
+  </data>
+  <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
+    <value>Импорт / экспорт станций</value>
+  </data>
+  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+    <value>Не удалось выполнить импорт: {0}</value>
+  </data>
+  <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
+    <value>Импортировать станции</value>
+  </data>
+  <data name="SettingsPage_Language_English.Content" xml:space="preserve">
+    <value>Английский</value>
+  </data>
+  <data name="SettingsPage_Language_System.Content" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="SettingsPage_Language_Spanish.Content" xml:space="preserve">
+    <value>Испанский</value>
+  </data>
+  <data name="SettingsPage_Language_French.Content" xml:space="preserve">
+    <value>Французский</value>
+  </data>
+  <data name="SettingsPage_Language_Chinese.Content" xml:space="preserve">
+    <value>Китайский</value>
+  </data>
+  <data name="SettingsPage_Language_German.Content" xml:space="preserve">
+    <value>Немецкий</value>
+  </data>
+  <data name="SettingsPage_Language_PortugueseBrazil.Content" xml:space="preserve">
+    <value>Португальский (Бразилия)</value>
+  </data>
+  <data name="SettingsPage_Language_PortuguesePortugal.Content" xml:space="preserve">
+    <value>Португальский (Португалия)</value>
+  </data>
+  <data name="SettingsPage_Language_Arabic.Content" xml:space="preserve">
+    <value>Арабский</value>
+  </data>
+  <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
+    <value>Польский</value>
+  </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
+    <value>Выберите язык интерфейса приложения.</value>
+  </data>
+  <data name="SettingsPage_LanguageTitle.Text" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="SettingsPage_MusicSearchServicesDescription.Text" xml:space="preserve">
+    <value>Выберите, какие ссылки будут отображаться на страницах «Сейчас играет» и «Избранное», когда вы захотите найти текущую песню в другом сервисе.</value>
+  </data>
+  <data name="SettingsPage_MusicSearchServicesTitle.Text" xml:space="preserve">
+    <value>Сервисы поиска музыки</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolder.Content" xml:space="preserve">
+    <value>Открыть папку журналов</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolderFailed" xml:space="preserve">
+    <value>Не удалось открыть папку журналов: {0}</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolderFailedLocation" xml:space="preserve">
+    <value>Не удалось открыть папку журналов. Она находится здесь: {0}</value>
+  </data>
+  <data name="SettingsPage_OpenOnStartupDescription.Text" xml:space="preserve">
+    <value>Автоматически запускать Traydio при входе в систему, чтобы плеер был готов без ручного запуска.</value>
+  </data>
+  <data name="SettingsPage_OpenOnStartupTitle.Text" xml:space="preserve">
+    <value>Запускать при старте системы</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_Auto.Content" xml:space="preserve">
+    <value>Авто (рекомендуется)</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_NativeOnly.Content" xml:space="preserve">
+    <value>Только средства Windows</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_NativePreferred.Content" xml:space="preserve">
+    <value>Предпочитать средства Windows</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_RememberedInfo.Text" xml:space="preserve">
+    <value>Traydio запоминает, на каком модуле фактически играет каждая станция, поэтому станция, работающая только на одном из них, в следующий раз запустится сразу на нём. Сбросьте это, если способ воспроизведения станции изменился.</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngineDescription.Text" xml:space="preserve">
+    <value>Выберите, как Traydio воспроизводит потоки. В режиме «Авто» сначала используется LibVLC, а при необходимости — Windows Media Foundation.</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngineTitle.Text" xml:space="preserve">
+    <value>Модуль воспроизведения</value>
+  </data>
+  <data name="SettingsPage_PlayOnStartupDescription.Text" xml:space="preserve">
+    <value>Автоматически возобновлять последнюю станцию сразу после запуска Traydio.</value>
+  </data>
+  <data name="SettingsPage_PlayOnStartupTitle.Text" xml:space="preserve">
+    <value>Воспроизводить при запуске</value>
+  </data>
+  <data name="SettingsPage_PopupDwellExplanation.Text" xml:space="preserve">
+    <value>Как долго уведомление остаётся на экране, прежде чем исчезнуть. Щелчок по нему закрывает его раньше.</value>
+  </data>
+  <data name="SettingsPage_PopupDwellSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Как долго уведомление о песне остаётся на экране, в секундах</value>
+  </data>
+  <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
+    <value>Заполнять тишину во время загрузки станции мягким шумом FM-радио. Он нарастает плавно, а не включается резко, и затихает, когда станция начинает играть.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Прослушать радиошум</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Воспроизвести шум сейчас, чтобы услышать, как он звучит</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.Content" xml:space="preserve">
+    <value>Проверить</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTitle.Text" xml:space="preserve">
+    <value>Радиошум во время буферизации</value>
+  </data>
+  <data name="SettingsPage_RadioStaticToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Воспроизводить радиошум во время буферизации</value>
+  </data>
+  <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
+    <value>Не удалось сбросить запомненные модули: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Очистить журналы</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Не удалось очистить журналы: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Файлы журналов очищены.</value>
+  </data>
+  <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
+    <value>Сбросить запомненные модули</value>
+  </data>
+  <data name="SettingsPage_RestartRequiredInfoBar.Message" xml:space="preserve">
+    <value>Перезапустите Traydio, чтобы завершить смену языка.</value>
+  </data>
+  <data name="SettingsPage_SilenceTimeoutDescription.Text" xml:space="preserve">
+    <value>Задайте, как долго воспроизведение может оставаться беззвучным, прежде чем Traydio автоматически перезапустит поток.</value>
+  </data>
+  <data name="SettingsPage_SilenceTimeoutTitle.Text" xml:space="preserve">
+    <value>Время ожидания при тишине</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupDescription.Text" xml:space="preserve">
+    <value>Показывать короткое уведомление на экране рядом с панелью задач при каждой смене песни.</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupTitle.Text" xml:space="preserve">
+    <value>Уведомление о смене песни</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Уведомление о смене песни</value>
+  </data>
+  <data name="SettingsPage_SongPopupDelayExplanation.Text" xml:space="preserve">
+    <value>Многие станции объявляют трек раньше, чем он действительно начинает звучать. Задержите информацию о треке, чтобы она менялась в тот момент, когда вы слышите песню, — в окне, в мини-плеере, в элементах управления мультимедиа, в истории воспроизведения и в уведомлении. Первый трек после настройки на станцию появляется сразу. Отдельные станции могут переопределить это значение в своих дополнительных настройках или через щелчок правой кнопкой мыши по самому уведомлению.</value>
+  </data>
+  <data name="SettingsPage_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Задержка информации о треке в секундах</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
+    <value>Задержка информации о треке</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Добавить текущую песню в избранное</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Выключить / включить звук</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Ничего не делать</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Воспроизвести / пауза</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Открыть Traydio</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Показать уведомление «Сейчас играет»</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Показать / скрыть мини-плеер</value>
+  </data>
+  <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
+    <value>Выберите, что происходит при щелчке левой и правой кнопкой мыши по значку в области уведомлений. Одно из действий всегда открывает Traydio, чтобы вы могли вернуться в настройки.</value>
+  </data>
+  <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
+    <value>Действия при щелчке по значку в области уведомлений</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Одиночные щелчки срабатывают мгновенно. Если назначить двойной щелчок, одиночный щелчок этой кнопкой будет немного ждать, чтобы Windows могла отличить одно от другого.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Щелчок левой кнопкой</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Двойной щелчок левой кнопкой</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Щелчок правой кнопкой</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Двойной щелчок правой кнопкой</value>
+  </data>
+  <data name="ShellPage_TitleBar.Title" xml:space="preserve">
+    <value>Traydio</value>
+  </data>
+  <data name="SongChangePopup_FavoriteIcon.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Добавить песню в избранное</value>
+  </data>
+  <data name="SongChangePopup_Surface.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Сейчас играет</value>
+  </data>
+  <data name="SongChangePopup_Surface.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Щёлкните, чтобы закрыть; щёлкните правой кнопкой, чтобы настроить задержку информации о треке</value>
+  </data>
+  <data name="SongChangePopup_Title.Text" xml:space="preserve">
+    <value>Сейчас играет</value>
+  </data>
+  <data name="StreamDiagnosis_EngineFailedHealthyServer" xml:space="preserve">
+    <value>Станция работает, но ни один из модулей воспроизведения не смог воспроизвести её на этом компьютере.</value>
+  </data>
+  <data name="StreamDiagnosis_EngineFailedHealthyServerWithReason" xml:space="preserve">
+    <value>Станция работает, но воспроизвести её на этом компьютере не удалось: {0}</value>
+  </data>
+  <data name="StreamDiagnosis_TryPlaylistEntry" xml:space="preserve">
+    <value>{0} Попробуйте указать {1} в качестве адреса потока.</value>
+  </data>
+  <data name="Toggle_Off" xml:space="preserve">
+    <value>Выкл.</value>
+  </data>
+  <data name="Toggle_On" xml:space="preserve">
+    <value>Вкл.</value>
+  </data>
+  <data name="TrayIcon_AddStation" xml:space="preserve">
+    <value>Traydio — добавьте станцию, чтобы начать слушать</value>
+  </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>на {0}</value>
+  </data>
+  <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
+    <value>Щелчок левой кнопкой — пауза</value>
+  </data>
+  <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
+    <value>Щелчок левой кнопкой — воспроизвести</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>Звук выключен</value>
+  </data>
+  <data name="TrayIcon_Paused" xml:space="preserve">
+    <value>Traydio {0} (пауза)
+{1}</value>
+  </data>
+  <data name="TrayIcon_Playing" xml:space="preserve">
+    <value>Traydio {0} (воспроизведение)
+{1}</value>
+  </data>
+  <data name="TrayIcon_PlayingWithNowPlaying" xml:space="preserve">
+    <value>Traydio {0} (воспроизведение)
+{1}
+{2}</value>
+  </data>
+  <data name="TrayIcon_RightClickToPause" xml:space="preserve">
+    <value>Щелчок правой кнопкой — пауза</value>
+  </data>
+  <data name="TrayIcon_RightClickToPlay" xml:space="preserve">
+    <value>Щелчок правой кнопкой — воспроизвести</value>
+  </data>
+  <data name="TutorialWindow_Feature_1.Text" xml:space="preserve">
+    <value>• Лёгкий и минималистичный дизайн</value>
+  </data>
+  <data name="TutorialWindow_Feature_2.Text" xml:space="preserve">
+    <value>• Тысячи радиостанций со всего мира</value>
+  </data>
+  <data name="TutorialWindow_Feature_3.Text" xml:space="preserve">
+    <value>• Красивый фон Mica и современный интерфейс</value>
+  </data>
+  <data name="TutorialWindow_Feature_4.Text" xml:space="preserve">
+    <value>• Тихо живёт в области уведомлений</value>
+  </data>
+  <data name="TutorialWindow_FeaturesTitle.Text" xml:space="preserve">
+    <value>✨ Чем хорош Traydio:</value>
+  </data>
+  <data name="TutorialWindow_Intro.Text" xml:space="preserve">
+    <value>Ваше крошечное радио в области уведомлений Windows</value>
+  </data>
+  <data name="TutorialWindow_QuickStart.Text" xml:space="preserve">
+    <value>Краткое руководство</value>
+  </data>
+  <data name="TutorialWindow_StartButton.Text" xml:space="preserve">
+    <value>Начнём!</value>
+  </data>
+  <data name="TutorialWindow_Step_Options_Desc.Text" xml:space="preserve">
+    <value>Просматривайте станции, меняйте параметры и изучайте все возможности</value>
+  </data>
+  <data name="TutorialWindow_Step_Options_Title.Text" xml:space="preserve">
+    <value>Правая кнопка — дополнительные параметры</value>
+  </data>
+  <data name="TutorialWindow_Step_Pin_Desc.Text" xml:space="preserve">
+    <value>Сделайте так, чтобы значок Traydio всегда был виден в области уведомлений</value>
+  </data>
+  <data name="TutorialWindow_Step_Pin_Title.Text" xml:space="preserve">
+    <value>Закрепите значок</value>
+  </data>
+  <data name="TutorialWindow_Step_Play_Desc.Text" xml:space="preserve">
+    <value>Быстрое и удобное управление воспроизведением всегда под рукой</value>
+  </data>
+  <data name="TutorialWindow_Step_Play_Title.Text" xml:space="preserve">
+    <value>Левая кнопка — воспроизвести / пауза</value>
+  </data>
+  <data name="TutorialWindow_Title" xml:space="preserve">
+    <value>Первый запуск Traydio</value>
+  </data>
+  <data name="TutorialWindow_TitleBar.Title" xml:space="preserve">
+    <value>Traydio</value>
+  </data>
+  <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
+    <value>Добро пожаловать в Traydio!</value>
+  </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Доступно</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Проверка доступности...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>Недоступно</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Использовалось ранее — {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} — {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} недоступно в этой сети.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Подключение...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>Устройство не начало воспроизведение.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>Модуль воспроизведения отклонил устройство для трансляции.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>этот компьютер</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>Добавить в группу</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>Удалить из группы</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>Объединить колонки…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>Объединение колонок</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>Выберите колонки, которые должны играть вместе.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>Добавленные колонки прекращают текущее воспроизведение и присоединяются к группе.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>Название группы</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>Не в группе</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>Играет вместе с: {0}</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>Для объединения нужно как минимум две колонки Sonos в этой сети.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>В этой сети колонки Sonos не найдены.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>Не удалось изменить группу: {0}</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>Не удалось сохранить предпочтение трансляции: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Скрыть кнопку трансляции в этой сети Wi-Fi</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Показать кнопку трансляции в этой сети Wi-Fi</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Автоматически завершать трансляцию</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Возвращаться на это устройство, если воспроизведение остаётся на паузе или остановлено заданное время. Воспроизведение останется на паузе.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Остановить трансляцию при бездействии</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Никогда</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} мин</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Не удалось автоматически остановить трансляцию. Нажмите «Остановить трансляцию».</value>
+  </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Прослушать станцию</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Изменить сведения о станции перед добавлением</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>Добавить станцию</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>Поиск радиостанций</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Поиск по названию или с помощью фильтров...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Фильтры</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Фильтры</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Удалить этот фильтр</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>Ошибка поиска</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Найти страну, язык или жанр</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>Страна, язык или жанр...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>Ни одна страна, язык или жанр не подходят.</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>Качество и порядок</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>Кодек</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>Минимальный битрейт</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>Сортировать по</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>Скрыть неработающие станции</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>Очистить всё</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>Показать результаты</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>Недавние:</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>Показать популярные рядом со мной</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>Или добавьте станцию вручную</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>Добавить белый шум...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>Добавить локальную музыку...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>Мини-плеер Traydio</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>Мини-плеер</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>Показать визуализатор</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>Поверх всех окон</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>Скрыть строку заголовка</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Громкость станции</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Размер буфера станции</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Задержка информации о треке станции в секундах</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Громкость</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Громкость</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Дополнительные параметры избранного</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>Очистить историю экспорта</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Настройки поиска музыки</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Нажмите, чтобы увидеть подробности</value>
+  </data>
+</root>

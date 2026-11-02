@@ -722,6 +722,9 @@
   <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
     <value>波兰语</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>ä¿è¯­</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>选择应用中使用的语言。</value>
   </data>
