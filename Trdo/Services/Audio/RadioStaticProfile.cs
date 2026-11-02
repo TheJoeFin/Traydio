@@ -95,7 +95,21 @@ internal static class RadioStaticProfile
     /// allows amplification above 1).
     /// </param>
     internal static float EffectiveGain(double userVolume) =>
-        (float)(Math.Clamp(userVolume, 0d, 2d) * StaticLevel);
+        EffectiveGain(userVolume, DefaultUserLevel);
+
+    /// <summary>The slider position (0-1) that reproduces the original fixed <see cref="StaticLevel"/>.</summary>
+    internal const double DefaultUserLevel = 0.5;
+
+    /// <summary>
+    /// Gain the static should play at for a given stream volume and the user's static-level setting.
+    /// </summary>
+    /// <param name="userVolume">The player's volume, on the 0-2 scale.</param>
+    /// <param name="staticLevel">
+    /// The Settings slider position, 0-1. <see cref="DefaultUserLevel"/> gives <see cref="StaticLevel"/>;
+    /// 1 doubles it and 0 mutes the static.
+    /// </param>
+    internal static float EffectiveGain(double userVolume, double staticLevel) =>
+        (float)(Math.Clamp(userVolume, 0d, 2d) * StaticLevel * (Math.Clamp(staticLevel, 0d, 1d) / DefaultUserLevel));
 
     /// <summary>
     /// Advances the swell envelope by one step of a bounded random walk.

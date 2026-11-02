@@ -863,6 +863,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Fill the silence while a station loads with gentle FM radio static. It swells in rather than snapping on, and fades back out as the station arrives.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Radio static volume</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Hear the radio static</value>
   </data>

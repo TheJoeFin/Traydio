@@ -41,6 +41,7 @@ public static class SettingsService
     private const string StationSortModeKey = "StationSortMode";
     private const string StationGroupByModeKey = "StationGroupByMode";
     private const string IsRadioStaticEnabledKey = "IsRadioStaticEnabled";
+    private const string RadioStaticLevelKey = "RadioStaticLevel";
     private const string LocalMusicLoopModeKey = "LocalMusicLoopMode";
     private const string RecentStationSearchesKey = "RecentStationSearches";
 
@@ -844,6 +845,39 @@ public static class SettingsService
         get => GetBoolSetting(IsRadioStaticEnabledKey, defaultValue: false);
         set => SetBoolSetting(IsRadioStaticEnabledKey, value);
     }
+
+    /// <summary>
+    /// How loud the buffering static is, 0-1 (0.5 is the original level). Raised through
+    /// <see cref="RadioStaticLevelChanged"/> so a burst already playing follows the slider.
+    /// </summary>
+    public static double RadioStaticLevel
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(RadioStaticLevelKey, out object? value) &&
+                    value is double d)
+                {
+                    return Math.Clamp(d, 0d, 1d);
+                }
+            }
+            catch
+            {
+                // Fall through to the default.
+            }
+
+            return 0.5;
+        }
+        set
+        {
+            SetDoubleSetting(RadioStaticLevelKey, Math.Clamp(value, 0d, 1d));
+            RadioStaticLevelChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>Raised when <see cref="RadioStaticLevel"/> changes.</summary>
+    public static event EventHandler? RadioStaticLevelChanged;
 
     /// <summary>Controls whether local music stops, repeats the track, or repeats the album.</summary>
     public static LocalMusicLoopMode LocalMusicLoopMode

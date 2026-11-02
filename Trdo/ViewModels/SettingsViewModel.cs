@@ -562,6 +562,21 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Static loudness as a 0-100 percentage for the Settings slider.</summary>
+    public double RadioStaticLevelPercent
+    {
+        get => Math.Round(SettingsService.RadioStaticLevel * 100);
+        set
+        {
+            if (Math.Abs(value - RadioStaticLevelPercent) < 0.5) return;
+            SettingsService.RadioStaticLevel = value / 100d;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(RadioStaticLevelText));
+        }
+    }
+
+    public string RadioStaticLevelText => $"{RadioStaticLevelPercent:0}%";
+
     public string RadioStaticToggleText
     {
         get => _radioStaticToggleText;

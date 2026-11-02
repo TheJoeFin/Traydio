@@ -724,6 +724,23 @@
                                 AutomationProperties.AutomationId="RadioStaticTestButton"
                                 Click="RadioStaticTestButton_Click" />
                         </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <Slider
+                                x:Name="RadioStaticLevelSlider"
+                                x:Uid="SettingsPage_RadioStaticLevelSlider"
+                                Grid.Column="0"
+                                AutomationProperties.AutomationId="RadioStaticLevelSlider"
+                                Maximum="100"
+                                Minimum="0"
+                                StepFrequency="5"
+                                SnapsTo="StepValues"
+                                Value="{x:Bind ViewModel.RadioStaticLevelPercent, Mode=TwoWay}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                MinWidth="48"
+                                Style="{StaticResource SettingStatusStyle}"
+                                Text="{x:Bind ViewModel.RadioStaticLevelText, Mode=OneWay}" />
+                        </Grid>
                     </StackPanel>
                 </Border>
 
