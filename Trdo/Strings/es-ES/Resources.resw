@@ -1026,6 +1026,9 @@
   <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
     <value>{0} no está disponible en esta red.</value>
   </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>Se eligió otro dispositivo antes de que este terminara de conectarse.</value>
+  </data>
   <data name="CastDeviceDialog_Connecting" xml:space="preserve">
     <value>Conectando...</value>
   </data>

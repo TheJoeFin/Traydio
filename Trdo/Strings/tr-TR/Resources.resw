@@ -1104,6 +1104,9 @@
   <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
     <value>{0} bu ağda kullanılamıyor.</value>
   </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>Bu cihazın bağlantısı tamamlanmadan başka bir cihaz seçildi.</value>
+  </data>
   <data name="CastDeviceDialog_Connecting" xml:space="preserve">
     <value>Bağlanılıyor...</value>
   </data>

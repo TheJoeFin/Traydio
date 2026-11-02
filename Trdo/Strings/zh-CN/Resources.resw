@@ -1026,6 +1026,9 @@
   <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
     <value>{0} 在此网络上不可用。</value>
   </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>在此设备完成连接之前，已选择了另一台设备。</value>
+  </data>
   <data name="CastDeviceDialog_Connecting" xml:space="preserve">
     <value>正在连接...</value>
   </data>

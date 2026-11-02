@@ -1026,6 +1026,9 @@
   <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
     <value>{0} nie jest dostępne w tej sieci.</value>
   </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>Wybrano inne urządzenie, zanim połączenie z tym zostało nawiązane.</value>
+  </data>
   <data name="CastDeviceDialog_Connecting" xml:space="preserve">
     <value>Łączenie...</value>
   </data>

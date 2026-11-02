@@ -50,6 +50,10 @@ public sealed partial class RadioPlayerService
     // request (a start still confirming, a stop still sending) recognises it is stale.
     private int _sonosSession;
 
+    // Bumped by every target change that gets past the no-op checks, so an older change can
+    // tell a newer one replaced it (unlike _sonosSession, which a play or pause also bumps).
+    private int _sonosTargetChange;
+
     // The transport URI the speaker currently holds, so resuming a paused local track can
     // send Play alone instead of re-setting the URI, which would restart it from the top.
     private string? _sonosCurrentUri;
@@ -169,6 +173,9 @@ public sealed partial class RadioPlayerService
             return;
         }
 
+        // Lets a switch notice a newer one took over while it was awaiting the old speaker.
+        int change = Interlocked.Increment(ref _sonosTargetChange);
+
         // Decided before anything is torn down: IsPlaying reads whichever output is live now.
         bool resume = resumePlayback &&
                       IsPlaybackWanted &&
@@ -183,18 +190,29 @@ public sealed partial class RadioPlayerService
         {
             if (_sonosDevice is not null)
             {
-                Task stop = StopSonosSessionAsync(stopSpeaker: true, cancellationToken);
-                int session = Volatile.Read(ref _sonosSession);
-                await stop;
-                if (_isDisposed)
-                    return;
-
-                // A play or target change during the stop request supersedes this handoff.
-                if (session != Volatile.Read(ref _sonosSession))
+                for (int stops = 0; ; stops++)
                 {
-                    if (_sonosDevice is not null && _sonosPollCts is null)
-                        StartSonosPolling();
-                    return;
+                    Task stop = StopSonosSessionAsync(stopSpeaker: true, cancellationToken);
+                    int session = Volatile.Read(ref _sonosSession);
+                    await stop;
+                    if (_isDisposed)
+                        return;
+
+                    // A newer target change owns the outcome now. Returning quietly would read as
+                    // success to the caller while the speaker never switched, so say it did not.
+                    if (change != Volatile.Read(ref _sonosTargetChange))
+                    {
+                        if (_sonosDevice is not null && _sonosPollCts is null)
+                            StartSonosPolling();
+                        throw new InvalidOperationException(LocalizationService.GetString(
+                            "Sonos_SwitchSuperseded", "Another device was chosen before this one finished connecting."));
+                    }
+
+                    // A play or pause during the stop request is not a reason to abandon the
+                    // switch: the target is still wanted. Stop again so the play it started on the
+                    // old speaker is cancelled and silenced; bounded so a busy caller cannot hold it.
+                    if (session == Volatile.Read(ref _sonosSession) || stops >= 2)
+                        break;
                 }
             }
             else if (resume)
