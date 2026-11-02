@@ -70,9 +70,14 @@ public sealed class SonosDevice
             return null;
         }
 
+        // A group can carry a name the user gave it; otherwise it is called after its rooms.
+        string name = group.RoomNames.Count > 1 && SonosGroupNames.Find(group.RoomUuids) is { } custom
+            ? custom
+            : SonosPolicy.GroupDisplayName(group.RoomNames);
+
         return new SonosDevice(
             group.CoordinatorUuid,
-            SonosPolicy.GroupDisplayName(group.RoomNames),
+            name,
             SonosPolicy.GroupKind(group.RoomNames.Count),
             address,
             location.Port,

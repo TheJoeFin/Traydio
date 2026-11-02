@@ -103,6 +103,20 @@ public sealed class SonosDiscovery : IDisposable
         }
     }
 
+    /// <summary>
+    /// Re-reads the household's grouping now, from the players already found, instead of waiting
+    /// for the next search round. Used right after the app itself changes a group.
+    /// </summary>
+    public async Task RefreshAsync(CancellationToken cancellationToken)
+    {
+        List<string> locations = [.. _devices
+            .Where(device => device.Sonos is not null)
+            .Select(device => device.Sonos!.BaseUrl + "/xml/device_description.xml")];
+        IReadOnlyList<SonosZoneGroup>? groups = await ResolveTopologyAsync(locations, cancellationToken);
+        if (groups is not null)
+            Reconcile(groups);
+    }
+
     /// <summary>One M-SEARCH on every interface, then a short listen for replies. Returns the distinct device-description URLs that answered.</summary>
     private static async Task<List<string>> SearchAsync(CancellationToken cancellationToken)
     {

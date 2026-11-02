@@ -55,6 +55,30 @@ public sealed class SonosController : IDisposable
         ], cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Makes <paramref name="member"/> play along with the group led by <paramref name="coordinatorUuid"/>.
+    /// Sonos groups rooms by pointing the joining room at an "x-rincon:" URI of the room to follow;
+    /// whatever the joining room was playing is dropped.
+    /// </summary>
+    public async Task JoinGroupAsync(SonosDevice member, string coordinatorUuid, CancellationToken cancellationToken)
+    {
+        await InvokeAsync(member.AvTransportControlUrl, SonosPolicy.AvTransportNamespace, "SetAVTransportURI",
+        [
+            new("InstanceID", "0"),
+            new("CurrentURI", "x-rincon:" + coordinatorUuid),
+            new("CurrentURIMetaData", string.Empty),
+        ], cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Takes <paramref name="member"/> out of its group, leaving it to play on its own.</summary>
+    public async Task LeaveGroupAsync(SonosDevice member, CancellationToken cancellationToken)
+    {
+        await InvokeAsync(member.AvTransportControlUrl, SonosPolicy.AvTransportNamespace, "BecomeCoordinatorOfStandaloneGroup",
+        [
+            new("InstanceID", "0"),
+        ], cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task PlayAsync(SonosDevice device, CancellationToken cancellationToken)
     {
         await InvokeAsync(device.AvTransportControlUrl, SonosPolicy.AvTransportNamespace, "Play",
