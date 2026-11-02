@@ -44,15 +44,14 @@
                 </Button>
                 <Button
                     x:Uid="FavoritesPage_Options"
-                    AutomationProperties.Name="More favorites options"
                     Padding="8">
                     <FontIcon FontSize="14" Glyph="&#xE712;" />
                     <Button.Flyout>
                         <MenuFlyout>
                             <MenuFlyoutItem
+                                x:Uid="FavoritesPage_ClearExportHistory"
                                 Click="ClearExportHistory_Click"
-                                IsEnabled="{x:Bind ViewModel.HasArchivedFavorites, Mode=OneWay}"
-                                Text="Clear export history">
+                                IsEnabled="{x:Bind ViewModel.HasArchivedFavorites, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xE7A7;" />
                                 </MenuFlyoutItem.Icon>
@@ -337,14 +336,14 @@
 
                                 <Button
                                     Grid.Column="1"
+                                    x:Uid="FavoritesPage_MusicSearchSettings"
                                     Padding="8"
                                     VerticalAlignment="Center"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Click="SettingsButton_Click"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Tag="{x:Bind}"
-                                    ToolTipService.ToolTip="Music search settings">
+                                    Tag="{x:Bind}">
                                     <FontIcon FontSize="14" Glyph="&#xE713;" />
                                 </Button>
                             </Grid>

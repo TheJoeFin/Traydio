@@ -106,20 +106,20 @@
                                         Orientation="Horizontal"
                                         Spacing="8">
                                         <Button
+                                            x:Uid="SearchStation_PreviewButton"
                                             Click="PreviewButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Preview station">
+                                            Tag="{x:Bind}">
                                             <FontIcon FontSize="14" Glyph="&#xE768;" />
                                         </Button>
                                         <Button
+                                            x:Uid="SearchStation_EditButton"
                                             Click="EditStationButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Edit station details before adding">
+                                            Tag="{x:Bind}">
                                             <FontIcon FontSize="14" Glyph="&#xE70F;" />
                                         </Button>
                                         <Button
+                                            x:Uid="SearchStation_AddButton"
                                             Click="AddStationButton_Click"
-                                            Content="Add Station"
                                             Style="{StaticResource AccentButtonStyle}"
                                             Tag="{x:Bind}" />
                                     </StackPanel>
@@ -143,10 +143,10 @@
 
         <!--  Title  -->
         <TextBlock
+            x:Uid="SearchStation_Title"
             Grid.Row="0"
             FontSize="20"
             FontWeight="SemiBold"
-            Text="Search Radio Stations"
             Visibility="Collapsed" />
 
         <!--  Search Input  -->
@@ -156,20 +156,19 @@
             ColumnSpacing="8">
             <TextBox
                 x:Name="SearchTextBox"
+                x:Uid="SearchStation_SearchBox"
                 Grid.Column="0"
-                PlaceholderText="Search by name, or use filters..."
                 Text="{x:Bind ViewModel.SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Filter toggle shares this cell with the search spinner  -->
             <Grid Grid.Column="1" VerticalAlignment="Center">
                 <ToggleButton
                     x:Name="FilterButton"
+                    x:Uid="SearchStation_FilterButton"
                     Height="32"
                     Padding="8,0"
-                    AutomationProperties.Name="Filters"
                     Checked="FilterButton_Checked"
-                    IsChecked="{x:Bind ViewModel.IsFilterPanelOpen, Mode=TwoWay}"
-                    ToolTipService.ToolTip="Filters">
+                    IsChecked="{x:Bind ViewModel.IsFilterPanelOpen, Mode=TwoWay}">
                     <FontIcon FontSize="16" Glyph="&#xE71C;" />
                 </ToggleButton>
 
@@ -212,12 +211,12 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:IStationFilterChip">
                     <Button
+                        x:Uid="SearchStation_RemoveFilterButton"
                         Padding="8,3"
                         AutomationProperties.Name="{x:Bind ChipLabel}"
                         Click="RemoveFilterButton_Click"
                         CornerRadius="12"
-                        Tag="{x:Bind}"
-                        ToolTipService.ToolTip="Remove this filter">
+                        Tag="{x:Bind}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock FontSize="12" Text="{x:Bind ChipLabel}" />
                             <FontIcon
@@ -232,7 +231,7 @@
 
         <!--  Error InfoBar  -->
         <InfoBar
-            Title="Search Error"
+            x:Uid="SearchStation_ErrorBar"
             Grid.Row="3"
             IsClosable="True"
             IsOpen="{x:Bind ViewModel.HasError, Mode=OneWay}"
@@ -258,9 +257,8 @@
                 ColumnSpacing="8">
                 <TextBox
                     x:Name="FilterQueryTextBox"
+                    x:Uid="SearchStation_FilterQuery"
                     Grid.Column="0"
-                    AutomationProperties.Name="Find a country, language or genre"
-                    PlaceholderText="Country, language or genre..."
                     Text="{x:Bind ViewModel.FilterQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <ProgressRing
                     Grid.Column="1"
@@ -285,9 +283,9 @@
                     <StackPanel Spacing="16">
                         <StackPanel Spacing="0">
                             <TextBlock
+                                x:Uid="SearchStation_NoSuggestions"
                                 FontStyle="Italic"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="No country, language or genre matches that."
                                 TextAlignment="Center"
                                 Visibility="{x:Bind ViewModel.HasNoSuggestions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
@@ -336,9 +334,9 @@
                             WrapPanel when a row runs out of width.
                         -->
                         <StackPanel Spacing="10">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Quality and order" />
+                            <TextBlock x:Uid="SearchStation_QualityAndOrder" Style="{StaticResource BodyStrongTextBlockStyle}" />
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Codec" />
+                                <TextBlock x:Uid="SearchStation_Codec" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -353,7 +351,7 @@
                                 </toolkit:Segmented>
                             </StackPanel>
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Minimum bitrate" />
+                                <TextBlock x:Uid="SearchStation_MinimumBitrate" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -368,7 +366,7 @@
                                 </toolkit:Segmented>
                             </StackPanel>
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Sort by" />
+                                <TextBlock x:Uid="SearchStation_SortBy" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -382,7 +380,7 @@
                                     </toolkit:Segmented.ItemsPanel>
                                 </toolkit:Segmented>
                             </StackPanel>
-                            <CheckBox Content="Hide broken stations" IsChecked="{x:Bind ViewModel.HideBroken, Mode=TwoWay}" />
+                            <CheckBox x:Uid="SearchStation_HideBroken" IsChecked="{x:Bind ViewModel.HideBroken, Mode=TwoWay}" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -392,16 +390,16 @@
                     ColumnDefinitions="*,*"
                     ColumnSpacing="8">
                     <Button
+                        x:Uid="SearchStation_ClearAll"
                         Grid.Column="0"
                         HorizontalAlignment="Stretch"
                         Click="ClearFiltersButton_Click"
-                        Content="Clear all"
                         IsEnabled="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}" />
                     <Button
+                        x:Uid="SearchStation_ShowResults"
                         Grid.Column="1"
                         HorizontalAlignment="Stretch"
                         Click="DoneFilteringButton_Click"
-                        Content="Show results"
                         Style="{StaticResource AccentButtonStyle}" />
                 </Grid>
             </Grid>
@@ -428,10 +426,10 @@
                         ColumnSpacing="8"
                         Visibility="{x:Bind ViewModel.ShowRecentSearches, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock
+                            x:Uid="SearchStation_Recent"
                             Grid.Column="0"
                             VerticalAlignment="Center"
-                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                            Text="Recent:" />
+                            Style="{StaticResource BodyStrongTextBlockStyle}" />
                         <ScrollViewer
                             Grid.Column="1"
                             HorizontalScrollBarVisibility="Auto"
@@ -471,16 +469,16 @@
                             shortcut onto the ordinary search rather than a separate experience.
                         -->
                         <Button
+                            x:Uid="SearchStation_PopularNearMe"
                             HorizontalAlignment="Center"
                             Click="PopularNearYouButton_Click"
-                            Content="Show popular near me"
                             Style="{StaticResource AccentButtonStyle}"
                             Visibility="{x:Bind ViewModel.ShowPopularNearYouOption, Mode=OneTime, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                         <HyperlinkButton
+                            x:Uid="SearchStation_ManualEntry"
                             HorizontalAlignment="Center"
-                            Click="ManualEntryButton_Click"
-                            Content="Or add station manually">
+                            Click="ManualEntryButton_Click">
                             <!--
                                 White noise is a niche enough option that it doesn't deserve a
                                 second permanently-visible link next to the common case - right-click
@@ -488,8 +486,8 @@
                             -->
                             <HyperlinkButton.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Click="AddWhiteNoiseButton_Click" Text="Add white noise..." />
-                                    <MenuFlyoutItem Click="AddLocalMusicButton_Click" Text="Add local music..." />
+                                    <MenuFlyoutItem x:Uid="SearchStation_AddWhiteNoise" Click="AddWhiteNoiseButton_Click" />
+                                    <MenuFlyoutItem x:Uid="SearchStation_AddLocalMusic" Click="AddLocalMusicButton_Click" />
                                 </MenuFlyout>
                             </HyperlinkButton.ContextFlyout>
                         </HyperlinkButton>
@@ -522,7 +520,7 @@
             Click="CancelButton_Click">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon FontSize="16" Glyph="&#xE711;" />
-                <TextBlock Text="Cancel" />
+                <TextBlock x:Uid="Action_Cancel" />
             </StackPanel>
         </Button>
     </Grid>

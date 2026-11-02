@@ -361,8 +361,8 @@
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Click="FavoriteHistoryItem_Click"
-                                Tag="{x:Bind}"
-                                ToolTipService.ToolTip="Favorite Song">
+                                x:Uid="NowPlayingPage_Tooltip_Favorite"
+                                Tag="{x:Bind}">
                                 <FontIcon
                                     FontSize="14"
                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"

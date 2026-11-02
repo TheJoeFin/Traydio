@@ -13,9 +13,7 @@
             <!--  Modern Commands with Fluent Icons  -->
             <XamlUICommand
                 x:Key="ShowHideWindowCommand"
-                x:Uid="App_ShowHideWindowCommand"
-                Description="Show or hide the main window"
-                Label="Show Window">
+                x:Uid="App_ShowHideWindowCommand">
                 <XamlUICommand.IconSource>
                     <FontIconSource FontFamily="Segoe Fluent Icons" Glyph="&#xE8A7;" />
                 </XamlUICommand.IconSource>
@@ -23,9 +21,7 @@
 
             <XamlUICommand
                 x:Key="ExitApplicationCommand"
-                x:Uid="App_ExitApplicationCommand"
-                Description="Exit Traydio"
-                Label="Exit">
+                x:Uid="App_ExitApplicationCommand">
                 <XamlUICommand.IconSource>
                     <FontIconSource FontFamily="Segoe Fluent Icons" Glyph="&#xE8BB;" />
                 </XamlUICommand.IconSource>
@@ -33,9 +29,7 @@
 
             <XamlUICommand
                 x:Key="PlayPauseCommand"
-                x:Uid="App_PlayPauseCommand"
-                Description="Play or pause radio"
-                Label="xPlay">
+                x:Uid="App_PlayPauseCommand">
                 <XamlUICommand.IconSource>
                     <FontIconSource FontFamily="Segoe Fluent Icons" Glyph="&#xE768;" />
                 </XamlUICommand.IconSource>

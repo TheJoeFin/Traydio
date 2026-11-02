@@ -698,7 +698,7 @@
             BorderThickness="0"
             Click="NowPlayingInfo_Click"
             CornerRadius="4"
-            ToolTipService.ToolTip="Click for details"
+            x:Uid="PlayingPage_NowPlayingInfo"
             Visibility="{x:Bind ViewModel.HasNowPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid VerticalAlignment="Center" ColumnSpacing="6">
                 <Grid.ColumnDefinitions>
@@ -759,8 +759,8 @@
                     VerticalAlignment="Center"
                     Background="Transparent"
                     BorderThickness="0"
-                    Click="FavoriteButton_Click"
-                    ToolTipService.ToolTip="Favorite Song">
+                    x:Uid="NowPlayingPage_Tooltip_Favorite"
+                    Click="FavoriteButton_Click">
                     <FontIcon
                         x:Name="FavoriteIcon"
                         FontSize="14"
