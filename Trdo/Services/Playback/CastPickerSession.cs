@@ -189,8 +189,9 @@ internal sealed class CastPickerSession : IDisposable
         if (_isDisposed)
             return;
 
-        List<CastHistoryRow> desired = CastHistoryPolicy.Merge(_context.RememberedDevices,
-            _live.Select(device => device.ToHistoryDevice()).ToList());
+        // Converted once: a renderer's ToHistoryDevice makes native LibVLC calls.
+        List<(CastDevice Device, CastHistoryDevice History)> live = _live.Select(device => (device, device.ToHistoryDevice())).ToList();
+        List<CastHistoryRow> desired = CastHistoryPolicy.Merge(_context.RememberedDevices, live.Select(pair => pair.History).ToList());
         for (int i = Entries.Count - 1; i >= 0; i--)
         {
             if (!desired.Exists(row => CastHistoryPolicy.Matches(row.Device, Entries[i].Device)))
@@ -206,12 +207,13 @@ internal sealed class CastPickerSession : IDisposable
                 entry = new CastDeviceEntry(row);
                 Entries.Insert(i, entry);
             }
-            else if (Entries.IndexOf(entry) != i)
+            else if (Entries.IndexOf(entry) is var current && current != i)
             {
-                Entries.Move(Entries.IndexOf(entry), i);
+                Entries.Move(current, i);
             }
 
-            entry.Update(row, _live.FirstOrDefault(device => CastHistoryPolicy.Matches(device.ToHistoryDevice(), row.Device)), _isChecking);
+            CastDevice? liveDevice = live.FirstOrDefault(pair => CastHistoryPolicy.Matches(pair.History, row.Device)).Device;
+            entry.Update(row, liveDevice, _isChecking);
         }
 
         TaskCompletionSource<bool> signal = _liveChanged;
