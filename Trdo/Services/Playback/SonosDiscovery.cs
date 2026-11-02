@@ -2,6 +2,7 @@ using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -242,7 +243,7 @@ public sealed class SonosDiscovery : IDisposable
             return null;
         }
 
-        return [.. merged.Values];
+        return merged.Values.ToList();
     }
 
     private void Reconcile(IReadOnlyList<SonosZoneGroup> groups)

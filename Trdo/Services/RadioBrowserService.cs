@@ -157,7 +157,7 @@ public class RadioBrowserService
         {
             // byurl takes the URL as a form parameter rather than in the path, which avoids
             // having to escape a whole URL inside another URL.
-            using FormUrlEncodedContent body = new([new KeyValuePair<string, string>("url", streamUrl)]);
+            using FormUrlEncodedContent body = new(new KeyValuePair<string, string>[] { new("url", streamUrl) });
             using HttpResponseMessage response =
                 await _httpClient.PostAsync("json/stations/byurl", body, cancellationToken);
             response.EnsureSuccessStatusCode();

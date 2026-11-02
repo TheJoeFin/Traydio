@@ -174,7 +174,7 @@ public sealed class SonosController : IDisposable
         string controlUrl,
         string serviceNamespace,
         string action,
-        IReadOnlyList<KeyValuePair<string, string>> arguments,
+        KeyValuePair<string, string>[] arguments,
         CancellationToken cancellationToken)
     {
         string envelope = SonosPolicy.BuildSoapEnvelope(serviceNamespace, action, arguments);

@@ -2063,7 +2063,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// </param>
     public void ApplyDisplayReorder(IReadOnlyCollection<object>? movedRows = null)
     {
-        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, [.. DisplayRows], movedRows));
+        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, (List<object>)[.. DisplayRows], movedRows));
     }
 
     /// <summary>

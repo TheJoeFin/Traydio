@@ -74,11 +74,11 @@ public static class SonosPolicy
         string trimmed = streamUrl.Trim();
         if (sourceKind == AudioSourceKind.Files || LooksLikeHlsPlaylist(trimmed))
         {
-            return [trimmed];
+            return new[] { trimmed };
         }
 
         string radioUri = ToRadioUri(trimmed);
-        return radioUri == trimmed ? [trimmed] : [radioUri, trimmed];
+        return radioUri == trimmed ? new[] { trimmed } : new[] { radioUri, trimmed };
     }
 
     /// <summary>

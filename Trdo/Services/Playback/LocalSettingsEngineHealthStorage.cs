@@ -17,7 +17,7 @@ public sealed class LocalSettingsEngineHealthStorage : IEngineHealthStorage
             try
             {
                 // Copy: the caller removes entries while enumerating.
-                return [.. ApplicationData.Current.LocalSettings.Values.Keys];
+                return (List<string>)[.. ApplicationData.Current.LocalSettings.Values.Keys];
             }
             catch
             {

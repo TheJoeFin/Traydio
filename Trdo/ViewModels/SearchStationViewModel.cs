@@ -99,7 +99,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     /// </summary>
     public ObservableCollection<string> RecentSearches { get; } = [];
 
-    public IReadOnlyList<CodecOption> Codecs { get; } =
+    public IReadOnlyList<CodecOption> Codecs { get; } = (List<CodecOption>)
     [
         new("Any codec", string.Empty),
         new("MP3", "MP3"),
@@ -109,7 +109,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         new("FLAC", "FLAC"),
     ];
 
-    public IReadOnlyList<BitrateOption> Bitrates { get; } =
+    public IReadOnlyList<BitrateOption> Bitrates { get; } = (List<BitrateOption>)
     [
         new("Any bitrate", 0),
         new("64 kbps+", 64),
@@ -119,7 +119,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         new("320 kbps+", 320),
     ];
 
-    public IReadOnlyList<SortOption> SortOptions { get; } =
+    public IReadOnlyList<SortOption> SortOptions { get; } = (List<SortOption>)
     [
         new("Most voted", "votes", true),
         new("Most popular", "clickcount", true),
