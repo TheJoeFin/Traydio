@@ -222,9 +222,14 @@ internal sealed class CastPickerSession : IDisposable
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    // Restart swaps _lifetime for a fresh source, so a wait must hold the token it started with
+    // to tell "the network changed" from a timeout. Cancelled once the session is shut down.
+    private CancellationToken LifetimeToken() => _isDisposed ? new CancellationToken(true) : _lifetime.Token;
+
     public async Task<CastDevice> ResolveAsync(CastDeviceEntry entry, CancellationToken cancellationToken)
     {
-        using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
+        CancellationToken lifetime = LifetimeToken();
+        using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, lifetime);
         timeout.CancelAfter(TimeSpan.FromSeconds(15));
         try
         {
@@ -236,10 +241,16 @@ internal sealed class CastPickerSession : IDisposable
                 await _liveChanged.Task.WaitAsync(timeout.Token);
             }
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_lifetime.IsCancellationRequested)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            _isChecking = false;
-            Reconcile();
+            // Only a real timeout ends the check; if the network changed, the restarted session is still checking.
+            if (!lifetime.IsCancellationRequested)
+            {
+                _isChecking = false;
+                Reconcile();
+            }
+
+            // Not a bare cancellation: the caller never cancelled, and would show "operation was canceled".
             throw new TimeoutException(string.Format(LocalizationService.GetString(
                 "CastDeviceDialog_DeviceUnavailable", "{0} is not available on this network."), entry.Name));
         }
@@ -254,7 +265,7 @@ internal sealed class CastPickerSession : IDisposable
     /// </summary>
     public async Task<IReadOnlyList<SonosZoneGroup>> GetSonosHouseholdAsync(CancellationToken cancellationToken)
     {
-        using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetime.Token);
+        using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, LifetimeToken());
         timeout.CancelAfter(TimeSpan.FromSeconds(15));
         try
         {
@@ -269,8 +280,9 @@ internal sealed class CastPickerSession : IDisposable
                 await _liveChanged.Task.WaitAsync(timeout.Token);
             }
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_lifetime.IsCancellationRequested)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
+            // Timeout or a network change; either way the caller gets a message, not a bare cancellation.
             throw new TimeoutException(LocalizationService.GetString(
                 "GroupSpeakersPage_NoneFound", "No Sonos speakers were found on this network."));
         }
