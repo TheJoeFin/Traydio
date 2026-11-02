@@ -788,6 +788,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Preenche o silêncio enquanto uma estação carrega com um ruído suave de rádio FM. Surge gradualmente em vez de começar de repente e desvanece-se quando a estação começa a tocar.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume do ruído de rádio</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Ouvir o ruído de rádio</value>
   </data>

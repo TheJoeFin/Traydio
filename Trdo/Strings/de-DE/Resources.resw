@@ -788,6 +788,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Füllt die Stille beim Laden eines Senders mit sanftem UKW-Radiorauschen. Es schwillt an, statt abrupt einzusetzen, und blendet wieder aus, sobald der Sender ankommt.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lautstärke des Radiorauschens</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Radiorauschen anhören</value>
   </data>

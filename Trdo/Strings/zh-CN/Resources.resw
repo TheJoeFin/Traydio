@@ -788,6 +788,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>在电台加载期间，用轻柔的调频广播杂音填补静默。它会渐渐响起而不是突然出现，并在电台开始播放时逐渐淡出。</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>电台杂音音量</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>试听广播杂音</value>
   </data>

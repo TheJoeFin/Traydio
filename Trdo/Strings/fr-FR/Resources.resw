@@ -788,6 +788,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Comble le silence pendant le chargement d&apos;une station avec un léger grésillement de radio FM. Il monte progressivement au lieu d&apos;apparaître d&apos;un coup, puis s&apos;estompe à l&apos;arrivée de la station.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Volume du grésillement radio</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Écouter le grésillement radio</value>
   </data>

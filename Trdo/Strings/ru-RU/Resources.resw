@@ -866,6 +866,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Заполнять тишину во время загрузки станции мягким шумом FM-радио. Он нарастает плавно, а не включается резко, и затихает, когда станция начинает играть.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Громкость шума радио</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Прослушать радиошум</value>
   </data>

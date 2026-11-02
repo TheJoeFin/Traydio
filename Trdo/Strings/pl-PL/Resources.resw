@@ -788,6 +788,9 @@
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Wypełnia ciszę podczas ładowania stacji delikatnym szumem radia FM. Narasta stopniowo zamiast włączać się nagle i wycisza się, gdy stacja zaczyna grać.</value>
   </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Głośność szumu radia</value>
+  </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Posłuchaj szumu radiowego</value>
   </data>
