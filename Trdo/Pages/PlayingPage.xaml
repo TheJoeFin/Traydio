@@ -806,7 +806,10 @@
                 BorderThickness="0"
                 Click="PreviousTrackButton_Click"
                 IsEnabled="{x:Bind ViewModel.CanGoToPreviousLocalTrack, Mode=OneWay}">
-                <FontIcon FontSize="14" Glyph="&#xE892;" />
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE892;" />
             </Button>
 
             <TextBlock
@@ -840,7 +843,10 @@
                 BorderThickness="0"
                 Click="NextTrackButton_Click"
                 IsEnabled="{x:Bind ViewModel.CanGoToNextLocalTrack, Mode=OneWay}">
-                <FontIcon FontSize="14" Glyph="&#xE893;" />
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE893;" />
             </Button>
         </Grid>
 
