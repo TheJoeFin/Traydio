@@ -632,7 +632,10 @@
                 BorderThickness="0"
                 Click="SpeakerCastButton_Click"
                 CornerRadius="16">
-                <FontIcon FontSize="20" Glyph="&#xE7F5;" />
+                <FontIcon
+                    FontSize="20"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE7F5;" />
                 <Button.ContextFlyout>
                     <MenuFlyout x:Name="SpeakerCastMenu">
                         <MenuFlyoutItem x:Uid="PlayingPage_StopCasting" Click="StopCastingMenuItem_Click">
@@ -663,7 +666,10 @@
                 BorderThickness="0"
                 Click="SpeakerMuteButton_Click"
                 CornerRadius="16">
-                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
+                <FontIcon
+                    FontSize="20"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
             </Button>
             <Slider
                 x:Name="SpeakerVolumeSlider"
