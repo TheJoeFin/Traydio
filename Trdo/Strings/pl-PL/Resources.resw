@@ -725,6 +725,9 @@
   <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
     <value>Rosyjski</value>
   </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>Turecki</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>Wybierz język aplikacji.</value>
   </data>

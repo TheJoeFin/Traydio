@@ -725,6 +725,9 @@
   <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
     <value>Ø§ÙØ±ÙØ³ÙØ©</value>
   </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>التركية</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>اختر اللغة المستخدمة في التطبيق بأكمله.</value>
   </data>

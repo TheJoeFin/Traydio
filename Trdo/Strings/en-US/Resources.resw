@@ -803,6 +803,9 @@
   <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
     <value>Russian</value>
   </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>Turkish</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>Choose the language used throughout the app.</value>
   </data>
