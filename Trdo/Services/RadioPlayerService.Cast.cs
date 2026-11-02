@@ -40,6 +40,23 @@ public sealed partial class RadioPlayerService
     public string? CastTargetName => _sonosDevice?.Name ?? _castTargetName;
 
     /// <summary>
+    /// Whether <paramref name="device"/> is the device audio is going to right now. Compares
+    /// identity (the Sonos target, or the renderer's native pointer), not display names, which
+    /// can repeat across protocols and change while casting.
+    /// </summary>
+    internal bool IsCastTarget(CastDevice? device)
+    {
+        if (device is null)
+            return false;
+
+        if (device.Sonos is { } sonos)
+            return _sonosDevice is { } current && sonos.SameTargetAs(current);
+
+        return device.Item is { } item && _castRenderer is { } renderer &&
+               item.NativeReference != IntPtr.Zero && item.NativeReference == renderer.NativeReference;
+    }
+
+    /// <summary>
     /// Routes playback to <paramref name="renderer"/>, or back to this PC's output when null.
     /// Takes ownership of the item, which must be a wrapper of its own (from
     /// <see cref="CastRendererDiscovery.Claim"/>), never one still held by a discovery list.

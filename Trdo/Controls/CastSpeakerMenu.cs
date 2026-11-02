@@ -71,7 +71,6 @@ internal sealed class CastSpeakerMenu
             return;
 
         RadioPlayerService player = RadioPlayerService.Instance;
-        string? current = player.IsCasting ? player.CastTargetName : null;
 
         // Previously used speakers go first and are listed straight away (they're known from
         // history), even while their availability check is still running; they drop out if
@@ -90,8 +89,9 @@ internal sealed class CastSpeakerMenu
         }
 
         // Discovery reports in bursts; only touch the open menu when what it shows changes.
-        string signature = $"{session.IsScanning}|{player.IsCasting}|{current}|" +
-            string.Join("|", devices.ConvertAll(entry => $"{entry.Name}:{entry.Glyph}:{string.Join(",", entry.Rooms)}"));
+        string signature = $"{session.IsScanning}|{player.IsCasting}|" +
+            string.Join("|", devices.ConvertAll(entry =>
+                $"{entry.Name}:{entry.Glyph}:{string.Join(",", entry.Rooms)}:{player.IsCastTarget(entry.LiveDevice)}"));
         if (signature == _signature)
             return;
         _signature = signature;
@@ -112,7 +112,7 @@ internal sealed class CastSpeakerMenu
 
         foreach (CastDeviceEntry entry in devices)
         {
-            bool isCurrent = current is not null && string.Equals(entry.Name, current, StringComparison.Ordinal);
+            bool isCurrent = player.IsCastTarget(entry.LiveDevice);
             ToggleMenuFlyoutItem item = new()
             {
                 Text = entry.Name,
