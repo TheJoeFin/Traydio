@@ -548,6 +548,9 @@
   <data name="PlayingPage_Cast" xml:space="preserve">
     <value>Cast…</value>
   </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>Casting options</value>
+  </data>
   <data name="PlayingPage_CastingTo" xml:space="preserve">
     <value>Casting to {0}…</value>
   </data>
@@ -607,6 +610,15 @@
   </data>
   <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Mute / unmute the speaker</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Mute / unmute the speaker</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Casting options</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Casting options</value>
   </data>
   <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
     <value>{0} volume</value>

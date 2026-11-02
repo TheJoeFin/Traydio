@@ -773,6 +773,11 @@ public sealed partial class PlayingPage : Page
         ViewModel.ToggleSpeakerMute();
     }
 
+    private void SpeakerCastButton_Click(object sender, RoutedEventArgs e)
+    {
+        SpeakerCastMenu.ShowAt(SpeakerCastButton);
+    }
+
     private void ToggleVolumeSlider_Click(object sender, RoutedEventArgs e)
     {
         SetVolumeSliderVisible(!SettingsService.IsVolumeSliderVisible);

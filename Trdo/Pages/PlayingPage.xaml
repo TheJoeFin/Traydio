@@ -615,35 +615,59 @@
             Visibility="{x:Bind ViewModel.IsCastingToSonos, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button
-                x:Uid="PlayingPage_SpeakerMuteButton"
+                x:Name="SpeakerCastButton"
+                x:Uid="PlayingPage_SpeakerCastButton"
                 Grid.Column="0"
                 Width="32"
                 Height="32"
                 Padding="0"
                 VerticalAlignment="Center"
+                AutomationProperties.AutomationId="SpeakerCastButton"
                 Background="Transparent"
                 BorderThickness="0"
-                Click="SpeakerMuteButton_Click"
+                Click="SpeakerCastButton_Click"
                 CornerRadius="16">
-                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
-                <!--  The row only exists while casting, so Stop Casting needs no visibility binding here  -->
+                <FontIcon FontSize="20" Glyph="&#xE7F5;" />
                 <Button.ContextFlyout>
-                    <MenuFlyout>
+                    <MenuFlyout x:Name="SpeakerCastMenu">
                         <MenuFlyoutItem x:Uid="PlayingPage_StopCasting" Click="StopCastingMenuItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE711;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_CastingOptions"
+                            AutomationProperties.AutomationId="CastingOptionsMenuItem"
+                            Click="CastMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE713;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                     </MenuFlyout>
                 </Button.ContextFlyout>
             </Button>
+            <Button
+                x:Uid="PlayingPage_SpeakerMuteButton"
+                Grid.Column="1"
+                Width="32"
+                Height="32"
+                Padding="0"
+                VerticalAlignment="Center"
+                AutomationProperties.AutomationId="SpeakerMuteButton"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="SpeakerMuteButton_Click"
+                CornerRadius="16">
+                <FontIcon FontSize="20" Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
+            </Button>
             <Slider
                 x:Name="SpeakerVolumeSlider"
-                Grid.Column="1"
+                Grid.Column="2"
                 Maximum="100"
                 Minimum="0"
                 SmallChange="1"
@@ -651,7 +675,7 @@
                 ThumbToolTipValueConverter="{StaticResource PercentStringConverter}"
                 Value="{x:Bind ViewModel.SpeakerVolume, Mode=TwoWay}" />
             <TextBlock
-                Grid.Column="2"
+                Grid.Column="3"
                 MinWidth="40"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"

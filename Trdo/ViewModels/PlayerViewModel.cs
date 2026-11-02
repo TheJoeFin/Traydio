@@ -1079,8 +1079,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     public void ToggleSpeakerMute() => IsSpeakerMuted = !IsSpeakerMuted;
 
-    /// <summary>Speaker glyph for the Sonos volume row: a speaker cabinet, crossed out while the player is muted.</summary>
-    public string SpeakerVolumeGlyph => IsSpeakerMuted ? "" : "";
+    /// <summary>Volume glyph for the speaker mute button, crossed out while the player is muted.</summary>
+    public string SpeakerVolumeGlyph => IsSpeakerMuted ? "\uE74F" : "\uE767";
 
     /// <summary>"Kitchen volume" - names the room so two sliders on one page are not mistaken for each other.</summary>
     public string SpeakerVolumeToolTip => string.Format(
