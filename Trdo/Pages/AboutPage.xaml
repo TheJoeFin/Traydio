@@ -238,6 +238,42 @@
                     </HyperlinkButton>
                 </StackPanel>
 
+                <!--  Translators Section (names and native language names are intentionally not localized)  -->
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        x:Uid="AboutPage_TranslatorsTitle"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Radek" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Polski"
+                            TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="tucoinfo" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Français"
+                            TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Igor (IM-Digital)" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Русский"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+
                 <!--  Features Section  -->
                 <StackPanel Spacing="8">
                     <TextBlock
