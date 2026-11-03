@@ -29,7 +29,8 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public bool ShowContactDeveloper => SelectedRating > 0 && SelectedRating <= 3;
 
     public string AppName => "Traydio";
-    public string AppDescription => "A simple, elegant internet radio player for Windows";
+    public string AppDescription => Trdo.Services.LocalizationService.GetString(
+        "AboutPage_AppDescription", "A simple, elegant internet radio player for Windows");
     public string Version
     {
         get

@@ -2364,7 +2364,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 }
                 else
                 {
-                    updater.MusicProperties.Artist = _currentStationName ?? "Radio Station";
+                    updater.MusicProperties.Artist = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
                     updater.MusicProperties.AlbumArtist = string.Empty;
                 }
 
@@ -2379,19 +2379,19 @@ public sealed partial class RadioPlayerService : IDisposable
                 }
                 else
                 {
-                    updater.MusicProperties.Title = "Now Playing";
+                    updater.MusicProperties.Title = LocalizationService.GetString("Smtc_NowPlaying", "Now Playing");
                 }
 
                 // Set album title to station name for additional context
-                updater.MusicProperties.AlbumTitle = _currentStationName ?? "Radio Station";
+                updater.MusicProperties.AlbumTitle = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
 
                 Debug.WriteLine($"[RadioPlayerService] SMTC updated with metadata - Artist: {updater.MusicProperties.Artist}, Title: {updater.MusicProperties.Title}, Album: {updater.MusicProperties.AlbumTitle}");
             }
             else
             {
                 // No metadata available, show station name
-                updater.MusicProperties.Artist = _currentStationName ?? "Radio Station";
-                updater.MusicProperties.Title = "Streaming...";
+                updater.MusicProperties.Artist = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
+                updater.MusicProperties.Title = LocalizationService.GetString("Smtc_Streaming", "Streaming...");
                 updater.MusicProperties.AlbumArtist = string.Empty;
                 updater.MusicProperties.AlbumTitle = string.Empty;
                 Debug.WriteLine($"[RadioPlayerService] SMTC updated with station name: {_currentStationName}");

@@ -438,9 +438,9 @@ public sealed partial class PlayingPage : Page
     {
         ContentDialog dialog = new()
         {
-            Title = "Add Station",
-            Content = "Add station functionality coming soon!",
-            CloseButtonText = "OK",
+            Title = LocalizationService.GetString("AddStationFallback_Title", "Add Station"),
+            Content = LocalizationService.GetString("AddStationFallback_Body", "Add station functionality coming soon!"),
+            CloseButtonText = LocalizationService.GetString("Dialog_OK", "OK"),
             XamlRoot = this.XamlRoot
         };
 
@@ -806,21 +806,23 @@ public sealed partial class PlayingPage : Page
             if (match is null)
             {
                 await ShowInfoDialogAsync(
-                    "No match found",
-                    $"radio-browser.info has no entry for this station's stream address, so there are no details to add.");
+                    LocalizationService.GetString("Lookup_NoMatch_Title", "No match found"),
+                    LocalizationService.GetString("Lookup_NoMatch_Body", "radio-browser.info has no entry for this station's stream address, so there are no details to add."));
                 return;
             }
 
             ViewModel.PersistStationList();
 
             await ShowInfoDialogAsync(
-                $"Updated {station.Name}",
+                string.Format(LocalizationService.GetString("Lookup_Updated_Title", "Updated {0}"), station.Name),
                 StationMetadataBackfillService.DescribeStation(station));
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[PlayingPage] Station info refresh failed: {ex.Message}");
-            await ShowInfoDialogAsync("Couldn't reach radio-browser.info", "Check your connection and try again.");
+            await ShowInfoDialogAsync(
+                LocalizationService.GetString("Lookup_Unreachable_Title", "Couldn't reach radio-browser.info"),
+                LocalizationService.GetString("Lookup_Unreachable_Body", "Check your connection and try again."));
         }
     }
 
@@ -831,19 +833,19 @@ public sealed partial class PlayingPage : Page
 
         CheckBox overwriteCheck = new()
         {
-            Content = "Also refresh stations that already have details",
+            Content = LocalizationService.GetString("Lookup_Overwrite", "Also refresh stations that already have details"),
             IsChecked = false
         };
 
         string body = withoutDetails.Count == 0
-            ? "All your stations already have details. You can look them up again to pick up any changes."
+            ? LocalizationService.GetString("Lookup_Body_None", "All your stations already have details. You can look them up again to pick up any changes.")
             : withoutDetails.Count == 1
-                ? "One station has no genre or country saved."
-                : $"{withoutDetails.Count} stations have no genre or country saved.";
+                ? LocalizationService.GetString("Lookup_Body_One", "One station has no genre or country saved.")
+                : string.Format(LocalizationService.GetString("Lookup_Body_Many", "{0} stations have no genre or country saved."), withoutDetails.Count);
 
         ContentDialog preflight = new()
         {
-            Title = "Look up station details",
+            Title = LocalizationService.GetString("Lookup_Preflight_Title", "Look up station details"),
             Content = new StackPanel
             {
                 Spacing = 12,
@@ -853,14 +855,14 @@ public sealed partial class PlayingPage : Page
                     {
                         // Says plainly what leaves the machine. This is the app's only outbound
                         // request about the user's own saved stations.
-                        Text = $"{body} Traydio will ask radio-browser.info about them. Only each station's stream address is sent.",
+                        Text = string.Format(LocalizationService.GetString("Lookup_Privacy", "{0} Traydio will ask radio-browser.info about them. Only each station's stream address is sent."), body),
                         TextWrapping = TextWrapping.Wrap
                     },
                     overwriteCheck
                 }
             },
-            PrimaryButtonText = "Look up",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = LocalizationService.GetString("Dialog_LookUp", "Look up"),
+            CloseButtonText = LocalizationService.GetString("Dialog_Cancel", "Cancel"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = this.XamlRoot
         };
@@ -875,8 +877,8 @@ public sealed partial class PlayingPage : Page
         if (candidates.Count == 0)
         {
             await ShowInfoDialogAsync(
-                "Nothing to look up",
-                "Every station has been checked recently. Try again in a few days.");
+                LocalizationService.GetString("Lookup_NothingToLookUp_Title", "Nothing to look up"),
+                LocalizationService.GetString("Lookup_NothingToLookUp_Body", "Every station has been checked recently. Try again in a few days."));
             return;
         }
 
@@ -888,18 +890,18 @@ public sealed partial class PlayingPage : Page
         using CancellationTokenSource cts = new();
 
         ProgressBar progress = new() { Minimum = 0, Maximum = candidates.Count, Value = 0 };
-        TextBlock status = new() { Text = "Starting…", TextWrapping = TextWrapping.Wrap };
+        TextBlock status = new() { Text = LocalizationService.GetString("Lookup_Starting", "Starting…"), TextWrapping = TextWrapping.Wrap };
 
         ContentDialog progressDialog = new()
         {
-            Title = "Looking up station details",
+            Title = LocalizationService.GetString("Lookup_Progress_Title", "Looking up station details"),
             Content = new StackPanel
             {
                 Spacing = 12,
                 MinWidth = 280,
                 Children = { progress, status }
             },
-            CloseButtonText = "Cancel",
+            CloseButtonText = LocalizationService.GetString("Dialog_Cancel", "Cancel"),
             XamlRoot = this.XamlRoot
         };
 
@@ -922,7 +924,9 @@ public sealed partial class PlayingPage : Page
                 onProgress: (done, total, name) =>
                 {
                     progress.Value = done;
-                    status.Text = string.IsNullOrEmpty(name) ? "Finishing…" : $"{done} of {total} · {name}";
+                    status.Text = string.IsNullOrEmpty(name)
+                        ? LocalizationService.GetString("Lookup_Finishing", "Finishing…")
+                        : string.Format(LocalizationService.GetString("Lookup_Progress", "{0} of {1} · {2}"), done, total, name);
                 },
                 onPartialSave: () => ViewModel.PersistStationList(),
                 cancellationToken: cts.Token);
@@ -933,23 +937,23 @@ public sealed partial class PlayingPage : Page
             progressDialog.Hide();
         }
 
-        await ShowInfoDialogAsync("Station details", SummarizeBackfill(result));
+        await ShowInfoDialogAsync(LocalizationService.GetString("Lookup_Result_Title", "Station details"), SummarizeBackfill(result));
     }
 
     private static string SummarizeBackfill(StationMetadataBackfillService.BackfillResult result)
     {
-        List<string> lines = [$"Updated {result.Updated} of {result.Attempted} stations."];
+        List<string> lines = [string.Format(LocalizationService.GetString("Lookup_Summary_Updated", "Updated {0} of {1} stations."), result.Updated, result.Attempted)];
 
         if (result.NotFound > 0)
-            lines.Add($"{result.NotFound} had no entry on radio-browser.info.");
+            lines.Add(string.Format(LocalizationService.GetString("Lookup_Summary_NotFound", "{0} had no entry on radio-browser.info."), result.NotFound));
         if (result.Ambiguous > 0)
-            lines.Add($"{result.Ambiguous} matched more than one entry; the closest was used.");
+            lines.Add(string.Format(LocalizationService.GetString("Lookup_Summary_Ambiguous", "{0} matched more than one entry; the closest was used."), result.Ambiguous));
         if (result.Skipped > 0)
-            lines.Add($"{result.Skipped} were left for next time to keep the request count reasonable.");
+            lines.Add(string.Format(LocalizationService.GetString("Lookup_Summary_Skipped", "{0} were left for next time to keep the request count reasonable."), result.Skipped));
         if (result.AbortedUnreachable)
-            lines.Add("Stopped early because radio-browser.info stopped responding.");
+            lines.Add(LocalizationService.GetString("Lookup_Summary_Unreachable", "Stopped early because radio-browser.info stopped responding."));
         if (result.Cancelled)
-            lines.Add("Stopped at your request. What was found so far has been saved.");
+            lines.Add(LocalizationService.GetString("Lookup_Summary_Cancelled", "Stopped at your request. What was found so far has been saved."));
 
         return string.Join("\n", lines);
     }
@@ -965,7 +969,7 @@ public sealed partial class PlayingPage : Page
                 TextWrapping = TextWrapping.Wrap,
                 IsTextSelectionEnabled = true,
             },
-            CloseButtonText = "OK",
+            CloseButtonText = LocalizationService.GetString("Dialog_OK", "OK"),
             XamlRoot = this.XamlRoot
         };
 
@@ -1231,12 +1235,12 @@ public sealed partial class PlayingPage : Page
         // once is not something to discover after the fact.
         ContentDialog confirm = new()
         {
-            Title = $"Delete \"{group.Name}\"?",
+            Title = string.Format(LocalizationService.GetString("Group_Delete_Title", "Delete \"{0}\"?"), group.Name),
             Content = count == 1
-                ? "The station in this group will be removed as well. This cannot be undone."
-                : $"All {count} stations in this group will be removed as well. This cannot be undone.",
-            PrimaryButtonText = "Delete",
-            CloseButtonText = "Cancel",
+                ? LocalizationService.GetString("Group_Delete_One", "The station in this group will be removed as well. This cannot be undone.")
+                : string.Format(LocalizationService.GetString("Group_Delete_Many", "All {0} stations in this group will be removed as well. This cannot be undone."), count),
+            PrimaryButtonText = LocalizationService.GetString("Dialog_Delete", "Delete"),
+            CloseButtonText = LocalizationService.GetString("Dialog_Cancel", "Cancel"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = this.XamlRoot
         };

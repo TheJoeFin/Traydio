@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>开发者</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>翻译</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>适用于 Windows 的简洁优雅的网络电台播放器</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>无延迟</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 分钟</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} 秒</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} 秒</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>大</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>特大</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>缓冲：{0}（此电台）</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>缓冲：{0}（应用设置）</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>曲目信息延迟：{0}（此电台）</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>曲目信息延迟：{0}（应用设置）</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>曲目信息延迟</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>{0} 的曲目信息延迟</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>使用应用设置（{0}）</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>当前为 {0}（未选择电台）</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>关闭歌曲弹出提示</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>查找</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>没有可导出的内容</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>请先收藏一些歌曲。</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>导出全部收藏</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>仅新增（{0}/{1}）</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>全部收藏（{0}）</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>归档已导出的曲目</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV 适用于 Soundiiz 或 TuneMyMusic 等播放列表转移服务。XSPF 是适用于 VLC 等播放器的播放列表文件。保存时选择格式。</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>已归档的曲目仍保留在收藏中，但会在以后的导出中被跳过。</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>导出收藏</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>没有新的可导出内容</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>所有收藏均已导出。请开启“{0}”或清除导出历史记录。</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>导出完成</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>已将 {0} 首曲目导出到 {1}。</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>已将 {0} 首曲目导出到 {1}。</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>已归档 {0} 首，下次将被跳过。</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>导出历史记录已清除</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} 首曲目将包含在下次导出中。</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} 首曲目将包含在下次导出中。</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>未找到匹配项</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info 中没有此电台流地址的条目，因此没有可添加的详细信息。</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>已更新 {0}</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>无法连接到 radio-browser.info</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>请检查网络连接后重试。</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>同时刷新已有详细信息的电台</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>您的所有电台都已有详细信息。您可以重新查找以获取更新。</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>有一个电台未保存流派或国家/地区。</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>有 {0} 个电台未保存流派或国家/地区。</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio 将向 radio-browser.info 查询这些电台。仅发送每个电台的流地址。</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>查找电台详细信息</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>没有可查找的内容</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>所有电台最近都已检查过。请过几天再试。</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>正在启动…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>正在完成…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0}/{1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>正在查找电台详细信息</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>电台详细信息</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>已更新 {1} 个电台中的 {0} 个。</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} 个在 radio-browser.info 上没有条目。</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} 个匹配多个条目，已使用最接近的一个。</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} 个留待下次处理，以控制请求数量。</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>由于 radio-browser.info 停止响应，已提前停止。</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>已按您的要求停止。目前找到的内容已保存。</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>没有更多详细信息。</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>删除“{0}”？</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>此分组中的电台也将被删除。此操作无法撤销。</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>此分组中的全部 {0} 个电台也将被删除。此操作无法撤销。</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>添加电台</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>添加电台功能即将推出！</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>正在播放</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>广播电台</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>正在串流...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>喜欢 Traydio 吗？</value>
   </data>

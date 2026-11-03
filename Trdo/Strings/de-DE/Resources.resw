@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>Entwickler</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>Übersetzungen</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>Ein einfacher, eleganter Internetradio-Player für Windows</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>Keine Verzögerung</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 Minute</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} Sekunde</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} Sekunden</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>Mittel</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>Groß</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>Sehr groß</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>Puffer: {0} (dieser Sender)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>Puffer: {0} (App-Einstellung)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>Titelinfo-Verzögerung: {0} (dieser Sender)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>Titelinfo-Verzögerung: {0} (App-Einstellung)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>Titelinfo-Verzögerung</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>Titelinfo-Verzögerung für {0}</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>App-Einstellung verwenden ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>Aktuell {0} (kein Sender ausgewählt)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>Song-Popups ausschalten</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>Exportieren</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>Nachschlagen</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>Nichts zu exportieren</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>Markieren Sie zuerst einige Songs als Favoriten.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>Alle Favoriten exportieren</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>Nur neue ({0} von {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>Alle Favoriten ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>Exportierte Titel archivieren</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV funktioniert mit Playlist-Transferdiensten wie Soundiiz oder TuneMyMusic. XSPF ist eine Playlist-Datei für Player wie VLC. Das Format wählen Sie beim Speichern.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>Archivierte Titel bleiben in Ihren Favoriten, werden aber bei späteren Exporten übersprungen.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>Favoriten exportieren</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>Nichts Neues zu exportieren</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>Alle Favoriten wurden bereits exportiert. Aktivieren Sie „{0}“ oder löschen Sie den Exportverlauf.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>Export abgeschlossen</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>{0} Titel nach {1} exportiert.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>{0} Titel nach {1} exportiert.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>{0} archiviert und beim nächsten Mal übersprungen.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>Exportverlauf gelöscht</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} Titel wird in den nächsten Export aufgenommen.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} Titel werden in den nächsten Export aufgenommen.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>Keine Übereinstimmung gefunden</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info hat keinen Eintrag für die Stream-Adresse dieses Senders, daher gibt es keine Details zum Hinzufügen.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>{0} aktualisiert</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>radio-browser.info nicht erreichbar</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>Auch Sender aktualisieren, die bereits Details haben</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>Alle Ihre Sender haben bereits Details. Sie können sie erneut nachschlagen, um Änderungen zu übernehmen.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>Für einen Sender sind weder Genre noch Land gespeichert.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>Für {0} Sender sind weder Genre noch Land gespeichert.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio fragt radio-browser.info nach ihnen. Es wird nur die Stream-Adresse jedes Senders gesendet.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>Senderdetails nachschlagen</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>Nichts nachzuschlagen</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>Jeder Sender wurde kürzlich geprüft. Versuchen Sie es in ein paar Tagen erneut.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>Wird gestartet…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>Wird abgeschlossen…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} von {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>Senderdetails werden nachgeschlagen</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>Senderdetails</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>{0} von {1} Sendern aktualisiert.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} hatten keinen Eintrag auf radio-browser.info.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} passten zu mehr als einem Eintrag; der nächstliegende wurde verwendet.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} wurden für das nächste Mal zurückgestellt, um die Anzahl der Anfragen vertretbar zu halten.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>Vorzeitig beendet, da radio-browser.info nicht mehr antwortete.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>Auf Ihren Wunsch beendet. Bisher Gefundenes wurde gespeichert.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>Keine weiteren Details verfügbar.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>„{0}“ löschen?</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>Der Sender in dieser Gruppe wird ebenfalls entfernt. Dies kann nicht rückgängig gemacht werden.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>Alle {0} Sender in dieser Gruppe werden ebenfalls entfernt. Dies kann nicht rückgängig gemacht werden.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>Sender hinzufügen</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>Die Funktion zum Hinzufügen von Sendern folgt in Kürze!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>Wiedergabe läuft</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>Radiosender</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>Streaming...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>Gefällt dir Traydio?</value>
   </data>

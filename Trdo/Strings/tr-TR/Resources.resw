@@ -92,6 +92,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>Geliştirici</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>Çeviriler</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>Windows için basit ve şık bir internet radyosu oynatıcısı</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>Gecikme yok</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 dakika</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} saniye</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} saniye</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>Varsayılan</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>Orta</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>Büyük</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>Çok büyük</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>Arabellek: {0} (bu istasyon)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>Arabellek: {0} (uygulama ayarı)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi: {0} (bu istasyon)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi: {0} (uygulama ayarı)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>{0} için parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>Uygulama ayarını kullan ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>Şu anda {0} (istasyon seçilmedi)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>Şarkı açılır pencerelerini kapat</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>Dışa aktar</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>Dışa aktarılacak bir şey yok</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>Önce birkaç şarkıyı favorilere ekleyin.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>Tüm favorileri dışa aktar</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>Yalnızca yeniler ({0} / {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>Tüm favoriler ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>Dışa aktarılan parçaları arşivle</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV, Soundiiz veya TuneMyMusic gibi çalma listesi aktarım hizmetleriyle çalışır. XSPF, VLC gibi oynatıcılar için bir çalma listesi dosyasıdır. Biçimi kaydederken seçin.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>Arşivlenen parçalar favorilerinizde kalır ancak sonraki dışa aktarmalarda atlanır.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>Favorileri dışa aktar</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>Dışa aktarılacak yeni bir şey yok</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>Tüm favoriler zaten dışa aktarıldı. "{0}" seçeneğini açın veya dışa aktarma geçmişini temizleyin.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>Dışa aktarma tamamlandı</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>{0} parça {1} dosyasına aktarıldı.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>{0} parça {1} dosyasına aktarıldı.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>{0} parça arşivlendi ve bir dahaki sefere atlanacak.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>Dışa aktarma geçmişi temizlendi</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} parça sonraki dışa aktarmaya dahil edilecek.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} parça sonraki dışa aktarmaya dahil edilecek.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>Eşleşme bulunamadı</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info'da bu istasyonun yayın adresi için kayıt yok, bu yüzden eklenecek ayrıntı yok.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>{0} güncellendi</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>radio-browser.info'ya ulaşılamadı</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>Bağlantınızı kontrol edip tekrar deneyin.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>Ayrıntıları olan istasyonları da yenile</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>Tüm istasyonlarınızın zaten ayrıntıları var. Değişiklikleri almak için yeniden arayabilirsiniz.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>Bir istasyonun kayıtlı türü veya ülkesi yok.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>{0} istasyonun kayıtlı türü veya ülkesi yok.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio, bunlar hakkında radio-browser.info'ya soracak. Yalnızca her istasyonun yayın adresi gönderilir.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>İstasyon ayrıntılarını ara</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>Aranacak bir şey yok</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>Her istasyon yakın zamanda kontrol edildi. Birkaç gün sonra tekrar deneyin.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>Başlatılıyor…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>Tamamlanıyor…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} / {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>İstasyon ayrıntıları aranıyor</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>İstasyon ayrıntıları</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>{1} istasyondan {0} tanesi güncellendi.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} istasyonun radio-browser.info'da kaydı yoktu.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} istasyon birden fazla kayıtla eşleşti; en yakını kullanıldı.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} istasyon, istek sayısını makul tutmak için bir sonraki sefere bırakıldı.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>radio-browser.info yanıt vermeyi bıraktığı için erken durduruldu.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>İsteğiniz üzerine durduruldu. Şimdiye kadar bulunanlar kaydedildi.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>Ek ayrıntı yok.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>"{0}" silinsin mi?</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>Bu gruptaki istasyon da kaldırılacak. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>Bu gruptaki {0} istasyonun tümü de kaldırılacak. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>İstasyon ekle</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>İstasyon ekleme özelliği çok yakında!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>Şimdi çalıyor</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>Radyo istasyonu</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>Yayın akıyor...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>Traydio'yu beğeniyor musunuz?</value>
   </data>

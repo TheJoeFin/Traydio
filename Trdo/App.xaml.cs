@@ -97,6 +97,7 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
+        SongChangeAnnouncementPolicy.Localize = LocalizationService.GetString;
         SettingsService.MigrateTrayClickActions();
         InitializeComponent();
         _playerVm.PropertyChanged += PlayerVmOnPropertyChanged;

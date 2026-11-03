@@ -66,40 +66,44 @@ public sealed partial class FavoritesPage : Page
     {
         if (ViewModel.Favorites.Count == 0)
         {
-            ShowInfo(InfoBarSeverity.Informational, "Nothing to export", "Favorite some songs first.");
+            ShowInfo(InfoBarSeverity.Informational,
+                LocalizationService.GetString("Fav_NothingToExport_Title", "Nothing to export"),
+                LocalizationService.GetString("Fav_NothingToExport_Body", "Favorite some songs first."));
             return;
         }
 
         int unarchived = ViewModel.UnarchivedCount;
         int total = ViewModel.Favorites.Count;
+        string exportAllHeader = LocalizationService.GetString("Fav_ExportAll_Header", "Export all favorites");
 
         ToggleSwitch exportAllToggle = new()
         {
-            Header = "Export all favorites",
-            OffContent = $"New only ({unarchived} of {total})",
-            OnContent = $"All favorites ({total})",
+            Header = exportAllHeader,
+            OffContent = string.Format(LocalizationService.GetString("Fav_ExportAll_Off", "New only ({0} of {1})"), unarchived, total),
+            OnContent = string.Format(LocalizationService.GetString("Fav_ExportAll_On", "All favorites ({0})"), total),
             // Nothing new to send means the only useful export is a full one.
             IsOn = unarchived == 0,
         };
 
         CheckBox archiveCheckBox = new()
         {
-            Content = "Archive exported tracks",
+            Content = LocalizationService.GetString("Fav_Archive", "Archive exported tracks"),
             IsChecked = true,
         };
 
         StackPanel content = new() { Spacing = 12 };
         content.Children.Add(new TextBlock
         {
-            Text = "CSV works with playlist transfer services like Soundiiz or TuneMyMusic. "
-                 + "XSPF is a playlist file for players such as VLC. Pick the format when you save.",
+            Text = LocalizationService.GetString("Fav_ExportHelp",
+                "CSV works with playlist transfer services like Soundiiz or TuneMyMusic. "
+                + "XSPF is a playlist file for players such as VLC. Pick the format when you save."),
             TextWrapping = TextWrapping.Wrap,
         });
         content.Children.Add(exportAllToggle);
         content.Children.Add(archiveCheckBox);
         content.Children.Add(new TextBlock
         {
-            Text = "Archived tracks stay in your favorites but are skipped by later exports.",
+            Text = LocalizationService.GetString("Fav_ArchiveHelp", "Archived tracks stay in your favorites but are skipped by later exports."),
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
             Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorTertiaryBrush"],
@@ -108,10 +112,10 @@ public sealed partial class FavoritesPage : Page
         ContentDialog dialog = new()
         {
             XamlRoot = XamlRoot,
-            Title = "Export favorites",
+            Title = LocalizationService.GetString("Fav_ExportDialog_Title", "Export favorites"),
             Content = content,
-            PrimaryButtonText = "Export",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = LocalizationService.GetString("Dialog_Export", "Export"),
+            CloseButtonText = LocalizationService.GetString("Dialog_Cancel", "Cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -123,8 +127,10 @@ public sealed partial class FavoritesPage : Page
 
         if (!exportAll && unarchived == 0)
         {
-            ShowInfo(InfoBarSeverity.Informational, "Nothing new to export",
-                "Every favorite has already been exported. Turn on \"Export all favorites\" or clear the export history.");
+            ShowInfo(InfoBarSeverity.Informational,
+                LocalizationService.GetString("Fav_NothingNew_Title", "Nothing new to export"),
+                string.Format(LocalizationService.GetString("Fav_NothingNew_Body",
+                    "Every favorite has already been exported. Turn on \"{0}\" or clear the export history."), exportAllHeader));
             return;
         }
 
@@ -135,11 +141,13 @@ public sealed partial class FavoritesPage : Page
             if (!result.Succeeded)
                 return;
 
-            string message = $"Exported {result.ExportedCount} track{(result.ExportedCount == 1 ? "" : "s")} to {result.FileName}.";
+            string message = result.ExportedCount == 1
+                ? string.Format(LocalizationService.GetString("Fav_ExportComplete_One", "Exported {0} track to {1}."), result.ExportedCount, result.FileName)
+                : string.Format(LocalizationService.GetString("Fav_ExportComplete_Other", "Exported {0} tracks to {1}."), result.ExportedCount, result.FileName);
             if (result.ArchivedCount > 0)
-                message += $" {result.ArchivedCount} archived and will be skipped next time.";
+                message += " " + string.Format(LocalizationService.GetString("Fav_Archived", "{0} archived and will be skipped next time."), result.ArchivedCount);
 
-            ShowInfo(InfoBarSeverity.Success, "Export complete", message);
+            ShowInfo(InfoBarSeverity.Success, LocalizationService.GetString("Fav_ExportComplete_Title", "Export complete"), message);
         }
         catch (Exception ex)
         {
@@ -151,8 +159,11 @@ public sealed partial class FavoritesPage : Page
     private void ClearExportHistory_Click(object sender, RoutedEventArgs e)
     {
         int cleared = ViewModel.ClearAllArchived();
-        ShowInfo(InfoBarSeverity.Informational, "Export history cleared",
-            $"{cleared} track{(cleared == 1 ? "" : "s")} will be included in the next export.");
+        ShowInfo(InfoBarSeverity.Informational,
+            LocalizationService.GetString("Fav_HistoryCleared_Title", "Export history cleared"),
+            cleared == 1
+                ? string.Format(LocalizationService.GetString("Fav_HistoryCleared_One", "{0} track will be included in the next export."), cleared)
+                : string.Format(LocalizationService.GetString("Fav_HistoryCleared_Other", "{0} tracks will be included in the next export."), cleared));
     }
 
     private void ClearArchivedForTrack_Click(object sender, RoutedEventArgs e)

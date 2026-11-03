@@ -271,6 +271,6 @@ public sealed class StationMetadataBackfillService
         else if (!string.IsNullOrWhiteSpace(station.Codec))
             parts.Add(station.Codec!);
 
-        return parts.Count == 0 ? "No extra details were available." : string.Join(" · ", parts);
+        return parts.Count == 0 ? LocalizationService.GetString("Lookup_NoExtraDetails", "No extra details were available.") : string.Join(" · ", parts);
     }
 }

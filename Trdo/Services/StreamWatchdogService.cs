@@ -223,14 +223,10 @@ public sealed partial class StreamWatchdogService : IDisposable
     /// </summary>
     public static string DescribeBufferLevel(double level) => level switch
     {
-        0 => "Default",
-        1 => "Medium",
-        2 => "Large",
-        3 => "Extra Large",
-        _ when level < 0.5 => "Default",
-        _ when level < 1.5 => "Medium",
-        _ when level < 2.5 => "Large",
-        _ => "Extra Large"
+        < 0.5 => LocalizationService.GetString("BufferLevel_Default", "Default"),
+        < 1.5 => LocalizationService.GetString("BufferLevel_Medium", "Medium"),
+        < 2.5 => LocalizationService.GetString("BufferLevel_Large", "Large"),
+        _ => LocalizationService.GetString("BufferLevel_ExtraLarge", "Extra Large")
     };
 
     public StreamWatchdogService(RadioPlayerService playerService)

@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>المطوّر</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>الترجمات</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>مشغّل راديو إنترنت بسيط وأنيق لنظام Windows</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>بدون تأخير</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>دقيقة واحدة</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} ثانية</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} ثانية</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>افتراضي</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>متوسط</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>كبير</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>كبير جدًا</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>المخزن المؤقت: {0} (هذه المحطة)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>المخزن المؤقت: {0} (إعداد التطبيق)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة: {0} (هذه المحطة)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة: {0} (إعداد التطبيق)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة لـ {0}</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>استخدام إعداد التطبيق ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>الحالي {0} (لم يتم اختيار محطة)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>إيقاف نوافذ الأغاني المنبثقة</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>موافق</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>تصدير</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>لا يوجد ما يمكن تصديره</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>أضف بعض الأغاني إلى المفضلة أولًا.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>تصدير كل المفضلة</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>الجديد فقط ({0} من {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>كل المفضلة ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>أرشفة المقطوعات المصدّرة</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>يعمل CSV مع خدمات نقل قوائم التشغيل مثل Soundiiz أو TuneMyMusic. أما XSPF فهو ملف قائمة تشغيل لمشغّلات مثل VLC. اختر الصيغة عند الحفظ.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>تبقى المقطوعات المؤرشفة في المفضلة لكن يتم تخطيها في عمليات التصدير اللاحقة.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>تصدير المفضلة</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>لا يوجد جديد للتصدير</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>تم تصدير كل المفضلة بالفعل. فعّل "{0}" أو امسح سجل التصدير.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>اكتمل التصدير</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>تم تصدير {0} مقطوعة إلى {1}.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>تم تصدير {0} مقطوعة إلى {1}.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>تمت أرشفة {0} وسيتم تخطيها في المرة القادمة.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>تم مسح سجل التصدير</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>ستُضمَّن {0} مقطوعة في التصدير القادم.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>ستُضمَّن {0} مقطوعة في التصدير القادم.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>لم يتم العثور على تطابق</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>لا يحتوي radio-browser.info على إدخال لعنوان بث هذه المحطة، لذا لا توجد تفاصيل لإضافتها.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>تم تحديث {0}</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>تعذّر الوصول إلى radio-browser.info</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>تحقق من اتصالك وحاول مرة أخرى.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>تحديث المحطات التي لديها تفاصيل أيضًا</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>جميع محطاتك لديها تفاصيل بالفعل. يمكنك البحث عنها مرة أخرى للحصول على أي تغييرات.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>محطة واحدة ليس لديها نوع أو بلد محفوظ.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>{0} محطات ليس لديها نوع أو بلد محفوظ.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} سيستعلم Traydio عنها من radio-browser.info. يتم إرسال عنوان بث كل محطة فقط.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>البحث عن تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>لا يوجد ما يمكن البحث عنه</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>تم التحقق من كل محطة مؤخرًا. حاول مرة أخرى بعد بضعة أيام.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>جارٍ البدء…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>جارٍ الإنهاء…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} من {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>جارٍ البحث عن تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>تم تحديث {0} من {1} محطات.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} ليس لها إدخال في radio-browser.info.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} تطابقت مع أكثر من إدخال؛ تم استخدام الأقرب.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} تُركت للمرة القادمة للحفاظ على عدد الطلبات معقولًا.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>توقف مبكرًا لأن radio-browser.info توقف عن الاستجابة.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>تم الإيقاف بناءً على طلبك. تم حفظ ما تم العثور عليه حتى الآن.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>لا توجد تفاصيل إضافية.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>حذف "{0}"؟</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>ستتم إزالة المحطة الموجودة في هذه المجموعة أيضًا. لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>ستتم إزالة جميع المحطات ({0}) في هذه المجموعة أيضًا. لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>إضافة محطة</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>ميزة إضافة المحطات قادمة قريبًا!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>قيد التشغيل الآن</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>محطة راديو</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>جارٍ البث...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>هل يعجبك Traydio؟</value>
   </data>

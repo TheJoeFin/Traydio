@@ -238,8 +238,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     /// collapsed Advanced header so the setting is discoverable without expanding.
     /// </summary>
     public string BufferSummary => _hasBufferOverride
-        ? $"Buffer: {BufferLevelDescription} (this station)"
-        : $"Buffer: {StreamWatchdogService.DescribeBufferLevel(GlobalBufferLevel)} (app setting)";
+        ? string.Format(LocalizationService.GetString("AddStation_BufferSummary_Station", "Buffer: {0} (this station)"), BufferLevelDescription)
+        : string.Format(LocalizationService.GetString("AddStation_BufferSummary_App", "Buffer: {0} (app setting)"), StreamWatchdogService.DescribeBufferLevel(GlobalBufferLevel));
 
     /// <summary>
     /// Whether this station overrides the app-wide track info delay. When false the
@@ -290,8 +290,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     /// header so the setting is discoverable without expanding.
     /// </summary>
     public string SongPopupDelaySummary => _hasSongPopupDelayOverride
-        ? $"Track info delay: {SongPopupDelayDescription} (this station)"
-        : $"Track info delay: {SongChangeAnnouncementPolicy.DescribeDelay(GlobalSongPopupDelaySeconds)} (app setting)";
+        ? string.Format(LocalizationService.GetString("AddStation_DelaySummary_Station", "Track info delay: {0} (this station)"), SongPopupDelayDescription)
+        : string.Format(LocalizationService.GetString("AddStation_DelaySummary_App", "Track info delay: {0} (app setting)"), SongChangeAnnouncementPolicy.DescribeDelay(GlobalSongPopupDelaySeconds));
 
     public bool HasValidationError
     {
