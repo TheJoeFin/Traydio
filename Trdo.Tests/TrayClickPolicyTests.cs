@@ -90,6 +90,23 @@ public sealed class TrayClickPolicyTests
         Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Parse(-1, TrayClickAction.ShowFlyout));
     }
 
+    [TestMethod]
+    [DataRow(TrayClickAction.NextStationOrTrack)]
+    [DataRow(TrayClickAction.PreviousStationOrTrack)]
+    public void NavigationAction_CanBeAssignedToEveryClickAndRestored(TrayClickAction action)
+    {
+        foreach (TrayClickButton button in System.Enum.GetValues<TrayClickButton>())
+        {
+            TrayClickAssignments assignments = Assignments(TrayClickAction.PlayPause, TrayClickAction.ShowFlyout)
+                .With(button, action);
+            TrayClickAssignments guarded = TrayClickPolicy.EnsureFlyoutReachable(button, assignments);
+
+            Assert.AreEqual(action, guarded[button], button.ToString());
+            Assert.IsTrue(guarded.OpensFlyout);
+            Assert.AreEqual(action, TrayClickPolicy.Parse((int)guarded[button], TrayClickAction.None));
+        }
+    }
+
     private static TrayClickAssignments Assignments(
         TrayClickAction left,
         TrayClickAction right,
@@ -215,6 +232,8 @@ public sealed class TrayClickPolicyTests
         Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Resolve(TrayClickAction.FavoriteTrack, canPlay: false));
         Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Resolve(TrayClickAction.ShowTrackInfo, canPlay: false));
         Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Resolve(TrayClickAction.ShowFlyout, canPlay: false));
+        Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Resolve(TrayClickAction.NextStationOrTrack, canPlay: false));
+        Assert.AreEqual(TrayClickAction.ShowFlyout, TrayClickPolicy.Resolve(TrayClickAction.PreviousStationOrTrack, canPlay: false));
     }
 
     [TestMethod]

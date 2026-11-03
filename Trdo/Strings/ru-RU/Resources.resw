@@ -1160,11 +1160,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>Выключить / включить звук</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Следующая станция / следующий трек</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>Ничего не делать</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>Воспроизвести / пауза</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Предыдущая станция / предыдущий трек</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>Открыть Traydio</value>

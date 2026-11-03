@@ -29,5 +29,11 @@ public enum TrayClickAction
     ShowTrackInfo = 5,
 
     /// <summary>Opens the mini player, or closes it when it is already open.</summary>
-    ToggleMiniPlayer = 6
+    ToggleMiniPlayer = 6,
+
+    /// <summary>Moves to the next station or local track.</summary>
+    NextStationOrTrack = 7,
+
+    /// <summary>Moves to the previous station or local track.</summary>
+    PreviousStationOrTrack = 8
 }

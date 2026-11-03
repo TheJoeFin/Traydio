@@ -1262,6 +1262,40 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         await _player.PreviousLocalTrackAsync();
     }
 
+    // The incoming album's track list is scanned before the outgoing source has finished
+    // fading out, so it cannot be navigated safely until the transition is over.
+    public void NextStationOrTrack()
+    {
+        if (!IsLocalMusicActive)
+        {
+            SelectNextStation();
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Next track skipped during station transition");
+        }
+        else if (CanGoToNextLocalTrack)
+        {
+            NextLocalTrack();
+        }
+    }
+
+    public void PreviousStationOrTrack()
+    {
+        if (!IsLocalMusicActive)
+        {
+            SelectPreviousStation();
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Previous track skipped during station transition");
+        }
+        else if (CanGoToPreviousLocalTrack)
+        {
+            PreviousLocalTrack();
+        }
+    }
+
     /// <summary>Plays an arbitrary track from <see cref="LocalTrackList"/>, e.g. tapped from the details page.</summary>
     public async Task PlayLocalTrackAtIndexAsync(int index)
     {

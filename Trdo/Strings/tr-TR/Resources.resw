@@ -1160,11 +1160,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>Sesi kapat / aç</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Sonraki istasyon / parça</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>Hiçbir şey yapma</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>Oynat / duraklat</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Önceki istasyon / parça</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>Traydio'yu aç</value>

@@ -1082,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>静音 / 取消静音</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>下一个电台 / 曲目</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>不执行任何操作</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>播放 / 暂停</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>上一个电台 / 曲目</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>打开 Traydio</value>

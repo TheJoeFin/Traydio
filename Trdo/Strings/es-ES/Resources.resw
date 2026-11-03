@@ -1082,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>Silenciar / activar sonido</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Siguiente estación / pista</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>No hacer nada</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>Reproducir / pausar</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Estación / pista anterior</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>Abrir Traydio</value>

@@ -1082,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>Stumm schalten / Ton an</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Nächster Sender / Titel</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>Nichts tun</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>Abspielen / Pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Vorheriger Sender / Titel</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>Traydio öffnen</value>

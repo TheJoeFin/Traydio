@@ -691,6 +691,12 @@ public partial class App : Application
             case TrayClickAction.ToggleMiniPlayer:
                 ToggleMiniPlayerFromTray();
                 break;
+            case TrayClickAction.NextStationOrTrack:
+                _playerVm.NextStationOrTrack();
+                break;
+            case TrayClickAction.PreviousStationOrTrack:
+                _playerVm.PreviousStationOrTrack();
+                break;
         }
     }
 

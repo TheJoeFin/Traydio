@@ -172,6 +172,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayRightClick"
@@ -184,6 +186,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayLeftDoubleClick"
@@ -196,6 +200,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayRightDoubleClick"
@@ -208,6 +214,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <TextBlock
                             x:Uid="SettingsPage_TrayDoubleClickNote"
