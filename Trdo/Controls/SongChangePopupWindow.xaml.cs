@@ -287,8 +287,8 @@ public sealed partial class SongChangePopupWindow : Window
         double effective = SongChangeAnnouncementPolicy.ResolveDelaySeconds(stationDelay, globalDelay);
 
         string header = station is null
-            ? "Track info delay"
-            : $"Track info delay for {station.Name}";
+            ? LocalizationService.GetString("SongPopupMenu_Header", "Track info delay")
+            : string.Format(LocalizationService.GetString("SongPopupMenu_HeaderStation", "Track info delay for {0}"), station.Name);
 
         flyout.Items.Add(new MenuFlyoutItem
         {
@@ -313,7 +313,7 @@ public sealed partial class SongChangePopupWindow : Window
 
             ToggleMenuFlyoutItem followApp = new()
             {
-                Text = $"Use app setting ({SongChangeAnnouncementPolicy.DescribeDelay(globalDelay)})",
+                Text = string.Format(LocalizationService.GetString("SongPopupMenu_UseAppSetting", "Use app setting ({0})"), SongChangeAnnouncementPolicy.DescribeDelay(globalDelay)),
                 IsChecked = stationDelay is null
             };
             followApp.Click += (_, _) => ApplyStationDelay(station, null);
@@ -325,12 +325,12 @@ public sealed partial class SongChangePopupWindow : Window
         {
             flyout.Items.Add(new MenuFlyoutItem
             {
-                Text = $"Currently {SongChangeAnnouncementPolicy.DescribeDelay(effective)} (no station selected)",
+                Text = string.Format(LocalizationService.GetString("SongPopupMenu_CurrentlyNoStation", "Currently {0} (no station selected)"), SongChangeAnnouncementPolicy.DescribeDelay(effective)),
                 IsEnabled = false
             });
         }
 
-        MenuFlyoutItem turnOff = new() { Text = "Turn off song popups" };
+        MenuFlyoutItem turnOff = new() { Text = LocalizationService.GetString("SongPopupMenu_TurnOff", "Turn off song popups") };
         turnOff.Click += (_, _) =>
         {
             SettingsService.IsSongChangePopupEnabled = false;

@@ -42,6 +42,7 @@ public sealed partial class MiniPlayerWindow : WindowEx
     public MiniPlayerWindow()
     {
         InitializeComponent();
+        Title = LocalizationService.GetString("MiniPlayer_WindowTitle", "Traydio Mini Player");
 
         ViewModel = PlayerViewModel.Shared;
         ExtendsContentIntoTitleBar = true;

@@ -281,7 +281,7 @@ public sealed class EngineHealthStore
     /// <returns>How many records were removed.</returns>
     public int Clear()
     {
-        return RemoveKeysWithPrefixes([KeyPrefix]);
+        return RemoveKeysWithPrefixes(new[] { KeyPrefix });
     }
 
     /// <summary>Removes records written by earlier versions, whose meaning no longer holds.</summary>

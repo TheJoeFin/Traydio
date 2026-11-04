@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Trdo.Models;
+using Trdo.Services.Metadata;
 
 namespace Trdo.Services;
 
@@ -303,8 +304,13 @@ public sealed partial class StreamMetadataService : IDisposable
                 totalRead += bytesRead;
             }
 
-            // Parse metadata string (null-terminated, padded with zeros)
-            string metadataStr = Encoding.UTF8.GetString(metaBuffer).TrimEnd('\0');
+            // Parse metadata string (null-terminated, padded with zeros).
+            // ICY metadata has no charset signaling. Most stations send UTF-8, but many
+            // legacy Shoutcast/Icecast sources send whatever local codepage the broadcast
+            // software used, which is not valid UTF-8. Decoding those bytes as UTF-8 replaces
+            // every invalid sequence with U+FFFD, permanently destroying the original text.
+            // IcyTextDecoder falls back to Windows-1251 for Cyrillic-looking bytes, else Latin-1.
+            string metadataStr = IcyTextDecoder.Decode(metaBuffer).TrimEnd('\0');
             Debug.WriteLine($"[StreamMetadataService] Raw metadata: {metadataStr}");
 
             return ParseIcyMetadata(metadataStr);

@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>开发者</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>翻译</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>适用于 Windows 的简洁优雅的网络电台播放器</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>无延迟</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 分钟</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} 秒</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} 秒</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>大</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>特大</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>缓冲：{0}（此电台）</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>缓冲：{0}（应用设置）</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>曲目信息延迟：{0}（此电台）</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>曲目信息延迟：{0}（应用设置）</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>曲目信息延迟</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>{0} 的曲目信息延迟</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>使用应用设置（{0}）</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>当前为 {0}（未选择电台）</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>关闭歌曲弹出提示</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>查找</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>没有可导出的内容</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>请先收藏一些歌曲。</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>导出全部收藏</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>仅新增（{0}/{1}）</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>全部收藏（{0}）</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>归档已导出的曲目</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV 适用于 Soundiiz 或 TuneMyMusic 等播放列表转移服务。XSPF 是适用于 VLC 等播放器的播放列表文件。保存时选择格式。</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>已归档的曲目仍保留在收藏中，但会在以后的导出中被跳过。</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>导出收藏</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>没有新的可导出内容</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>所有收藏均已导出。请开启“{0}”或清除导出历史记录。</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>导出完成</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>已将 {0} 首曲目导出到 {1}。</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>已将 {0} 首曲目导出到 {1}。</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>已归档 {0} 首，下次将被跳过。</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>导出历史记录已清除</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} 首曲目将包含在下次导出中。</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} 首曲目将包含在下次导出中。</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>未找到匹配项</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info 中没有此电台流地址的条目，因此没有可添加的详细信息。</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>已更新 {0}</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>无法连接到 radio-browser.info</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>请检查网络连接后重试。</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>同时刷新已有详细信息的电台</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>您的所有电台都已有详细信息。您可以重新查找以获取更新。</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>有一个电台未保存流派或国家/地区。</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>有 {0} 个电台未保存流派或国家/地区。</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio 将向 radio-browser.info 查询这些电台。仅发送每个电台的流地址。</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>查找电台详细信息</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>没有可查找的内容</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>所有电台最近都已检查过。请过几天再试。</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>正在启动…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>正在完成…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0}/{1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>正在查找电台详细信息</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>电台详细信息</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>已更新 {1} 个电台中的 {0} 个。</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} 个在 radio-browser.info 上没有条目。</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} 个匹配多个条目，已使用最接近的一个。</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} 个留待下次处理，以控制请求数量。</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>由于 radio-browser.info 停止响应，已提前停止。</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>已按您的要求停止。目前找到的内容已保存。</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>没有更多详细信息。</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>删除“{0}”？</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>此分组中的电台也将被删除。此操作无法撤销。</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>此分组中的全部 {0} 个电台也将被删除。此操作无法撤销。</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>添加电台</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>添加电台功能即将推出！</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>正在播放</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>广播电台</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>正在串流...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>喜欢 Traydio 吗？</value>
   </data>
@@ -311,6 +536,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>显示窗口</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>投放</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>投放到设备</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>正在投放到 {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>尚未找到设备。请确保设备已开机并与此电脑连接到同一网络。</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>无法投放到 {0}：{1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>正在搜索网络中的设备…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>停止投放</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>此电脑无法投放，因为 LibVLC 播放引擎无法加载。</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>点击喜欢的歌曲上的星标图标即可保存到这里</value>
   </data>
@@ -467,6 +719,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>添加您的第一个电台</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>投放…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>正在投放到 {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>删除分组</value>
   </data>
@@ -581,6 +839,9 @@
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>电台</value>
   </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>停止投放</value>
+  </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>查看专辑曲目</value>
   </data>
@@ -686,6 +947,12 @@
   <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
     <value>波兰语</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>ä¿è¯­</value>
+  </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>土耳其语</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>选择应用中使用的语言。</value>
   </data>
@@ -745,6 +1012,9 @@
   </data>
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>在电台加载期间，用轻柔的调频广播杂音填补静默。它会渐渐响起而不是突然出现，并在电台开始播放时逐渐淡出。</value>
+  </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>电台杂音音量</value>
   </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>试听广播杂音</value>
@@ -812,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>静音 / 取消静音</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>下一个电台 / 曲目</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>不执行任何操作</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>播放 / 暂停</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>上一个电台 / 曲目</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>打开 Traydio</value>
@@ -880,6 +1156,9 @@
   </data>
   <data name="TrayIcon_AddStation" xml:space="preserve">
     <value>Traydio - 添加电台以开始收听</value>
+  </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>在 {0} 上</value>
   </data>
   <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
     <value>左键单击暂停</value>
@@ -959,5 +1238,296 @@
   </data>
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>欢迎使用 Traydio！</value>
+  </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>可用</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>正在检查可用性...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>不可用</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>以前使用过 - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} 在此网络上不可用。</value>
+  </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>在此设备完成连接之前，已选择了另一台设备。</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>正在连接...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>设备未开始播放。</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>播放引擎拒绝了投放设备。</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>这台电脑</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>无法保存投放偏好设置：{0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>在此 Wi-Fi 上隐藏投放按钮</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>在此 Wi-Fi 上显示投放按钮</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>自动结束投放</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>播放暂停或停止达到所选时长后，返回此设备。播放将保持暂停。</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>闲置多久后停止投放</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>从不</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} 分钟</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>无法自动停止投放。请尝试选择“停止投放”。</value>
+  </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>试听电台</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加前编辑电台详细信息</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>添加电台</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>搜索广播电台</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>按名称搜索，或使用筛选器...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>筛选器</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>筛选器</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>移除此筛选器</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>搜索错误</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>查找国家/地区、语言或流派</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>国家/地区、语言或流派...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>没有匹配的国家/地区、语言或流派。</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>质量和排序</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>编解码器</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>最低比特率</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>排序方式</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>隐藏无法播放的电台</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>全部清除</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>显示结果</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>最近：</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>显示我附近的热门电台</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>或手动添加电台</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>添加白噪声...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>添加本地音乐...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>Traydio 迷你播放器</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>迷你播放器</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>显示可视化效果</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>始终置顶</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>隐藏标题栏</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>电台音量</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>电台缓冲级别</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>电台曲目信息延迟（秒）</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>音量</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>音量</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>更多收藏选项</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>清除导出历史记录</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>音乐搜索设置</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>点击查看详细信息</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Sonos 投放功能深受 RoomRelay 及其作者 guicn555 的启发。感谢！</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>继续</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>正在完成...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>无法连接到 Last.fm。请稍后再试。</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>此版本未配置 Last.fm。</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>Last.fm 尚未收到你的授权。请确认已在浏览器中批准访问，然后再次选择“继续”。</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>正在连接到 Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>正在连接到 Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>连接到 Last.fm</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>请在刚刚打开的浏览器窗口中批准访问你的 Last.fm 帐户，然后返回此处并选择“继续”。</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>连接到 Last.fm</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>已连接为 {0}</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>未连接</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>自动将你收听的内容（包括电台和本地音乐库）记录（scrobble）到你的 Last.fm 帐户。</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>断开连接</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>投放选项</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>将扬声器静音 / 取消静音</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>将扬声器静音 / 取消静音</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>投放选项</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>投放选项</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>{0} 音量</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} 报告：{1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} 未能及时开始播放。</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} 停止了播放流。</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>添加到分组</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>从分组中移除</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>扬声器分组…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>扬声器分组</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>选择需要一起播放的扬声器。</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>添加的扬声器将停止当前播放并跟随该分组。</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>分组名称</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>未分组</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>正在与 {0} 一起播放</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>分组至少需要此网络上的两个 Sonos 扬声器。</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>在此网络上未找到 Sonos 扬声器。</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>无法更改分组：{0}</value>
   </data>
 </root>

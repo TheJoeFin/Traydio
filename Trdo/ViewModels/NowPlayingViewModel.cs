@@ -125,6 +125,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsAppleMusicEnabled));
         OnPropertyChanged(nameof(IsYouTubeMusicEnabled));
         OnPropertyChanged(nameof(IsBandcampEnabled));
+        OnPropertyChanged(nameof(IsQobuzEnabled));
         OnPropertyChanged(nameof(HasEnabledMusicServices));
     }
 
@@ -151,6 +152,7 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsAppleMusicEnabled));
         OnPropertyChanged(nameof(IsYouTubeMusicEnabled));
         OnPropertyChanged(nameof(IsBandcampEnabled));
+        OnPropertyChanged(nameof(IsQobuzEnabled));
         OnPropertyChanged(nameof(HasEnabledMusicServices));
 
         // History is now managed by PlaylistHistoryService singleton
@@ -391,6 +393,19 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Opens Qobuz search with the current track information.
+    /// </summary>
+    public async Task SearchOnQobuz()
+    {
+        if (!HasMetadata)
+            return;
+
+        string query = Uri.EscapeDataString(DisplayText.Length > 0 ? DisplayText : StreamTitle);
+        string url = $"https://www.qobuz.com/us-en/search?q={query}";
+        await Launcher.LaunchUriAsync(new Uri(url));
+    }
+
+    /// <summary>
     /// Gets whether Spotify search links should be shown.
     /// </summary>
     public bool IsSpotifyEnabled => SettingsService.IsSpotifyEnabled;
@@ -416,6 +431,11 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
     public bool IsBandcampEnabled => SettingsService.IsBandcampEnabled;
 
     /// <summary>
+    /// Gets whether Qobuz search links should be shown.
+    /// </summary>
+    public bool IsQobuzEnabled => SettingsService.IsQobuzEnabled;
+
+    /// <summary>
     /// Gets whether at least one music service search link should be shown. Never shown for
     /// local music - a locally-tagged filename has no guaranteed metadata match on any of
     /// these services.
@@ -426,7 +446,8 @@ public partial class NowPlayingViewModel : INotifyPropertyChanged
         IsDiscogsEnabled ||
         IsAppleMusicEnabled ||
         IsYouTubeMusicEnabled ||
-        IsBandcampEnabled);
+        IsBandcampEnabled ||
+        IsQobuzEnabled);
 
     /// <summary>True when the selected station is a local music folder rather than radio/white noise.</summary>
     public bool IsLocalMusicActive => PlayerViewModel.Shared.IsLocalMusicActive;

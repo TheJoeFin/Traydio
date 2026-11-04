@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Trdo.Models"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    NavigationCacheMode="Required"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -16,16 +17,136 @@
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!--
+            One card per station name, shared by the main results list and the "popular near
+            you" section - both show the same kind of thing and get the same preview/edit/add
+            actions.
+        -->
+        <DataTemplate x:Key="StationGroupCardTemplate" x:DataType="models:StationSearchResultGroup">
+            <Border
+                Margin="0,4"
+                Padding="6"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="6">
+
+                    <!--  Header: favicon, name, country/tags, shared by every stream below  -->
+                    <Grid
+                        Grid.Row="0"
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="12">
+                        <Grid
+                            Grid.Column="0"
+                            Width="40"
+                            Height="40"
+                            VerticalAlignment="Top"
+                            Visibility="{x:Bind Favicon, Converter={StaticResource NullToVisibilityConverter}, Mode=OneTime}">
+                            <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6">
+                                <Image Source="{x:Bind Favicon, Converter={StaticResource StringToImageSourceConverter}, Mode=OneTime}" Stretch="UniformToFill" />
+                            </Border>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontWeight="SemiBold"
+                                    Text="{x:Bind Name}"
+                                    TextWrapping="WrapWholeWords" />
+                                <!--  How many streams this station has - hidden when there's just the one  -->
+                                <Border
+                                    Grid.Column="1"
+                                    Padding="6,1"
+                                    VerticalAlignment="Top"
+                                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                    CornerRadius="8"
+                                    Visibility="{x:Bind HasMultipleStreams, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneTime}">
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="{x:Bind StreamCountLabel}" />
+                                </Border>
+                            </Grid>
+                            <TextBlock TextWrapping="WrapWholeWords">
+                                <Run
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="{x:Bind Country}" />
+                                <Run
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text=" • " />
+                                <Run
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="{x:Bind Tags}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  One row per stream: its codec/bitrate, and its own preview/edit/add  -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{x:Bind Streams}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:RadioBrowserStation">
+                                <Grid
+                                    Margin="0,4,0,0"
+                                    ColumnDefinitions="*,Auto"
+                                    ColumnSpacing="8">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="{x:Bind QualityLabel}" />
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Button
+                                            x:Uid="SearchStation_PreviewButton"
+                                            Click="PreviewButton_Click"
+                                            Tag="{x:Bind}">
+                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                        </Button>
+                                        <Button
+                                            x:Uid="SearchStation_EditButton"
+                                            Click="EditStationButton_Click"
+                                            Tag="{x:Bind}">
+                                            <FontIcon FontSize="14" Glyph="&#xE70F;" />
+                                        </Button>
+                                        <Button
+                                            x:Uid="SearchStation_AddButton"
+                                            Click="AddStationButton_Click"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Tag="{x:Bind}" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </Page.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+    <!--
+        Rows carry their own top margin instead of the Grid a uniform RowSpacing: the filter-chip
+        row and the error bar are usually collapsed, and RowSpacing still inserts its gap between
+        rows regardless of whether either side has anything visible in it. A margin on a
+        Collapsed element collapses along with it, so the gap only ever appears once, between
+        whichever two rows actually have something in them.
+    -->
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
 
         <!--  Title  -->
         <TextBlock
+            x:Uid="SearchStation_Title"
             Grid.Row="0"
             FontSize="20"
             FontWeight="SemiBold"
-            Text="Search Radio Stations"
             Visibility="Collapsed" />
 
         <!--  Search Input  -->
@@ -35,20 +156,19 @@
             ColumnSpacing="8">
             <TextBox
                 x:Name="SearchTextBox"
+                x:Uid="SearchStation_SearchBox"
                 Grid.Column="0"
-                PlaceholderText="Search by name, or use filters..."
                 Text="{x:Bind ViewModel.SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Filter toggle shares this cell with the search spinner  -->
             <Grid Grid.Column="1" VerticalAlignment="Center">
                 <ToggleButton
                     x:Name="FilterButton"
+                    x:Uid="SearchStation_FilterButton"
                     Height="32"
                     Padding="8,0"
-                    AutomationProperties.Name="Filters"
                     Checked="FilterButton_Checked"
-                    IsChecked="{x:Bind ViewModel.IsFilterPanelOpen, Mode=TwoWay}"
-                    ToolTipService.ToolTip="Filters">
+                    IsChecked="{x:Bind ViewModel.IsFilterPanelOpen, Mode=TwoWay}">
                     <FontIcon FontSize="16" Glyph="&#xE71C;" />
                 </ToggleButton>
 
@@ -80,6 +200,7 @@
         -->
         <ItemsControl
             Grid.Row="2"
+            Margin="0,12,0,0"
             ItemsSource="{x:Bind ViewModel.FilterChips, Mode=OneWay}"
             Visibility="{x:Bind ViewModel.FilterChips.Count, Mode=OneWay, Converter={StaticResource HasItemsVisibilityConverter}}">
             <ItemsControl.ItemsPanel>
@@ -90,12 +211,12 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:IStationFilterChip">
                     <Button
+                        x:Uid="SearchStation_RemoveFilterButton"
                         Padding="8,3"
                         AutomationProperties.Name="{x:Bind ChipLabel}"
                         Click="RemoveFilterButton_Click"
                         CornerRadius="12"
-                        Tag="{x:Bind}"
-                        ToolTipService.ToolTip="Remove this filter">
+                        Tag="{x:Bind}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock FontSize="12" Text="{x:Bind ChipLabel}" />
                             <FontIcon
@@ -110,7 +231,7 @@
 
         <!--  Error InfoBar  -->
         <InfoBar
-            Title="Search Error"
+            x:Uid="SearchStation_ErrorBar"
             Grid.Row="3"
             IsClosable="True"
             IsOpen="{x:Bind ViewModel.HasError, Mode=OneWay}"
@@ -125,6 +246,7 @@
         -->
         <Grid
             Grid.Row="4"
+            Margin="0,12,0,0"
             RowDefinitions="Auto,*"
             RowSpacing="8"
             Visibility="{x:Bind ViewModel.IsFilterPanelOpen, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -135,9 +257,8 @@
                 ColumnSpacing="8">
                 <TextBox
                     x:Name="FilterQueryTextBox"
+                    x:Uid="SearchStation_FilterQuery"
                     Grid.Column="0"
-                    AutomationProperties.Name="Find a country, language or genre"
-                    PlaceholderText="Country, language or genre..."
                     Text="{x:Bind ViewModel.FilterQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <ProgressRing
                     Grid.Column="1"
@@ -162,9 +283,9 @@
                     <StackPanel Spacing="16">
                         <StackPanel Spacing="0">
                             <TextBlock
+                                x:Uid="SearchStation_NoSuggestions"
                                 FontStyle="Italic"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="No country, language or genre matches that."
                                 TextAlignment="Center"
                                 Visibility="{x:Bind ViewModel.HasNoSuggestions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
@@ -213,9 +334,9 @@
                             WrapPanel when a row runs out of width.
                         -->
                         <StackPanel Spacing="10">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Quality and order" />
+                            <TextBlock x:Uid="SearchStation_QualityAndOrder" Style="{StaticResource BodyStrongTextBlockStyle}" />
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Codec" />
+                                <TextBlock x:Uid="SearchStation_Codec" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -230,7 +351,7 @@
                                 </toolkit:Segmented>
                             </StackPanel>
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Minimum bitrate" />
+                                <TextBlock x:Uid="SearchStation_MinimumBitrate" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -245,7 +366,7 @@
                                 </toolkit:Segmented>
                             </StackPanel>
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Sort by" />
+                                <TextBlock x:Uid="SearchStation_SortBy" />
                                 <toolkit:Segmented
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberPath="Display"
@@ -259,7 +380,7 @@
                                     </toolkit:Segmented.ItemsPanel>
                                 </toolkit:Segmented>
                             </StackPanel>
-                            <CheckBox Content="Hide broken stations" IsChecked="{x:Bind ViewModel.HideBroken, Mode=TwoWay}" />
+                            <CheckBox x:Uid="SearchStation_HideBroken" IsChecked="{x:Bind ViewModel.HideBroken, Mode=TwoWay}" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -269,148 +390,124 @@
                     ColumnDefinitions="*,*"
                     ColumnSpacing="8">
                     <Button
+                        x:Uid="SearchStation_ClearAll"
                         Grid.Column="0"
                         HorizontalAlignment="Stretch"
                         Click="ClearFiltersButton_Click"
-                        Content="Clear all"
                         IsEnabled="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}" />
                     <Button
+                        x:Uid="SearchStation_ShowResults"
                         Grid.Column="1"
                         HorizontalAlignment="Stretch"
                         Click="DoneFilteringButton_Click"
-                        Content="Show results"
                         Style="{StaticResource AccentButtonStyle}" />
                 </Grid>
             </Grid>
         </Grid>
 
         <!--  Search Results  -->
-        <ScrollView Grid.Row="4" Visibility="{x:Bind ViewModel.AreResultsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <ScrollView
+            Grid.Row="4"
+            Margin="0,0,0,0"
+            Visibility="{x:Bind ViewModel.AreResultsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Spacing="8">
-                <!--  Initial state  -->
-                <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.ShowInitialState, Mode=OneWay}">
-                    <TextBlock
-                        FontStyle="Italic"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="Enter a search term to find stations..."
-                        TextAlignment="Center" />
-                    <HyperlinkButton
-                        HorizontalAlignment="Center"
-                        Click="ManualEntryButton_Click"
-                        Content="Or add station manually">
+                <!--  Initial / no-results state  -->
+                <StackPanel Spacing="20" Visibility="{x:Bind ViewModel.ShowEmptyState, Mode=OneWay}">
+                    <!--
+                        Recent searches, as a horizontally sliding chip row - a click re-runs
+                        that search instead of retyping it. The label sits beside the row rather
+                        than above it to keep this from costing an extra line of height. Only
+                        meaningful before there's anything else on screen, so it lives inside the
+                        initial-state block, above the "enter a search term" prompt so it's the
+                        first thing offered.
+                    -->
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind ViewModel.ShowRecentSearches, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock
+                            x:Uid="SearchStation_Recent"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <ScrollViewer
+                            Grid.Column="1"
+                            HorizontalScrollBarVisibility="Auto"
+                            HorizontalScrollMode="Enabled"
+                            VerticalScrollBarVisibility="Disabled"
+                            VerticalScrollMode="Disabled">
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.RecentSearches, Mode=OneWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Button
+                                            Padding="10,4"
+                                            Click="RecentSearchChip_Click"
+                                            Content="{x:Bind}"
+                                            CornerRadius="12"
+                                            Tag="{x:Bind}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <StackPanel Margin="0,48,0,0" Spacing="8">
+                        <TextBlock
+                            FontStyle="Italic"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ViewModel.EmptyStateMessage, Mode=OneWay}"
+                            TextAlignment="Center" />
+
                         <!--
-                            White noise is a niche enough option that it doesn't deserve a
-                            second permanently-visible link next to the common case - right-click
-                            (or press-and-hold) the manual-entry link to reach it instead.
+                            Applies country + "most popular" to the regular search - same
+                            outcome as picking them by hand in the filter panel - so it's a
+                            shortcut onto the ordinary search rather than a separate experience.
                         -->
-                        <HyperlinkButton.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Click="AddWhiteNoiseButton_Click" Text="Add white noise..." />
-                                <MenuFlyoutItem Click="AddLocalMusicButton_Click" Text="Add local music..." />
-                            </MenuFlyout>
-                        </HyperlinkButton.ContextFlyout>
-                    </HyperlinkButton>
+                        <Button
+                            x:Uid="SearchStation_PopularNearMe"
+                            HorizontalAlignment="Center"
+                            Click="PopularNearYouButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Visibility="{x:Bind ViewModel.ShowPopularNearYouOption, Mode=OneTime, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                        <HyperlinkButton
+                            x:Uid="SearchStation_ManualEntry"
+                            HorizontalAlignment="Center"
+                            Click="ManualEntryButton_Click">
+                            <!--
+                                White noise is a niche enough option that it doesn't deserve a
+                                second permanently-visible link next to the common case - right-click
+                                (or press-and-hold) the manual-entry link to reach it instead.
+                            -->
+                            <HyperlinkButton.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem x:Uid="SearchStation_AddWhiteNoise" Click="AddWhiteNoiseButton_Click" />
+                                    <MenuFlyoutItem x:Uid="SearchStation_AddLocalMusic" Click="AddLocalMusicButton_Click" />
+                                </MenuFlyout>
+                            </HyperlinkButton.ContextFlyout>
+                        </HyperlinkButton>
+                    </StackPanel>
                 </StackPanel>
 
                 <!--  Results List  -->
                 <ListView
                     Margin="0"
                     Padding="0"
-                    ItemsSource="{x:Bind ViewModel.SearchResults, Mode=OneWay}"
+                    ItemTemplate="{StaticResource StationGroupCardTemplate}"
+                    ItemsSource="{x:Bind ViewModel.SearchResultGroups, Mode=OneWay}"
                     SelectionMode="None"
-                    Visibility="{x:Bind ViewModel.SearchResults.Count, Mode=OneWay, Converter={StaticResource HasItemsVisibilityConverter}}">
+                    Visibility="{x:Bind ViewModel.SearchResultGroups.Count, Mode=OneWay, Converter={StaticResource HasItemsVisibilityConverter}}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="Padding" Value="0" />
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         </Style>
                     </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:RadioBrowserStation">
-                            <Border
-                                Margin="0,4"
-                                Padding="6"
-                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                BorderThickness="1"
-                                CornerRadius="8">
-                                <Grid
-                                    ColumnDefinitions="Auto,*"
-                                    ColumnSpacing="12"
-                                    RowDefinitions="Auto,Auto,Auto"
-                                    RowSpacing="4">
-
-                                    <!--  Favicon  -->
-                                    <Grid
-                                        Grid.Row="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="0"
-                                        Width="40"
-                                        Height="40"
-                                        VerticalAlignment="Top"
-                                        Visibility="{x:Bind Favicon, Converter={StaticResource NullToVisibilityConverter}, Mode=OneTime}">
-                                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6">
-                                            <Image Source="{x:Bind Favicon, Converter={StaticResource StringToImageSourceConverter}, Mode=OneTime}" Stretch="UniformToFill" />
-                                        </Border>
-                                    </Grid>
-
-                                    <!--  Station Name  -->
-                                    <TextBlock
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        FontWeight="SemiBold"
-                                        Text="{x:Bind Name}"
-                                        TextWrapping="WrapWholeWords" />
-
-                                    <!--  Station Info  -->
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        TextWrapping="WrapWholeWords">
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind Country}" />
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text=" • " />
-                                        <Run
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind Tags}" />
-                                    </TextBlock>
-
-                                    <!--  Preview & Add Buttons  -->
-                                    <StackPanel
-                                        Grid.Row="2"
-                                        Grid.Column="0"
-                                        Grid.ColumnSpan="2"
-                                        Margin="0,4,0,0"
-                                        Orientation="Horizontal"
-                                        Spacing="8">
-                                        <Button
-                                            Click="PreviewButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Preview station">
-                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
-                                        </Button>
-                                        <Button
-                                            Click="EditStationButton_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Edit station details before adding">
-                                            <FontIcon FontSize="14" Glyph="&#xE70F;" />
-                                        </Button>
-                                        <Button
-                                            Click="AddStationButton_Click"
-                                            Content="Add Station"
-                                            Style="{StaticResource AccentButtonStyle}"
-                                            Tag="{x:Bind}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
                 </ListView>
             </StackPanel>
         </ScrollView>
@@ -418,11 +515,12 @@
         <!--  Cancel Button  -->
         <Button
             Grid.Row="5"
+            Margin="0,12,0,0"
             HorizontalAlignment="Stretch"
             Click="CancelButton_Click">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon FontSize="16" Glyph="&#xE711;" />
-                <TextBlock Text="Cancel" />
+                <TextBlock x:Uid="Action_Cancel" />
             </StackPanel>
         </Button>
     </Grid>

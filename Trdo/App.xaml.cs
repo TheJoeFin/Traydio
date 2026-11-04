@@ -11,6 +11,7 @@ using Trdo.Controls;
 using Trdo.Models;
 using Trdo.Services;
 using Trdo.Services.Audio;
+using Trdo.Services.Lastfm;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.UI.ViewManagement;
@@ -62,7 +63,9 @@ public partial class App : Application
     private readonly UISettings _uiSettings = new();
     private Mutex? _singleInstanceMutex;
     private EventWaitHandle? _trayIconRestoreEvent;
+    private RegisteredWaitHandle? _trayIconRestoreRegisteredWait;
     private DispatcherQueue? _uiDispatcherQueue;
+    private AudioSessionGroupingService? _audioSessionGrouping;
 #if DEBUG
     private DispatcherQueueTimer? _songChangePopupPreviewTimer;
 #endif
@@ -94,6 +97,7 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         LocalizationService.ApplyLanguage(SettingsService.AppLanguage);
+        SongChangeAnnouncementPolicy.Localize = LocalizationService.GetString;
         SettingsService.MigrateTrayClickActions();
         InitializeComponent();
         _playerVm.PropertyChanged += PlayerVmOnPropertyChanged;
@@ -104,6 +108,10 @@ public partial class App : Application
         // Same for playback errors: the service has to be listening before the first
         // failure, and it needs this (UI) thread's dispatcher for its review timer.
         PlaybackErrorService.EnsureInitialized();
+
+        // Last.fm scrobbling: listens for the same metadata changes, so it has to be
+        // subscribed before the first track plays, same as PlaylistHistoryService above.
+        LastfmScrobbleService.EnsureInitialized();
 
         // Radio static listens for buffering, which can start before any window is shown.
         RadioStaticService.Instance.Initialize();
@@ -349,7 +357,7 @@ public partial class App : Application
             if (!createdNew)
             {
                 // Another instance is already running
-                // Signal it to restore the tray icon before exiting
+                // Signal it to open its window before exiting
                 try
                 {
                     using EventWaitHandle restoreEvent = EventWaitHandle.OpenExisting(restoreEventName);
@@ -358,7 +366,7 @@ public partial class App : Application
                 catch
                 {
                     // Event handle doesn't exist or couldn't be opened
-                    // This is acceptable - the watchdog timer will eventually restore the icon
+                    // This is acceptable - the other instance just won't raise its window
                 }
 
                 // Exit this instance gracefully
@@ -372,26 +380,48 @@ public partial class App : Application
             // This could happen in restricted environments
         }
 
-        // Create the event handle for other instances to signal us
+        // Create the event handle for other instances to signal us, and listen for it so a
+        // second launch raises this instance's window instead of silently doing nothing.
         try
         {
             _trayIconRestoreEvent = new EventWaitHandle(false, EventResetMode.AutoReset, restoreEventName);
+            _trayIconRestoreRegisteredWait = ThreadPool.RegisterWaitForSingleObject(
+                _trayIconRestoreEvent,
+                (_, _) => OnSecondInstanceLaunchDetected(),
+                state: null,
+                timeout: Timeout.InfiniteTimeSpan,
+                executeOnlyOnce: false);
         }
         catch
         {
-            // If we can't create the event handle, continue without it
-            // The watchdog timer will still provide periodic restoration
+            // If we can't create the event handle, a second launch just exits quietly instead
+            // of raising this instance's window.
         }
 
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
-
+        _audioSessionGrouping = new AudioSessionGroupingService();
         InitializeTrayIcon();
         await UpdateTrayIconAsync();
         UpdatePlayPauseCommandText(forceTooltip: true);
 
+        // Casting history is optional; the tray must not wait on it or fail because of it.
+        _ = InitializeCastingContextAsync(_uiDispatcherQueue);
+
 #if DEBUG
         StartSongChangePopupPreviewIfRequested();
 #endif
+    }
+
+    private static async Task InitializeCastingContextAsync(DispatcherQueue queue)
+    {
+        try
+        {
+            await CastingContextService.Instance.InitializeAsync(queue);
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("App", "Casting context failed to initialize; cast history is unavailable", ex);
+        }
     }
 
 #if DEBUG
@@ -460,7 +490,8 @@ public partial class App : Application
             // Update tray icon to show loading state
             _ = UpdateTrayIconAsync();
         }
-        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted))
+        else if (e.PropertyName is nameof(PlayerViewModel.CanPlay) or nameof(PlayerViewModel.IsMuted)
+                 or nameof(PlayerViewModel.IsCasting) or nameof(PlayerViewModel.CastTargetName))
         {
             UpdatePlayPauseCommandText();
         }
@@ -660,6 +691,12 @@ public partial class App : Application
             case TrayClickAction.ToggleMiniPlayer:
                 ToggleMiniPlayerFromTray();
                 break;
+            case TrayClickAction.NextStationOrTrack:
+                _playerVm.NextStationOrTrack();
+                break;
+            case TrayClickAction.PreviousStationOrTrack:
+                _playerVm.PreviousStationOrTrack();
+                break;
         }
     }
 
@@ -800,6 +837,31 @@ public partial class App : Application
         _trayPopupWindow.ToggleNearAnchor(clickedAtUtc);
     }
 
+    /// <summary>
+    /// Fires on a thread pool thread when a second launch of the app signals
+    /// <see cref="_trayIconRestoreEvent"/> before exiting. Marshals to the UI thread and raises
+    /// the tray popup window, so re-launching the app (e.g. double-clicking the exe or a
+    /// shortcut again) surfaces the already-running instance instead of appearing to do nothing.
+    /// </summary>
+    private void OnSecondInstanceLaunchDetected()
+    {
+        _uiDispatcherQueue?.TryEnqueue(() =>
+        {
+            WindowPlacementService.ClearPointerAnchor();
+
+            if (_trayPopupWindow is null)
+            {
+                _trayPopupWindow = new TrayPopupWindow();
+                WindowHelper.Track(_trayPopupWindow);
+                _trayPopupWindow.Closed += (_, _) => _trayPopupWindow = null;
+            }
+
+            // Always shows rather than toggling: a relaunch means "let me see the app", never
+            // "close what's open".
+            _trayPopupWindow.ShowNearAnchor();
+        });
+    }
+
     private async Task UpdateTrayIconAsync()
     {
         if (_trayIcon is null)
@@ -912,6 +974,18 @@ public partial class App : Application
                 "TrayIcon_Paused",
                 "Traydio {0} (Paused)\n{1}");
             tooltip = string.Format(pausedFormat, station, playPauseClickHint);
+        }
+
+        if (_playerVm.CanPlay && _playerVm.IsCasting && !string.IsNullOrWhiteSpace(_playerVm.CastTargetName))
+        {
+            // Directly under the station line, since it qualifies where that station is playing.
+            string castingLine = string.Format(
+                LocalizationService.GetString("TrayIcon_CastingTo", "on {0}"),
+                _playerVm.CastTargetName);
+            int firstLineEnd = tooltip.IndexOf('\n');
+            tooltip = firstLineEnd < 0
+                ? string.Concat(tooltip, "\n", castingLine)
+                : tooltip.Insert(firstLineEnd, "\n" + castingLine);
         }
 
         if (_playerVm.CanPlay && _playerVm.IsMuted)
@@ -1050,6 +1124,9 @@ public partial class App : Application
             // throw a catchable exception.
             PlaybackErrorService.Instance.Shutdown();
 
+            _audioSessionGrouping?.Dispose();
+            CastingContextService.Instance.Shutdown();
+
             // Order matters twice over: RadioStaticService unsubscribes from the player's events
             // first, so nothing reacts to the source teardown below by starting static that would
             // never fade out; then the player's Dispose() tears down the LibVlcPlaybackBackend
@@ -1066,6 +1143,7 @@ public partial class App : Application
             // below swallows.
             _singleInstanceMutex?.ReleaseMutex();
             _singleInstanceMutex?.Dispose();
+            _trayIconRestoreRegisteredWait?.Unregister(null);
             _trayIconRestoreEvent?.Dispose();
         }
         catch (Exception ex)

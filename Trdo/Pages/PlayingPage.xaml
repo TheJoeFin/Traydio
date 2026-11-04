@@ -34,6 +34,7 @@
             <Grid
                 Background="Transparent"
                 ColumnDefinitions="Auto,Auto,*,Auto"
+                DoubleTapped="StationRow_DoubleTapped"
                 PointerEntered="StationRow_PointerEntered"
                 PointerExited="StationRow_PointerExited">
                 <Grid.ContextFlyout>
@@ -322,7 +323,7 @@
         its gap on both sides of a row even when that row's content is Collapsed, which is what
         left a phantom gap above the playback buttons whenever the volume slider was hidden.
     -->
-    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto">
+    <Grid Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto">
         <Grid.ContextFlyout>
             <MenuFlyout x:Name="PageContextMenu" Opening="PageContextMenu_Opening">
                 <MenuFlyoutItem
@@ -594,10 +595,104 @@
                 TextAlignment="Right" />
         </Grid>
 
+        <!--
+            Speaker Volume: the Sonos player's own level, shown only while casting to one.
+            A Sonos fetches the stream itself, so the stream volume above never reaches it;
+            this row is the only way to turn the room up or down from here. Not tied to the
+            Show/Hide Volume Slider setting - it appears with the cast and goes with it.
+        -->
+        <Grid
+            x:Name="SpeakerVolumeControlGrid"
+            Grid.Row="4"
+            Margin="0,4,0,0"
+            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
+            animations:Implicit.HideAnimations="{StaticResource ImplicitFadeHideAnimations}"
+            animations:Implicit.ShowAnimations="{StaticResource ImplicitFadeShowAnimations}"
+            Background="Transparent"
+            ColumnSpacing="8"
+            PointerWheelChanged="SpeakerVolumeControl_PointerWheelChanged"
+            ToolTipService.ToolTip="{x:Bind ViewModel.SpeakerVolumeToolTip, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.IsCastingToSonos, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button
+                x:Name="SpeakerCastButton"
+                x:Uid="PlayingPage_SpeakerCastButton"
+                Grid.Column="0"
+                Width="32"
+                Height="32"
+                Padding="0"
+                VerticalAlignment="Center"
+                AutomationProperties.AutomationId="SpeakerCastButton"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="SpeakerCastButton_Click"
+                CornerRadius="16">
+                <FontIcon
+                    FontSize="20"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE7F5;" />
+                <Button.ContextFlyout>
+                    <MenuFlyout x:Name="SpeakerCastMenu">
+                        <MenuFlyoutItem x:Uid="PlayingPage_StopCasting" Click="StopCastingMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE711;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Uid="PlayingPage_CastingOptions"
+                            AutomationProperties.AutomationId="CastingOptionsMenuItem"
+                            Click="CastMenuItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE713;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.ContextFlyout>
+            </Button>
+            <Button
+                x:Uid="PlayingPage_SpeakerMuteButton"
+                Grid.Column="1"
+                Width="32"
+                Height="32"
+                Padding="0"
+                VerticalAlignment="Center"
+                AutomationProperties.AutomationId="SpeakerMuteButton"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="SpeakerMuteButton_Click"
+                CornerRadius="16">
+                <FontIcon
+                    FontSize="20"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="{x:Bind ViewModel.SpeakerVolumeGlyph, Mode=OneWay}" />
+            </Button>
+            <Slider
+                x:Name="SpeakerVolumeSlider"
+                Grid.Column="2"
+                Maximum="100"
+                Minimum="0"
+                SmallChange="1"
+                StepFrequency="1"
+                ThumbToolTipValueConverter="{StaticResource PercentStringConverter}"
+                Value="{x:Bind ViewModel.SpeakerVolume, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Column="3"
+                MinWidth="40"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind ViewModel.SpeakerVolume, Mode=OneWay, Converter={StaticResource PercentStringConverter}}"
+                TextAlignment="Right" />
+        </Grid>
+
         <!--  Now Playing Info  -->
         <Button
             x:Name="NowPlayingButton"
-            Grid.Row="4"
+            Grid.Row="5"
             Margin="0,12,0,0"
             Padding="8,4"
             HorizontalAlignment="Stretch"
@@ -609,7 +704,7 @@
             BorderThickness="0"
             Click="NowPlayingInfo_Click"
             CornerRadius="4"
-            ToolTipService.ToolTip="Click for details"
+            x:Uid="PlayingPage_NowPlayingInfo"
             Visibility="{x:Bind ViewModel.HasNowPlaying, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid VerticalAlignment="Center" ColumnSpacing="6">
                 <Grid.ColumnDefinitions>
@@ -670,8 +765,8 @@
                     VerticalAlignment="Center"
                     Background="Transparent"
                     BorderThickness="0"
-                    Click="FavoriteButton_Click"
-                    ToolTipService.ToolTip="Favorite Song">
+                    x:Uid="NowPlayingPage_Tooltip_Favorite"
+                    Click="FavoriteButton_Click">
                     <FontIcon
                         x:Name="FavoriteIcon"
                         FontSize="14"
@@ -689,7 +784,7 @@
 
         <!--  Local Music Scrub Bar  -->
         <Grid
-            Grid.Row="5"
+            Grid.Row="6"
             Margin="0,12,0,0"
             animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
             ColumnSpacing="4"
@@ -711,7 +806,10 @@
                 BorderThickness="0"
                 Click="PreviousTrackButton_Click"
                 IsEnabled="{x:Bind ViewModel.CanGoToPreviousLocalTrack, Mode=OneWay}">
-                <FontIcon FontSize="14" Glyph="&#xE892;" />
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE892;" />
             </Button>
 
             <TextBlock
@@ -745,60 +843,132 @@
                 BorderThickness="0"
                 Click="NextTrackButton_Click"
                 IsEnabled="{x:Bind ViewModel.CanGoToNextLocalTrack, Mode=OneWay}">
-                <FontIcon FontSize="14" Glyph="&#xE893;" />
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                    Glyph="&#xE893;" />
             </Button>
         </Grid>
 
         <!--  Playback Actions  -->
         <Grid
-            Grid.Row="6"
+            Grid.Row="7"
             Margin="0,12,0,0"
-            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}"
-            ColumnSpacing="12">
+            animations:Implicit.Animations="{StaticResource ImplicitReflowAnimations}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button
-                x:Name="PlayButton"
-                Grid.Column="0"
-                HorizontalAlignment="Stretch"
-                Click="PlayButton_Click"
-                IsEnabled="{x:Bind ViewModel.CanPlay, Mode=OneWay}"
-                Style="{StaticResource AccentButtonStyle}">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <FontIcon FontSize="16" Glyph="{x:Bind ViewModel.PlaybackButtonGlyph, Mode=OneWay}" />
-                    <TextBlock FontSize="12" Text="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}" />
-                </StackPanel>
-                <Button.ContextFlyout>
-                    <MenuFlyout>
-                        <!--  Disabled item used as a plain label rather than a real command.  -->
-                        <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer15Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="15" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer20Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="20" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer30Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="30" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer45Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="45" />
-                        <MenuFlyoutItem
-                            x:Uid="PlayingPage_SleepTimer50Minutes"
-                            Click="SleepTimerMenuItem_Click"
-                            Tag="50" />
-                    </MenuFlyout>
-                </Button.ContextFlyout>
-            </Button>
+            <Grid ColumnDefinitions="*,Auto">
+                <Button
+                    x:Name="PlayButton"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    AutomationProperties.Name="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}"
+                    Click="PlayButton_Click"
+                    IsEnabled="{x:Bind ViewModel.CanPlay, Mode=OneWay}"
+                    Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon FontSize="16" Glyph="{x:Bind ViewModel.PlaybackButtonGlyph, Mode=OneWay}" />
+                        <TextBlock FontSize="12" Text="{x:Bind ViewModel.PlaybackButtonText, Mode=OneWay}" />
+                    </StackPanel>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                x:Name="CastMenuItem"
+                                AutomationProperties.AutomationId="CastMenuItem"
+                                Click="CastMenuItem_Click"
+                                IsEnabled="{x:Bind ViewModel.CanCast}"
+                                Text="{x:Bind ViewModel.CastMenuText, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE7F4;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem
+                                x:Name="StopCastingMenuItem"
+                                x:Uid="PlayingPage_StopCasting"
+                                Click="StopCastingMenuItem_Click"
+                                Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE711;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <ToggleMenuFlyoutItem
+                                x:Uid="PlayingPage_ShowCastShortcut"
+                                AutomationProperties.AutomationId="CastShortcutPreference"
+                                Click="CastShortcutPreference_Click"
+                                IsChecked="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.HasCastShortcutPreference, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="PlayingPage_SleepTimer" IsEnabled="False" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer15Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="15" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer20Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="20" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer30Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="30" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer45Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="45" />
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_SleepTimer50Minutes"
+                                Click="SleepTimerMenuItem_Click"
+                                Tag="50" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+
+                <Button
+                    x:Name="CastShortcutButton"
+                    Grid.Column="1"
+                    Width="32"
+                    Height="32"
+                    Margin="12,0,0,0"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.AutomationId="CastShortcutButton"
+                    AutomationProperties.Name="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="16"
+                    ToolTipService.ToolTip="{x:Bind ViewModel.CastMenuText, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsCastShortcutVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <FontIcon
+                            FontSize="18"
+                            Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                            Glyph="&#xE7F5;" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                            Visibility="{x:Bind ViewModel.IsCasting, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                    <!--  Left click: speakers to cast to (filled in by CastSpeakerMenu). Opens upward, so its first item is the farthest from the button.  -->
+                    <Button.Flyout>
+                        <MenuFlyout x:Name="CastShortcutMenu" Placement="Top" />
+                    </Button.Flyout>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                x:Uid="PlayingPage_HideCastShortcut"
+                                AutomationProperties.AutomationId="HideCastShortcut"
+                                Click="HideCastShortcut_Click" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+            </Grid>
 
             <!--
                 Sleep timer countdown. Only takes a column when active, at which point it
@@ -812,6 +982,7 @@
                 Grid.Column="1"
                 Width="32"
                 Height="32"
+                Margin="12,0,0,0"
                 Padding="0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -859,7 +1030,9 @@
             <HyperlinkButton
                 x:Uid="PlayingPage_PopOutButton"
                 Grid.Column="2"
+                Margin="12,0,0,0"
                 VerticalAlignment="Center"
+                AutomationProperties.AutomationId="MiniPlayerButton"
                 Click="PopOutButton_Click">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon FontSize="16" Glyph="&#xE93A;" />
@@ -869,6 +1042,7 @@
             <HyperlinkButton
                 x:Uid="PlayingPage_QuitButton"
                 Grid.Column="3"
+                Margin="12,0,0,0"
                 VerticalAlignment="Center"
                 Click="CloseButton_Click" />
         </Grid>

@@ -122,8 +122,8 @@
                                 TextWrapping="Wrap" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <Slider
+                                    x:Uid="ManualStationWindow_VolumeSlider"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station volume"
                                     Maximum="200"
                                     Minimum="0"
                                     StepFrequency="1"
@@ -150,8 +150,8 @@
                                 IsOn="{x:Bind ViewModel.HasBufferOverride, Mode=TwoWay}" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <Slider
+                                    x:Uid="ManualStationWindow_BufferLevelSlider"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station buffer level"
                                     IsEnabled="{x:Bind ViewModel.HasBufferOverride, Mode=OneWay}"
                                     Maximum="3"
                                     Minimum="0"
@@ -180,8 +180,8 @@
                                 IsOn="{x:Bind ViewModel.HasSongPopupDelayOverride, Mode=TwoWay}" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <Slider
+                                    x:Uid="ManualStationWindow_SongPopupDelaySlider"
                                     Grid.Column="0"
-                                    AutomationProperties.Name="Station track info delay in seconds"
                                     IsEnabled="{x:Bind ViewModel.HasSongPopupDelayOverride, Mode=OneWay}"
                                     Maximum="{x:Bind ViewModel.MaxSongPopupDelaySeconds}"
                                     Minimum="0"
@@ -221,7 +221,7 @@
                     Click="CancelButton_Click">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="16" Glyph="&#xE711;" />
-                        <TextBlock Text="Cancel" />
+                        <TextBlock x:Uid="Action_Cancel" />
                     </StackPanel>
                 </Button>
 
@@ -233,7 +233,7 @@
                     Style="{StaticResource AccentButtonStyle}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontSize="16" Glyph="&#xE74E;" />
-                        <TextBlock Text="Save" />
+                        <TextBlock x:Uid="Action_Save" />
                     </StackPanel>
                 </Button>
             </Grid>

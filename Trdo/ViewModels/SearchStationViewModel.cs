@@ -36,9 +36,13 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     private CancellationTokenSource? _searchCancellationTokenSource;
     private bool _filterOptionsLoaded;
 
+    /// <summary>When the page was last navigated away from, for <see cref="ResetIfStale"/>.</summary>
+    private DateTimeOffset? _lastLeftUtc;
+
     private string _searchTerm = string.Empty;
     private bool _isSearching;
     private bool _hasError;
+    private bool _hasCompletedSearch;
     private string _errorMessage = string.Empty;
     private bool _isLoadingFilterOptions;
 
@@ -61,11 +65,21 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     public SearchStationViewModel()
     {
         _selectedSort = SortOptions[0];
+
+        foreach (string term in SettingsService.RecentStationSearches)
+        {
+            RecentSearches.Add(term);
+        }
     }
 
     // Results and filter option sources ---------------------------------
 
-    public ObservableCollection<RadioBrowserStation> SearchResults { get; } = [];
+    /// <summary>
+    /// Search results grouped by station name - see <see cref="StationSearchGroupingPolicy"/>.
+    /// Mirrors of the same station (a relay, a backup feed, a second codec) collapse into one
+    /// card with several streams rather than several near-identical rows.
+    /// </summary>
+    public ObservableCollection<StationSearchResultGroup> SearchResultGroups { get; } = [];
 
     /// <summary>The country/language/genre filters currently narrowing the search.</summary>
     public ObservableCollection<StationFilterOption> ActiveFilters { get; } = [];
@@ -79,7 +93,13 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     /// <summary>What the filter picker is offering for the text typed into it.</summary>
     public ObservableCollection<StationFilterOption> FilterSuggestions { get; } = [];
 
-    public IReadOnlyList<CodecOption> Codecs { get; } =
+    /// <summary>
+    /// Past search terms, most recent first - shown as chips so the user can jump straight back
+    /// into a search instead of retyping it. Hidden once there's anything to search or show.
+    /// </summary>
+    public ObservableCollection<string> RecentSearches { get; } = [];
+
+    public IReadOnlyList<CodecOption> Codecs { get; } = (List<CodecOption>)
     [
         new("Any codec", string.Empty),
         new("MP3", "MP3"),
@@ -89,7 +109,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         new("FLAC", "FLAC"),
     ];
 
-    public IReadOnlyList<BitrateOption> Bitrates { get; } =
+    public IReadOnlyList<BitrateOption> Bitrates { get; } = (List<BitrateOption>)
     [
         new("Any bitrate", 0),
         new("64 kbps+", 64),
@@ -99,7 +119,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         new("320 kbps+", 320),
     ];
 
-    public IReadOnlyList<SortOption> SortOptions { get; } =
+    public IReadOnlyList<SortOption> SortOptions { get; } = (List<SortOption>)
     [
         new("Most voted", "votes", true),
         new("Most popular", "clickcount", true),
@@ -117,7 +137,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _searchTerm) return;
             _searchTerm = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
             _ = PerformSearchAsync();
         }
     }
@@ -130,7 +150,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _isSearching) return;
             _isSearching = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
         }
     }
 
@@ -142,7 +162,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             if (value == _hasError) return;
             _hasError = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
         }
     }
 
@@ -311,9 +331,34 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     public bool ShowInitialState => string.IsNullOrWhiteSpace(SearchTerm) &&
                 !HasActiveFilters &&
-                SearchResults.Count == 0 &&
+                SearchResultGroups.Count == 0 &&
                 !IsSearching &&
                 !HasError;
+
+    /// <summary>A search ran to completion and the directory had nothing matching it.</summary>
+    public bool ShowNoResults => _hasCompletedSearch &&
+                SearchResultGroups.Count == 0 &&
+                !IsSearching &&
+                !HasError;
+
+    /// <summary>
+    /// The prompt plus "popular near me" / "add manually" block, shared by the initial state and
+    /// the no-results state so a dead-end search still offers a way forward.
+    /// </summary>
+    public bool ShowEmptyState => ShowInitialState || ShowNoResults;
+
+    public string EmptyStateMessage => ShowNoResults
+        ? "No stations found"
+        : "Enter a search term to find stations...";
+
+    /// <summary>
+    /// Whether the recent-searches chip row has anything to show. Only before a search - under
+    /// "No stations found" it would read as suggestions for the failed search.
+    /// </summary>
+    public bool ShowRecentSearches => RecentSearches.Count > 0 && ShowInitialState;
+
+    /// <summary>Whether Windows has a home region set, i.e. there's a "near you" to search for.</summary>
+    public bool ShowPopularNearYouOption => UserRegionService.CurrentRegionCode is not null;
 
     /// <summary>Results give up the screen while the filter panel is open.</summary>
     public bool AreResultsVisible => !IsFilterPanelOpen;
@@ -371,6 +416,121 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         }
     }
 
+    // Navigation lifetime: keep recent results on a quick trip away, start fresh after a while --
+
+    /// <summary>
+    /// Records that the page is being navigated away from, and banks the current search term as
+    /// a "recent search" chip for next time. Called from the page's Unloaded handler.
+    /// </summary>
+    public void MarkLeft()
+    {
+        _lastLeftUtc = DateTimeOffset.UtcNow;
+
+        string term = SearchTerm.Trim();
+        if (term.Length == 0 || string.Equals(RecentSearches.FirstOrDefault(), term, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        SettingsService.AddRecentStationSearch(term);
+
+        RecentSearches.Clear();
+        foreach (string recent in SettingsService.RecentStationSearches)
+        {
+            RecentSearches.Add(recent);
+        }
+
+        OnPropertyChanged(nameof(ShowRecentSearches));
+    }
+
+    /// <summary>
+    /// Clears the search back to its initial state if the page has been away for longer than
+    /// <see cref="SearchFreshnessPolicy.StaleAfter"/>. Called from the page's Loaded handler; a
+    /// quick round trip (e.g. to the edit page and back) leaves everything as it was.
+    /// </summary>
+    public void ResetIfStale()
+    {
+        DateTimeOffset? leftUtc = _lastLeftUtc;
+        _lastLeftUtc = null;
+
+        if (leftUtc is null || !SearchFreshnessPolicy.IsStale(leftUtc.Value, DateTimeOffset.UtcNow))
+        {
+            return;
+        }
+
+        _searchCancellationTokenSource?.Cancel();
+
+        _searchTerm = string.Empty;
+        _selectedCodec = null;
+        _selectedBitrate = null;
+        _hideBroken = false;
+        _selectedSort = SortOptions[0];
+        ActiveFilters.Clear();
+        SearchResultGroups.Clear();
+        FilterChips.Clear();
+        _hasError = false;
+        _hasCompletedSearch = false;
+        _errorMessage = string.Empty;
+        _isFilterPanelOpen = false;
+
+        OnPropertyChanged(nameof(SearchTerm));
+        OnPropertyChanged(nameof(SelectedCodec));
+        OnPropertyChanged(nameof(SelectedBitrate));
+        OnPropertyChanged(nameof(HideBroken));
+        OnPropertyChanged(nameof(SelectedSort));
+        OnPropertyChanged(nameof(HasError));
+        OnPropertyChanged(nameof(ErrorMessage));
+        OnPropertyChanged(nameof(IsFilterPanelOpen));
+        OnPropertyChanged(nameof(HasActiveFilters));
+        OnPropertyChanged(nameof(AreResultsVisible));
+        OnEmptyStateChanged();
+    }
+
+    /// <summary>Runs a past search again. Bound to a "recent searches" chip click.</summary>
+    public void RecentSearchClicked(string term)
+    {
+        SearchTerm = term;
+    }
+
+    // Popular near you: one click onto a regular, tweakable search rather than a display of --
+    // its own -------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Applies "this country" + "most popular" to the regular search, the same as picking them
+    /// by hand in the filter panel - so the result is an ordinary search with ordinary chips
+    /// the user can adjust or remove, not a separate experience of its own.
+    /// </summary>
+    public async Task ApplyPopularNearYouFilterAsync()
+    {
+        string? regionCode = UserRegionService.CurrentRegionCode;
+        if (regionCode is null)
+        {
+            return;
+        }
+
+        try
+        {
+            List<RadioBrowserCountry> countries = await _radioBrowserService.GetCountriesAsync();
+            RadioBrowserCountry? match = countries.FirstOrDefault(
+                country => string.Equals(country.CountryCode, regionCode, StringComparison.OrdinalIgnoreCase));
+
+            if (match is null)
+            {
+                return;
+            }
+
+            // From "No stations found" the typed term is what came up empty, so drop it rather
+            // than narrowing the popular list by it. Already empty from the initial state.
+            SearchTerm = string.Empty;
+            AddFilter(new StationFilterOption(StationFilterFacet.Country, match.Name, match.StationCount));
+            SelectedSort = SortOptions[1]; // "Most popular" (clickcount)
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SearchStationViewModel] Failed to apply popular-near-you filter: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// Re-ranks the picker's suggestions against what has been typed and what is already
     /// applied. Cheap enough to run on every keystroke: it is a scan of a few hundred strings
@@ -416,7 +576,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     private void OnFiltersChanged()
     {
         OnPropertyChanged(nameof(HasActiveFilters));
-        OnPropertyChanged(nameof(ShowInitialState));
+        OnEmptyStateChanged();
         RefreshFilterChips();
         _ = PerformSearchAsync();
     }
@@ -469,10 +629,11 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         // Nothing to search for: clear results and return to the initial state.
         if (query.IsEmpty)
         {
-            SearchResults.Clear();
+            _hasCompletedSearch = false;
+            SearchResultGroups.Clear();
             HasError = false;
             ErrorMessage = string.Empty;
-            OnPropertyChanged(nameof(ShowInitialState));
+            OnEmptyStateChanged();
             return;
         }
 
@@ -486,14 +647,15 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 query,
                 _searchCancellationTokenSource.Token);
 
-            SearchResults.Clear();
-            foreach (RadioBrowserStation station in results)
+            SearchResultGroups.Clear();
+            foreach (StationSearchResultGroup group in StationSearchGroupingPolicy.Group(results))
             {
-                SearchResults.Add(station);
+                SearchResultGroups.Add(group);
             }
 
-            OnPropertyChanged(nameof(ShowInitialState));
-            Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {SearchResults.Count} stations");
+            _hasCompletedSearch = true;
+            OnEmptyStateChanged();
+            Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {results.Count} stations in {SearchResultGroups.Count} groups");
         }
         catch (TaskCanceledException)
         {
@@ -553,9 +715,18 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         field = value;
         OnPropertyChanged(propertyName);
         OnPropertyChanged(nameof(HasActiveFilters));
-        OnPropertyChanged(nameof(ShowInitialState));
+        OnEmptyStateChanged();
         RefreshFilterChips();
         _ = PerformSearchAsync();
+    }
+
+    private void OnEmptyStateChanged()
+    {
+        OnPropertyChanged(nameof(ShowInitialState));
+        OnPropertyChanged(nameof(ShowNoResults));
+        OnPropertyChanged(nameof(ShowEmptyState));
+        OnPropertyChanged(nameof(EmptyStateMessage));
+        OnPropertyChanged(nameof(ShowRecentSearches));
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

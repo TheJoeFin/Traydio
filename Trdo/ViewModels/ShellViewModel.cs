@@ -79,6 +79,18 @@ public partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void NavigateToCastPage()
+    {
+        _navigationService.Navigate(typeof(CastPage));
+    }
+
+    [RelayCommand]
+    public void NavigateToGroupSpeakersPage()
+    {
+        _navigationService.Navigate(typeof(GroupSpeakersPage));
+    }
+
+    [RelayCommand]
     public void NavigateToAboutPage()
     {
         _navigationService.Navigate(typeof(AboutPage));

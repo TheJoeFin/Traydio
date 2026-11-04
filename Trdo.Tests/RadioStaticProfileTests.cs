@@ -24,6 +24,16 @@ public sealed class RadioStaticProfileTests
     }
 
     [TestMethod]
+    public void EffectiveGain_ScalesWithTheStaticLevelSetting()
+    {
+        Assert.AreEqual(0f, RadioStaticProfile.EffectiveGain(1, 0), 1e-6f);
+        Assert.AreEqual(RadioStaticProfile.StaticLevel, RadioStaticProfile.EffectiveGain(1, RadioStaticProfile.DefaultUserLevel), 1e-6f);
+        Assert.AreEqual(RadioStaticProfile.StaticLevel * 2f, RadioStaticProfile.EffectiveGain(1, 1), 1e-6f);
+        // Out-of-range settings are clamped rather than amplified further.
+        Assert.AreEqual(RadioStaticProfile.EffectiveGain(1, 1), RadioStaticProfile.EffectiveGain(1, 5), 1e-6f);
+    }
+
+    [TestMethod]
     public void EffectiveGain_ClampsVolumeToThePlayersRange()
     {
         // RadioPlayerService.Volume runs 0-2 (LibVLC allows amplification). Anything outside that

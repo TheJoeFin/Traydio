@@ -223,14 +223,10 @@ public sealed partial class StreamWatchdogService : IDisposable
     /// </summary>
     public static string DescribeBufferLevel(double level) => level switch
     {
-        0 => "Default",
-        1 => "Medium",
-        2 => "Large",
-        3 => "Extra Large",
-        _ when level < 0.5 => "Default",
-        _ when level < 1.5 => "Medium",
-        _ when level < 2.5 => "Large",
-        _ => "Extra Large"
+        < 0.5 => LocalizationService.GetString("BufferLevel_Default", "Default"),
+        < 1.5 => LocalizationService.GetString("BufferLevel_Medium", "Medium"),
+        < 2.5 => LocalizationService.GetString("BufferLevel_Large", "Large"),
+        _ => LocalizationService.GetString("BufferLevel_ExtraLarge", "Extra Large")
     };
 
     public StreamWatchdogService(RadioPlayerService playerService)
@@ -448,6 +444,7 @@ public sealed partial class StreamWatchdogService : IDisposable
         {
             bool isPlaying = false;
             AudioSourceKind activeSourceKind = AudioSourceKind.Radio;
+            bool isCastingToSonos = false;
             TimeSpan currentPosition = TimeSpan.Zero;
             double currentBufferingProgress = 0;
 
@@ -458,6 +455,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 {
                     isPlaying = _playerService.IsPlaying;
                     activeSourceKind = _playerService.ActiveSourceKind;
+                    isCastingToSonos = _playerService.IsCastingToSonos;
                     currentPosition = _playerService.Position;
                     currentBufferingProgress = _playerService.BufferingProgress;
                 }
@@ -467,7 +465,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 }
             });
 
-            if (activeSourceKind != AudioSourceKind.Radio)
+            if (activeSourceKind != AudioSourceKind.Radio || isCastingToSonos)
             {
                 // Everything below is shaped around a network stream that can stall, drop, or
                 // need a buffer bump - none of which applies to a locally-generated source like
@@ -753,6 +751,12 @@ public sealed partial class StreamWatchdogService : IDisposable
             StopSilenceMonitor();
 
             Debug.WriteLine("[Watchdog] NAudio silence detected - attempting stream recovery");
+
+            // The active engine's own state machine still thinks it is playing - nothing it
+            // raises will explain this on its own, so capture what it knows now, before the
+            // recovery below tears the source down and the evidence goes with it.
+            _playerService.DumpActiveBackendDiagnostics("NAudio detected silence while stream reported playing");
+
             RaiseStatusChanged("Stream is silent - refreshing", StreamWatchdogStatus.Recovering);
 
             // AttemptRecoveryAsync owns the recovery gate, so a health-poll recovery

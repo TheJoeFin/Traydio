@@ -69,6 +69,7 @@ public sealed partial class RadioStaticService : IDisposable
         RadioPlayerService.Instance.VolumeChanged += OnVolumeChanged;
         RadioPlayerService.Instance.PlaybackPausedByUser += OnPlaybackPausedByUser;
         SettingsService.RadioStaticEnabledChanged += OnRadioStaticEnabledChanged;
+        SettingsService.RadioStaticLevelChanged += OnRadioStaticLevelChanged;
     }
 
     private void OnBufferingStateChanged(object? sender, bool isBuffering)
@@ -80,11 +81,15 @@ public sealed partial class RadioStaticService : IDisposable
         // Static is the sound of an actual radio dial searching for a signal - white noise
         // never buffers, and a local file merely opening (which briefly reads as "buffering"
         // on some backends) has nothing to do with a signal being found.
-        if (RadioPlayerService.Instance.ActiveSourceKind != AudioSourceKind.Radio)
+        // While a Sonos player fetches the stream, "buffering" is the speaker connecting -
+        // static out of this PC's speakers would be the wrong room, and a signal it would
+        // then never hear the end of.
+        if (RadioPlayerService.Instance.ActiveSourceKind != AudioSourceKind.Radio ||
+            RadioPlayerService.Instance.IsCastingToSonos)
         {
             if (_isAudible)
             {
-                LogService.Info("RadioStatic", "Active source is not Radio - stopping static");
+                LogService.Info("RadioStatic", "Active source is not local radio - stopping static");
                 RunDetached(StopCoreAsync);
             }
 
@@ -124,8 +129,11 @@ public sealed partial class RadioStaticService : IDisposable
         // A plain float assignment - no need to take the gate to follow the slider.
         VolumeSampleProvider? volumeProvider = _volume;
         if (volumeProvider is not null)
-            volumeProvider.Volume = RadioStaticProfile.EffectiveGain(volume);
+            volumeProvider.Volume = RadioStaticProfile.EffectiveGain(volume, SettingsService.RadioStaticLevel);
     }
+
+    private void OnRadioStaticLevelChanged(object? sender, EventArgs e) =>
+        OnVolumeChanged(sender, RadioPlayerService.Instance.EffectiveVolume);
 
     private void OnRadioStaticEnabledChanged(object? sender, EventArgs e)
     {
@@ -173,7 +181,8 @@ public sealed partial class RadioStaticService : IDisposable
             if (_player is null && !TryBuildGraph())
                 return;
 
-            _volume!.Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.EffectiveVolume);
+            _volume!.Volume = RadioStaticProfile.EffectiveGain(
+                RadioPlayerService.Instance.EffectiveVolume, SettingsService.RadioStaticLevel);
             _whine?.Restart();
 
             // The fade always starts from the current level, so this is also the right call when
@@ -338,7 +347,8 @@ public sealed partial class RadioStaticService : IDisposable
             ContinuousFadeSampleProvider fade = new(mixer, initiallySilent: true);
             VolumeSampleProvider volume = new(fade)
             {
-                Volume = RadioStaticProfile.EffectiveGain(RadioPlayerService.Instance.EffectiveVolume),
+                Volume = RadioStaticProfile.EffectiveGain(
+                    RadioPlayerService.Instance.EffectiveVolume, SettingsService.RadioStaticLevel),
             };
 
             player.Init(new SampleToWaveProvider(volume));
@@ -401,6 +411,7 @@ public sealed partial class RadioStaticService : IDisposable
             RadioPlayerService.Instance.VolumeChanged -= OnVolumeChanged;
             RadioPlayerService.Instance.PlaybackPausedByUser -= OnPlaybackPausedByUser;
             SettingsService.RadioStaticEnabledChanged -= OnRadioStaticEnabledChanged;
+            SettingsService.RadioStaticLevelChanged -= OnRadioStaticLevelChanged;
         }
 
         DisposePlayer();

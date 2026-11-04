@@ -1,0 +1,1533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="1" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutPage_BuiltWithOpenSourceBody.Text" xml:space="preserve">
+    <value>Bu uygulama aşağıdaki açık kaynak kütüphaneleri kullanır:</value>
+  </data>
+  <data name="AboutPage_BuiltWithOpenSourceTitle.Text" xml:space="preserve">
+    <value>Açık Kaynakla Geliştirildi</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Sonos'a yayın özelliği, RoomRelay ve yazarı guicn555'ten büyük ölçüde esinlenmiştir. Teşekkürler!</value>
+  </data>
+  <data name="AboutPage_ContactDeveloper.Text" xml:space="preserve">
+    <value>Geliştiriciyle İletişime Geç</value>
+  </data>
+  <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
+    <value>Geliştirici</value>
+  </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>Çeviriler</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>Windows için basit ve şık bir internet radyosu oynatıcısı</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>Gecikme yok</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 dakika</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} saniye</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} saniye</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>Varsayılan</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>Orta</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>Büyük</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>Çok büyük</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>Arabellek: {0} (bu istasyon)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>Arabellek: {0} (uygulama ayarı)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi: {0} (bu istasyon)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi: {0} (uygulama ayarı)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>{0} için parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>Uygulama ayarını kullan ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>Şu anda {0} (istasyon seçilmedi)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>Şarkı açılır pencerelerini kapat</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>Dışa aktar</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>Dışa aktarılacak bir şey yok</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>Önce birkaç şarkıyı favorilere ekleyin.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>Tüm favorileri dışa aktar</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>Yalnızca yeniler ({0} / {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>Tüm favoriler ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>Dışa aktarılan parçaları arşivle</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV, Soundiiz veya TuneMyMusic gibi çalma listesi aktarım hizmetleriyle çalışır. XSPF, VLC gibi oynatıcılar için bir çalma listesi dosyasıdır. Biçimi kaydederken seçin.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>Arşivlenen parçalar favorilerinizde kalır ancak sonraki dışa aktarmalarda atlanır.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>Favorileri dışa aktar</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>Dışa aktarılacak yeni bir şey yok</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>Tüm favoriler zaten dışa aktarıldı. "{0}" seçeneğini açın veya dışa aktarma geçmişini temizleyin.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>Dışa aktarma tamamlandı</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>{0} parça {1} dosyasına aktarıldı.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>{0} parça {1} dosyasına aktarıldı.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>{0} parça arşivlendi ve bir dahaki sefere atlanacak.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>Dışa aktarma geçmişi temizlendi</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} parça sonraki dışa aktarmaya dahil edilecek.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} parça sonraki dışa aktarmaya dahil edilecek.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>Eşleşme bulunamadı</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info'da bu istasyonun yayın adresi için kayıt yok, bu yüzden eklenecek ayrıntı yok.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>{0} güncellendi</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>radio-browser.info'ya ulaşılamadı</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>Bağlantınızı kontrol edip tekrar deneyin.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>Ayrıntıları olan istasyonları da yenile</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>Tüm istasyonlarınızın zaten ayrıntıları var. Değişiklikleri almak için yeniden arayabilirsiniz.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>Bir istasyonun kayıtlı türü veya ülkesi yok.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>{0} istasyonun kayıtlı türü veya ülkesi yok.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio, bunlar hakkında radio-browser.info'ya soracak. Yalnızca her istasyonun yayın adresi gönderilir.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>İstasyon ayrıntılarını ara</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>Aranacak bir şey yok</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>Her istasyon yakın zamanda kontrol edildi. Birkaç gün sonra tekrar deneyin.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>Başlatılıyor…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>Tamamlanıyor…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} / {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>İstasyon ayrıntıları aranıyor</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>İstasyon ayrıntıları</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>{1} istasyondan {0} tanesi güncellendi.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} istasyonun radio-browser.info'da kaydı yoktu.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} istasyon birden fazla kayıtla eşleşti; en yakını kullanıldı.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} istasyon, istek sayısını makul tutmak için bir sonraki sefere bırakıldı.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>radio-browser.info yanıt vermeyi bıraktığı için erken durduruldu.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>İsteğiniz üzerine durduruldu. Şimdiye kadar bulunanlar kaydedildi.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>Ek ayrıntı yok.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>"{0}" silinsin mi?</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>Bu gruptaki istasyon da kaldırılacak. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>Bu gruptaki {0} istasyonun tümü de kaldırılacak. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>İstasyon ekle</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>İstasyon ekleme özelliği çok yakında!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>Şimdi çalıyor</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>Radyo istasyonu</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>Yayın akıyor...</value>
+  </data>
+  <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
+    <value>Traydio'yu beğeniyor musunuz?</value>
+  </data>
+  <data name="AboutPage_Feature_MultiStations.Text" xml:space="preserve">
+    <value>Birden fazla radyo istasyonu desteği</value>
+  </data>
+  <data name="AboutPage_Feature_StartWithWindows.Text" xml:space="preserve">
+    <value>Windows ile başlatma seçeneği</value>
+  </data>
+  <data name="AboutPage_Feature_SystemTray.Text" xml:space="preserve">
+    <value>Kolay erişim için sistem tepsisi entegrasyonu</value>
+  </data>
+  <data name="AboutPage_Feature_Watchdog.Text" xml:space="preserve">
+    <value>Otomatik yeniden bağlanma için yayın gözcüsü</value>
+  </data>
+  <data name="AboutPage_FeaturesTitle.Text" xml:space="preserve">
+    <value>Özellikler</value>
+  </data>
+  <data name="AboutPage_Formerly.Text" xml:space="preserve">
+    <value>Eski adı Trdo</value>
+  </data>
+  <data name="AboutPage_HelpBody.Text" xml:space="preserve">
+    <value>Traydio'nun nasıl kullanılacağını öğrenmek için eğitimi yeniden görüntüleyin.</value>
+  </data>
+  <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
+    <value>Yardıma mı ihtiyacınız var?</value>
+  </data>
+  <data name="AboutPage_IssuePrompt.Text" xml:space="preserve">
+    <value>Bir sorununuz mu var ya da bir öneriniz mi var?</value>
+  </data>
+  <data name="AboutPage_OpenSourceBody.Text" xml:space="preserve">
+    <value>Bu uygulama açık kaynaklıdır ve GitHub'da bulunur.</value>
+  </data>
+  <data name="AboutPage_OpenSourceTitle.Text" xml:space="preserve">
+    <value>Açık Kaynak</value>
+  </data>
+  <data name="AboutPage_RadioDatabaseTitle.Text" xml:space="preserve">
+    <value>Radyo Veritabanı</value>
+  </data>
+  <data name="AboutPage_RateLabel.Text" xml:space="preserve">
+    <value>Uygulama deneyiminizi değerlendirin:</value>
+  </data>
+  <data name="AboutPage_SupportBody.Text" xml:space="preserve">
+    <value>Traydio'yu seviyorsanız, bana bir kahve ısmarlamayı düşünün!</value>
+  </data>
+  <data name="AboutPage_SupportTitle.Text" xml:space="preserve">
+    <value>Geliştiriciyi Destekleyin</value>
+  </data>
+  <data name="AboutPage_Title.Text" xml:space="preserve">
+    <value>Hakkında</value>
+  </data>
+  <data name="AboutPage_ViewTutorial.Text" xml:space="preserve">
+    <value>Eğitimi Görüntüle</value>
+  </data>
+  <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
+    <value>Geliştiricinin GitHub Sayfasını Ziyaret Et</value>
+  </data>
+  <data name="Action_Cancel.Text" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Action_Save.Text" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="AddStation_AddPageTitle" xml:space="preserve">
+    <value>Radyo İstasyonu Ekle</value>
+  </data>
+  <data name="AddStation_EditPageTitle" xml:space="preserve">
+    <value>Radyo İstasyonunu Düzenle</value>
+  </data>
+  <data name="AddStation_HomepageLabel.Text" xml:space="preserve">
+    <value>Ana Sayfa (İsteğe bağlı)</value>
+  </data>
+  <data name="AddStation_HomepagePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. https://example.com</value>
+  </data>
+  <data name="AddStation_LogoUrlLabel.Text" xml:space="preserve">
+    <value>İstasyon Logosu/Simgesi URL'si (İsteğe bağlı)</value>
+  </data>
+  <data name="AddStation_LogoUrlPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. https://example.com/logo.png</value>
+  </data>
+  <data name="AddStation_InvalidUrl" xml:space="preserve">
+    <value>Lütfen geçerli bir HTTP veya HTTPS URL'si girin.</value>
+  </data>
+  <data name="AddStation_NameRequired" xml:space="preserve">
+    <value>İstasyon adı gereklidir.</value>
+  </data>
+  <data name="AddStation_PageTitle.Text" xml:space="preserve">
+    <value>İstasyon Ekle</value>
+  </data>
+  <data name="AddStation_StationNameLabel.Text" xml:space="preserve">
+    <value>İstasyon Adı</value>
+  </data>
+  <data name="AddStation_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. WYMS - Memleket radyosu</value>
+  </data>
+  <data name="AddStation_StreamUrlLabel.Text" xml:space="preserve">
+    <value>Yayın URL'si</value>
+  </data>
+  <data name="AddStation_StreamUrlPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. https://example.com/stream</value>
+  </data>
+  <data name="AddStation_UrlRequired" xml:space="preserve">
+    <value>Yayın URL'si gereklidir.</value>
+  </data>
+  <data name="AddLocalMusic_AddPageTitle" xml:space="preserve">
+    <value>Yerel Müzik Ekle</value>
+  </data>
+  <data name="AddLocalMusic_EditPageTitle" xml:space="preserve">
+    <value>Yerel Müziği Düzenle</value>
+  </data>
+  <data name="AddLocalMusic_StationNameLabel.Text" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="AddLocalMusic_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. Müziklerim, Favoriler</value>
+  </data>
+  <data name="AddLocalMusic_FolderLabel.Text" xml:space="preserve">
+    <value>Klasör</value>
+  </data>
+  <data name="AddLocalMusic_BrowseButton.Content" xml:space="preserve">
+    <value>Gözat...</value>
+  </data>
+  <data name="AddLocalMusic_VolumeLabel.Text" xml:space="preserve">
+    <value>Ses düzeyi</value>
+  </data>
+  <data name="AddLocalMusic_NoFolderSelected" xml:space="preserve">
+    <value>Klasör seçilmedi</value>
+  </data>
+  <data name="AddLocalMusic_NoTracksFound" xml:space="preserve">
+    <value>Bu klasörde ses dosyası bulunamadı.</value>
+  </data>
+  <data name="AddLocalMusic_OneTrackFound" xml:space="preserve">
+    <value>1 parça bulundu.</value>
+  </data>
+  <data name="AddLocalMusic_TracksFound" xml:space="preserve">
+    <value>{0} parça bulundu.</value>
+  </data>
+  <data name="AddLocalMusic_OneAlbumFound" xml:space="preserve">
+    <value>Müzik içeren 1 alt klasör bulundu. Yeni bir klasörün içinde kendi istasyonu olacak.</value>
+  </data>
+  <data name="AddLocalMusic_AlbumsFound" xml:space="preserve">
+    <value>Müzik içeren {0} alt klasör bulundu. Her biri yeni bir klasörün içinde kendi istasyonu olacak.</value>
+  </data>
+  <data name="AddWhiteNoise_AddPageTitle" xml:space="preserve">
+    <value>Beyaz Gürültü Ekle</value>
+  </data>
+  <data name="AddWhiteNoise_Blue.Content" xml:space="preserve">
+    <value>Mavi</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Blue" xml:space="preserve">
+    <value>Parlak ve yüksek frekanslara doğru ağırlıklı.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Brown" xml:space="preserve">
+    <value>Neredeyse hiç tıslama içermeyen derin, ağır bir gümbürtü. Rahatlamak için iyidir.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Grey" xml:space="preserve">
+    <value>Her frekansta eşit yüksek sesle duyulacak şekilde biçimlendirilmiştir. Odaklanmak için iyidir.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Pink" xml:space="preserve">
+    <value>Yağmur gibi daha yumuşak ve düşük frekanslara doğru ağırlıklı. Uyumak için iyidir.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_Violet" xml:space="preserve">
+    <value>Çok parlak, yüksek frekansların hâkim olduğu bir ses.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorDescription_White" xml:space="preserve">
+    <value>Tüm frekanslarda düz bir tıslama. Gürültüyü bastırmak ve test yapmak için iyidir.</value>
+  </data>
+  <data name="AddWhiteNoise_ColorLabel.Text" xml:space="preserve">
+    <value>Gürültü rengi</value>
+  </data>
+  <data name="AddWhiteNoise_Brown.Content" xml:space="preserve">
+    <value>Kahverengi</value>
+  </data>
+  <data name="AddWhiteNoise_DefaultName" xml:space="preserve">
+    <value>Beyaz Gürültü</value>
+  </data>
+  <data name="AddWhiteNoise_EditPageTitle" xml:space="preserve">
+    <value>Beyaz Gürültüyü Düzenle</value>
+  </data>
+  <data name="AddWhiteNoise_Grey.Content" xml:space="preserve">
+    <value>Gri</value>
+  </data>
+  <data name="AddWhiteNoise_PageTitle.Text" xml:space="preserve">
+    <value>Beyaz Gürültü Ekle</value>
+  </data>
+  <data name="AddWhiteNoise_Pink.Content" xml:space="preserve">
+    <value>Pembe</value>
+  </data>
+  <data name="AddWhiteNoise_StationNameLabel.Text" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="AddWhiteNoise_StationNamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>örn. Yağmur, Vantilatör, Okyanus dalgaları</value>
+  </data>
+  <data name="AddWhiteNoise_Violet.Content" xml:space="preserve">
+    <value>Mor</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeLabel.Text" xml:space="preserve">
+    <value>Ses düzeyi</value>
+  </data>
+  <data name="AddWhiteNoise_White.Content" xml:space="preserve">
+    <value>Beyaz</value>
+  </data>
+  <data name="App_ExitApplicationCommand.Description" xml:space="preserve">
+    <value>Traydio'dan çık</value>
+  </data>
+  <data name="App_ExitApplicationCommand.Label" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="App_PlayPauseCommand.Description" xml:space="preserve">
+    <value>Radyoyu oynat veya duraklat</value>
+  </data>
+  <data name="App_PlayPauseCommand.Label" xml:space="preserve">
+    <value>Oynat</value>
+  </data>
+  <data name="App_ShowHideWindowCommand.Description" xml:space="preserve">
+    <value>Ana pencereyi göster veya gizle</value>
+  </data>
+  <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
+    <value>Pencereyi Göster</value>
+  </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Yayınla</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>Cihaza yayınla</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Şu anda {0} cihazına yayınlanıyor</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Henüz cihaz bulunamadı. Cihazın açık olduğundan ve bu bilgisayarla aynı ağa bağlı olduğundan emin olun.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>{0} cihazına yayınlanamadı: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Ağınızdaki cihazlar aranıyor…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Yayını durdur</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>Bu bilgisayarda yayınlama kullanılamıyor: LibVLC oynatma altyapısı yüklenemedi ve Sonos oynatıcılarını aramak için ağ bağlantısı yok.</value>
+  </data>
+  <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
+    <value>Sevdiğiniz şarkıları burada kaydetmek için yıldız simgesine dokunun</value>
+  </data>
+  <data name="FavoritesPage_EmptyTitle.Text" xml:space="preserve">
+    <value>Henüz favori şarkı yok</value>
+  </data>
+  <data name="FavoritesPage_Export.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorileri bir çalma listesi dosyasına aktar</value>
+  </data>
+  <data name="FavoritesPage_ExportFailed" xml:space="preserve">
+    <value>Dışa aktarma başarısız oldu</value>
+  </data>
+  <data name="FavoritesPage_ExportLabel.Text" xml:space="preserve">
+    <value>Dışa aktar…</value>
+  </data>
+  <data name="FavoritesPage_IncludeInNextExport.Text" xml:space="preserve">
+    <value>Sonraki dışa aktarmaya dahil et</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Diğer seçenekler</value>
+  </data>
+  <data name="FavoritesPage_Remove.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorilerden kaldır</value>
+  </data>
+  <data name="FavoritesPage_Title.Text" xml:space="preserve">
+    <value>Favori Şarkılar</value>
+  </data>
+  <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
+    <value>Gelişmiş</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
+    <value>Arabellek düzeyi</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelDescription.Text" xml:space="preserve">
+    <value>Daha yüksek arabellek düzeyleri kararsız bağlantılarda yardımcı olur, ancak oynatmaya biraz daha gecikme ekler. Bunu yalnızca gerektiren bir istasyon için geçersiz kılın.</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Bu istasyon için arabellek düzeyini geçersiz kıl</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.OffContent" xml:space="preserve">
+    <value>Uygulama ayarını izliyor</value>
+  </data>
+  <data name="ManualStationWindow_BufferOverrideToggle.OnContent" xml:space="preserve">
+    <value>Bu istasyon için geçersiz kıl</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelay.Text" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>Devam</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>Tamamlanıyor...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>Last.fm'e bağlanılamadı. Lütfen daha sonra tekrar deneyin.</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>Last.fm bu sürüm için yapılandırılmamış.</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>Last.fm henüz onayınızı görmedi. Tarayıcıda erişimi onayladığınızdan emin olun, ardından tekrar Devam'ı seçin.</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>Last.fm'e bağlanılıyor...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>Last.fm'e bağlanılıyor...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>Last.fm'e Bağlan</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>Az önce açılan tarayıcı penceresinde Last.fm hesabınıza erişimi onaylayın, ardından buraya dönüp Devam'ı seçin.</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>Last.fm'e Bağlan</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>{0} olarak bağlı</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>Bağlı değil</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>Bağlan</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>Dinlediklerinizi - radyoda ve yerel kitaplığınızda - Last.fm hesabınıza otomatik olarak scrobble edin.</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>Bağlantıyı kes</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayDescription.Text" xml:space="preserve">
+    <value>Bazı istasyonlar sonraki parçayı gerçekte başlamadan önce duyurur. Parça bilgisini, şarkıyı duyduğunuz anda değişecek şekilde geciktirin. Bir istasyonun ne kadar önden gittiği kodlayıcısına bağlıdır, bu yüzden bunu istasyon başına ayarlayın.</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Bu istasyon için parça bilgisi gecikmesini geçersiz kıl</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.OffContent" xml:space="preserve">
+    <value>Uygulama ayarını izliyor</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
+    <value>Bu istasyon için geçersiz kıl</value>
+  </data>
+  <data name="ManualStationWindow_Title" xml:space="preserve">
+    <value>Traydio - İstasyon Ekle</value>
+  </data>
+  <data name="ManualStationWindow_Volume.Text" xml:space="preserve">
+    <value>Ses düzeyi</value>
+  </data>
+  <data name="ManualStationWindow_VolumeDescription.Text" xml:space="preserve">
+    <value>Bu istasyon için hatırlanır; başka bir istasyona geçip geri döndüğünüzde ses düzeyi aynı kalır.</value>
+  </data>
+  <data name="NowPlayingPage_IdleSubtitle.Text" xml:space="preserve">
+    <value>Başlık ve sanatçı bilgisini görmek için oynatmayı başlatın</value>
+  </data>
+  <data name="NowPlayingPage_IdleTitle.Text" xml:space="preserve">
+    <value>Çalan istasyon yok</value>
+  </data>
+  <data name="NowPlayingPage_Label_Artist.Text" xml:space="preserve">
+    <value>Sanatçı</value>
+  </data>
+  <data name="NowPlayingPage_Label_Title.Text" xml:space="preserve">
+    <value>Başlık</value>
+  </data>
+  <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
+    <value>Son Parçalar</value>
+  </data>
+  <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
+    <value>Parçalar</value>
+  </data>
+  <data name="NowPlayingPage_Title.Text" xml:space="preserve">
+    <value>Şimdi Çalıyor</value>
+  </data>
+  <data name="NowPlayingPage_Tooltip_Favorite.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Şarkıyı Favorilere Ekle</value>
+  </data>
+  <data name="NowPlayingPage_Tooltip_SearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Müzik arama ayarları</value>
+  </data>
+  <data name="PlaybackFailure_NoDetail" xml:space="preserve">
+    <value>Bu istasyon oynatılamadı. Yayın kullanılamıyor olabilir veya URL yanlış olabilir.</value>
+  </data>
+  <data name="PlaybackFailure_NoNetwork" xml:space="preserve">
+    <value>İnternet bağlantısı yok. Bir ağa bağlanıp tekrar deneyin.</value>
+  </data>
+  <data name="PlaybackFailure_TooManyAttemptsNoDetail" xml:space="preserve">
+    <value>Birkaç denemeden sonra bu istasyon oynatılamadı. Yayın çevrimdışı olabilir veya URL yanlış olabilir.</value>
+  </data>
+  <data name="PlaybackFailure_TooManyAttemptsWithDetail" xml:space="preserve">
+    <value>Birkaç denemeden sonra bu istasyon oynatılamadı ({0}). Yayın çevrimdışı olabilir veya URL yanlış olabilir.</value>
+  </data>
+  <data name="PlaybackFailure_WithDetail" xml:space="preserve">
+    <value>Bu istasyon oynatılamadı: {0}</value>
+  </data>
+  <data name="PlaybackFailure_WhiteNoiseNoOutput" xml:space="preserve">
+    <value>Beyaz gürültü oynatılamadı - kullanılabilir bir ses çıkış cihazı yok.</value>
+  </data>
+  <data name="PlaybackFailure_WithSentenceDetail" xml:space="preserve">
+    <value>Bu istasyon oynatılamadı. {0}</value>
+  </data>
+  <data name="PlayerViewModel_Buffering" xml:space="preserve">
+    <value>Arabelleğe alınıyor</value>
+  </data>
+  <data name="PlayerViewModel_FailedToInitializeStream" xml:space="preserve">
+    <value>Yayın başlatılamadı: {0}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToPause" xml:space="preserve">
+    <value>{0} duraklatılamadı: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToPlay" xml:space="preserve">
+    <value>{0} oynatılamadı: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToRestore" xml:space="preserve">
+    <value>{0} geri yüklenemedi: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToSwitch" xml:space="preserve">
+    <value>{0} istasyonuna geçilemedi: {1}</value>
+  </data>
+  <data name="PlayerViewModel_FailedToUpdateStream" xml:space="preserve">
+    <value>Yayın güncellenemedi: {0}</value>
+  </data>
+  <data name="PlayerViewModel_InvalidStreamUrl" xml:space="preserve">
+    <value>{0} için geçersiz yayın URL'si</value>
+  </data>
+  <data name="PlayerViewModel_Pause" xml:space="preserve">
+    <value>Duraklat</value>
+  </data>
+  <data name="PlayerViewModel_PauseAndClose" xml:space="preserve">
+    <value>Duraklat ve kapat</value>
+  </data>
+  <data name="PlayerViewModel_Play" xml:space="preserve">
+    <value>Oynat</value>
+  </data>
+  <data name="PlayingPage_About.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Traydio Hakkında</value>
+  </data>
+  <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
+    <value>İlk İstasyonunuzu Ekleyin</value>
+  </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Yayınla…</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>Yayın seçenekleri</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>{0} cihazına yayınlanıyor…</value>
+  </data>
+  <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
+    <value>Grubu sil</value>
+  </data>
+  <data name="PlayingPage_DeleteGroupAndStations.Text" xml:space="preserve">
+    <value>Grubu ve istasyonlarını sil</value>
+  </data>
+  <data name="PlayingPage_Edit.Text" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="PlayingPage_EditLabel.Text" xml:space="preserve">
+    <value>Etiketi düzenle</value>
+  </data>
+  <data name="PlayingPage_EmptySubtitle.Text" xml:space="preserve">
+    <value>Dinlemeye başlamak için favori radyo istasyonunuzu ekleyin.</value>
+  </data>
+  <data name="PlayingPage_EmptyTitle.Text" xml:space="preserve">
+    <value>Henüz İstasyon Yok</value>
+  </data>
+  <data name="PlayingPage_Favorites.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favori Şarkılar</value>
+  </data>
+  <data name="PlayingPage_GroupBy.Text" xml:space="preserve">
+    <value>Gruplandır</value>
+  </data>
+  <data name="PlayingPage_HideVolumeSlider" xml:space="preserve">
+    <value>Ses Kaydırıcısını Gizle</value>
+  </data>
+  <data name="PlayingPage_InsertDividerAbove.Text" xml:space="preserve">
+    <value>Üste ayırıcı ekle</value>
+  </data>
+  <data name="PlayingPage_Manual.Content" xml:space="preserve">
+    <value>Elle</value>
+  </data>
+  <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
+    <value>Gruba taşı</value>
+  </data>
+  <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
+    <value>Yeni Ayırıcı</value>
+  </data>
+  <data name="PlayingPage_NewGroup.Text" xml:space="preserve">
+    <value>Yeni Grup</value>
+  </data>
+  <data name="PlayingPage_OpenFolder" xml:space="preserve">
+    <value>Klasörü Aç</value>
+  </data>
+  <data name="PlayingPage_PlaybackErrorClose" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="PlayingPage_PlaybackErrorTitle" xml:space="preserve">
+    <value>Oynatma Hatası</value>
+  </data>
+  <data name="PlayingPage_MuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sesi kapat / aç</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Hoparlörün sesini kapat / aç</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Hoparlörün sesini kapat / aç</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Yayın seçenekleri</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Yayın seçenekleri</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>{0} ses düzeyi</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} bildirdi: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} zamanında oynatmaya başlamadı.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} yayını oynatmayı durdurdu.</value>
+  </data>
+  <data name="PlayingPage_PopOutButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Mini oynatıcıyı aç</value>
+  </data>
+  <data name="PlayingPage_QuitButton.Content" xml:space="preserve">
+    <value>Çık</value>
+  </data>
+  <data name="PlayingPage_QuitButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Traydio'dan çık</value>
+  </data>
+  <data name="PlayingPage_RefreshAllInfo.Text" xml:space="preserve">
+    <value>Tüm istasyonların bilgilerini yenile</value>
+  </data>
+  <data name="PlayingPage_RefreshStationInfo.Text" xml:space="preserve">
+    <value>İstasyon bilgilerini yenile</value>
+  </data>
+  <data name="PlayingPage_Remove.Text" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="PlayingPage_RemoveDivider.Text" xml:space="preserve">
+    <value>Ayırıcıyı kaldır</value>
+  </data>
+  <data name="PlayingPage_Rename.Text" xml:space="preserve">
+    <value>Yeniden adlandır</value>
+  </data>
+  <data name="PlayingPage_Settings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="PlayingPage_ShowVolume.Text" xml:space="preserve">
+    <value>Ses Kaydırıcısını Göster</value>
+  </data>
+  <data name="PlayingPage_CancelSleepTimer.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Uyku zamanlayıcısını iptal et</value>
+  </data>
+  <data name="PlayingPage_SleepTimer.Text" xml:space="preserve">
+    <value>Uyku zamanlayıcısı</value>
+  </data>
+  <data name="PlayingPage_SleepTimer15Minutes.Text" xml:space="preserve">
+    <value>15 dakika</value>
+  </data>
+  <data name="PlayingPage_SleepTimer20Minutes.Text" xml:space="preserve">
+    <value>20 dakika</value>
+  </data>
+  <data name="PlayingPage_SleepTimer30Minutes.Text" xml:space="preserve">
+    <value>30 dakika</value>
+  </data>
+  <data name="PlayingPage_SleepTimer45Minutes.Text" xml:space="preserve">
+    <value>45 dakika</value>
+  </data>
+  <data name="PlayingPage_SleepTimer50Minutes.Text" xml:space="preserve">
+    <value>50 dakika</value>
+  </data>
+  <data name="PlayingPage_SortBy.Text" xml:space="preserve">
+    <value>Sırala</value>
+  </data>
+  <data name="PlayingPage_StationButton.Text" xml:space="preserve">
+    <value>İstasyon</value>
+  </data>
+  <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
+    <value>İstasyonlar</value>
+  </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Yayını durdur</value>
+  </data>
+  <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Albüm Parçalarını Görüntüle</value>
+  </data>
+  <data name="PlayingPage_VisitWebsite.Text" xml:space="preserve">
+    <value>Web Sitesini Ziyaret Et</value>
+  </data>
+  <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
+    <value>Radyo çalarken bilgisayarın normal zamanlamasına göre uykuya geçmesine izin verin. Windows'un, herhangi bir ses çalarken bilgisayarı uyanık tutabileceğini unutmayın.</value>
+  </data>
+  <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
+    <value>Bilgisayarın uykuya geçmesine izin ver</value>
+  </data>
+  <data name="SettingsPage_AutoIncreaseBufferDescription.Text" xml:space="preserve">
+    <value>Yayın akıcı kalmakta zorlandığında Traydio'nun arabelleği otomatik olarak artırmasına izin verin.</value>
+  </data>
+  <data name="SettingsPage_AutoIncreaseBufferTitle.Text" xml:space="preserve">
+    <value>Takılmada arabelleği otomatik artır</value>
+  </data>
+  <data name="SettingsPage_AutoPlayWarning.Message" xml:space="preserve">
+    <value>Bu, Traydio başlatıldığında sesin çalmaya başlayacağı anlamına gelir. Bu rahatsız edici olabilir. Bunu etkinleştirmek istediğinizden emin misiniz?</value>
+  </data>
+  <data name="SettingsPage_AutoRecoverDescription.Text" xml:space="preserve">
+    <value>Oynatmayı izleyin ve yayın takıldığında, kesildiğinde veya sessiz kaldığında otomatik olarak kurtarmayı deneyin.</value>
+  </data>
+  <data name="SettingsPage_AutoRecoverTitle.Text" xml:space="preserve">
+    <value>Otomatik kurtarma</value>
+  </data>
+  <data name="SettingsPage_BufferLevelDescription.Text" xml:space="preserve">
+    <value>Daha yüksek arabellek düzeyleri kararsız bağlantılarda yardımcı olur, ancak oynatmaya biraz daha gecikme ekleyebilir.</value>
+  </data>
+  <data name="SettingsPage_BufferLevelTitle.Text" xml:space="preserve">
+    <value>Arabellek düzeyi</value>
+  </data>
+  <data name="SettingsPage_CopyDiagnostics.Content" xml:space="preserve">
+    <value>Tanılama bilgilerini kopyala</value>
+  </data>
+  <data name="SettingsPage_CopyDiagnosticsFailed" xml:space="preserve">
+    <value>Tanılama bilgileri kopyalanamadı: {0}</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Şarkı değişikliği açılır penceresini göster</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Nasıl göründüğünü görmek için açılır pencereyi şimdi göster</value>
+  </data>
+  <data name="SettingsPage_DemoPopupButton.Content" xml:space="preserve">
+    <value>Demo</value>
+  </data>
+  <data name="SettingsPage_DiagnosticsDescription.Text" xml:space="preserve">
+    <value>Traydio, oynatma etkinliğinin (hangi altyapının kullanıldığı, yayın durumu ve hatalar) bir günlüğünü tutar. Bir sorunu bildirirken paylaşmak için günlük klasörünü açın veya son tanılama bilgilerini kopyalayın.</value>
+  </data>
+  <data name="SettingsPage_DiagnosticsTitle.Text" xml:space="preserve">
+    <value>Tanılama</value>
+  </data>
+  <data name="SettingsPage_Enable.Content" xml:space="preserve">
+    <value>Etkinleştir</value>
+  </data>
+  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+    <value>Dışa aktarma başarısız oldu: {0}</value>
+  </data>
+  <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
+    <value>İstasyonları dışa aktar</value>
+  </data>
+  <data name="SettingsPage_ImportExportDescription.Text" xml:space="preserve">
+    <value>İstasyon listenizi yedekleyin veya M3U ve PLS çalma listesi dosyalarıyla başka bir cihaza taşıyın.</value>
+  </data>
+  <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
+    <value>İstasyonları içe / dışa aktar</value>
+  </data>
+  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+    <value>İçe aktarma başarısız oldu: {0}</value>
+  </data>
+  <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
+    <value>İstasyonları içe aktar</value>
+  </data>
+  <data name="SettingsPage_Language_English.Content" xml:space="preserve">
+    <value>İngilizce</value>
+  </data>
+  <data name="SettingsPage_Language_System.Content" xml:space="preserve">
+    <value>Sistem</value>
+  </data>
+  <data name="SettingsPage_Language_Spanish.Content" xml:space="preserve">
+    <value>İspanyolca</value>
+  </data>
+  <data name="SettingsPage_Language_French.Content" xml:space="preserve">
+    <value>Fransızca</value>
+  </data>
+  <data name="SettingsPage_Language_Chinese.Content" xml:space="preserve">
+    <value>Çince</value>
+  </data>
+  <data name="SettingsPage_Language_German.Content" xml:space="preserve">
+    <value>Almanca</value>
+  </data>
+  <data name="SettingsPage_Language_PortugueseBrazil.Content" xml:space="preserve">
+    <value>Portekizce (Brezilya)</value>
+  </data>
+  <data name="SettingsPage_Language_PortuguesePortugal.Content" xml:space="preserve">
+    <value>Portekizce (Portekiz)</value>
+  </data>
+  <data name="SettingsPage_Language_Arabic.Content" xml:space="preserve">
+    <value>Arapça</value>
+  </data>
+  <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
+    <value>Lehçe</value>
+  </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Rusça</value>
+  </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>Türkçe</value>
+  </data>
+  <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
+    <value>Uygulamanın genelinde kullanılacak dili seçin.</value>
+  </data>
+  <data name="SettingsPage_LanguageTitle.Text" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="SettingsPage_MusicSearchServicesDescription.Text" xml:space="preserve">
+    <value>Geçerli şarkıyı başka yerde aramak istediğinizde Şimdi Çalıyor ve Favoriler sayfalarında hangi kısayolların görüneceğini seçin.</value>
+  </data>
+  <data name="SettingsPage_MusicSearchServicesTitle.Text" xml:space="preserve">
+    <value>Müzik arama hizmetleri</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolder.Content" xml:space="preserve">
+    <value>Günlük klasörünü aç</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolderFailed" xml:space="preserve">
+    <value>Günlük klasörü açılamadı: {0}</value>
+  </data>
+  <data name="SettingsPage_OpenLogsFolderFailedLocation" xml:space="preserve">
+    <value>Günlük klasörü açılamadı. Konumu: {0}</value>
+  </data>
+  <data name="SettingsPage_OpenOnStartupDescription.Text" xml:space="preserve">
+    <value>Oturum açtığınızda Traydio'yu otomatik olarak başlatın; böylece oynatıcı elle açmadan hazır olur.</value>
+  </data>
+  <data name="SettingsPage_OpenOnStartupTitle.Text" xml:space="preserve">
+    <value>Başlangıçta aç</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_Auto.Content" xml:space="preserve">
+    <value>Otomatik (önerilir)</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_NativeOnly.Content" xml:space="preserve">
+    <value>Yalnızca yerel</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_NativePreferred.Content" xml:space="preserve">
+    <value>Yerel tercih edilir</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_RememberedInfo.Text" xml:space="preserve">
+    <value>Traydio, her istasyonun gerçekte hangi altyapıda çaldığını hatırlar; böylece yalnızca birinde çalışan bir istasyon bir sonraki sefer orada başlar. Bir istasyonun oynatma durumu değiştiyse bunu sıfırlayın.</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngineDescription.Text" xml:space="preserve">
+    <value>Traydio'nun yayınları nasıl oynatacağını seçin. Otomatik önce LibVLC'yi kullanır ve gerektiğinde Windows Media Foundation'a geçer.</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngineTitle.Text" xml:space="preserve">
+    <value>Oynatma altyapısı</value>
+  </data>
+  <data name="SettingsPage_PlayOnStartupDescription.Text" xml:space="preserve">
+    <value>Traydio açılır açılmaz son istasyonu otomatik olarak sürdürün.</value>
+  </data>
+  <data name="SettingsPage_PlayOnStartupTitle.Text" xml:space="preserve">
+    <value>Başlangıçta oynat</value>
+  </data>
+  <data name="SettingsPage_PopupDwellExplanation.Text" xml:space="preserve">
+    <value>Açılır pencerenin kaybolmadan önce ekranda ne kadar kalacağı. Üzerine tıklamak onu daha erken kapatır.</value>
+  </data>
+  <data name="SettingsPage_PopupDwellSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Şarkı açılır penceresinin ekranda saniye cinsinden ne kadar kalacağı</value>
+  </data>
+  <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
+    <value>Bir istasyon yüklenirken oluşan sessizliği hafif FM radyo paraziti ile doldurun. Aniden başlamak yerine yavaşça yükselir ve istasyon geldiğinde yavaşça kaybolur.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Radyo paraziti ses düzeyi</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Radyo parazitini dinle</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Nasıl ses çıkardığını duymak için parazitini şimdi oynat</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTestButton.Content" xml:space="preserve">
+    <value>Dene</value>
+  </data>
+  <data name="SettingsPage_RadioStaticTitle.Text" xml:space="preserve">
+    <value>Arabelleğe alma sırasında radyo paraziti</value>
+  </data>
+  <data name="SettingsPage_RadioStaticToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Arabelleğe alma sırasında radyo parazitini çal</value>
+  </data>
+  <data name="SettingsPage_ResetEngineMemoryFailed" xml:space="preserve">
+    <value>Hatırlanan altyapılar sıfırlanamadı: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogs.Content" xml:space="preserve">
+    <value>Günlükleri sıfırla</value>
+  </data>
+  <data name="SettingsPage_ResetLogsFailed" xml:space="preserve">
+    <value>Günlükler sıfırlanamadı: {0}</value>
+  </data>
+  <data name="SettingsPage_ResetLogsSuccess" xml:space="preserve">
+    <value>Günlük dosyaları temizlendi.</value>
+  </data>
+  <data name="SettingsPage_ResetRememberedEngines.Content" xml:space="preserve">
+    <value>Hatırlanan altyapıları sıfırla</value>
+  </data>
+  <data name="SettingsPage_RestartRequiredInfoBar.Message" xml:space="preserve">
+    <value>Dil değişikliğini tamamlamak için Traydio'yu yeniden başlatın.</value>
+  </data>
+  <data name="SettingsPage_SilenceTimeoutDescription.Text" xml:space="preserve">
+    <value>Traydio yayını otomatik olarak yeniden başlatmadan önce oynatmanın ne kadar süre sessiz kalabileceğini belirleyin.</value>
+  </data>
+  <data name="SettingsPage_SilenceTimeoutTitle.Text" xml:space="preserve">
+    <value>Sessizlik algılama zaman aşımı</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupDescription.Text" xml:space="preserve">
+    <value>Çalan şarkı her değiştiğinde görev çubuğunun yakınında kısa bir ekran bildirimi gösterin.</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupTitle.Text" xml:space="preserve">
+    <value>Şarkı değişikliği açılır penceresi</value>
+  </data>
+  <data name="SettingsPage_SongChangePopupToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Şarkı değişikliği açılır penceresi</value>
+  </data>
+  <data name="SettingsPage_SongPopupDelayExplanation.Text" xml:space="preserve">
+    <value>Birçok istasyon bir parçayı gerçekte çalmaya başlamadan önce duyurur. Parça bilgisini, şarkıyı duyduğunuz anda değişecek şekilde geciktirin — pencerede, mini oynatıcıda, medya denetimlerinde, çalma listesi geçmişinde ve açılır pencerede aynı şekilde. Bir istasyona girdikten sonraki ilk parça hemen görünür. Tek tek istasyonlar bunu Gelişmiş ayarlarında veya açılır pencereye sağ tıklayarak geçersiz kılabilir.</value>
+  </data>
+  <data name="SettingsPage_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Saniye cinsinden parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="SettingsPage_TrackInfoDelayTitle.Text" xml:space="preserve">
+    <value>Parça bilgisi gecikmesi</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_FavoriteTrack.Content" xml:space="preserve">
+    <value>Geçerli şarkıyı favorilere ekle</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
+    <value>Sesi kapat / aç</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Sonraki istasyon / parça</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
+    <value>Hiçbir şey yapma</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
+    <value>Oynat / duraklat</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Önceki istasyon / parça</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
+    <value>Traydio'yu aç</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ShowTrackInfo.Content" xml:space="preserve">
+    <value>Şimdi çalıyor açılır penceresini göster</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_ToggleMiniPlayer.Content" xml:space="preserve">
+    <value>Mini oynatıcıyı göster / gizle</value>
+  </data>
+  <data name="SettingsPage_TrayClickBehaviorDescription.Text" xml:space="preserve">
+    <value>Tepsi simgesine sol tıklama ve sağ tıklamanın ne yapacağını seçin. Bunlardan biri her zaman Traydio'yu açar, böylece Ayarlar'a geri dönebilirsiniz.</value>
+  </data>
+  <data name="SettingsPage_TrayClickBehaviorTitle.Text" xml:space="preserve">
+    <value>Tepsi simgesi tıklama davranışı</value>
+  </data>
+  <data name="SettingsPage_TrayDoubleClickNote.Text" xml:space="preserve">
+    <value>Tek tıklamalar anında çalışır. Bir çift tıklama atamak, Windows'un ikisini ayırt edebilmesi için o düğmenin tek tıklamasını kısa süre bekletir.</value>
+  </data>
+  <data name="SettingsPage_TrayLeftClick.Header" xml:space="preserve">
+    <value>Sol tıklama</value>
+  </data>
+  <data name="SettingsPage_TrayLeftDoubleClick.Header" xml:space="preserve">
+    <value>Sol çift tıklama</value>
+  </data>
+  <data name="SettingsPage_TrayRightClick.Header" xml:space="preserve">
+    <value>Sağ tıklama</value>
+  </data>
+  <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
+    <value>Sağ çift tıklama</value>
+  </data>
+  <data name="ShellPage_TitleBar.Title" xml:space="preserve">
+    <value>Traydio</value>
+  </data>
+  <data name="SongChangePopup_FavoriteIcon.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Favori şarkı</value>
+  </data>
+  <data name="SongChangePopup_Surface.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Şimdi çalıyor</value>
+  </data>
+  <data name="SongChangePopup_Surface.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Kapatmak için tıklayın, parça bilgisi gecikmesini ayarlamak için sağ tıklayın</value>
+  </data>
+  <data name="SongChangePopup_Title.Text" xml:space="preserve">
+    <value>Şimdi çalıyor</value>
+  </data>
+  <data name="StreamDiagnosis_EngineFailedHealthyServer" xml:space="preserve">
+    <value>İstasyon çevrimiçi, ancak iki oynatma altyapısı da bu bilgisayarda onu oynatamadı.</value>
+  </data>
+  <data name="StreamDiagnosis_EngineFailedHealthyServerWithReason" xml:space="preserve">
+    <value>İstasyon çevrimiçi, ancak bu bilgisayarda oynatma başarısız oldu: {0}</value>
+  </data>
+  <data name="StreamDiagnosis_TryPlaylistEntry" xml:space="preserve">
+    <value>{0} Bunun yerine yayın adresi olarak {1} adresini kullanmayı deneyin.</value>
+  </data>
+  <data name="Toggle_Off" xml:space="preserve">
+    <value>Kapalı</value>
+  </data>
+  <data name="Toggle_On" xml:space="preserve">
+    <value>Açık</value>
+  </data>
+  <data name="TrayIcon_AddStation" xml:space="preserve">
+    <value>Traydio - Dinlemeye başlamak için bir istasyon ekleyin</value>
+  </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>{0} üzerinde</value>
+  </data>
+  <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
+    <value>Duraklatmak için sol tıklayın</value>
+  </data>
+  <data name="TrayIcon_LeftClickToPlay" xml:space="preserve">
+    <value>Oynatmak için sol tıklayın</value>
+  </data>
+  <data name="TrayIcon_Muted" xml:space="preserve">
+    <value>Sessiz</value>
+  </data>
+  <data name="TrayIcon_Paused" xml:space="preserve">
+    <value>Traydio {0} (Duraklatıldı)
+{1}</value>
+  </data>
+  <data name="TrayIcon_Playing" xml:space="preserve">
+    <value>Traydio {0} (Çalıyor)
+{1}</value>
+  </data>
+  <data name="TrayIcon_PlayingWithNowPlaying" xml:space="preserve">
+    <value>Traydio {0} (Çalıyor)
+{1}
+{2}</value>
+  </data>
+  <data name="TrayIcon_RightClickToPause" xml:space="preserve">
+    <value>Duraklatmak için sağ tıklayın</value>
+  </data>
+  <data name="TrayIcon_RightClickToPlay" xml:space="preserve">
+    <value>Oynatmak için sağ tıklayın</value>
+  </data>
+  <data name="TutorialWindow_Feature_1.Text" xml:space="preserve">
+    <value>• Hafif ve minimalist tasarım</value>
+  </data>
+  <data name="TutorialWindow_Feature_2.Text" xml:space="preserve">
+    <value>• Dünya çapında binlerce radyo istasyonuna erişin</value>
+  </data>
+  <data name="TutorialWindow_Feature_3.Text" xml:space="preserve">
+    <value>• Güzel Mica arka planı ve modern arayüz</value>
+  </data>
+  <data name="TutorialWindow_Feature_4.Text" xml:space="preserve">
+    <value>• Sistem tepsinizde sessizce yaşar</value>
+  </data>
+  <data name="TutorialWindow_FeaturesTitle.Text" xml:space="preserve">
+    <value>✨ Traydio'yu özel kılan nedir:</value>
+  </data>
+  <data name="TutorialWindow_Intro.Text" xml:space="preserve">
+    <value>Windows için minik tepsi radyonuz</value>
+  </data>
+  <data name="TutorialWindow_QuickStart.Text" xml:space="preserve">
+    <value>Hızlı Başlangıç Kılavuzu</value>
+  </data>
+  <data name="TutorialWindow_StartButton.Text" xml:space="preserve">
+    <value>Haydi Başlayalım!</value>
+  </data>
+  <data name="TutorialWindow_Step_Options_Desc.Text" xml:space="preserve">
+    <value>İstasyonlara göz atın, ayarları yapın ve tüm özellikleri keşfedin</value>
+  </data>
+  <data name="TutorialWindow_Step_Options_Title.Text" xml:space="preserve">
+    <value>Daha Fazla Seçenek İçin Sağ Tıklayın</value>
+  </data>
+  <data name="TutorialWindow_Step_Pin_Desc.Text" xml:space="preserve">
+    <value>Traydio simgesinin sistem tepsinizde her zaman görünür olduğundan emin olun</value>
+  </data>
+  <data name="TutorialWindow_Step_Pin_Title.Text" xml:space="preserve">
+    <value>Tepsi Simgesini Sabitleyin</value>
+  </data>
+  <data name="TutorialWindow_Step_Play_Desc.Text" xml:space="preserve">
+    <value>Parmaklarınızın ucunda hızlı ve kolay oynatma denetimi</value>
+  </data>
+  <data name="TutorialWindow_Step_Play_Title.Text" xml:space="preserve">
+    <value>Oynat/Duraklat İçin Sol Tıklayın</value>
+  </data>
+  <data name="TutorialWindow_Title" xml:space="preserve">
+    <value>Traydio İlk Çalıştırma Penceresi</value>
+  </data>
+  <data name="TutorialWindow_TitleBar.Title" xml:space="preserve">
+    <value>Traydio</value>
+  </data>
+  <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
+    <value>Traydio'ya Hoş Geldiniz!</value>
+  </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Kullanılabilir</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Kullanılabilirlik denetleniyor...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>Kullanılamıyor</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Daha önce kullanıldı - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} bu ağda kullanılamıyor.</value>
+  </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>Bu cihazın bağlantısı tamamlanmadan başka bir cihaz seçildi.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Bağlanılıyor...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>Cihaz oynatmaya başlamadı.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>Oynatma altyapısı yayın cihazını reddetti.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>bu bilgisayar</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>Gruba ekle</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>Gruptan kaldır</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>Hoparlörleri grupla…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>Hoparlörleri grupla</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>Birlikte çalması gereken hoparlörleri seçin.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>Eklediğiniz hoparlörler çaldıklarını durdurur ve gruba uyar.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>Grup adı</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>Uygula</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>Gruplanmadı</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>{0} ile çalıyor</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>Gruplama için bu ağda en az iki Sonos hoparlörü gerekir.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>Bu ağda Sonos hoparlörü bulunamadı.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>Grup değiştirilemedi: {0}</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>Yayın tercihiniz kaydedilemedi: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Bu Wi-Fi'de yayın düğmesini gizle</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Bu Wi-Fi'de yayın düğmesini göster</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Yayını otomatik olarak sonlandır</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Oynatma bu kadar süre duraklatıldıktan veya durdurulduktan sonra bu cihaza dönün. Oynatma duraklatılmış kalır.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Hareketsizlikten sonra yayını durdur</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Asla</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} dakika</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Yayın otomatik olarak durdurulamadı. Yayını durdur'u deneyin.</value>
+  </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>İstasyonu önizle</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Eklemeden önce istasyon ayrıntılarını düzenle</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>İstasyon Ekle</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>Radyo İstasyonlarında Ara</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Ada göre arayın veya filtreleri kullanın...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filtreler</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filtreler</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Bu filtreyi kaldır</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>Arama Hatası</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Bir ülke, dil veya tür bulun</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>Ülke, dil veya tür...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>Hiçbir ülke, dil veya tür bununla eşleşmiyor.</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>Kalite ve sıralama</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>Codec</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>Minimum bit hızı</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>Sırala</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>Bozuk istasyonları gizle</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>Tümünü temizle</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>Sonuçları göster</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>Son:</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>Yakınımdaki popüler olanları göster</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>Veya istasyonu elle ekleyin</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>Beyaz gürültü ekle...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>Yerel müzik ekle...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>Traydio Mini Oynatıcı</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>Mini Oynatıcı</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>Görselleştiriciyi Göster</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>Her Zaman Üstte</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>Başlık Çubuğunu Gizle</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>İstasyon ses düzeyi</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>İstasyon arabellek düzeyi</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Saniye cinsinden istasyon parça bilgisi gecikmesi</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Ses düzeyi</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Ses düzeyi</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Diğer favori seçenekleri</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>Dışa aktarma geçmişini temizle</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Müzik arama ayarları</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ayrıntılar için tıklayın</value>
+  </data>
+</root>

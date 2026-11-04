@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>المطوّر</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>الترجمات</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>مشغّل راديو إنترنت بسيط وأنيق لنظام Windows</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>بدون تأخير</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>دقيقة واحدة</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} ثانية</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} ثانية</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>افتراضي</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>متوسط</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>كبير</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>كبير جدًا</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>المخزن المؤقت: {0} (هذه المحطة)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>المخزن المؤقت: {0} (إعداد التطبيق)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة: {0} (هذه المحطة)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة: {0} (إعداد التطبيق)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>تأخير معلومات المقطوعة لـ {0}</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>استخدام إعداد التطبيق ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>الحالي {0} (لم يتم اختيار محطة)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>إيقاف نوافذ الأغاني المنبثقة</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>موافق</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>تصدير</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>لا يوجد ما يمكن تصديره</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>أضف بعض الأغاني إلى المفضلة أولًا.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>تصدير كل المفضلة</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>الجديد فقط ({0} من {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>كل المفضلة ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>أرشفة المقطوعات المصدّرة</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>يعمل CSV مع خدمات نقل قوائم التشغيل مثل Soundiiz أو TuneMyMusic. أما XSPF فهو ملف قائمة تشغيل لمشغّلات مثل VLC. اختر الصيغة عند الحفظ.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>تبقى المقطوعات المؤرشفة في المفضلة لكن يتم تخطيها في عمليات التصدير اللاحقة.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>تصدير المفضلة</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>لا يوجد جديد للتصدير</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>تم تصدير كل المفضلة بالفعل. فعّل "{0}" أو امسح سجل التصدير.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>اكتمل التصدير</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>تم تصدير {0} مقطوعة إلى {1}.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>تم تصدير {0} مقطوعة إلى {1}.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>تمت أرشفة {0} وسيتم تخطيها في المرة القادمة.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>تم مسح سجل التصدير</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>ستُضمَّن {0} مقطوعة في التصدير القادم.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>ستُضمَّن {0} مقطوعة في التصدير القادم.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>لم يتم العثور على تطابق</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>لا يحتوي radio-browser.info على إدخال لعنوان بث هذه المحطة، لذا لا توجد تفاصيل لإضافتها.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>تم تحديث {0}</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>تعذّر الوصول إلى radio-browser.info</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>تحقق من اتصالك وحاول مرة أخرى.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>تحديث المحطات التي لديها تفاصيل أيضًا</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>جميع محطاتك لديها تفاصيل بالفعل. يمكنك البحث عنها مرة أخرى للحصول على أي تغييرات.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>محطة واحدة ليس لديها نوع أو بلد محفوظ.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>{0} محطات ليس لديها نوع أو بلد محفوظ.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} سيستعلم Traydio عنها من radio-browser.info. يتم إرسال عنوان بث كل محطة فقط.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>البحث عن تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>لا يوجد ما يمكن البحث عنه</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>تم التحقق من كل محطة مؤخرًا. حاول مرة أخرى بعد بضعة أيام.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>جارٍ البدء…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>جارٍ الإنهاء…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} من {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>جارٍ البحث عن تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>تفاصيل المحطات</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>تم تحديث {0} من {1} محطات.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} ليس لها إدخال في radio-browser.info.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} تطابقت مع أكثر من إدخال؛ تم استخدام الأقرب.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} تُركت للمرة القادمة للحفاظ على عدد الطلبات معقولًا.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>توقف مبكرًا لأن radio-browser.info توقف عن الاستجابة.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>تم الإيقاف بناءً على طلبك. تم حفظ ما تم العثور عليه حتى الآن.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>لا توجد تفاصيل إضافية.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>حذف "{0}"؟</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>ستتم إزالة المحطة الموجودة في هذه المجموعة أيضًا. لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>ستتم إزالة جميع المحطات ({0}) في هذه المجموعة أيضًا. لا يمكن التراجع عن هذا الإجراء.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>إضافة محطة</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>ميزة إضافة المحطات قادمة قريبًا!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>قيد التشغيل الآن</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>محطة راديو</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>جارٍ البث...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>هل يعجبك Traydio؟</value>
   </data>
@@ -311,6 +536,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>إظهار النافذة</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>إرسال</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>الإرسال إلى جهاز</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>يتم الإرسال حاليًا إلى {0}</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>لم يتم العثور على أجهزة بعد. تأكد من أن الجهاز قيد التشغيل ومتصل بنفس شبكة هذا الكمبيوتر.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>تعذر الإرسال إلى {0}: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>جارٍ البحث عن أجهزة على شبكتك…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>إيقاف الإرسال</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>الإرسال غير متاح على هذا الكمبيوتر لأنه تعذر تحميل محرك التشغيل LibVLC.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>اضغط على أيقونة النجمة في الأغاني التي تحبها لحفظها هنا</value>
   </data>
@@ -467,6 +719,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>أضف محطتك الأولى</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>إرسال…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>جارٍ الإرسال إلى {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>حذف المجموعة</value>
   </data>
@@ -581,6 +839,9 @@
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>المحطات</value>
   </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>إيقاف الإرسال</value>
+  </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>عرض مقطوعات الألبوم</value>
   </data>
@@ -686,6 +947,12 @@
   <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
     <value>البولندية</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Ø§ÙØ±ÙØ³ÙØ©</value>
+  </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>التركية</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>اختر اللغة المستخدمة في التطبيق بأكمله.</value>
   </data>
@@ -745,6 +1012,9 @@
   </data>
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>يملأ الصمت أثناء تحميل المحطة بتشويش راديو FM خفيف. يرتفع تدريجيًا بدلًا من أن يبدأ فجأة، ثم يتلاشى عند وصول المحطة.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مستوى صوت تشويش الراديو</value>
   </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>الاستماع إلى تشويش الراديو</value>
@@ -812,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>كتم الصوت / إلغاء الكتم</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>المحطة / المقطع التالي</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>لا شيء</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>تشغيل / إيقاف مؤقت</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>المحطة / المقطع السابق</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>فتح Traydio</value>
@@ -880,6 +1156,9 @@
   </data>
   <data name="TrayIcon_AddStation" xml:space="preserve">
     <value>Traydio - أضف محطة لبدء الاستماع</value>
+  </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>على {0}</value>
   </data>
   <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
     <value>انقر بالزر الأيسر للإيقاف المؤقت</value>
@@ -959,5 +1238,296 @@
   </data>
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>مرحبًا بك في Traydio!</value>
+  </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>متاح</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>جارٍ التحقق من التوفر...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>غير متاح</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>استُخدم سابقًا - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} غير متاح على هذه الشبكة.</value>
+  </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>تم اختيار جهاز آخر قبل اكتمال الاتصال بهذا الجهاز.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>جارٍ الاتصال...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>لم يبدأ الجهاز التشغيل.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>رفض محرك التشغيل جهاز البث.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>هذا الكمبيوتر</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>تعذر حفظ تفضيل البث: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>إخفاء زر البث على شبكة Wi-Fi هذه</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>إظهار زر البث على شبكة Wi-Fi هذه</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>إنهاء البث تلقائيًا</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>العودة إلى هذا الجهاز بعد إيقاف التشغيل مؤقتًا أو كليًا لهذه المدة. سيظل التشغيل متوقفًا مؤقتًا.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>إيقاف البث بعد فترة من عدم النشاط</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>أبدًا</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} دقيقة</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>تعذر إيقاف البث تلقائيًا. جرّب إيقاف البث.</value>
+  </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>معاينة المحطة</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>تعديل تفاصيل المحطة قبل الإضافة</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>إضافة محطة</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>البحث عن محطات الراديو</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>ابحث بالاسم أو استخدم عوامل التصفية...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>عوامل التصفية</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>عوامل التصفية</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>إزالة عامل التصفية هذا</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>خطأ في البحث</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ابحث عن بلد أو لغة أو نوع</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>بلد أو لغة أو نوع...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>لا يوجد بلد أو لغة أو نوع مطابق.</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>الجودة والترتيب</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>الترميز</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>الحد الأدنى لمعدل البت</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>الترتيب حسب</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>إخفاء المحطات المعطلة</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>مسح الكل</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>عرض النتائج</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>الأخيرة:</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>عرض المحطات الشائعة بالقرب مني</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>أو أضف محطة يدويًا</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>إضافة ضوضاء بيضاء...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>إضافة موسيقى محلية...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>مشغل Traydio المصغر</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>المشغل المصغر</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>عرض المؤثرات المرئية</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>دائمًا في المقدمة</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>إخفاء شريط العنوان</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مستوى صوت المحطة</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مستوى مخزن المحطة المؤقت</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>تأخير معلومات المقطع للمحطة بالثواني</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مستوى الصوت</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مستوى الصوت</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>مزيد من خيارات المفضلة</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>مسح سجل التصدير</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>إعدادات البحث عن الموسيقى</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>انقر لعرض التفاصيل</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>تأثر البث إلى Sonos كثيرًا بتطبيق RoomRelay ومؤلفه guicn555. شكرًا لك!</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>متابعة</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>جارٍ الإنهاء...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>تعذّر الاتصال بـ Last.fm. يُرجى المحاولة مرة أخرى لاحقًا.</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>لم يتم تكوين Last.fm لهذا الإصدار.</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>لم يتلقَّ Last.fm موافقتك بعد. تأكد من أنك وافقت على الوصول في المتصفح، ثم حدد "متابعة" مرة أخرى.</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>جارٍ الاتصال بـ Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>جارٍ الاتصال بـ Last.fm...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>الاتصال بـ Last.fm</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>وافق على الوصول إلى حسابك في Last.fm في نافذة المتصفح التي فُتحت للتو، ثم عد إلى هنا وحدد "متابعة".</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>الاتصال بـ Last.fm</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>متصل باسم {0}</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>غير متصل</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>اتصال</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>سجّل تلقائيًا (scrobble) ما تستمع إليه، في الراديو وفي مكتبتك المحلية، في حسابك على Last.fm.</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>قطع الاتصال</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>خيارات البث</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>كتم صوت مكبر الصوت / إلغاء كتمه</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>كتم صوت مكبر الصوت / إلغاء كتمه</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>خيارات البث</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>خيارات البث</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>مستوى صوت {0}</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>أفاد {0}: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>لم يبدأ {0} التشغيل في الوقت المناسب.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>أوقف {0} تشغيل البث.</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>إضافة إلى المجموعة</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>إزالة من المجموعة</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>تجميع مكبرات الصوت…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>تجميع مكبرات الصوت</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>اختر مكبرات الصوت التي يجب أن تعمل معًا.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>تتوقف مكبرات الصوت التي تضيفها عن تشغيل المحتوى الحالي وتتبع المجموعة.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>اسم المجموعة</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>تطبيق</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>غير مجمّع</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>يعمل مع {0}</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>يتطلب التجميع وجود مكبّري صوت Sonos على الأقل في هذه الشبكة.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>لم يتم العثور على مكبرات صوت Sonos في هذه الشبكة.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>تعذّر تغيير المجموعة: {0}</value>
   </data>
 </root>

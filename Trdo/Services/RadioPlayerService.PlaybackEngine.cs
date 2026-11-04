@@ -74,6 +74,7 @@ public sealed partial class RadioPlayerService
         {
             _libVlcBackend = new LibVlcPlaybackBackend(LibVlcHost.Instance, LibVlcHost.LogCapture);
             _libVlcBackend.PlaybackStateChanged += OnLibVlcPlaybackStateChanged;
+            _libVlcBackend.RendererPlaybackStarted += OnRendererPlaybackStarted;
             _libVlcBackend.BufferingStateChanged += OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed += OnLibVlcPlaybackFailed;
             _libVlcBackend.PlaybackEnded += OnBackendPlaybackEnded;
@@ -206,7 +207,12 @@ public sealed partial class RadioPlayerService
         return tcs.Task;
     }
 
-    private async Task<bool> RebuildPlaybackPipelineInternalAsync(bool recycleBackend, CancellationToken cancellationToken)
+    // reconfigure runs while the pipeline is torn down, before the stream is re-prepared, for
+    // changes LibVLC only honors on an idle player (a new cast renderer).
+    private async Task<bool> RebuildPlaybackPipelineInternalAsync(
+        bool recycleBackend,
+        CancellationToken cancellationToken,
+        Action? reconfigure = null)
     {
         if (string.IsNullOrWhiteSpace(_streamUrl))
         {
@@ -234,6 +240,8 @@ public sealed partial class RadioPlayerService
         {
             RecycleActiveBackend();
         }
+
+        reconfigure?.Invoke();
 
         // A rebuilt pipeline has no source and is not resuming from a user pause, so both
         // flags must return to their first-play values or the prepare below would be skipped.
@@ -294,6 +302,15 @@ public sealed partial class RadioPlayerService
         if (string.IsNullOrWhiteSpace(_streamUrl))
         {
             return false;
+        }
+
+        if (_playbackEngineSelector.RequireLibVlc)
+        {
+            // Casting has no other engine to switch to, and marking LibVLC unusable for this
+            // stream would outlive the cast session. Rebuild on the same engine instead.
+            LogService.Warn("RadioPlayerService",
+                $"Cannot switch engines for {LogService.Redact(_streamUrl)} while casting; rebuilding on LibVLC");
+            return await RebuildPlaybackPipelineAsync(recycleBackend: true, cancellationToken);
         }
 
         LogService.Warn("RadioPlayerService",
@@ -401,6 +418,12 @@ public sealed partial class RadioPlayerService
     /// </summary>
     private bool CanSwitchEngine(PlaybackBackendKind current)
     {
+        // The native engine cannot cast, so while a cast target is set there is nothing to switch to.
+        if (_playbackEngineSelector.RequireLibVlc)
+        {
+            return false;
+        }
+
         if (PlaybackEngineSelector.GetEngineMode() == PlaybackEngineMode.NativeOnly)
         {
             return false;
@@ -424,6 +447,23 @@ public sealed partial class RadioPlayerService
         catch (Exception ex)
         {
             return $"engine={ActivePlaybackBackend}, state unavailable ({ex.GetType().Name})";
+        }
+    }
+
+    /// <summary>
+    /// Logs the active backend's state and, on LibVLC, its native log ring buffer. Meant for
+    /// call sites that have evidence something is wrong (the NAudio silence monitor, a stall)
+    /// but whose engine never raised its own failure event - the "reports playing, produces
+    /// nothing" case that <see cref="LibVlcPlaybackBackend.PlaybackFailed"/> does not cover,
+    /// because LibVLC's own state machine never left the Playing state.
+    /// </summary>
+    public void DumpActiveBackendDiagnostics(string context)
+    {
+        LogService.Warn("RadioPlayerService", $"{context} ({DescribeActiveBackendState()})");
+
+        if (ActivePlaybackBackend == PlaybackBackendKind.LibVlc)
+        {
+            _libVlcBackend?.DumpDiagnostics(context);
         }
     }
 
@@ -881,6 +921,7 @@ public sealed partial class RadioPlayerService
         if (_libVlcBackend is not null)
         {
             _libVlcBackend.PlaybackStateChanged -= OnLibVlcPlaybackStateChanged;
+            _libVlcBackend.RendererPlaybackStarted -= OnRendererPlaybackStarted;
             _libVlcBackend.BufferingStateChanged -= OnLibVlcBackendBufferingStateChanged;
             _libVlcBackend.PlaybackFailed -= OnLibVlcPlaybackFailed;
             _libVlcBackend.PlaybackEnded -= OnBackendPlaybackEnded;
@@ -893,6 +934,8 @@ public sealed partial class RadioPlayerService
         // use-after-free access violation in LibVLCEventDetach.
         _metadataOrchestrator.Dispose();
         _playbackEngineSelector.Dispose();
+        DisposeCastTarget();
+        DisposeSonosTarget();
         _publishGate.Dispose();
         _icyMetadataService.Dispose();
         _hlsSegmentMetadataService.Dispose();

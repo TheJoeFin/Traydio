@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# This app's own Last.fm API credentials (api_key + shared secret). Never commit real values -
+# copy Trdo/OAuth.resw.example to Trdo/OAuth.resw and fill in your own, per that file's comments.
+Trdo/OAuth.resw

@@ -94,6 +94,10 @@ Traydio is designed to be simple and elegant, focusing on what matters most: enj
 
 Tests (`Trdo.Tests`) use [MSTest](https://www.nuget.org/packages/MSTest.TestFramework) via `Microsoft.NET.Test.Sdk`.
 
+### Acknowledgements
+
+- Sonos casting was heavily influenced by [RoomRelay](https://github.com/guicn555/RoomRelay) by [guicn555](https://github.com/guicn555) (MIT). Its SSDP discovery, UPnP SOAP control and RenderingControl volume handling shaped Traydio's Sonos implementation. Thank you!
+
 ### Thanks for using Traydio
 
 Hopefully this simple app makes listening to internet radio enjoyable and hassle-free.  

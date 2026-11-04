@@ -23,6 +23,8 @@
     <None Remove="Assets\apple_music.svg" />
     <None Remove="Assets\bandcamp.svg" />
     <None Remove="Assets\discogs.svg" />
+    <None Remove="Assets\LastFM.svg" />
+    <None Remove="Assets\qobuz.svg" />
     <None Remove="Assets\spotify.svg" />
     <None Remove="Assets\ytmusic.svg" />
     <None Remove="Assets\Tutorial.gif" />
@@ -34,6 +36,7 @@
     <None Remove="Pages\AddStation.xaml" />
     <None Remove="Pages\AddWhiteNoise.xaml" />
     <None Remove="Controls\AddLocalMusicWindow.xaml" />
+    <None Remove="Controls\LastfmAuthWindow.xaml" />
     <None Remove="Pages\FavoritesPage.xaml" />
     <None Remove="Pages\PlayingPage.xaml" />
     <None Remove="Pages\SettingsPage.xaml" />
@@ -70,16 +73,17 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
-    <PackageReference Include="LibVLCSharp" Version="3.10.1" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.333">
+    <PackageReference Include="LibVLCSharp" Version="3.10.2" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.367">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
-    <PackageReference Include="NAudio" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
+    <PackageReference Include="NAudio" Version="3.3.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" />
     <PackageReference Include="WinUIEx" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +109,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\discogs.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\LastFM.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\qobuz.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\spotify.svg">
@@ -144,6 +154,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\AddLocalMusicWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\LastfmAuthWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -205,6 +220,22 @@
   -->
   <ItemGroup>
     <TrimmerRootAssembly Include="TagLibSharp" />
+  </ItemGroup>
+
+  <!--
+    OAuth.resw holds this app's own Last.fm API credentials and is gitignored - every developer
+    fills in their own copy from OAuth.resw.example. It is a flat, non-localized credentials
+    file read directly as XML by LastfmCredentials, not a per-locale UI-string resource, so it is
+    explicitly kept out of the WinUI resource-index (PRIResource) pipeline that
+    Strings\<locale>\Resources.resw goes through, and only copied to the output/package when a
+    developer's local copy actually exists.
+  -->
+  <ItemGroup>
+    <PRIResource Remove="OAuth.resw" />
+    <None Remove="OAuth.resw" />
+    <Content Include="OAuth.resw" Condition="Exists('OAuth.resw')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <!-- Publish Properties -->

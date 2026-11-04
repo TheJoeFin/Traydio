@@ -65,8 +65,8 @@
                     <TextBlock x:Uid="AddLocalMusic_VolumeLabel" FontWeight="SemiBold" />
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <Slider
+                            x:Uid="AddLocalMusic_VolumeSlider"
                             Grid.Column="0"
-                            AutomationProperties.Name="Volume"
                             Maximum="200"
                             Minimum="0"
                             StepFrequency="1"

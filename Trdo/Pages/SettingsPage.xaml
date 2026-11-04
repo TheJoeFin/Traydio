@@ -78,6 +78,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_Language_PortuguesePortugal" />
                             <ComboBoxItem x:Uid="SettingsPage_Language_Arabic" />
                             <ComboBoxItem x:Uid="SettingsPage_Language_Polish" />
+                            <ComboBoxItem x:Uid="SettingsPage_Language_Russian" />
+                            <ComboBoxItem x:Uid="SettingsPage_Language_Turkish" />
                         </ComboBox>
                         <InfoBar
                             x:Uid="SettingsPage_RestartRequiredInfoBar"
@@ -170,6 +172,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayRightClick"
@@ -182,6 +186,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayLeftDoubleClick"
@@ -194,6 +200,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <ComboBox
                             x:Uid="SettingsPage_TrayRightDoubleClick"
@@ -206,6 +214,8 @@
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_FavoriteTrack" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ShowTrackInfo" />
                             <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_ToggleMiniPlayer" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_NextStationOrTrack" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayClickAction_PreviousStationOrTrack" />
                         </ComboBox>
                         <TextBlock
                             x:Uid="SettingsPage_TrayDoubleClickNote"
@@ -430,7 +440,83 @@
                                     OffContent=""
                                     OnContent="" />
                             </Grid>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Image
+                                    Grid.Column="0"
+                                    Width="20"
+                                    Height="20"
+                                    VerticalAlignment="Center">
+                                    <Image.Source>
+                                        <SvgImageSource UriSource="ms-appx:///Assets/qobuz.svg" />
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Text="Qobuz"
+                                    TextWrapping="Wrap" />
+                                <ToggleSwitch
+                                    Grid.Column="2"
+                                    MinWidth="0"
+                                    HorizontalAlignment="Right"
+                                    IsOn="{x:Bind ViewModel.IsQobuzEnabled,
+                                                  Mode=TwoWay}"
+                                    OffContent=""
+                                    OnContent="" />
+                            </Grid>
                         </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SettingCardStyle}" Visibility="{x:Bind ViewModel.IsLastfmAvailable}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <Image
+                                Grid.Column="0"
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Center">
+                                <Image.Source>
+                                    <SvgImageSource UriSource="ms-appx:///Assets/LastFM.svg" />
+                                </Image.Source>
+                            </Image>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                x:Uid="SettingsPage_LastfmTitle"
+                                Style="{StaticResource SettingTitleStyle}" />
+                            <ToggleSwitch
+                                Grid.Column="2"
+                                MinWidth="0"
+                                HorizontalAlignment="Right"
+                                IsOn="{x:Bind ViewModel.IsLastfmScrobblingEnabled, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                        </Grid>
+                        <TextBlock x:Uid="SettingsPage_LastfmDescription" Style="{StaticResource SettingDescriptionStyle}" />
+
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SettingStatusStyle}"
+                                Text="{x:Bind ViewModel.LastfmConnectionStatusText, Mode=OneWay}" />
+                            <Button
+                                x:Name="LastfmConnectButton"
+                                x:Uid="SettingsPage_LastfmConnectButton"
+                                Grid.Column="1"
+                                Click="LastfmConnectButton_Click"
+                                Visibility="{x:Bind ViewModel.IsLastfmNotConnected, Mode=OneWay}" />
+                            <Button
+                                x:Name="LastfmDisconnectButton"
+                                x:Uid="SettingsPage_LastfmDisconnectButton"
+                                Grid.Column="2"
+                                Click="LastfmDisconnectButton_Click"
+                                Visibility="{x:Bind ViewModel.IsLastfmConnected, Mode=OneWay}" />
+                        </Grid>
                     </StackPanel>
                 </Border>
 
@@ -461,6 +547,19 @@
                             x:Name="EngineMemoryInfoBar"
                             IsClosable="True"
                             IsOpen="False" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SettingCardStyle}">
+                    <StackPanel Spacing="10">
+                        <TextBlock x:Uid="SettingsPage_CastIdleTimeoutTitle" Style="{StaticResource SettingTitleStyle}" />
+                        <TextBlock x:Uid="SettingsPage_CastIdleTimeoutDescription" Style="{StaticResource SettingDescriptionStyle}" />
+                        <ComboBox
+                            x:Uid="SettingsPage_CastIdleTimeout"
+                            HorizontalAlignment="Stretch"
+                            AutomationProperties.AutomationId="CastIdleTimeoutComboBox"
+                            ItemsSource="{x:Bind ViewModel.CastIdleTimeoutLabels}"
+                            SelectedIndex="{x:Bind ViewModel.CastIdleTimeoutIndex, Mode=TwoWay}" />
                     </StackPanel>
                 </Border>
 
@@ -633,6 +732,23 @@
                                 VerticalAlignment="Center"
                                 AutomationProperties.AutomationId="RadioStaticTestButton"
                                 Click="RadioStaticTestButton_Click" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <Slider
+                                x:Name="RadioStaticLevelSlider"
+                                x:Uid="SettingsPage_RadioStaticLevelSlider"
+                                Grid.Column="0"
+                                AutomationProperties.AutomationId="RadioStaticLevelSlider"
+                                Maximum="100"
+                                Minimum="0"
+                                StepFrequency="5"
+                                SnapsTo="StepValues"
+                                Value="{x:Bind ViewModel.RadioStaticLevelPercent, Mode=TwoWay}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                MinWidth="48"
+                                Style="{StaticResource SettingStatusStyle}"
+                                Text="{x:Bind ViewModel.RadioStaticLevelText, Mode=OneWay}" />
                         </Grid>
                     </StackPanel>
                 </Border>

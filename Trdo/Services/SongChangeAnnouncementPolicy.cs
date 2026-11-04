@@ -145,13 +145,23 @@ public static class SongChangeAnnouncementPolicy
     /// Formats a dwell time for display. Unlike a delay, this is never zero, so it always
     /// reads as a duration.
     /// </summary>
-    public static string DescribeDwell(double seconds)
-    {
-        double clamped = ClampDwell(seconds);
+    public static string DescribeDwell(double seconds) => FormatSeconds(ClampDwell(seconds));
 
-        return Math.Abs(clamped - Math.Round(clamped)) < 0.05
-            ? $"{Math.Round(clamped):0} second{(Math.Round(clamped) == 1 ? "" : "s")}"
-            : $"{clamped:0.0} seconds";
+    /// <summary>
+    /// Looks up a localized string by resource key, returning the fallback when none is
+    /// available. The app wires this to its resource loader at startup; it stays a hook so
+    /// this policy has no dependency on the UI framework and remains unit-testable.
+    /// </summary>
+    public static Func<string, string, string> Localize { get; set; } = (_, fallback) => fallback;
+
+    private static string FormatSeconds(double clamped)
+    {
+        bool whole = Math.Abs(clamped - Math.Round(clamped)) < 0.05;
+        if (whole && Math.Round(clamped) == 1)
+            return string.Format(Localize("Duration_Seconds_One", "{0} second"), "1");
+
+        string number = whole ? $"{Math.Round(clamped):0}" : $"{clamped:0.0}";
+        return string.Format(Localize("Duration_Seconds_Other", "{0} seconds"), number);
     }
 
     /// <summary>
@@ -180,15 +190,13 @@ public static class SongChangeAnnouncementPolicy
         double clamped = ClampDelay(seconds);
 
         if (clamped <= 0)
-            return "No delay";
+            return Localize("Delay_None", "No delay");
 
         // The top of the range reads better as a minute than as 60 seconds.
         if (clamped >= MaxDelaySeconds)
-            return "1 minute";
+            return Localize("Duration_OneMinute", "1 minute");
 
         // Whole seconds read better than "5.0s" for the common preset values.
-        return Math.Abs(clamped - Math.Round(clamped)) < 0.05
-            ? $"{Math.Round(clamped):0} second{(Math.Round(clamped) == 1 ? "" : "s")}"
-            : $"{clamped:0.0} seconds";
+        return FormatSeconds(clamped);
     }
 }

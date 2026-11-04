@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,8 +20,9 @@ namespace Trdo.Helpers;
 /// them from a URI in a way this app can neither log nor work around - no exception, and at
 /// most an ImageFailed on the bound control that nothing handles - leaving just a blank image:
 /// <list type="bullet">
-/// <item>A track's embedded ID3 art is a <c>data:</c> URI (see <see cref="Services.Metadata.Id3TagParser"/>),
-/// which <see cref="BitmapImage"/> does not support at all.</item>
+/// <item>A track's embedded ID3 art is held by <see cref="EmbeddedArtStore"/> and referred to by a
+/// <c>trdo-art:</c> URL (see <see cref="Services.Metadata.Id3TagParser"/>), which
+/// <see cref="BitmapImage"/> cannot load; a legacy <c>data:</c> URI is not supported either.</item>
 /// <item>A local album's own cover on disk is a <c>file://</c> URI (see
 /// <see cref="LocalMusicFolderScanner"/>). That does work for a plain ASCII path, but a folder
 /// with a non-ASCII character in its name ("Ow ∞") is percent-encoded in the URI and XAML's
@@ -74,14 +75,37 @@ internal static class ImageSourceFactory
     };
 
     /// <summary>
-    /// Downloaded favicon bytes by absolute URL, for the lifetime of the process. Every station
-    /// row, the now-playing card, the mini player and the popup each ask for the same URL, and
-    /// the station list asks again on every render; BitmapImage(uri) used to lean on XAML's
-    /// internal image cache for that, and this stands in for it. A failed download is evicted
-    /// (see <see cref="DownloadAsync"/>) so a later request tries again rather than replaying
-    /// the failure forever.
+    /// Downloaded favicon bytes by absolute URL. Every station row, the now-playing card, the
+    /// mini player and the popup each ask for the same URL, and the station list asks again on
+    /// every render; BitmapImage(uri) used to lean on XAML's internal image cache for that, and
+    /// this stands in for it. Bounded to <see cref="MaxDownloadCacheBytes"/> of completed
+    /// downloads, evicting the least recently used first, so browsing many stations can't grow
+    /// it for the lifetime of the process. A failed download is evicted so a later request tries
+    /// again rather than replaying the failure forever.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, Task<byte[]?>> DownloadCache = new(StringComparer.Ordinal);
+    private const long MaxDownloadCacheBytes = 8L * 1024 * 1024;
+
+    private static readonly object DownloadGate = new();
+    private static readonly Dictionary<string, DownloadEntry> DownloadCache = new(StringComparer.Ordinal);
+    private static readonly LinkedList<string> DownloadOrder = new(); // least recently used first
+    private static long _downloadCacheBytes;
+
+    private sealed class DownloadEntry(Task<byte[]?> task)
+    {
+        public Task<byte[]?> Download { get; } = task;
+        public LinkedListNode<string>? Node { get; set; }
+        public long Size { get; set; }
+    }
+
+    /// <summary>
+    /// The <see cref="BitmapImage"/> already created for a URL, while something still holds it.
+    /// Several bindings read the same now-playing art on every change notification; without
+    /// this each read built (and decoded) its own copy of the picture. Weak so a bitmap nothing
+    /// shows any more can be freed rather than pinned by the cache.
+    /// </summary>
+    private static readonly Dictionary<string, WeakReference<BitmapImage>> ImageCache = new(StringComparer.Ordinal);
+    private const int ImageCacheMinPruneCount = 64;
+    private static int _imageCachePruneAt = ImageCacheMinPruneCount;
 
     public static ImageSource? Create(string? url)
     {
@@ -90,6 +114,30 @@ internal static class ImageSourceFactory
             return null;
         }
 
+        lock (ImageCache)
+        {
+            if (ImageCache.TryGetValue(url, out WeakReference<BitmapImage>? weak) &&
+                weak.TryGetTarget(out BitmapImage? cached))
+            {
+                return cached;
+            }
+        }
+
+        BitmapImage? image = CreateCore(url);
+        if (image is not null)
+        {
+            lock (ImageCache)
+            {
+                ImageCache[url] = new WeakReference<BitmapImage>(image);
+                PruneImageCache();
+            }
+        }
+
+        return image;
+    }
+
+    private static BitmapImage? CreateCore(string url)
+    {
         // Checked before Uri parsing: a base64 payload is not something to run through Uri.
         if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
         {
@@ -99,7 +147,18 @@ internal static class ImageSourceFactory
                 return null;
             }
 
-            return LoadFromBytes(() => Task.FromResult<byte[]?>(bytes), "embedded art");
+            return LoadFromBytes(() => Task.FromResult<byte[]?>(bytes), "embedded art", url);
+        }
+
+        if (EmbeddedArtStore.IsEmbeddedUrl(url))
+        {
+            byte[]? bytes = EmbeddedArtStore.TryGet(url);
+            if (bytes is null)
+            {
+                return null;
+            }
+
+            return LoadFromBytes(() => Task.FromResult<byte[]?>(bytes), "embedded art", url);
         }
 
         if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
@@ -112,7 +171,7 @@ internal static class ImageSourceFactory
             // LocalCoverReader handles a cover that has been renamed or removed since the station
             // was scanned; the retry budget here is for one that exists but can't be read yet.
             string path = uri.LocalPath;
-            return LoadFromBytes(() => LocalCoverReader.ReadAsync(path), path, MaxFileRetries);
+            return LoadFromBytes(() => LocalCoverReader.ReadAsync(path), path, url, MaxFileRetries);
         }
 
         // Downloaded here rather than handed to BitmapImage as a URI: XAML's own loader does not
@@ -122,33 +181,136 @@ internal static class ImageSourceFactory
         // logo while every in-app Image stayed blank. Going through bytes also means a failure
         // is logged instead of silently swallowed, since none of the bound Image controls
         // handle ImageFailed.
-        return LoadFromBytes(() => DownloadAsync(uri), uri.AbsoluteUri, MaxHttpRetries);
+        return LoadFromBytes(() => DownloadAsync(uri), uri.AbsoluteUri, url, MaxHttpRetries);
+    }
+
+    // Caller holds the ImageCache lock.
+    private static void PruneImageCache()
+    {
+        if (ImageCache.Count < _imageCachePruneAt)
+        {
+            return;
+        }
+
+        List<string> dead = [];
+        foreach (KeyValuePair<string, WeakReference<BitmapImage>> entry in ImageCache)
+        {
+            if (!entry.Value.TryGetTarget(out _))
+            {
+                dead.Add(entry.Key);
+            }
+        }
+
+        foreach (string key in dead)
+        {
+            ImageCache.Remove(key);
+        }
+
+        _imageCachePruneAt = Math.Max(ImageCacheMinPruneCount, ImageCache.Count * 2);
+    }
+
+    /// <summary>
+    /// Drops the cache entry for a bitmap that ended up with nothing in it, so the next
+    /// <see cref="Create"/> for the URL makes a fresh attempt instead of handing back the blank one.
+    /// </summary>
+    private static void ForgetImage(string cacheKey, BitmapImage image)
+    {
+        lock (ImageCache)
+        {
+            if (ImageCache.TryGetValue(cacheKey, out WeakReference<BitmapImage>? weak) &&
+                weak.TryGetTarget(out BitmapImage? current) &&
+                ReferenceEquals(current, image))
+            {
+                ImageCache.Remove(cacheKey);
+            }
+        }
     }
 
     /// <summary>
     /// Fetches the image at <paramref name="uri"/>, sharing one in-flight download and one
     /// cached result between every caller asking for the same URL. Only ever called on the UI
-    /// thread (see the class remarks), so the get-or-add needs no further coordination.
+    /// thread (see the class remarks).
     /// </summary>
     private static Task<byte[]?> DownloadAsync(Uri uri)
     {
         string key = uri.AbsoluteUri;
-        return DownloadCache.GetOrAdd(key, static k => DownloadCoreAsync(k));
+
+        lock (DownloadGate)
+        {
+            if (DownloadCache.TryGetValue(key, out DownloadEntry? existing))
+            {
+                DownloadOrder.Remove(existing.Node!);
+                DownloadOrder.AddLast(existing.Node!);
+                return existing.Download;
+            }
+        }
+
+        Task<byte[]?> task = ImageDownloader.GetBytesAsync(Http, key);
+
+        lock (DownloadGate)
+        {
+            if (DownloadCache.TryGetValue(key, out DownloadEntry? raced))
+            {
+                return raced.Download;
+            }
+
+            DownloadEntry entry = new(task);
+            entry.Node = DownloadOrder.AddLast(key);
+            DownloadCache[key] = entry;
+        }
+
+        _ = task.ContinueWith(
+            static (t, state) => OnDownloadCompleted((string)state!, t),
+            key,
+            TaskScheduler.Default);
+        return task;
     }
 
-    private static async Task<byte[]?> DownloadCoreAsync(string url)
+    private static void OnDownloadCompleted(string key, Task<byte[]?> task)
     {
-        try
+        lock (DownloadGate)
         {
-            return await Http.GetByteArrayAsync(url);
+            if (!DownloadCache.TryGetValue(key, out DownloadEntry? entry) || !ReferenceEquals(entry.Download, task))
+            {
+                return;
+            }
+
+            if (task.IsFaulted || task.IsCanceled)
+            {
+                // Let the caller's retry (and any later caller) start a fresh download rather than
+                // awaiting this same faulted task. The exception itself is logged by LoadAsync.
+                _ = task.Exception;
+                RemoveDownload(key, entry);
+                return;
+            }
+
+            entry.Size = task.Result?.Length ?? 0;
+            _downloadCacheBytes += entry.Size;
+
+            LinkedListNode<string>? node = DownloadOrder.First;
+            while (_downloadCacheBytes > MaxDownloadCacheBytes && node is not null)
+            {
+                LinkedListNode<string>? next = node.Next;
+                if (DownloadCache.TryGetValue(node.Value, out DownloadEntry? candidate) && candidate.Download.IsCompleted)
+                {
+                    RemoveDownload(node.Value, candidate);
+                }
+
+                node = next;
+            }
         }
-        catch
+    }
+
+    // Caller holds DownloadGate.
+    private static void RemoveDownload(string key, DownloadEntry entry)
+    {
+        DownloadCache.Remove(key);
+        if (entry.Node is not null)
         {
-            // Let the caller's retry (and any later caller) start a fresh download rather than
-            // awaiting this same faulted task. The exception itself is logged by LoadAsync.
-            DownloadCache.TryRemove(url, out _);
-            throw;
+            DownloadOrder.Remove(entry.Node);
         }
+
+        _downloadCacheBytes -= entry.Size;
     }
 
     private static byte[]? DecodeDataUri(string url)
@@ -186,14 +348,14 @@ internal static class ImageSourceFactory
     /// change out from under a failed read (an already-decoded <c>data:</c> payload); nonzero
     /// for a file on disk that may still be mid-write.
     /// </param>
-    private static BitmapImage LoadFromBytes(Func<Task<byte[]?>> readBytes, string description, int maxRetries = 0)
+    private static BitmapImage LoadFromBytes(Func<Task<byte[]?>> readBytes, string description, string cacheKey, int maxRetries = 0)
     {
         BitmapImage image = new();
-        _ = LoadAsync(image, readBytes, description, maxRetries);
+        _ = LoadAsync(image, readBytes, description, cacheKey, maxRetries);
         return image;
     }
 
-    private static async Task LoadAsync(BitmapImage image, Func<Task<byte[]?>> readBytes, string description, int maxRetries)
+    private static async Task LoadAsync(BitmapImage image, Func<Task<byte[]?>> readBytes, string description, string cacheKey, int maxRetries)
     {
         for (int attempt = 0; ; attempt++)
         {
@@ -202,12 +364,29 @@ internal static class ImageSourceFactory
                 byte[]? bytes = await readBytes();
                 if (bytes is null)
                 {
+                    ForgetImage(cacheKey, image);
                     return;
                 }
 
                 if (ImageFormat.DetectMime(bytes) is null)
                 {
                     LogService.Warn(LogComponent, $"UI image '{description}' is not a recognized image ({ImageFormat.Describe(bytes)}); the decoder will most likely show nothing");
+                }
+
+                // Without this the decoder expands a 3000x3000 cover to 36 MB of pixels for an
+                // Image a few hundred pixels wide. Only ever shrinks: a small favicon is left
+                // alone, since a decode size above the natural size would upscale it.
+                if (ImageFormat.TryGetDimensions(bytes, out int pixelWidth, out int pixelHeight) &&
+                    Math.Max(pixelWidth, pixelHeight) > ArtworkResizer.UiDecodeEdge)
+                {
+                    if (pixelWidth >= pixelHeight)
+                    {
+                        image.DecodePixelWidth = ArtworkResizer.UiDecodeEdge;
+                    }
+                    else
+                    {
+                        image.DecodePixelHeight = ArtworkResizer.UiDecodeEdge;
+                    }
                 }
 
                 // Deliberately not disposed here, matching RadioPlayerService's SMTC thumbnail: the
@@ -232,6 +411,7 @@ internal static class ImageSourceFactory
                 if (attempt >= maxRetries)
                 {
                     LogService.Warn(LogComponent, $"UI image '{description}' failed to load: {ex.GetType().Name}: {ex.Message}");
+                    ForgetImage(cacheKey, image);
                     return;
                 }
 

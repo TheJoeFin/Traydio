@@ -122,6 +122,13 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            // A speaker fetching the stream itself is the only thing that knows whether it
+            // is playing; the local engines are idle for the whole cast.
+            if (UsesSonosForActiveSource)
+            {
+                return _sonosState == SonosPlaybackState.Playing;
+            }
+
             switch (_activeSourceKind)
             {
                 case AudioSourceKind.WhiteNoise:
@@ -145,6 +152,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return _sonosState == SonosPlaybackState.Starting;
+            }
+
             switch (_activeSourceKind)
             {
                 case AudioSourceKind.WhiteNoise:
@@ -211,6 +223,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return SonosPosition;
+            }
+
             try
             {
                 return ActiveBackend.Position;
@@ -230,6 +247,11 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         get
         {
+            if (UsesSonosForActiveSource)
+            {
+                return SonosDuration;
+            }
+
             try
             {
                 return ActiveBackend.Duration;
@@ -244,6 +266,12 @@ public sealed partial class RadioPlayerService : IDisposable
     /// <summary>Seeks the active backend to <paramref name="position"/>. Meaningful only for <see cref="AudioSourceKind.Files"/>.</summary>
     public void Seek(TimeSpan position)
     {
+        if (UsesSonosForActiveSource)
+        {
+            SeekOnSonos(position);
+            return;
+        }
+
         try
         {
             ActiveBackend.Seek(position);
@@ -475,6 +503,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
 
         InitializePlaybackEngine();
+        InitializeCastIdleTimeout();
 
         // Initialize SystemMediaTransportControls
         try
@@ -1037,6 +1066,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         LogService.Info("RadioPlayerService",
             $"Play requested for {LogService.Redact(_streamUrl)} (hasPlayedOnce={_hasPlayedOnce}, wasExternalPause={_wasExternalPause})");
+        _castIdleTimeout.Reset();
 
         // A real play attempt is starting, so any buffering it reports from here on is genuine
         // and radio static should be allowed to react to it again - see _isUserPaused.
@@ -1081,6 +1111,15 @@ public sealed partial class RadioPlayerService : IDisposable
         // Cancel any in-flight play attempt (e.g. still buffering) before starting a new one
         CancelPendingPlayAttempt();
         _playAttemptCts = new CancellationTokenSource();
+
+        if (UsesSonosForActiveSource)
+        {
+            // The speaker fetches the stream itself; nothing here buffers or plays. See
+            // RadioPlayerService.Sonos.cs.
+            _ = PlayOnSonosAsync(_playAttemptCts.Token);
+            Debug.WriteLine($"=== Play END (sonos) ===");
+            return;
+        }
 
         // Always use buffer-aware playback to apply buffer settings
         // Fire and forget - PlayWithBufferAsync handles everything including buffering
@@ -1146,7 +1185,7 @@ public sealed partial class RadioPlayerService : IDisposable
     /// </para>
     /// </summary>
     private bool IsPlaybackWanted =>
-        ActiveBackend.IsPlaying || _playAttemptCts is { IsCancellationRequested: false };
+        IsPlaying || _playAttemptCts is { IsCancellationRequested: false };
 
     /// <summary>
     /// Cancels an in-flight play attempt started by Play(), if one is pending.
@@ -1466,6 +1505,14 @@ public sealed partial class RadioPlayerService : IDisposable
         {
             // See Play(): this is a caller with nothing to play yet, not a failure.
             Debug.WriteLine("[RadioPlayerService] PlayWithBufferAsync called with no stream URL set");
+            return false;
+        }
+
+        if (UsesSonosForActiveSource)
+        {
+            // Recovery and rebuild paths are about the local engines, which are idle while a
+            // speaker fetches the stream. Nothing here can help the speaker.
+            LogService.Info("RadioPlayerService", "PlayWithBufferAsync skipped: playback is on a Sonos speaker");
             return false;
         }
 
@@ -1972,6 +2019,13 @@ public sealed partial class RadioPlayerService : IDisposable
             return;
         }
 
+        if (UsesSonosForActiveSource)
+        {
+            PauseOnSonos();
+            Debug.WriteLine($"=== Pause END (sonos) ===");
+            return;
+        }
+
         switch (_activeSourceKind)
         {
             case AudioSourceKind.WhiteNoise:
@@ -2310,7 +2364,7 @@ public sealed partial class RadioPlayerService : IDisposable
                 }
                 else
                 {
-                    updater.MusicProperties.Artist = _currentStationName ?? "Radio Station";
+                    updater.MusicProperties.Artist = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
                     updater.MusicProperties.AlbumArtist = string.Empty;
                 }
 
@@ -2325,19 +2379,19 @@ public sealed partial class RadioPlayerService : IDisposable
                 }
                 else
                 {
-                    updater.MusicProperties.Title = "Now Playing";
+                    updater.MusicProperties.Title = LocalizationService.GetString("Smtc_NowPlaying", "Now Playing");
                 }
 
                 // Set album title to station name for additional context
-                updater.MusicProperties.AlbumTitle = _currentStationName ?? "Radio Station";
+                updater.MusicProperties.AlbumTitle = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
 
                 Debug.WriteLine($"[RadioPlayerService] SMTC updated with metadata - Artist: {updater.MusicProperties.Artist}, Title: {updater.MusicProperties.Title}, Album: {updater.MusicProperties.AlbumTitle}");
             }
             else
             {
                 // No metadata available, show station name
-                updater.MusicProperties.Artist = _currentStationName ?? "Radio Station";
-                updater.MusicProperties.Title = "Streaming...";
+                updater.MusicProperties.Artist = _currentStationName ?? LocalizationService.GetString("Smtc_RadioStation", "Radio Station");
+                updater.MusicProperties.Title = LocalizationService.GetString("Smtc_Streaming", "Streaming...");
                 updater.MusicProperties.AlbumArtist = string.Empty;
                 updater.MusicProperties.AlbumTitle = string.Empty;
                 Debug.WriteLine($"[RadioPlayerService] SMTC updated with station name: {_currentStationName}");
@@ -2432,7 +2486,19 @@ public sealed partial class RadioPlayerService : IDisposable
         try
         {
             byte[] imageData;
-            if (imageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            if (EmbeddedArtStore.IsEmbeddedUrl(imageUrl))
+            {
+                byte[]? stored = EmbeddedArtStore.TryGet(imageUrl);
+                if (stored is null)
+                {
+                    LogService.Warn("AlbumArt", "SMTC art is no longer available in the embedded art store");
+                    return false;
+                }
+
+                imageData = stored;
+                Debug.WriteLine($"[RadioPlayerService] Using embedded album art ({imageData.Length} bytes)");
+            }
+            else if (imageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             {
                 int commaIndex = imageUrl.IndexOf(',');
                 if (commaIndex < 0)
@@ -2465,7 +2531,14 @@ public sealed partial class RadioPlayerService : IDisposable
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
-                imageData = await _httpClient.GetByteArrayAsync(imageUrl);
+                byte[]? downloaded = await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
+                if (downloaded is null)
+                {
+                    // Over the size limit; already logged.
+                    return false;
+                }
+
+                imageData = downloaded;
                 Debug.WriteLine($"[RadioPlayerService] Downloaded {imageData.Length} bytes of album art");
             }
 
@@ -2477,6 +2550,9 @@ public sealed partial class RadioPlayerService : IDisposable
                 LogService.Warn("AlbumArt", $"SMTC art is not a recognized image; skipping it: {ImageFormat.Describe(imageData)}");
                 return false;
             }
+
+            // The shell shows this at well under 600 px; handing it a 3000 px cover only costs memory.
+            imageData = await ArtworkResizer.DownscaleAsync(imageData, ArtworkResizer.SmtcEdge);
 
             // Create a random access stream from the image data
             InMemoryRandomAccessStream stream = new();

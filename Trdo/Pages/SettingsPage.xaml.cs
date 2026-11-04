@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using Trdo.Controls;
 using Trdo.Services;
 using Trdo.Services.Audio;
 using Trdo.Services.Playback;
@@ -46,6 +47,18 @@ public sealed partial class SettingsPage : Page
     {
         if (Application.Current is App app)
             app.ShowSongChangePopupDemo();
+    }
+
+    private void LastfmConnectButton_Click(object sender, RoutedEventArgs e)
+    {
+        LastfmAuthWindow authWindow = new();
+        WindowHelper.Track(authWindow);
+        authWindow.Activate();
+    }
+
+    private void LastfmDisconnectButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.DisconnectLastfm();
     }
 
     /// <summary>

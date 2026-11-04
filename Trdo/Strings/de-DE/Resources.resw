@@ -89,6 +89,231 @@
   <data name="AboutPage_DeveloperTitle.Text" xml:space="preserve">
     <value>Entwickler</value>
   </data>
+  <data name="AboutPage_TranslatorsTitle.Text" xml:space="preserve">
+    <value>Übersetzungen</value>
+  </data>
+  <data name="AboutPage_AppDescription" xml:space="preserve">
+    <value>Ein einfacher, eleganter Internetradio-Player für Windows</value>
+  </data>
+  <data name="Delay_None" xml:space="preserve">
+    <value>Keine Verzögerung</value>
+  </data>
+  <data name="Duration_OneMinute" xml:space="preserve">
+    <value>1 Minute</value>
+  </data>
+  <data name="Duration_Seconds_One" xml:space="preserve">
+    <value>{0} Sekunde</value>
+  </data>
+  <data name="Duration_Seconds_Other" xml:space="preserve">
+    <value>{0} Sekunden</value>
+  </data>
+  <data name="BufferLevel_Default" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="BufferLevel_Medium" xml:space="preserve">
+    <value>Mittel</value>
+  </data>
+  <data name="BufferLevel_Large" xml:space="preserve">
+    <value>Groß</value>
+  </data>
+  <data name="BufferLevel_ExtraLarge" xml:space="preserve">
+    <value>Sehr groß</value>
+  </data>
+  <data name="AddStation_BufferSummary_Station" xml:space="preserve">
+    <value>Puffer: {0} (dieser Sender)</value>
+  </data>
+  <data name="AddStation_BufferSummary_App" xml:space="preserve">
+    <value>Puffer: {0} (App-Einstellung)</value>
+  </data>
+  <data name="AddStation_DelaySummary_Station" xml:space="preserve">
+    <value>Titelinfo-Verzögerung: {0} (dieser Sender)</value>
+  </data>
+  <data name="AddStation_DelaySummary_App" xml:space="preserve">
+    <value>Titelinfo-Verzögerung: {0} (App-Einstellung)</value>
+  </data>
+  <data name="SongPopupMenu_Header" xml:space="preserve">
+    <value>Titelinfo-Verzögerung</value>
+  </data>
+  <data name="SongPopupMenu_HeaderStation" xml:space="preserve">
+    <value>Titelinfo-Verzögerung für {0}</value>
+  </data>
+  <data name="SongPopupMenu_UseAppSetting" xml:space="preserve">
+    <value>App-Einstellung verwenden ({0})</value>
+  </data>
+  <data name="SongPopupMenu_CurrentlyNoStation" xml:space="preserve">
+    <value>Aktuell {0} (kein Sender ausgewählt)</value>
+  </data>
+  <data name="SongPopupMenu_TurnOff" xml:space="preserve">
+    <value>Song-Popups ausschalten</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="Dialog_Export" xml:space="preserve">
+    <value>Exportieren</value>
+  </data>
+  <data name="Dialog_LookUp" xml:space="preserve">
+    <value>Nachschlagen</value>
+  </data>
+  <data name="Fav_NothingToExport_Title" xml:space="preserve">
+    <value>Nichts zu exportieren</value>
+  </data>
+  <data name="Fav_NothingToExport_Body" xml:space="preserve">
+    <value>Markieren Sie zuerst einige Songs als Favoriten.</value>
+  </data>
+  <data name="Fav_ExportAll_Header" xml:space="preserve">
+    <value>Alle Favoriten exportieren</value>
+  </data>
+  <data name="Fav_ExportAll_Off" xml:space="preserve">
+    <value>Nur neue ({0} von {1})</value>
+  </data>
+  <data name="Fav_ExportAll_On" xml:space="preserve">
+    <value>Alle Favoriten ({0})</value>
+  </data>
+  <data name="Fav_Archive" xml:space="preserve">
+    <value>Exportierte Titel archivieren</value>
+  </data>
+  <data name="Fav_ExportHelp" xml:space="preserve">
+    <value>CSV funktioniert mit Playlist-Transferdiensten wie Soundiiz oder TuneMyMusic. XSPF ist eine Playlist-Datei für Player wie VLC. Das Format wählen Sie beim Speichern.</value>
+  </data>
+  <data name="Fav_ArchiveHelp" xml:space="preserve">
+    <value>Archivierte Titel bleiben in Ihren Favoriten, werden aber bei späteren Exporten übersprungen.</value>
+  </data>
+  <data name="Fav_ExportDialog_Title" xml:space="preserve">
+    <value>Favoriten exportieren</value>
+  </data>
+  <data name="Fav_NothingNew_Title" xml:space="preserve">
+    <value>Nichts Neues zu exportieren</value>
+  </data>
+  <data name="Fav_NothingNew_Body" xml:space="preserve">
+    <value>Alle Favoriten wurden bereits exportiert. Aktivieren Sie „{0}“ oder löschen Sie den Exportverlauf.</value>
+  </data>
+  <data name="Fav_ExportComplete_Title" xml:space="preserve">
+    <value>Export abgeschlossen</value>
+  </data>
+  <data name="Fav_ExportComplete_One" xml:space="preserve">
+    <value>{0} Titel nach {1} exportiert.</value>
+  </data>
+  <data name="Fav_ExportComplete_Other" xml:space="preserve">
+    <value>{0} Titel nach {1} exportiert.</value>
+  </data>
+  <data name="Fav_Archived" xml:space="preserve">
+    <value>{0} archiviert und beim nächsten Mal übersprungen.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Title" xml:space="preserve">
+    <value>Exportverlauf gelöscht</value>
+  </data>
+  <data name="Fav_HistoryCleared_One" xml:space="preserve">
+    <value>{0} Titel wird in den nächsten Export aufgenommen.</value>
+  </data>
+  <data name="Fav_HistoryCleared_Other" xml:space="preserve">
+    <value>{0} Titel werden in den nächsten Export aufgenommen.</value>
+  </data>
+  <data name="Lookup_NoMatch_Title" xml:space="preserve">
+    <value>Keine Übereinstimmung gefunden</value>
+  </data>
+  <data name="Lookup_NoMatch_Body" xml:space="preserve">
+    <value>radio-browser.info hat keinen Eintrag für die Stream-Adresse dieses Senders, daher gibt es keine Details zum Hinzufügen.</value>
+  </data>
+  <data name="Lookup_Updated_Title" xml:space="preserve">
+    <value>{0} aktualisiert</value>
+  </data>
+  <data name="Lookup_Unreachable_Title" xml:space="preserve">
+    <value>radio-browser.info nicht erreichbar</value>
+  </data>
+  <data name="Lookup_Unreachable_Body" xml:space="preserve">
+    <value>Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</value>
+  </data>
+  <data name="Lookup_Overwrite" xml:space="preserve">
+    <value>Auch Sender aktualisieren, die bereits Details haben</value>
+  </data>
+  <data name="Lookup_Body_None" xml:space="preserve">
+    <value>Alle Ihre Sender haben bereits Details. Sie können sie erneut nachschlagen, um Änderungen zu übernehmen.</value>
+  </data>
+  <data name="Lookup_Body_One" xml:space="preserve">
+    <value>Für einen Sender sind weder Genre noch Land gespeichert.</value>
+  </data>
+  <data name="Lookup_Body_Many" xml:space="preserve">
+    <value>Für {0} Sender sind weder Genre noch Land gespeichert.</value>
+  </data>
+  <data name="Lookup_Privacy" xml:space="preserve">
+    <value>{0} Traydio fragt radio-browser.info nach ihnen. Es wird nur die Stream-Adresse jedes Senders gesendet.</value>
+  </data>
+  <data name="Lookup_Preflight_Title" xml:space="preserve">
+    <value>Senderdetails nachschlagen</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Title" xml:space="preserve">
+    <value>Nichts nachzuschlagen</value>
+  </data>
+  <data name="Lookup_NothingToLookUp_Body" xml:space="preserve">
+    <value>Jeder Sender wurde kürzlich geprüft. Versuchen Sie es in ein paar Tagen erneut.</value>
+  </data>
+  <data name="Lookup_Starting" xml:space="preserve">
+    <value>Wird gestartet…</value>
+  </data>
+  <data name="Lookup_Finishing" xml:space="preserve">
+    <value>Wird abgeschlossen…</value>
+  </data>
+  <data name="Lookup_Progress" xml:space="preserve">
+    <value>{0} von {1} · {2}</value>
+  </data>
+  <data name="Lookup_Progress_Title" xml:space="preserve">
+    <value>Senderdetails werden nachgeschlagen</value>
+  </data>
+  <data name="Lookup_Result_Title" xml:space="preserve">
+    <value>Senderdetails</value>
+  </data>
+  <data name="Lookup_Summary_Updated" xml:space="preserve">
+    <value>{0} von {1} Sendern aktualisiert.</value>
+  </data>
+  <data name="Lookup_Summary_NotFound" xml:space="preserve">
+    <value>{0} hatten keinen Eintrag auf radio-browser.info.</value>
+  </data>
+  <data name="Lookup_Summary_Ambiguous" xml:space="preserve">
+    <value>{0} passten zu mehr als einem Eintrag; der nächstliegende wurde verwendet.</value>
+  </data>
+  <data name="Lookup_Summary_Skipped" xml:space="preserve">
+    <value>{0} wurden für das nächste Mal zurückgestellt, um die Anzahl der Anfragen vertretbar zu halten.</value>
+  </data>
+  <data name="Lookup_Summary_Unreachable" xml:space="preserve">
+    <value>Vorzeitig beendet, da radio-browser.info nicht mehr antwortete.</value>
+  </data>
+  <data name="Lookup_Summary_Cancelled" xml:space="preserve">
+    <value>Auf Ihren Wunsch beendet. Bisher Gefundenes wurde gespeichert.</value>
+  </data>
+  <data name="Lookup_NoExtraDetails" xml:space="preserve">
+    <value>Keine weiteren Details verfügbar.</value>
+  </data>
+  <data name="Group_Delete_Title" xml:space="preserve">
+    <value>„{0}“ löschen?</value>
+  </data>
+  <data name="Group_Delete_One" xml:space="preserve">
+    <value>Der Sender in dieser Gruppe wird ebenfalls entfernt. Dies kann nicht rückgängig gemacht werden.</value>
+  </data>
+  <data name="Group_Delete_Many" xml:space="preserve">
+    <value>Alle {0} Sender in dieser Gruppe werden ebenfalls entfernt. Dies kann nicht rückgängig gemacht werden.</value>
+  </data>
+  <data name="AddStationFallback_Title" xml:space="preserve">
+    <value>Sender hinzufügen</value>
+  </data>
+  <data name="AddStationFallback_Body" xml:space="preserve">
+    <value>Die Funktion zum Hinzufügen von Sendern folgt in Kürze!</value>
+  </data>
+  <data name="Smtc_NowPlaying" xml:space="preserve">
+    <value>Wiedergabe läuft</value>
+  </data>
+  <data name="Smtc_RadioStation" xml:space="preserve">
+    <value>Radiosender</value>
+  </data>
+  <data name="Smtc_Streaming" xml:space="preserve">
+    <value>Streaming...</value>
+  </data>
   <data name="AboutPage_EnjoyingPrompt.Text" xml:space="preserve">
     <value>Gefällt dir Traydio?</value>
   </data>
@@ -311,6 +536,33 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Fenster anzeigen</value>
   </data>
+  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Übertragen</value>
+  </data>
+  <data name="CastDeviceDialog.Title" xml:space="preserve">
+    <value>An Gerät übertragen</value>
+  </data>
+  <data name="CastDeviceDialog_CurrentlyCasting" xml:space="preserve">
+    <value>Wird gerade an {0} übertragen</value>
+  </data>
+  <data name="CastDeviceDialog_Empty.Text" xml:space="preserve">
+    <value>Noch keine Geräte gefunden. Stelle sicher, dass das Gerät eingeschaltet und mit demselben Netzwerk wie dieser PC verbunden ist.</value>
+  </data>
+  <data name="CastDeviceDialog_Failed" xml:space="preserve">
+    <value>Übertragung an {0} nicht möglich: {1}</value>
+  </data>
+  <data name="CastDeviceDialog_Searching.Text" xml:space="preserve">
+    <value>Suche nach Geräten in deinem Netzwerk…</value>
+  </data>
+  <data name="CastDeviceDialog_StopCasting" xml:space="preserve">
+    <value>Übertragung beenden</value>
+  </data>
+  <data name="CastDeviceDialog_Unavailable.Text" xml:space="preserve">
+    <value>Übertragen ist auf diesem PC nicht verfügbar, da die LibVLC-Wiedergabe-Engine nicht geladen werden konnte.</value>
+  </data>
   <data name="FavoritesPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Tippe auf das Stern-Symbol bei Songs, die dir gefallen, um sie hier zu speichern</value>
   </data>
@@ -467,6 +719,12 @@
   <data name="PlayingPage_AddFirstStation.Text" xml:space="preserve">
     <value>Füge deinen ersten Sender hinzu</value>
   </data>
+  <data name="PlayingPage_Cast" xml:space="preserve">
+    <value>Übertragen…</value>
+  </data>
+  <data name="PlayingPage_CastingTo" xml:space="preserve">
+    <value>Übertragung an {0}…</value>
+  </data>
   <data name="PlayingPage_DeleteGroup.Text" xml:space="preserve">
     <value>Gruppe löschen</value>
   </data>
@@ -581,6 +839,9 @@
   <data name="PlayingPage_StationsHeader.Text" xml:space="preserve">
     <value>Sender</value>
   </data>
+  <data name="PlayingPage_StopCasting.Text" xml:space="preserve">
+    <value>Übertragung beenden</value>
+  </data>
   <data name="PlayingPage_ViewAlbumTracks.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Albumtitel anzeigen</value>
   </data>
@@ -686,6 +947,12 @@
   <data name="SettingsPage_Language_Polish.Content" xml:space="preserve">
     <value>Polnisch</value>
   </data>
+  <data name="SettingsPage_Language_Russian.Content" xml:space="preserve">
+    <value>Russisch</value>
+  </data>
+  <data name="SettingsPage_Language_Turkish.Content" xml:space="preserve">
+    <value>Türkisch</value>
+  </data>
   <data name="SettingsPage_LanguageDescription.Text" xml:space="preserve">
     <value>Wähle die Sprache, die in der gesamten App verwendet wird.</value>
   </data>
@@ -745,6 +1012,9 @@
   </data>
   <data name="SettingsPage_RadioStaticDescription.Text" xml:space="preserve">
     <value>Füllt die Stille beim Laden eines Senders mit sanftem UKW-Radiorauschen. Es schwillt an, statt abrupt einzusetzen, und blendet wieder aus, sobald der Sender ankommt.</value>
+  </data>
+  <data name="SettingsPage_RadioStaticLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lautstärke des Radiorauschens</value>
   </data>
   <data name="SettingsPage_RadioStaticTestButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Radiorauschen anhören</value>
@@ -812,11 +1082,17 @@
   <data name="SettingsPage_TrayClickAction_MuteUnmute.Content" xml:space="preserve">
     <value>Stumm schalten / Ton an</value>
   </data>
+  <data name="SettingsPage_TrayClickAction_NextStationOrTrack.Content" xml:space="preserve">
+    <value>Nächster Sender / Titel</value>
+  </data>
   <data name="SettingsPage_TrayClickAction_None.Content" xml:space="preserve">
     <value>Nichts tun</value>
   </data>
   <data name="SettingsPage_TrayClickAction_PlayPause.Content" xml:space="preserve">
     <value>Abspielen / Pause</value>
+  </data>
+  <data name="SettingsPage_TrayClickAction_PreviousStationOrTrack.Content" xml:space="preserve">
+    <value>Vorheriger Sender / Titel</value>
   </data>
   <data name="SettingsPage_TrayClickAction_ShowFlyout.Content" xml:space="preserve">
     <value>Traydio öffnen</value>
@@ -880,6 +1156,9 @@
   </data>
   <data name="TrayIcon_AddStation" xml:space="preserve">
     <value>Traydio - Füge einen Sender hinzu, um mit dem Hören zu beginnen</value>
+  </data>
+  <data name="TrayIcon_CastingTo" xml:space="preserve">
+    <value>auf {0}</value>
   </data>
   <data name="TrayIcon_LeftClickToPause" xml:space="preserve">
     <value>Linksklick zum Pausieren</value>
@@ -959,5 +1238,296 @@
   </data>
   <data name="TutorialWindow_WelcomeTitle.Text" xml:space="preserve">
     <value>Willkommen bei Traydio!</value>
+  </data>
+  <data name="CastDeviceDialog_Available" xml:space="preserve">
+    <value>Verfügbar</value>
+  </data>
+  <data name="CastDeviceDialog_Checking" xml:space="preserve">
+    <value>Verfügbarkeit wird geprüft...</value>
+  </data>
+  <data name="CastDeviceDialog_Offline" xml:space="preserve">
+    <value>Nicht verfügbar</value>
+  </data>
+  <data name="CastDeviceDialog_PreviouslyUsed" xml:space="preserve">
+    <value>Zuvor verwendet - {0}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceStatus" xml:space="preserve">
+    <value>{0} - {1}</value>
+  </data>
+  <data name="CastDeviceDialog_DeviceUnavailable" xml:space="preserve">
+    <value>{0} ist in diesem Netzwerk nicht verfügbar.</value>
+  </data>
+  <data name="Sonos_SwitchSuperseded" xml:space="preserve">
+    <value>Ein anderes Gerät wurde ausgewählt, bevor die Verbindung zu diesem hergestellt war.</value>
+  </data>
+  <data name="CastDeviceDialog_Connecting" xml:space="preserve">
+    <value>Verbindung wird hergestellt...</value>
+  </data>
+  <data name="CastDeviceDialog_StartFailed" xml:space="preserve">
+    <value>Das Gerät hat die Wiedergabe nicht gestartet.</value>
+  </data>
+  <data name="CastDeviceDialog_RendererRejected" xml:space="preserve">
+    <value>Die Wiedergabe-Engine hat das Übertragungsgerät abgelehnt.</value>
+  </data>
+  <data name="CastDeviceDialog_ThisPc" xml:space="preserve">
+    <value>diesen PC</value>
+  </data>
+  <data name="PlayingPage_CastPreferenceSaveFailed" xml:space="preserve">
+    <value>Die Übertragungseinstellung konnte nicht gespeichert werden: {0}</value>
+  </data>
+  <data name="PlayingPage_HideCastShortcut.Text" xml:space="preserve">
+    <value>Übertragungsschaltfläche in diesem WLAN ausblenden</value>
+  </data>
+  <data name="PlayingPage_ShowCastShortcut.Text" xml:space="preserve">
+    <value>Übertragungsschaltfläche in diesem WLAN anzeigen</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutTitle.Text" xml:space="preserve">
+    <value>Übertragung automatisch beenden</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeoutDescription.Text" xml:space="preserve">
+    <value>Zu diesem Gerät zurückkehren, wenn die Wiedergabe so lange pausiert oder gestoppt ist. Die Wiedergabe bleibt pausiert.</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout.AutomationProperties.Name" xml:space="preserve">
+    <value>Übertragung nach Inaktivität beenden</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Never" xml:space="preserve">
+    <value>Nie</value>
+  </data>
+  <data name="SettingsPage_CastIdleTimeout_Minutes" xml:space="preserve">
+    <value>{0} Minuten</value>
+  </data>
+  <data name="CastIdleTimeout_EndFailed" xml:space="preserve">
+    <value>Die Übertragung konnte nicht automatisch beendet werden. Versuchen Sie Übertragung beenden.</value>
+  </data>
+  <data name="SearchStation_PreviewButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sender vorhören</value>
+  </data>
+  <data name="SearchStation_EditButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Senderdetails vor dem Hinzufügen bearbeiten</value>
+  </data>
+  <data name="SearchStation_AddButton.Content" xml:space="preserve">
+    <value>Sender hinzufügen</value>
+  </data>
+  <data name="SearchStation_Title.Text" xml:space="preserve">
+    <value>Radiosender suchen</value>
+  </data>
+  <data name="SearchStation_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Nach Name suchen oder Filter verwenden...</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="SearchStation_FilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="SearchStation_RemoveFilterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Diesen Filter entfernen</value>
+  </data>
+  <data name="SearchStation_ErrorBar.Title" xml:space="preserve">
+    <value>Suchfehler</value>
+  </data>
+  <data name="SearchStation_FilterQuery.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Land, Sprache oder Genre suchen</value>
+  </data>
+  <data name="SearchStation_FilterQuery.PlaceholderText" xml:space="preserve">
+    <value>Land, Sprache oder Genre...</value>
+  </data>
+  <data name="SearchStation_NoSuggestions.Text" xml:space="preserve">
+    <value>Kein Land, keine Sprache und kein Genre passt dazu.</value>
+  </data>
+  <data name="SearchStation_QualityAndOrder.Text" xml:space="preserve">
+    <value>Qualität und Reihenfolge</value>
+  </data>
+  <data name="SearchStation_Codec.Text" xml:space="preserve">
+    <value>Codec</value>
+  </data>
+  <data name="SearchStation_MinimumBitrate.Text" xml:space="preserve">
+    <value>Mindestbitrate</value>
+  </data>
+  <data name="SearchStation_SortBy.Text" xml:space="preserve">
+    <value>Sortieren nach</value>
+  </data>
+  <data name="SearchStation_HideBroken.Content" xml:space="preserve">
+    <value>Defekte Sender ausblenden</value>
+  </data>
+  <data name="SearchStation_ClearAll.Content" xml:space="preserve">
+    <value>Alle löschen</value>
+  </data>
+  <data name="SearchStation_ShowResults.Content" xml:space="preserve">
+    <value>Ergebnisse anzeigen</value>
+  </data>
+  <data name="SearchStation_Recent.Text" xml:space="preserve">
+    <value>Zuletzt:</value>
+  </data>
+  <data name="SearchStation_PopularNearMe.Content" xml:space="preserve">
+    <value>Beliebte in meiner Nähe anzeigen</value>
+  </data>
+  <data name="SearchStation_ManualEntry.Content" xml:space="preserve">
+    <value>Oder Sender manuell hinzufügen</value>
+  </data>
+  <data name="SearchStation_AddWhiteNoise.Text" xml:space="preserve">
+    <value>Weißes Rauschen hinzufügen...</value>
+  </data>
+  <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
+    <value>Lokale Musik hinzufügen...</value>
+  </data>
+  <data name="MiniPlayer_WindowTitle" xml:space="preserve">
+    <value>Traydio Mini-Player</value>
+  </data>
+  <data name="MiniPlayer_TitleBar.Subtitle" xml:space="preserve">
+    <value>Mini-Player</value>
+  </data>
+  <data name="MiniPlayer_ShowVisualizer.Text" xml:space="preserve">
+    <value>Visualisierung anzeigen</value>
+  </data>
+  <data name="MiniPlayer_AlwaysOnTop.Text" xml:space="preserve">
+    <value>Immer im Vordergrund</value>
+  </data>
+  <data name="MiniPlayer_HideTitleBar.Text" xml:space="preserve">
+    <value>Titelleiste ausblenden</value>
+  </data>
+  <data name="ManualStationWindow_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Senderlautstärke</value>
+  </data>
+  <data name="ManualStationWindow_BufferLevelSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Pufferstand des Senders</value>
+  </data>
+  <data name="ManualStationWindow_SongPopupDelaySlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Verzögerung der Titelinfo des Senders in Sekunden</value>
+  </data>
+  <data name="AddLocalMusic_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lautstärke</value>
+  </data>
+  <data name="AddWhiteNoise_VolumeSlider.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lautstärke</value>
+  </data>
+  <data name="FavoritesPage_Options.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Weitere Favoritenoptionen</value>
+  </data>
+  <data name="FavoritesPage_ClearExportHistory.Text" xml:space="preserve">
+    <value>Exportverlauf löschen</value>
+  </data>
+  <data name="FavoritesPage_MusicSearchSettings.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Einstellungen für die Musiksuche</value>
+  </data>
+  <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Für Details klicken</value>
+  </data>
+  <data name="AboutPage_SonosAcknowledgement.Text" xml:space="preserve">
+    <value>Die Sonos-Übertragung wurde stark von RoomRelay und dessen Autor guicn555 beeinflusst. Vielen Dank!</value>
+  </data>
+  <data name="LastfmAuth_ContinueButton.Text" xml:space="preserve">
+    <value>Weiter</value>
+  </data>
+  <data name="LastfmAuth_Finishing" xml:space="preserve">
+    <value>Wird abgeschlossen...</value>
+  </data>
+  <data name="LastfmAuth_GenericError" xml:space="preserve">
+    <value>Verbindung mit Last.fm nicht möglich. Bitte versuche es später erneut.</value>
+  </data>
+  <data name="LastfmAuth_NotConfigured" xml:space="preserve">
+    <value>Last.fm ist für diese Version nicht konfiguriert.</value>
+  </data>
+  <data name="LastfmAuth_NotYetApproved" xml:space="preserve">
+    <value>Last.fm hat deine Bestätigung noch nicht erhalten. Stelle sicher, dass du den Zugriff im Browser bestätigt hast, und wähle dann erneut „Weiter“.</value>
+  </data>
+  <data name="LastfmAuth_OpeningBrowser.Text" xml:space="preserve">
+    <value>Verbindung mit Last.fm wird hergestellt...</value>
+  </data>
+  <data name="LastfmAuth_RequestingToken" xml:space="preserve">
+    <value>Verbindung mit Last.fm wird hergestellt...</value>
+  </data>
+  <data name="LastfmAuth_TitleBar.Title" xml:space="preserve">
+    <value>Mit Last.fm verbinden</value>
+  </data>
+  <data name="LastfmAuth_WaitingForApproval" xml:space="preserve">
+    <value>Bestätige den Zugriff auf dein Last.fm-Konto im soeben geöffneten Browserfenster, kehre dann hierher zurück und wähle „Weiter“.</value>
+  </data>
+  <data name="LastfmAuth_WindowTitle" xml:space="preserve">
+    <value>Mit Last.fm verbinden</value>
+  </data>
+  <data name="Lastfm_ConnectedAs" xml:space="preserve">
+    <value>Verbunden als {0}</value>
+  </data>
+  <data name="Lastfm_NotConnected" xml:space="preserve">
+    <value>Nicht verbunden</value>
+  </data>
+  <data name="SettingsPage_LastfmConnectButton.Content" xml:space="preserve">
+    <value>Verbinden</value>
+  </data>
+  <data name="SettingsPage_LastfmDescription.Text" xml:space="preserve">
+    <value>Scrobble automatisch, was du hörst – im Radio und in deiner lokalen Bibliothek – in dein Last.fm-Konto.</value>
+  </data>
+  <data name="SettingsPage_LastfmDisconnectButton.Content" xml:space="preserve">
+    <value>Trennen</value>
+  </data>
+  <data name="SettingsPage_LastfmTitle.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="PlayingPage_CastingOptions.Text" xml:space="preserve">
+    <value>Übertragungsoptionen</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Lautsprecher stummschalten / Stummschaltung aufheben</value>
+  </data>
+  <data name="PlayingPage_SpeakerMuteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lautsprecher stummschalten / Stummschaltung aufheben</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Übertragungsoptionen</value>
+  </data>
+  <data name="PlayingPage_SpeakerCastButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Übertragungsoptionen</value>
+  </data>
+  <data name="PlayingPage_SpeakerVolume" xml:space="preserve">
+    <value>Lautstärke von {0}</value>
+  </data>
+  <data name="Sonos_ReportedDetail" xml:space="preserve">
+    <value>{0} meldete: {1}</value>
+  </data>
+  <data name="Sonos_StartTimeout" xml:space="preserve">
+    <value>{0} hat die Wiedergabe nicht rechtzeitig gestartet.</value>
+  </data>
+  <data name="Sonos_StoppedUnexpectedly" xml:space="preserve">
+    <value>{0} hat die Wiedergabe des Streams beendet.</value>
+  </data>
+  <data name="CastPage_AddToGroup" xml:space="preserve">
+    <value>Zur Gruppe hinzufügen</value>
+  </data>
+  <data name="CastPage_RemoveFromGroup" xml:space="preserve">
+    <value>Aus Gruppe entfernen</value>
+  </data>
+  <data name="CastPage_GroupSpeakers" xml:space="preserve">
+    <value>Lautsprecher gruppieren…</value>
+  </data>
+  <data name="GroupSpeakersPage_Title" xml:space="preserve">
+    <value>Lautsprecher gruppieren</value>
+  </data>
+  <data name="GroupSpeakersPage_Hint" xml:space="preserve">
+    <value>Wähle die Lautsprecher aus, die zusammen wiedergeben sollen.</value>
+  </data>
+  <data name="GroupSpeakersPage_Warning" xml:space="preserve">
+    <value>Hinzugefügte Lautsprecher beenden ihre aktuelle Wiedergabe und folgen der Gruppe.</value>
+  </data>
+  <data name="GroupSpeakersPage_NameHeader" xml:space="preserve">
+    <value>Gruppenname</value>
+  </data>
+  <data name="GroupSpeakersPage_Apply" xml:space="preserve">
+    <value>Übernehmen</value>
+  </data>
+  <data name="GroupSpeakersPage_NotGrouped" xml:space="preserve">
+    <value>Nicht gruppiert</value>
+  </data>
+  <data name="GroupSpeakersPage_PlayingWith" xml:space="preserve">
+    <value>Wiedergabe mit {0}</value>
+  </data>
+  <data name="GroupSpeakersPage_TooFew" xml:space="preserve">
+    <value>Für das Gruppieren sind mindestens zwei Sonos-Lautsprecher in diesem Netzwerk erforderlich.</value>
+  </data>
+  <data name="GroupSpeakersPage_NoneFound" xml:space="preserve">
+    <value>In diesem Netzwerk wurden keine Sonos-Lautsprecher gefunden.</value>
+  </data>
+  <data name="GroupSpeakersPage_Failed" xml:space="preserve">
+    <value>Die Gruppe konnte nicht geändert werden: {0}</value>
   </data>
 </root>

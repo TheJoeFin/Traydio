@@ -10,9 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="4.4.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="4.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.5.2" />
   </ItemGroup>
 
   <!--
@@ -26,6 +26,16 @@
     <Compile Include="..\Trdo\Services\Playback\EngineHealthStore.cs" Link="Playback\EngineHealthStore.cs" />
     <Compile Include="..\Trdo\Services\Playback\PlaybackBackendKind.cs" Link="Playback\PlaybackBackendKind.cs" />
     <Compile Include="..\Trdo\Services\Playback\StreamDiagnostics.cs" Link="Playback\StreamDiagnostics.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastDevicePolicy.cs" Link="Playback\CastDevicePolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastIdleTimeout.cs" Link="Playback\CastIdleTimeout.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastHistory.cs" Link="Playback\CastHistory.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastHistoryPolicy.cs" Link="Playback\CastHistoryPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastHistoryJsonContext.cs" Link="Playback\CastHistoryJsonContext.cs" />
+    <Compile Include="..\Trdo\Services\Playback\CastHistoryStore.cs" Link="Playback\CastHistoryStore.cs" />
+    <Compile Include="..\Trdo\Services\Playback\NetworkContextPolicy.cs" Link="Playback\NetworkContextPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosPolicy.cs" Link="Playback\SonosPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosGroupingPolicy.cs" Link="Playback\SonosGroupingPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Playback\SonosGroupNames.cs" Link="Playback\SonosGroupNames.cs" />
     <Compile Include="..\Trdo\Services\SongChangeAnnouncementPolicy.cs" Link="Services\SongChangeAnnouncementPolicy.cs" />
     <Compile Include="..\Trdo\Services\PlaybackErrorPolicy.cs" Link="Services\PlaybackErrorPolicy.cs" />
     <Compile Include="..\Trdo\Services\LocalMusicPlaybackPolicy.cs" Link="Services\LocalMusicPlaybackPolicy.cs" />
@@ -50,6 +60,8 @@
     <Compile Include="..\Trdo\Services\StationMetadataMergePolicy.cs" Link="Services\StationMetadataMergePolicy.cs" />
     <Compile Include="..\Trdo\Models\StationFilterOption.cs" Link="Models\StationFilterOption.cs" />
     <Compile Include="..\Trdo\Services\StationFilterSearchPolicy.cs" Link="Services\StationFilterSearchPolicy.cs" />
+    <Compile Include="..\Trdo\Services\RecentSearchesPolicy.cs" Link="Services\RecentSearchesPolicy.cs" />
+    <Compile Include="..\Trdo\Services\SearchFreshnessPolicy.cs" Link="Services\SearchFreshnessPolicy.cs" />
     <Compile Include="..\Trdo\Models\FavoriteTrack.cs" Link="Models\FavoriteTrack.cs" />
     <Compile Include="..\Trdo\Models\StreamMetadata.cs" Link="Models\StreamMetadata.cs" />
     <Compile Include="..\Trdo\Services\Metadata\MetadataPublishGate.cs" Link="Services\Metadata\MetadataPublishGate.cs" />
@@ -58,6 +70,13 @@
     <Compile Include="..\Trdo\Services\Audio\FadeEnvelope.cs" Link="Services\Audio\FadeEnvelope.cs" />
     <Compile Include="..\Trdo\Models\TrayClickAction.cs" Link="Models\TrayClickAction.cs" />
     <Compile Include="..\Trdo\Services\TrayClickPolicy.cs" Link="Services\TrayClickPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmSignature.cs" Link="Services\Lastfm\LastfmSignature.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmErrorCode.cs" Link="Services\Lastfm\LastfmErrorCode.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" Link="Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" />
+    <Compile Include="..\Trdo\Services\Lastfm\ScrobbleTimingTracker.cs" Link="Services\Lastfm\ScrobbleTimingTracker.cs" />
+    <Compile Include="..\Trdo\Helpers\ImageFormat.cs" Link="Helpers\ImageFormat.cs" />
+    <Compile Include="..\Trdo\Helpers\EmbeddedArtStore.cs" Link="Helpers\EmbeddedArtStore.cs" />
+    <Compile Include="..\Trdo\Services\Metadata\IcyTextDecoder.cs" Link="Services\Metadata\IcyTextDecoder.cs" />
   </ItemGroup>
 
 </Project>

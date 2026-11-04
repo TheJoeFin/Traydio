@@ -238,6 +238,42 @@
                     </HyperlinkButton>
                 </StackPanel>
 
+                <!--  Translators Section (names and native language names are intentionally not localized)  -->
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        x:Uid="AboutPage_TranslatorsTitle"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Radek" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Polski"
+                            TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="tucoinfo" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Français"
+                            TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Igor (IM-Digital)" TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Русский"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+
                 <!--  Features Section  -->
                 <StackPanel Spacing="8">
                     <TextBlock
@@ -354,6 +390,20 @@
                             </StackPanel>
                         </HyperlinkButton>
                     </StackPanel>
+
+                    <!--  Sonos casting owes its approach to RoomRelay; credit where it is due  -->
+                    <TextBlock
+                        x:Uid="AboutPage_SonosAcknowledgement"
+                        Margin="0,8,0,0"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextWrapping="Wrap" />
+
+                    <HyperlinkButton Padding="0,4" Click="RoomRelayButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE774;" />
+                            <TextBlock Text="{x:Bind ViewModel.RoomRelayDisplayText}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </HyperlinkButton>
                 </StackPanel>
 
                 <!--  Tutorial Section  -->

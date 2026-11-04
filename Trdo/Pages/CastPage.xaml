@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Trdo.Pages.CastPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:playback="using:Trdo.Services.Playback"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+
+        <TextBlock
+            x:Name="PageTitle"
+            FontSize="20"
+            FontWeight="SemiBold" />
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" RowSpacing="12">
+            <StackPanel Spacing="12">
+                <!--  Shown only while already casting, above the list, so "Stop casting" has context  -->
+                <TextBlock
+                    x:Name="CurrentTargetText"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+
+                <!--  Search is continuous while open: mDNS and SSDP answers arrive whenever a device wakes up  -->
+                <StackPanel
+                    x:Name="ScanningRow"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <ProgressRing
+                        Width="16"
+                        Height="16"
+                        IsActive="True" />
+                    <TextBlock
+                        x:Uid="CastDeviceDialog_Searching"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <TextBlock
+                    x:Name="EmptyText"
+                    x:Uid="CastDeviceDialog_Empty"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+
+                <TextBlock
+                    x:Name="UnavailableText"
+                    x:Uid="CastDeviceDialog_Unavailable"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+            </StackPanel>
+
+            <ListView
+                x:Name="DeviceList"
+                Grid.Row="1"
+                AutomationProperties.AutomationId="CastDeviceList"
+                DoubleTapped="DeviceList_DoubleTapped"
+                SelectionChanged="DeviceList_SelectionChanged"
+                SelectionMode="Single"
+                Visibility="Collapsed">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="playback:CastDeviceEntry">
+                        <Grid
+                            Padding="0,6"
+                            AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"
+                            Background="Transparent"
+                            ColumnDefinitions="Auto,*"
+                            ColumnSpacing="12"
+                            ContextRequested="DeviceItem_ContextRequested">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontSize="18"
+                                Glyph="{x:Bind Glyph, Mode=OneWay}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="{x:Bind Details, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <InfoBar
+                x:Name="CastError"
+                Grid.Row="2"
+                AutomationProperties.AutomationId="CastError"
+                IsClosable="True"
+                IsOpen="False"
+                Severity="Error" />
+        </Grid>
+
+        <Grid
+            Grid.Row="2"
+            RowDefinitions="Auto,Auto"
+            RowSpacing="8"
+            ColumnDefinitions="Auto,*">
+            <!--  Shown once a Sonos speaker has been seen; opens the room picker  -->
+            <HyperlinkButton
+                x:Name="GroupSpeakersButton"
+                Grid.ColumnSpan="2"
+                Padding="0"
+                BorderThickness="0"
+                AutomationProperties.AutomationId="GroupSpeakersButton"
+                Click="GroupSpeakersButton_Click"
+                Visibility="Collapsed" />
+            <Button
+                x:Name="StopCastingButton"
+                Grid.Row="1"
+                Margin="0,0,8,0"
+                AutomationProperties.AutomationId="StopCastingButton"
+                Click="StopCastingButton_Click"
+                Visibility="Collapsed">
+                <TextBlock
+                    x:Name="StopCastingText"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </Button>
+
+            <Button
+                x:Name="CastButton"
+                Grid.Row="1"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                AutomationProperties.AutomationId="CastButton"
+                Click="CastButton_Click"
+                IsEnabled="False"
+                Style="{StaticResource AccentButtonStyle}">
+                <TextBlock x:Name="CastButtonText" />
+            </Button>
+        </Grid>
+    </Grid>
+</Page>

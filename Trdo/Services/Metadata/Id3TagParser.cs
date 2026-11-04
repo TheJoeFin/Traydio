@@ -188,7 +188,11 @@ internal static class Id3TagParser
             LogService.Info(LogComponent, $"Embedded APIC art: {summary}");
         }
 
-        metadata.AlbumArtUrl = $"data:{mime};base64,{Convert.ToBase64String(imageSpan)}";
+        metadata.AlbumArtUrl = EmbeddedArtStore.Register(imageSpan);
+        if (metadata.AlbumArtUrl is null)
+        {
+            LogService.Warn(LogComponent, $"APIC image skipped: {imageSpan.Length} bytes is over the {EmbeddedArtStore.MaxImageBytes} byte limit");
+        }
     }
 
     private static string ReadTextFrame(ReadOnlySpan<byte> frameData)

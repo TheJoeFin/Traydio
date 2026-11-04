@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using Trdo.Services;
 
 namespace Trdo.Models;
@@ -122,16 +124,30 @@ public partial class PlaylistHistoryItem : INotifyPropertyChanged
     {
         get
         {
+            // Use the user's regional short time pattern so 24-hour locales (e.g. pl-PL)
+            // and the Windows "24-hour clock" setting are respected.
+            string time = PlayedAt.ToString("t", CultureInfo.CurrentCulture);
+
             if (PlayedAt.Date == DateTime.Today)
             {
-                return PlayedAt.ToString("h:mm tt");
+                return time;
             }
-            else
-            {
-                return PlayedAt.ToString("M/d h:mm tt");
-            }
+
+            return $"{FormatShortDateWithoutYear(PlayedAt)} {time}";
         }
     }
+
+    // Culture short date (e.g. "10/5/2026" or "05.10.2026") with the year dropped
+    // (-> "10/5" or "05.10").
+    private static string FormatShortDateWithoutYear(DateTime value)
+    {
+        string pattern = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+        string trimmed = YearPatternRegex().Replace(pattern, string.Empty).Trim('/', '.', '-', ' ', ',');
+        return value.ToString(string.IsNullOrWhiteSpace(trimmed) ? "M/d" : trimmed, CultureInfo.CurrentCulture);
+    }
+
+    [GeneratedRegex(@"[^dMm]*y+[^dMm]*")]
+    private static partial Regex YearPatternRegex();
 
     /// <summary>
     /// Indicates whether to show the date (true if not today).

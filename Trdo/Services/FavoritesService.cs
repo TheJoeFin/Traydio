@@ -21,11 +21,6 @@ public class FavoritesService
     private static readonly Lazy<FavoritesService> _instance = new(() => new FavoritesService());
     public static FavoritesService Instance => _instance.Value;
 
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        TypeInfoResolver = FavoritesJsonContext.Default
-    };
-
     private readonly List<FavoriteTrack> _cachedFavorites = [];
 
     public event EventHandler? FavoritesChanged;
@@ -228,7 +223,7 @@ public class FavoritesService
     {
         try
         {
-            string json = JsonSerializer.Serialize(_cachedFavorites, _jsonOptions);
+            string json = JsonSerializer.Serialize(_cachedFavorites, FavoritesJsonContext.Default.ListFavoriteTrack);
             File.WriteAllText(_favoritesFilePath, json);
         }
         catch (Exception ex)
@@ -244,7 +239,7 @@ public class FavoritesService
             if (File.Exists(_favoritesFilePath))
             {
                 string json = File.ReadAllText(_favoritesFilePath);
-                return JsonSerializer.Deserialize<List<FavoriteTrack>>(json, _jsonOptions) ?? [];
+                return JsonSerializer.Deserialize(json, FavoritesJsonContext.Default.ListFavoriteTrack) ?? [];
             }
 
             // One-time migration from LocalSettings
@@ -252,8 +247,8 @@ public class FavoritesService
                 value is string legacyJson)
             {
                 List<FavoriteTrack> migrated =
-                    JsonSerializer.Deserialize<List<FavoriteTrack>>(legacyJson, _jsonOptions) ?? [];
-                File.WriteAllText(_favoritesFilePath, JsonSerializer.Serialize(migrated, _jsonOptions));
+                    JsonSerializer.Deserialize(legacyJson, FavoritesJsonContext.Default.ListFavoriteTrack) ?? [];
+                File.WriteAllText(_favoritesFilePath, JsonSerializer.Serialize(migrated, FavoritesJsonContext.Default.ListFavoriteTrack));
                 ApplicationData.Current.LocalSettings.Values.Remove(FavoritesKey);
                 System.Diagnostics.Debug.WriteLine($"[FavoritesService] Migrated {migrated.Count} favorites from LocalSettings to file");
                 return migrated;

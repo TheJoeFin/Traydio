@@ -24,6 +24,7 @@ namespace Trdo.ViewModels;
 public sealed partial class PlayerViewModel : INotifyPropertyChanged
 {
     private readonly RadioPlayerService _player = RadioPlayerService.Instance;
+    private readonly CastingContextService _castingContext = CastingContextService.Instance;
     private readonly RadioStationService _stationService = RadioStationService.Instance;
     private readonly FavoritesService _favoritesService = FavoritesService.Instance;
     private string _watchdogStatus = string.Empty;
@@ -97,6 +98,21 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
         _player.NextStationRequested += (_, _) => SelectNextStation();
         _player.PreviousStationRequested += (_, _) => SelectPreviousStation();
+        _player.CastTargetChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsCasting));
+            OnPropertyChanged(nameof(CastTargetName));
+            OnPropertyChanged(nameof(CastMenuText));
+            OnPropertyChanged(nameof(IsCastingToSonos));
+            OnPropertyChanged(nameof(SpeakerVolumeToolTip));
+            RaiseSpeakerVolumeChanged();
+        };
+        _player.SonosSpeakerVolumeChanged += (_, _) => RaiseSpeakerVolumeChanged();
+        _castingContext.Changed += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsCastShortcutVisible));
+            OnPropertyChanged(nameof(HasCastShortcutPreference));
+        };
 
         // Failures raised by the player go straight to PlaybackErrorService, which decides
         // whether they are still worth showing. Recorded here only so LastError reflects them.
@@ -215,6 +231,8 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsDiscogsEnabled));
             OnPropertyChanged(nameof(IsAppleMusicEnabled));
             OnPropertyChanged(nameof(IsYouTubeMusicEnabled));
+            OnPropertyChanged(nameof(IsBandcampEnabled));
+            OnPropertyChanged(nameof(IsQobuzEnabled));
             OnPropertyChanged(nameof(HasEnabledMusicServices));
             OnPropertyChanged(nameof(ShowMiniPlayerSearchLinks));
         };
@@ -394,6 +412,30 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     public void SelectStationToBrowse(RadioStation station)
     {
         SetSelectedStation(station, forcePlayAfterSwitch: false);
+    }
+
+    /// <summary>
+    /// Selects a station and starts it playing, regardless of whether anything was already
+    /// playing - what double-clicking a station in the list is expected to do. The
+    /// <see cref="SelectedStation"/> setter only resumes across a switch if something already
+    /// was, so double-clicking a station while playback is paused would otherwise just select
+    /// it and do nothing further.
+    /// </summary>
+    public void PlayStation(RadioStation station)
+    {
+        // Already the selected station: SetSelectedStation would no-op on the reference
+        // equality check below, so resume it explicitly instead.
+        if (ReferenceEquals(station, _selectedStation))
+        {
+            if (!IsPlaying && !IsBuffering)
+            {
+                Toggle();
+            }
+
+            return;
+        }
+
+        SetSelectedStation(station, forcePlayAfterSwitch: true);
     }
 
     private void SetSelectedStation(RadioStation? value, bool? forcePlayAfterSwitch)
@@ -812,11 +854,17 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
     public bool IsYouTubeMusicEnabled => SettingsService.IsYouTubeMusicEnabled;
 
+    public bool IsBandcampEnabled => SettingsService.IsBandcampEnabled;
+
+    public bool IsQobuzEnabled => SettingsService.IsQobuzEnabled;
+
     public bool HasEnabledMusicServices =>
         IsSpotifyEnabled ||
         IsDiscogsEnabled ||
         IsAppleMusicEnabled ||
-        IsYouTubeMusicEnabled;
+        IsYouTubeMusicEnabled ||
+        IsBandcampEnabled ||
+        IsQobuzEnabled;
 
     public bool ShowMiniPlayerSearchLinks => HasNowPlaying && HasEnabledMusicServices;
 
@@ -971,6 +1019,98 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         Debug.WriteLine("=== Pause END ===");
     }
 
+    /// <summary>Whether the cast picker can be opened. Sonos needs no LibVLC, so this is always true today.</summary>
+    public bool CanCast => _player.CanCast;
+    public bool IsCastShortcutVisible => CanCast && _castingContext.IsShortcutVisible;
+    public bool HasCastShortcutPreference => _castingContext.HasRememberedDevices;
+
+    public async Task SetCastShortcutHiddenAsync(bool hidden)
+    {
+        try
+        {
+            await _castingContext.SetShortcutHiddenAsync(hidden);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            LogService.Error("PlayerViewModel", "Could not save the per-network cast shortcut preference", ex);
+            PlaybackErrorService.Instance.Report(string.Format(LocalizationService.GetString(
+                "PlayingPage_CastPreferenceSaveFailed", "Couldn't save your casting preference: {0}"), ex.Message));
+        }
+    }
+
+    public bool IsCasting => _player.IsCasting;
+
+    public string? CastTargetName => _player.CastTargetName;
+
+    /// <summary>The play button's context-menu entry: "Cast…" or, while casting, the target's name.</summary>
+    public string CastMenuText => IsCasting
+        ? string.Format(LocalizationService.GetString("PlayingPage_CastingTo", "Casting to {0}…"), CastTargetName)
+        : LocalizationService.GetString("PlayingPage_Cast", "Cast…");
+
+    /// <summary>True while the audio goes to a Sonos player, which is when the speaker volume row is shown.</summary>
+    public bool IsCastingToSonos => _player.IsCastingToSonos;
+
+    /// <summary>
+    /// The Sonos player's own volume, 0–100. Distinct from <see cref="Volume"/>: a Sonos
+    /// fetches the stream itself, so the app's stream volume never reaches it.
+    /// </summary>
+    public double SpeakerVolume
+    {
+        get => _player.SonosSpeakerVolume;
+        set
+        {
+            int level = (int)Math.Round(Math.Clamp(value, 0, 100));
+            if (level == _player.SonosSpeakerVolume)
+                return;
+
+            // As with the stream slider: reaching for the volume while muted means "I want
+            // to hear this", and a muted Sonos stays muted when only its level changes.
+            _player.IsSonosSpeakerMuted = false;
+            _player.SonosSpeakerVolume = level;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsSpeakerMuted
+    {
+        get => _player.IsSonosSpeakerMuted;
+        set => _player.IsSonosSpeakerMuted = value;
+    }
+
+    public void ToggleSpeakerMute() => IsSpeakerMuted = !IsSpeakerMuted;
+
+    /// <summary>Volume glyph for the speaker mute button, crossed out while the player is muted.</summary>
+    public string SpeakerVolumeGlyph => IsSpeakerMuted ? "\uE74F" : "\uE767";
+
+    /// <summary>"Kitchen volume" - names the room so two sliders on one page are not mistaken for each other.</summary>
+    public string SpeakerVolumeToolTip => string.Format(
+        LocalizationService.GetString("PlayingPage_SpeakerVolume", "{0} volume"),
+        CastTargetName ?? "Speaker");
+
+    private void RaiseSpeakerVolumeChanged()
+    {
+        OnPropertyChanged(nameof(SpeakerVolume));
+        OnPropertyChanged(nameof(IsSpeakerMuted));
+        OnPropertyChanged(nameof(SpeakerVolumeGlyph));
+    }
+
+    /// <summary>Brings the audio back to this PC. Failures go to the playback error service like any other.</summary>
+    public async Task StopCastingAsync()
+    {
+        try
+        {
+            await _player.SetCastTargetAsync(null, null);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PlayerViewModel] EXCEPTION in StopCastingAsync: {ex}");
+            PlaybackErrorService.Instance.Report(string.Format(
+                LocalizationService.GetString("CastDeviceDialog_Failed", "Couldn't cast to {0}: {1}"),
+                "this PC",
+                ex.Message));
+        }
+    }
+
     /// <summary>True while a sleep timer is counting down toward pausing playback.</summary>
     public bool IsSleepTimerActive
     {
@@ -1122,6 +1262,40 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         await _player.PreviousLocalTrackAsync();
     }
 
+    // The incoming album's track list is scanned before the outgoing source has finished
+    // fading out, so it cannot be navigated safely until the transition is over.
+    public void NextStationOrTrack()
+    {
+        if (!IsLocalMusicActive)
+        {
+            SelectNextStation();
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Next track skipped during station transition");
+        }
+        else if (CanGoToNextLocalTrack)
+        {
+            NextLocalTrack();
+        }
+    }
+
+    public void PreviousStationOrTrack()
+    {
+        if (!IsLocalMusicActive)
+        {
+            SelectPreviousStation();
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Previous track skipped during station transition");
+        }
+        else if (CanGoToPreviousLocalTrack)
+        {
+            PreviousLocalTrack();
+        }
+    }
+
     /// <summary>Plays an arbitrary track from <see cref="LocalTrackList"/>, e.g. tapped from the details page.</summary>
     public async Task PlayLocalTrackAtIndexAsync(int index)
     {
@@ -1249,6 +1423,15 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
 
         string query = Uri.EscapeDataString(NowPlaying);
         await Launcher.LaunchUriAsync(new Uri($"https://bandcamp.com/search?q={query}"));
+    }
+
+    public async Task SearchOnQobuz()
+    {
+        if (!HasNowPlaying)
+            return;
+
+        string query = Uri.EscapeDataString(NowPlaying);
+        await Launcher.LaunchUriAsync(new Uri($"https://www.qobuz.com/us-en/search?q={query}"));
     }
 
     public void RestoreSelectedStationPlaybackTarget()
@@ -1914,7 +2097,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// </param>
     public void ApplyDisplayReorder(IReadOnlyCollection<object>? movedRows = null)
     {
-        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, [.. DisplayRows], movedRows));
+        ReplaceTopLevelNodes(StationLayoutPolicy.ApplyReorder(_topLevelNodes, (List<object>)[.. DisplayRows], movedRows));
     }
 
     /// <summary>

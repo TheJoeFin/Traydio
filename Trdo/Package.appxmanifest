@@ -11,7 +11,7 @@
   <Identity
     Name="40087JoeFinApps.Trdo"
     Publisher="CN=153F3B0F-BA3D-4964-8098-71AC78A1DF6A"
-    Version="2.1.6.0" />
+    Version="2.2.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="fa86867b-3ba1-44b4-b776-ea2ad8aea4c7" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -57,6 +57,11 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <Capability Name="internetClientServer" />
+    <!--
+      Casting: LibVLC discovers Chromecast-style renderers over mDNS multicast and then serves
+      the audio to the chosen device from a local HTTP endpoint, both on the private network.
+    -->
+    <Capability Name="privateNetworkClientServer" />
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
