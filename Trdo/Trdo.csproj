@@ -238,6 +238,20 @@
     </Content>
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- Preserve the published GitHub identity; the manifest retains the Store publisher. -->
+    <GitHubIdentityName>40087JoeFinApps.Trdo</GitHubIdentityName>
+    <GitHubIdentityPublisher>CN=Joseph Finney, O=Joseph Finney, L=Milwaukee, S=Wisconsin, C=US, PostalCode=53212</GitHubIdentityPublisher>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(ReleaseAppInstallerPath)' != ''">
+    <Content Include="$(ReleaseAppInstallerPath)">
+      <Link>Update.appinstaller</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
   <!-- Publish Properties -->
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
