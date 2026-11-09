@@ -288,6 +288,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             // before playback starts, so the first connection already uses them.
             _player.Volume = _selectedStation.Volume;
             _player.Watchdog.StationBufferLevelOverride = _selectedStation.BufferLevel;
+            _player.RobustMetadata = _selectedStation.RobustMetadata;
 
             // Startup calls Initialize()/Play() directly rather than going through
             // TransitionToStationAsync, so there is no outgoing source whose reads this could
@@ -2306,6 +2307,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         // stream connects, so setting it afterwards would not take effect until the
         // next switch. Also covers SaveStations, which re-enters here after an edit.
         _player.Watchdog.StationBufferLevelOverride = station.BufferLevel;
+        _player.RobustMetadata = station.RobustMetadata;
 
         CancelStationTransition();
         CancellationTokenSource transitionCts = new();

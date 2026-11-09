@@ -196,6 +196,20 @@
                             </Grid>
                         </StackPanel>
 
+                        <!--  Per-station robust metadata (long-lived ICY connection)  -->
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="ManualStationWindow_RobustMetadata" FontWeight="SemiBold" />
+                            <TextBlock
+                                x:Uid="ManualStationWindow_RobustMetadataDescription"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                            <ToggleSwitch
+                                x:Uid="ManualStationWindow_RobustMetadataToggle"
+                                Margin="0,4,0,0"
+                                IsOn="{x:Bind ViewModel.RobustMetadata, Mode=TwoWay}" />
+                        </StackPanel>
+
                     </StackPanel>
                 </Expander>
 

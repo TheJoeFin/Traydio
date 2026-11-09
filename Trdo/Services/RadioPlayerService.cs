@@ -828,6 +828,12 @@ public sealed partial class RadioPlayerService : IDisposable
     }
 
     /// <summary>
+    /// Whether the current station reads its now-playing metadata over a long-lived ICY
+    /// connection. Set by the view model from the station's setting before playback starts.
+    /// </summary>
+    public bool RobustMetadata { get; set; }
+
+    /// <summary>
     /// What kind of source is currently active. <see cref="StreamWatchdogService"/> reads this
     /// to skip its network/buffer-shaped recovery entirely for anything that isn't
     /// <see cref="AudioSourceKind.Radio"/> - there is no stream to stall or reconnect.

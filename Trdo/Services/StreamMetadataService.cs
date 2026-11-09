@@ -23,6 +23,7 @@ public sealed partial class StreamMetadataService : IDisposable
     private string? _currentStreamUrl;
     private StreamMetadata _currentMetadata = StreamMetadata.Empty;
     private bool _isDisposed;
+    private volatile bool _robustSession;
 
     /// <summary>
     /// Polling interval for metadata updates.
@@ -68,7 +69,14 @@ public sealed partial class StreamMetadataService : IDisposable
     /// <summary>
     /// Starts polling for metadata from the specified stream URL.
     /// </summary>
-    public void StartPolling(string streamUrl)
+    /// <param name="streamUrl">The stream to read ICY metadata from.</param>
+    /// <param name="robust">
+    /// Keep one connection open for as long as polling runs, reading every metadata block as it
+    /// arrives, instead of opening a fresh connection per poll. Costs a second copy of the
+    /// audio's bandwidth, but suits stations that open each new session with a commercial or
+    /// intro whose metadata is just the station name: a long-lived session gets past it.
+    /// </param>
+    public void StartPolling(string streamUrl, bool robust = false)
     {
         if (string.IsNullOrWhiteSpace(streamUrl))
         {
@@ -82,15 +90,22 @@ public sealed partial class StreamMetadataService : IDisposable
             StopPollingCore(clearMetadata: false);
 
             _currentStreamUrl = streamUrl;
+            _robustSession = robust;
             _pollingCts = new CancellationTokenSource();
 
-            Debug.WriteLine($"[StreamMetadataService] Starting metadata polling for: {streamUrl}");
+            Debug.WriteLine($"[StreamMetadataService] Starting metadata polling for: {streamUrl} (robust={robust})");
 
             CancellationToken token = _pollingCts.Token;
             _pollingTask = Task.Run(async () =>
             {
                 try
                 {
+                    if (robust)
+                    {
+                        await RunRobustSessionAsync(streamUrl, token);
+                        return;
+                    }
+
                     // Fetch initial metadata immediately
                     await FetchMetadataAsync(token);
 
@@ -148,6 +163,7 @@ public sealed partial class StreamMetadataService : IDisposable
         _pollingCts = null;
         _pollingTask = null;
         _currentStreamUrl = null;
+        _robustSession = false;
 
         if (clearMetadata)
         {
@@ -165,7 +181,112 @@ public sealed partial class StreamMetadataService : IDisposable
             return;
         }
 
+        // A robust session is already receiving every block live. A one-off fetch would open a
+        // brand-new session, which is exactly what that mode exists to avoid.
+        if (_robustSession && string.Equals(streamUrl, _currentStreamUrl, StringComparison.Ordinal))
+        {
+            return;
+        }
+
         await FetchMetadataAsync(streamUrl, cancellationToken);
+    }
+
+    /// <summary>
+    /// Holds one connection open and publishes every metadata block it carries, reconnecting
+    /// with a growing delay when the stream drops. Runs until <paramref name="cancellationToken"/>
+    /// is cancelled.
+    /// </summary>
+    private async Task RunRobustSessionAsync(string streamUrl, CancellationToken cancellationToken)
+    {
+        TimeSpan retryDelay = TimeSpan.FromSeconds(2);
+        TimeSpan maxRetryDelay = TimeSpan.FromSeconds(30);
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            bool madeProgress = false;
+
+            try
+            {
+                using HttpRequestMessage request = new(HttpMethod.Get, streamUrl);
+                using HttpResponseMessage response = await _httpClient.SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Debug.WriteLine($"[StreamMetadataService] Robust session HTTP {(int)response.StatusCode}");
+                }
+                else
+                {
+                    int metaInterval = GetIcyMetaInterval(response);
+                    if (metaInterval <= 0)
+                    {
+                        Debug.WriteLine("[StreamMetadataService] Robust session: stream has no ICY metadata, stopping");
+                        return;
+                    }
+
+                    LogService.Info("StreamMetadataService", $"Robust metadata session connected (metaint={metaInterval})");
+
+                    using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    byte[] buffer = new byte[Math.Max(metaInterval, 4096)];
+
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        // Audio bytes up to the next metadata block are not needed.
+                        await stream.ReadExactlyAsync(buffer.AsMemory(0, metaInterval), cancellationToken);
+                        madeProgress = true;
+
+                        await stream.ReadExactlyAsync(buffer.AsMemory(0, 1), cancellationToken);
+                        int metaLength = buffer[0] * 16;
+                        if (metaLength == 0)
+                        {
+                            continue;
+                        }
+
+                        byte[] metaBuffer = new byte[metaLength];
+                        await stream.ReadExactlyAsync(metaBuffer, cancellationToken);
+
+                        string metadataStr = IcyTextDecoder.Decode(metaBuffer).TrimEnd('\0');
+                        StreamMetadata metadata = ParseIcyMetadata(metadataStr);
+                        if (metadata.HasMetadata)
+                        {
+                            UpdateMetadata(metadata);
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (EndOfStreamException)
+            {
+                Debug.WriteLine("[StreamMetadataService] Robust session: stream ended");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[StreamMetadataService] Robust session error: {ex.Message}");
+            }
+
+            // A session that got through at least one metadata interval was healthy, so the
+            // next failure starts the backoff over rather than continuing from a long wait.
+            if (madeProgress)
+            {
+                retryDelay = TimeSpan.FromSeconds(2);
+            }
+
+            try
+            {
+                await Task.Delay(retryDelay, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            retryDelay = TimeSpan.FromTicks(Math.Min(retryDelay.Ticks * 2, maxRetryDelay.Ticks));
+        }
     }
 
     /// <summary>
