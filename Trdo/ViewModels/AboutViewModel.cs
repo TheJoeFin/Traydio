@@ -41,7 +41,67 @@ public partial class AboutViewModel : INotifyPropertyChanged
         }
     }
 
-    public string GitHubUrl => "https://github.com/TheJoeFin/Trdo";
+    // ---- Updates (GitHub installs only) ----
+    public bool IsGitHubInstall { get; } = AppInstallerUpdateService.IsGitHubInstall;
+
+    private AppUpdateStatus _updateStatus = AppUpdateStatus.Unknown;
+    private bool _isBusy;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        private set
+        {
+            _isBusy = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(CanCheck));
+            OnPropertyChanged(nameof(CanRestart));
+        }
+    }
+
+    public bool CanCheck => !IsBusy;
+    public bool CanRestart => !IsBusy && _updateStatus == AppUpdateStatus.Available;
+
+    public string UpdateStatusText => _updateStatus switch
+    {
+        AppUpdateStatus.UpToDate => LocalizationService.GetString("AboutPage_UpdateUpToDate", "You're up to date."),
+        AppUpdateStatus.Available => LocalizationService.GetString("AboutPage_UpdateAvailable", "An update is available."),
+        AppUpdateStatus.Error => LocalizationService.GetString("AboutPage_UpdateError", "Couldn't check for updates."),
+        _ => string.Empty,
+    };
+
+    public async Task CheckForUpdates()
+    {
+        if (IsBusy)
+            return;
+        IsBusy = true;
+        try
+        {
+            _updateStatus = await AppInstallerUpdateService.CheckAsync();
+        }
+        finally
+        {
+            OnPropertyChanged(nameof(UpdateStatusText));
+            IsBusy = false;
+        }
+    }
+
+    public async Task RestartToUpdate()
+    {
+        if (IsBusy)
+            return;
+        IsBusy = true;
+        bool ok = await AppInstallerUpdateService.RestartToUpdateAsync();
+        if (!ok)
+        {
+            _updateStatus = AppUpdateStatus.Error;
+            OnPropertyChanged(nameof(UpdateStatusText));
+            IsBusy = false;
+        }
+        // On success Windows shuts the app down and relaunches it on the new version.
+    }
+
+    public string GitHubUrl =>"https://github.com/TheJoeFin/Trdo";
     public string GitHubDisplayText => "github.com/TheJoeFin/Trdo";
 
     public string DeveloperName => "Joe Finney (TheJoeFin)";

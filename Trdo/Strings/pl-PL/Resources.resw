@@ -338,6 +338,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>Obejrzyj poradnik ponownie, aby dowiedzieć się, jak korzystać z Traydio.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Aktualizacje</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>Ta kopia została zainstalowana z GitHuba i może aktualizować się samodzielnie.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Sprawdź aktualizacje</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Uruchom ponownie, aby zaktualizować</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>Masz najnowszą wersję.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>Dostępna jest aktualizacja.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Nie można sprawdzić aktualizacji.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Potrzebujesz pomocy?</value>
   </data>

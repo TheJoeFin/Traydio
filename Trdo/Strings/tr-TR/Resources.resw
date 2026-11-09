@@ -341,6 +341,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>Traydio'nun nasıl kullanılacağını öğrenmek için eğitimi yeniden görüntüleyin.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Güncellemeler</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>Bu kopya GitHub'dan yüklendi ve kendini güncelleyebilir.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Güncellemeleri denetle</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Güncellemek için yeniden başlat</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>Uygulamanız güncel.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>Bir güncelleme mevcut.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Güncellemeler denetlenemedi.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Yardıma mı ihtiyacınız var?</value>
   </data>
