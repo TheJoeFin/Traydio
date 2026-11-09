@@ -46,6 +46,10 @@ internal static partial class PowerManagementService
     {
         bool shouldKeepAwake = _isPlaybackActive && !SettingsService.AllowSleepWhilePlaying;
 
+        LogService.Info("Power",
+            $"Update: playing={_isPlaybackActive}, allowSleep={SettingsService.AllowSleepWhilePlaying}, " +
+            $"shouldKeepAwake={shouldKeepAwake}, requestActive={_requestActive}");
+
         try
         {
             if (shouldKeepAwake)

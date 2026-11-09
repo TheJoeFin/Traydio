@@ -80,6 +80,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[CastIdleTimeoutMinutesKey] = value;
+                LogChange(CastIdleTimeoutMinutesKey, value);
             }
             catch (Exception ex)
             {
@@ -148,6 +149,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[AutoPlayOnStartupKey] = value;
+                LogChange(AutoPlayOnStartupKey, value);
             }
             catch
             {
@@ -183,6 +185,7 @@ public static class SettingsService
             {
                 string normalized = string.IsNullOrWhiteSpace(value) ? LocalizationService.SystemLanguage : value;
                 ApplicationData.Current.LocalSettings.Values[AppLanguageKey] = normalized;
+                LogChange(AppLanguageKey, normalized);
                 LogService.Info("Localization", $"Saved language setting: '{normalized}'");
                 LocalizationService.ApplyLanguage(normalized);
             }
@@ -224,6 +227,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[IsVolumeSliderVisibleKey] = value;
+                LogChange(IsVolumeSliderVisibleKey, value);
             }
             catch
             {
@@ -336,6 +340,9 @@ public static class SettingsService
                     ApplicationData.Current.LocalSettings.Values.Remove(LastfmUsernameKey);
                 else
                     ApplicationData.Current.LocalSettings.Values[LastfmUsernameKey] = value;
+
+                // The username itself is not logged; only whether one is set.
+                LogChange(LastfmUsernameKey, string.IsNullOrWhiteSpace(value) ? "<cleared>" : "<set>");
             }
             catch
             {
@@ -382,6 +389,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[PlaybackEngineModeKey] = (int)value;
+                LogChange(PlaybackEngineModeKey, value);
             }
             catch
             {
@@ -433,6 +441,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[StationSortModeKey] = (int)value;
+                LogChange(StationSortModeKey, value);
             }
             catch
             {
@@ -481,6 +490,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[StationGroupByModeKey] = (int)value;
+                LogChange(StationGroupByModeKey, value);
             }
             catch
             {
@@ -674,6 +684,7 @@ public static class SettingsService
         {
             IPropertySet values = ApplicationData.Current.LocalSettings.Values;
             values[key] = (int)value;
+            LogChange(key, value);
 
             // Keep the pre-2.1 key describing the nearest two-way layout, so a downgrade does
             // not land on a layout the user never chose.
@@ -778,11 +789,19 @@ public static class SettingsService
         }
     }
 
+    /// <summary>
+    /// Writes one line to the log whenever a persisted setting is written, so support
+    /// reports can show what the user actually changed and when.
+    /// </summary>
+    private static void LogChange(string key, object? value)
+        => LogService.Info("Settings", $"{key} = {value}");
+
     private static void SetDoubleSetting(string key, double value)
     {
         try
         {
             ApplicationData.Current.LocalSettings.Values[key] = value;
+            LogChange(key, value);
         }
         catch
         {
@@ -816,6 +835,7 @@ public static class SettingsService
         try
         {
             ApplicationData.Current.LocalSettings.Values[key] = value;
+            LogChange(key, value);
             if (key is IsSpotifyEnabledKey or IsDiscogsEnabledKey or IsAppleMusicEnabledKey or IsYouTubeMusicEnabledKey or IsBandcampEnabledKey or IsQobuzEnabledKey)
             {
                 MusicSearchServicesChanged?.Invoke(null, EventArgs.Empty);
@@ -905,6 +925,7 @@ public static class SettingsService
             try
             {
                 ApplicationData.Current.LocalSettings.Values[LocalMusicLoopModeKey] = value.ToString();
+                LogChange(LocalMusicLoopModeKey, value);
             }
             catch
             {
@@ -950,6 +971,7 @@ public static class SettingsService
         try
         {
             ApplicationData.Current.LocalSettings.Values[IsFirstRunKey] = false;
+            LogChange(IsFirstRunKey, false);
         }
         catch
         {
