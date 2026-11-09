@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -2048,7 +2049,7 @@ public sealed partial class RadioPlayerService : IDisposable
         // happened to be mid-rebuffer at the moment of pausing, and SetManualBuffering(false)
         // re-reads that same backend state a few lines down - see _isUserPaused.
         _isUserPaused = true;
-        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true");
+        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true, caller={DescribePauseCaller()}");
 
         // Fired first, before any teardown: see PlaybackPausedByUser.
         TryEnqueueOnUi(() => PlaybackPausedByUser?.Invoke(this, EventArgs.Empty));
@@ -2195,9 +2196,31 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Compact "A &lt;- B &lt;- C" description of who called Pause(), for diagnosing unexpected pauses.
+    /// </summary>
+    private static string DescribePauseCaller()
+    {
+        try
+        {
+            var frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
+            var names = frames
+                .Select(f => f.GetMethod())
+                .Where(m => m?.DeclaringType != null)
+                .Take(5)
+                .Select(m => $"{m!.DeclaringType!.Name}.{m.Name}");
+            return string.Join(" <- ", names);
+        }
+        catch (Exception ex)
+        {
+            return $"unknown ({ex.GetType().Name})";
+        }
+    }
+
     private void OnSystemMediaButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
     {
         Debug.WriteLine($"[RadioPlayerService] System media button pressed: {args.Button}");
+        LogService.Info("RadioPlayerService", $"System media button pressed: {args.Button}");
 
         TryEnqueueOnUi(() =>
         {
