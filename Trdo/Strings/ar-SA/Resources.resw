@@ -1530,4 +1530,19 @@
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>تعذّر تغيير المجموعة: {0}</value>
   </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>LibVLC أولاً، ثم Windows كبديل</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>يمكن للكمبيوتر أن ينام أثناء التشغيل</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>يبقى الكمبيوتر مستيقظًا أثناء التشغيل</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>أدخل مصطلح بحث للعثور على محطات...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>قاعدة بيانات راديو إنترنت يديرها المجتمع تضم آلاف المحطات حول العالم</value>
+  </data>
 </root>

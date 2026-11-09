@@ -1530,4 +1530,19 @@
   <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Ayrıntılar için tıklayın</value>
   </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>Önce LibVLC, yedek olarak Windows</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>Bilgisayar çalma sırasında uykuya geçebilir</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>Bilgisayar çalma sırasında uyanık kalır</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>İstasyon bulmak için bir arama terimi girin...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>Dünya genelinde binlerce istasyon içeren, topluluk tarafından oluşturulan internet radyo veritabanı</value>
+  </data>
 </root>

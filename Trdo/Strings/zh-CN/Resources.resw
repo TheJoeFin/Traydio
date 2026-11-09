@@ -1530,4 +1530,19 @@
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>无法更改分组：{0}</value>
   </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>优先使用 LibVLC，Windows 作为备用</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>播放时电脑可以进入睡眠</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>播放时电脑保持唤醒</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>输入搜索词以查找电台...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>由社区维护的网络电台数据库，收录全球数千个电台</value>
+  </data>
 </root>

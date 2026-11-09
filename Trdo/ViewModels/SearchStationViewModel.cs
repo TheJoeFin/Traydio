@@ -349,7 +349,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     public string EmptyStateMessage => ShowNoResults
         ? "No stations found"
-        : "Enter a search term to find stations...";
+        : LocalizationService.GetString("SearchStation_EnterSearchTerm", "Enter a search term to find stations...");
 
     /// <summary>
     /// Whether the recent-searches chip row has anything to show. Only before a search - under

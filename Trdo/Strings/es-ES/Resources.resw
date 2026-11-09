@@ -1530,4 +1530,19 @@
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>No se pudo cambiar el grupo: {0}</value>
   </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>Primero LibVLC, Windows como alternativa</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>El PC puede suspenderse durante la reproducción</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>El PC permanece activo durante la reproducción</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Escribe un término de búsqueda para encontrar emisoras...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>Base de datos de radio por internet creada por la comunidad, con miles de emisoras de todo el mundo</value>
+  </data>
 </root>

@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Trdo.Services;
 using Windows.ApplicationModel;
 using Windows.System;
 
@@ -49,7 +50,7 @@ public partial class AboutViewModel : INotifyPropertyChanged
     public string RadioBrowserName => "Radio Browser";
     public string RadioBrowserUrl => "https://www.radio-browser.info";
     public string RadioBrowserDisplayText => "radio-browser.info";
-    public string RadioBrowserDescription => "Community-driven internet radio database with thousands of stations worldwide";
+    public string RadioBrowserDescription => LocalizationService.GetString("AboutPage_RadioBrowserDescription", "Community-driven internet radio database with thousands of stations worldwide");
 
     public string WinUIExUrl => "https://github.com/dotMorten/WinUIEx";
     public string WinUIExDisplayText => "WinUIEx";

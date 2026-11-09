@@ -1530,4 +1530,19 @@
   <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Нажмите, чтобы увидеть подробности</value>
   </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>Сначала LibVLC, затем Windows</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>ПК может засыпать во время воспроизведения</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>ПК не засыпает во время воспроизведения</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Введите поисковый запрос, чтобы найти станции...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>База данных интернет-радио, создаваемая сообществом, с тысячами станций по всему миру</value>
+  </data>
 </root>
