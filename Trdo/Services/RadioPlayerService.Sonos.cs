@@ -272,6 +272,46 @@ public sealed partial class RadioPlayerService
         }
     }
 
+    /// <summary>
+    /// Takes over a speaker that is already playing this app's stream - one left running when
+    /// the app last exited or crashed. Nothing is sent to the speaker: the target, transport
+    /// state and current URI are set to match what it reports, and polling resumes. Must be
+    /// called on the UI thread, after the matching station is selected. Returns false (and
+    /// changes nothing) if the user has since started something themselves.
+    /// </summary>
+    public bool AdoptRunningSonos(SonosDevice device, string transportUri)
+    {
+        if (_isDisposed || _sonosDevice is not null || IsCasting || IsPlaying || IsBuffering ||
+            _activeSourceKind != AudioSourceKind.Radio || string.IsNullOrWhiteSpace(_streamUrl))
+        {
+            return false;
+        }
+
+        LogService.Info(SonosComponent, $"Adopting Sonos '{device.Name}' already playing {LogService.Redact(transportUri)}");
+
+        Interlocked.Increment(ref _sonosTargetChange);
+        Interlocked.Increment(ref _sonosSession);
+        _sonosController ??= new SonosController();
+        _sonosDevice = device;
+        _pendingCastAttempt = null;
+        _sonosCurrentUri = transportUri;
+        _sonosStreamContent = null;
+        _sonosDuration = null;
+        _sonosPosition = TimeSpan.Zero;
+        _sonosPositionSampledUtc = DateTime.UtcNow;
+        _sonosUserStopped = false;
+        _hasPlayedOnce = true;
+        SetSonosState(SonosPlaybackState.Playing);
+        StartSonosPolling();
+
+        TryEnqueueOnUi(() =>
+        {
+            CastTargetChanged?.Invoke(this, EventArgs.Empty);
+            SonosSpeakerVolumeChanged?.Invoke(this, EventArgs.Empty);
+        });
+        return true;
+    }
+
     /// <summary>Starts the active source on the speaker. Called from <see cref="Play"/> under a fresh play-attempt token.</summary>
     private async Task PlayOnSonosAsync(CancellationToken cancellationToken)
     {

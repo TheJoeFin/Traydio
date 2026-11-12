@@ -114,6 +114,82 @@ public static class SonosPolicy
         return url;
     }
 
+    /// <summary>
+    /// The reverse of <see cref="ToRadioUri"/>: the address a speaker reports as its current
+    /// track, turned back into the http(s) stream it was given. Null when the speaker is
+    /// playing something that is not an internet radio stream (a queue, line-in, a group).
+    /// </summary>
+    public static string? StreamUrlFromTransportUri(string? transportUri)
+    {
+        if (string.IsNullOrWhiteSpace(transportUri))
+        {
+            return null;
+        }
+
+        string uri = transportUri.Trim();
+        if (uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return uri;
+        }
+
+        // The speaker reports what it was given under a scheme of its own choosing: the
+        // x-rincon-mp3radio form we send, or "aac://" once it has sniffed an AAC stream.
+        string? rest = null;
+        foreach (string scheme in new[] { RadioScheme, "aac://" })
+        {
+            if (uri.StartsWith(scheme, StringComparison.OrdinalIgnoreCase))
+            {
+                rest = uri[scheme.Length..];
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(rest))
+        {
+            return null;
+        }
+
+        // ToRadioUri keeps the scheme for https and drops it for plain http. Some firmware
+        // also returns it with the colon removed ("http//host/path").
+        if (rest.StartsWith("https//", StringComparison.OrdinalIgnoreCase))
+        {
+            return "https://" + rest["https//".Length..];
+        }
+
+        if (rest.StartsWith("http//", StringComparison.OrdinalIgnoreCase))
+        {
+            return "http://" + rest["http//".Length..];
+        }
+
+        return rest.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+               rest.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            ? rest
+            : "http://" + rest;
+    }
+
+    /// <summary>
+    /// Whether two stream addresses are the same stream. Ignores scheme case, host case, an
+    /// http/https difference (a speaker may fall back from one to the other) and a trailing slash.
+    /// </summary>
+    public static bool IsSameStream(string? a, string? b)
+    {
+        string? left = NormalizeStream(a);
+        return left is not null && string.Equals(left, NormalizeStream(b), StringComparison.Ordinal);
+    }
+
+    private static string? NormalizeStream(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri))
+        {
+            return null;
+        }
+
+        string path = uri.AbsolutePath.TrimEnd('/');
+        string port = uri.IsDefaultPort || (uri.Port is 80 or 443) ? string.Empty : ":" + uri.Port;
+        return uri.Host.ToLowerInvariant() + port + path + uri.Query;
+    }
+
     public static bool LooksLikeHlsPlaylist(string url)
     {
         int query = url.IndexOfAny(['?', '#']);
