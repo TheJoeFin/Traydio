@@ -127,6 +127,12 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
     }
 
     /// <summary>
+    /// Re-raises <see cref="FaviconUrl"/> so bound images rebuild from it even though the URL
+    /// itself is unchanged (after the user edits the station and its cached art is dropped).
+    /// </summary>
+    public void RefreshFavicon() => OnPropertyChanged(nameof(FaviconUrl));
+
+    /// <summary>
     /// Whether the row's placeholder icon (see <see cref="FaviconPlaceholderGlyph"/>) should be
     /// shown instead of the favicon/album art image. Kept as its own binding rather than just
     /// letting the image draw over the icon, since a transparent or not-yet-loaded image would

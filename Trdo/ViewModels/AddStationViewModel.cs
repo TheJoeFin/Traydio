@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Trdo.Helpers;
 using Trdo.Models;
 using Trdo.Services;
 
@@ -390,7 +391,13 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             _editingStation.Name = StationName.Trim();
             _editingStation.StreamUrl = StreamUrl.Trim();
             _editingStation.Homepage = !string.IsNullOrWhiteSpace(Homepage) ? Homepage.Trim() : null;
+            // Editing is the one time station art is refreshed: drop the cached thumbnail for the
+            // old and new URL (they differ if the user changed it) and rebuild from the source.
+            string? previousFavicon = _editingStation.FaviconUrl;
             _editingStation.FaviconUrl = !string.IsNullOrWhiteSpace(FaviconUrl) ? FaviconUrl.Trim() : null;
+            ImageSourceFactory.Forget(previousFavicon);
+            ImageSourceFactory.Forget(_editingStation.FaviconUrl);
+            _editingStation.RefreshFavicon();
             _editingStation.Volume = VolumePercent / 100;
             _editingStation.BufferLevel = HasBufferOverride ? BufferLevel : null;
             _editingStation.SongPopupDelaySeconds = HasSongPopupDelayOverride ? SongPopupDelaySeconds : null;

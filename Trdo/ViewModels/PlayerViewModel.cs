@@ -778,7 +778,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             string? trackArtUrl = CurrentMetadata?.AlbumArtUrl;
             string? faviconUrl = SelectedStation?.FaviconUrl;
             LogAlbumArtChoice(trackArtUrl, faviconUrl);
-            return CreateImageSource(trackArtUrl) ?? CreateImageSource(faviconUrl);
+            return CreateImageSource(trackArtUrl) ?? CreateImageSource(faviconUrl, stationArt: true);
         }
     }
 
@@ -825,7 +825,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         ? Visibility.Visible
         : Visibility.Collapsed;
 
-    public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl);
+    public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl, stationArt: true);
 
     public Visibility SelectedStationFallbackIconVisibility => SelectedStationFaviconImageSource is null
         ? Visibility.Visible
@@ -2396,7 +2396,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// own cover on disk. See <see cref="ImageSourceFactory"/> for why those two need special
     /// handling rather than a plain <see cref="BitmapImage"/>.
     /// </summary>
-    private static ImageSource? CreateImageSource(string? url) => ImageSourceFactory.Create(url);
+    private static ImageSource? CreateImageSource(string? url, bool stationArt = false) => ImageSourceFactory.Create(url, stationArt);
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)
     {

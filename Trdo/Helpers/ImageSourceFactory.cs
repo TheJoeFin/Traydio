@@ -107,7 +107,11 @@ internal static class ImageSourceFactory
     private const int ImageCacheMinPruneCount = 64;
     private static int _imageCachePruneAt = ImageCacheMinPruneCount;
 
-    public static ImageSource? Create(string? url)
+    /// <param name="url">The image URL.</param>
+    /// <param name="stationArt">True for a station's own favicon/cover, which is thumbnailed and
+    /// kept on disk until the station is edited. Leave false for per-track art: its URL is often
+    /// fixed while the picture changes, so it must be fetched fresh.</param>
+    public static ImageSource? Create(string? url, bool stationArt = false)
     {
         if (string.IsNullOrWhiteSpace(url))
         {
@@ -123,7 +127,7 @@ internal static class ImageSourceFactory
             }
         }
 
-        BitmapImage? image = CreateCore(url);
+        BitmapImage? image = CreateCore(url, stationArt);
         if (image is not null)
         {
             lock (ImageCache)
@@ -136,7 +140,45 @@ internal static class ImageSourceFactory
         return image;
     }
 
-    private static BitmapImage? CreateCore(string url)
+    /// <summary>
+    /// Discards everything cached for <paramref name="url"/> - the on-disk thumbnail and the
+    /// in-memory download and bitmap - so the next <see cref="Create"/> rebuilds it from the
+    /// source. Called when the user edits a station.
+    /// </summary>
+    public static void Forget(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return;
+        }
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? fileUri) && fileUri.IsFile)
+        {
+            LocalCoverReader.Forget(fileUri.LocalPath);
+        }
+        else
+        {
+            ArtThumbnailCache.Invalidate(url);
+        }
+
+        lock (ImageCache)
+        {
+            ImageCache.Remove(url);
+        }
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        {
+            lock (DownloadGate)
+            {
+                if (DownloadCache.TryGetValue(uri.AbsoluteUri, out DownloadEntry? entry))
+                {
+                    RemoveDownload(uri.AbsoluteUri, entry);
+                }
+            }
+        }
+    }
+
+    private static BitmapImage? CreateCore(string url, bool stationArt)
     {
         // Checked before Uri parsing: a base64 payload is not something to run through Uri.
         if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
@@ -181,7 +223,7 @@ internal static class ImageSourceFactory
         // logo while every in-app Image stayed blank. Going through bytes also means a failure
         // is logged instead of silently swallowed, since none of the bound Image controls
         // handle ImageFailed.
-        return LoadFromBytes(() => DownloadAsync(uri), uri.AbsoluteUri, url, MaxHttpRetries);
+        return LoadFromBytes(() => DownloadAsync(uri, stationArt), uri.AbsoluteUri, url, MaxHttpRetries);
     }
 
     // Caller holds the ImageCache lock.
@@ -231,7 +273,7 @@ internal static class ImageSourceFactory
     /// cached result between every caller asking for the same URL. Only ever called on the UI
     /// thread (see the class remarks).
     /// </summary>
-    private static Task<byte[]?> DownloadAsync(Uri uri)
+    private static Task<byte[]?> DownloadAsync(Uri uri, bool stationArt)
     {
         string key = uri.AbsoluteUri;
 
@@ -245,7 +287,12 @@ internal static class ImageSourceFactory
             }
         }
 
-        Task<byte[]?> task = ImageDownloader.GetBytesAsync(Http, key);
+        // Station art is cached on disk as a small thumbnail and is not re-downloaded unless the
+        // user edits the station (see Forget / ArtThumbnailCache.Invalidate). Anything else
+        // (per-track art) is downloaded as before.
+        Task<byte[]?> task = stationArt
+            ? ArtThumbnailCache.GetRemoteAsync(key, () => ImageDownloader.GetBytesAsync(Http, key))
+            : ImageDownloader.GetBytesAsync(Http, key);
 
         lock (DownloadGate)
         {

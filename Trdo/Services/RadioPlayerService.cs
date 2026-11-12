@@ -2465,7 +2465,7 @@ public sealed partial class RadioPlayerService : IDisposable
                     if (_currentStationFaviconUrl != _currentAlbumArtUrl)
                     {
                         Debug.WriteLine($"[RadioPlayerService] Attempting to set favicon as fallback: {_currentStationFaviconUrl}");
-                        thumbnailSet = await SetAlbumArtAsync(updater, _currentStationFaviconUrl);
+                        thumbnailSet = await SetAlbumArtAsync(updater, _currentStationFaviconUrl, stationArt: true);
 
                         if (thumbnailSet)
                         {
@@ -2510,7 +2510,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
-    private async Task<bool> SetAlbumArtAsync(SystemMediaTransportControlsDisplayUpdater updater, string imageUrl)
+    private async Task<bool> SetAlbumArtAsync(SystemMediaTransportControlsDisplayUpdater updater, string imageUrl, bool stationArt = false)
     {
         try
         {
@@ -2560,7 +2560,12 @@ public sealed partial class RadioPlayerService : IDisposable
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
-                byte[]? downloaded = await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
+                // Only the station's own art goes through the on-disk cache; per-track art is
+                // often a fixed URL whose picture changes, so it is fetched every time.
+                byte[]? downloaded = stationArt
+                    ? await ArtThumbnailCache.GetRemoteAsync(
+                        imageUrl, () => ImageDownloader.GetBytesAsync(_httpClient, imageUrl))
+                    : await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
                 if (downloaded is null)
                 {
                     // Over the size limit; already logged.
