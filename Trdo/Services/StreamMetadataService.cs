@@ -45,7 +45,8 @@ public sealed partial class StreamMetadataService : IDisposable
     {
         SocketsHttpHandler handler = new()
         {
-            UseProxy = false,
+            UseProxy = true,
+            DefaultProxyCredentials = System.Net.CredentialCache.DefaultCredentials,
             AutomaticDecompression = System.Net.DecompressionMethods.None,
             // Enable connection pooling and reuse to reduce overhead
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),

@@ -58,8 +58,10 @@ public class RadioBrowserService
         // The WinINet-based handler can fail with error 8007277C in app containers
         SocketsHttpHandler handler = new()
         {
-            // Disable proxy to ensure direct connection works in packaged apps
-            UseProxy = false,
+            // Follow the system proxy settings (HttpClient.DefaultProxy reads the Windows
+            // settings without going through WinINet), so search works behind an HTTP proxy.
+            UseProxy = true,
+            DefaultProxyCredentials = System.Net.CredentialCache.DefaultCredentials,
             // Enable automatic decompression for better performance
             AutomaticDecompression = System.Net.DecompressionMethods.All
         };
