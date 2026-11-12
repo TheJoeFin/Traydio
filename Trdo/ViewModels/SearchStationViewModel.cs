@@ -39,6 +39,16 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     /// <summary>When the page was last navigated away from, for <see cref="ResetIfStale"/>.</summary>
     private DateTimeOffset? _lastLeftUtc;
 
+    /// <summary>
+    /// How long a search's results must stay on screen, with nothing more typed, before its term
+    /// counts as a recent search. A search runs 500 ms after every pause in typing, so banking
+    /// each one that completes would save half-typed prefixes ("jaz" on the way to "jazz fm").
+    /// </summary>
+    private static readonly TimeSpan RecentSearchSettleDelay = TimeSpan.FromSeconds(3);
+
+    /// <summary>The term of the last search that completed with results, or null.</summary>
+    private string? _lastFruitfulSearchTerm;
+
     private string _searchTerm = string.Empty;
     private bool _isSearching;
     private bool _hasError;
@@ -420,22 +430,44 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// Records that the page is being navigated away from, and banks the current search term as
-    /// a "recent search" chip for next time. Called from the page's Unloaded handler.
+    /// a "recent search" chip for next time if it found anything. Called from the page's
+    /// Unloaded handler.
     /// </summary>
     public void MarkLeft()
     {
         _lastLeftUtc = DateTimeOffset.UtcNow;
 
-        RecordRecentSearch();
+        // Leaving straight after a search (to add or edit one of its results) shows it was the
+        // one wanted, even before it has been on screen for RecentSearchSettleDelay.
+        if (_lastFruitfulSearchTerm is { } term &&
+            string.Equals(term, SearchTerm.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            RecordRecentSearch(term);
+        }
+    }
+
+    /// <summary>Banks <paramref name="term"/> once its results have stayed up for <see cref="RecentSearchSettleDelay"/>.</summary>
+    private async Task RecordRecentSearchWhenSettledAsync(string term, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Cancelled by the next search, i.e. by more typing or a filter change.
+            await Task.Delay(RecentSearchSettleDelay, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        RecordRecentSearch(term);
     }
 
     /// <summary>
-    /// Banks the current search term as a recent-search chip. Called when a search succeeds (so
-    /// it doesn't depend on the page unloading cleanly) and again on leaving as a fallback.
+    /// Banks a search term as a recent-search chip. Called once a search with results has
+    /// settled (so it doesn't depend on the page unloading cleanly) and on leaving as a fallback.
     /// </summary>
-    private void RecordRecentSearch()
+    private void RecordRecentSearch(string term)
     {
-        string term = SearchTerm.Trim();
         if (term.Length == 0 || string.Equals(RecentSearches.FirstOrDefault(), term, StringComparison.OrdinalIgnoreCase))
         {
             return;
@@ -470,6 +502,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         _searchCancellationTokenSource?.Cancel();
 
         _searchTerm = string.Empty;
+        _lastFruitfulSearchTerm = null;
         _selectedCodec = null;
         _selectedBitrate = null;
         _hideBroken = false;
@@ -619,14 +652,16 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
 
     private async Task PerformSearchAsync()
     {
-        // Cancel any ongoing search
+        // Cancel any ongoing search, and the recent-search record still pending for the last one.
+        // Held locally so the code below keeps using this search's token after a newer one starts.
         _searchCancellationTokenSource?.Cancel();
-        _searchCancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource cts = new();
+        _searchCancellationTokenSource = cts;
 
         // Wait a bit for the user to finish typing / adjusting filters
         try
         {
-            await Task.Delay(500, _searchCancellationTokenSource.Token);
+            await Task.Delay(500, cts.Token);
         }
         catch (TaskCanceledException)
         {
@@ -634,6 +669,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         }
 
         StationSearchQuery query = BuildQuery();
+        _lastFruitfulSearchTerm = null;
 
         // Nothing to search for: clear results and return to the initial state.
         if (query.IsEmpty)
@@ -654,7 +690,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         {
             List<RadioBrowserStation> results = await _radioBrowserService.SearchAsync(
                 query,
-                _searchCancellationTokenSource.Token);
+                cts.Token);
 
             SearchResultGroups.Clear();
             foreach (StationSearchResultGroup group in StationSearchGroupingPolicy.Group(results))
@@ -663,7 +699,15 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             }
 
             _hasCompletedSearch = true;
-            RecordRecentSearch();
+
+            // A search that found nothing is not one worth offering again.
+            string term = query.Name?.Trim() ?? string.Empty;
+            if (results.Count > 0 && term.Length > 0)
+            {
+                _lastFruitfulSearchTerm = term;
+                _ = RecordRecentSearchWhenSettledAsync(term, cts.Token);
+            }
+
             OnEmptyStateChanged();
             Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {results.Count} stations in {SearchResultGroups.Count} groups");
         }
