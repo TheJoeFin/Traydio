@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Trdo.Services;
 
@@ -31,10 +32,23 @@ internal static class LocalCoverReader
     private const int MaxThumbnails = 64;
 
     /// <summary>
+    /// Results bigger than this are handed back but not kept in <see cref="Thumbnails"/>. A real
+    /// thumbnail is tens of KB; anything this size is the original cover, returned unchanged
+    /// because it could not be shrunk (a format whose size can't be read, or a failed transcode).
+    /// Without this cap the map could pin <see cref="MaxThumbnails"/> full-size covers.
+    /// </summary>
+    private const int MaxInMemoryThumbBytes = 256 * 1024;
+
+    /// <summary>
     /// Thumbnail bytes by cache file name (path + last-write time + size), so concurrent loaders
     /// of one cover share a single read and one disk-cache lookup, and a changed file gets a new name.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, Task<byte[]?>> Thumbnails = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ThumbnailEntry> Thumbnails = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>A shared read, stamped with when it was added so the trim can drop the oldest.</summary>
+    private sealed record ThumbnailEntry(long Order, Task<byte[]?> Read);
+
+    private static long _thumbnailOrder;
 
     /// <summary>Paths already reported as missing with nothing to replace them, so the warning logs once.</summary>
     private static readonly ConcurrentDictionary<string, byte> ReportedMissing = new(StringComparer.OrdinalIgnoreCase);
@@ -79,14 +93,17 @@ internal static class LocalCoverReader
         string name = ArtThumbnailCache.LocalName(currentPath, info.LastWriteTimeUtc, info.Length);
         TrimThumbnails();
 
-        Task<byte[]?> task = Thumbnails.GetOrAdd(name, _ => BuildThumbnailAsync(currentPath, name));
+        ThumbnailEntry entry = Thumbnails.GetOrAdd(
+            name,
+            key => new ThumbnailEntry(Interlocked.Increment(ref _thumbnailOrder), BuildThumbnailAsync(currentPath, key)));
         try
         {
-            byte[]? result = await task;
-            if (result is null)
+            byte[]? result = await entry.Read;
+            if (result is null || result.Length > MaxInMemoryThumbBytes)
             {
-                // Don't pin "nothing": the file may be readable on a later call.
-                Thumbnails.TryRemove(new KeyValuePair<string, Task<byte[]?>>(name, task));
+                // Don't pin "nothing" (the file may be readable on a later call), or a full-size
+                // cover that could not be shrunk (see MaxInMemoryThumbBytes).
+                Thumbnails.TryRemove(new KeyValuePair<string, ThumbnailEntry>(name, entry));
             }
 
             return result;
@@ -94,7 +111,7 @@ internal static class LocalCoverReader
         catch
         {
             // Don't pin a failed read (a lock, a partial write); the caller's retry starts fresh.
-            Thumbnails.TryRemove(new KeyValuePair<string, Task<byte[]?>>(name, task));
+            Thumbnails.TryRemove(new KeyValuePair<string, ThumbnailEntry>(name, entry));
             throw;
         }
     }
@@ -129,19 +146,22 @@ internal static class LocalCoverReader
     }
 
     // Keeps the in-memory map bounded by dropping the oldest-inserted entries one at a time
-    // rather than emptying it (which would make every cover on screen rebuild at once).
+    // rather than emptying it (which would make every cover on screen rebuild at once). The map
+    // is at most MaxThumbnails entries, so a scan for the oldest is cheap.
     private static void TrimThumbnails()
     {
         while (Thumbnails.Count >= MaxThumbnails)
         {
-            string? victim = null;
-            foreach (string key in Thumbnails.Keys)
+            KeyValuePair<string, ThumbnailEntry>? oldest = null;
+            foreach (KeyValuePair<string, ThumbnailEntry> pair in Thumbnails)
             {
-                victim = key;
-                break;
+                if (oldest is null || pair.Value.Order < oldest.Value.Value.Order)
+                {
+                    oldest = pair;
+                }
             }
 
-            if (victim is null || !Thumbnails.TryRemove(victim, out _))
+            if (oldest is null || !Thumbnails.TryRemove(oldest.Value))
             {
                 break;
             }

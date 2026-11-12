@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -235,9 +234,10 @@ internal static class ArtThumbnailCache
 
     /// <summary>
     /// A full-size read lands on the large object heap, which the GC otherwise only reclaims (and
-    /// returns to the OS) on some later gen-2 pass. The live heap is a few MB, so one compacting
-    /// pass after a large source is shrunk is cheap - but loading a list of covers shrinks many in
-    /// a row, so the pass is debounced to run once when the burst goes quiet, not once per cover.
+    /// returns to the OS) on some later gen-2 pass. Loading a list of covers shrinks many in a
+    /// row, so one collection is debounced to run when the burst goes quiet, not once per cover.
+    /// It is a background collection: it frees the dead buffers while the UI and playback threads
+    /// keep running, instead of suspending them all for a blocking, compacting pass.
     /// </summary>
     public static void ReleaseLargeBuffers(int sourceLength)
     {
@@ -252,10 +252,7 @@ internal static class ArtThumbnailCache
     private const int ReleaseDelayMs = 2000;
 
     private static readonly Timer ReleaseTimer = new(static _ =>
-    {
-        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
-    });
+        GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: false));
 
     // Keep the remote folder bounded: past MaxFiles the least recently used go (reads refresh the
     // timestamp), and anything evicted just re-downloads. Only remote entries are counted; local
