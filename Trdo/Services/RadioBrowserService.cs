@@ -99,7 +99,13 @@ public class RadioBrowserService
             }
 
             StringBuilder url = new("json/stations/search?");
-            AppendParam(url, "name", query.Name);
+            // The API only does substring matching, so for a multi-word name send the longest
+            // word and require every word client-side below ("p5 hits" finds "P5 Nonstop Hits").
+            string[] nameWords = (query.Name ?? string.Empty)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            AppendParam(url, "name", nameWords.Length > 1
+                ? nameWords.OrderByDescending(w => w.Length).First()
+                : query.Name);
             AppendParam(url, "country", query.Country);
             AppendParam(url, "language", query.Language);
             if (query.Tags is { Count: > 0 })
@@ -130,11 +136,18 @@ public class RadioBrowserService
 
             Debug.WriteLine($"[RadioBrowserService] Found {stations?.Count ?? 0} stations");
 
+            if (stations is not null && nameWords.Length > 1)
+            {
+                stations = stations
+                    .Where(s => nameWords.All(w => s.Name.Contains(w, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+            }
+
             return stations ?? [];
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[RadioBrowserService] Error searching stations: {ex.Message}");
+            Debug.WriteLine($"[RadioBrowserService] Error searching stations:{ex.Message}");
             Debug.WriteLine($"[RadioBrowserService] Stack trace: {ex.StackTrace}");
             throw;
         }
