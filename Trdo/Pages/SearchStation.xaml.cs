@@ -1,9 +1,12 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Core;
 using Trdo.Controls;
 using Trdo.Models;
 using Trdo.Services;
@@ -212,6 +215,18 @@ public sealed partial class SearchStation : Page
             await StopPreviewAsync();
 
             PlayerViewModel.Shared.AddStation(station.ToRadioStation());
+
+            // Holding Shift keeps the search open so several stations can be added in a row;
+            // the button is disabled and relabelled so a station can't be added twice.
+            var shiftHeld = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Shift)
+                .HasFlag(CoreVirtualKeyStates.Down);
+            if (shiftHeld)
+            {
+                button.IsEnabled = false;
+                button.Content = LocalizationService.GetString("SearchStation_AddedLabel", "Added");
+                return;
+            }
 
             // Save right away and return to the main page
             _shellViewModel?.NavigateToPlayingPage();

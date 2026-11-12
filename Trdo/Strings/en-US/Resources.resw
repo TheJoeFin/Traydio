@@ -1464,6 +1464,12 @@
   <data name="SearchStation_AddButton.Content" xml:space="preserve">
     <value>Add Station</value>
   </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add station and return. Hold Shift while clicking to add several stations without leaving search.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Added</value>
+  </data>
   <data name="SearchStation_Title.Text" xml:space="preserve">
     <value>Search Radio Stations</value>
   </data>
