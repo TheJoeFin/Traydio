@@ -426,6 +426,15 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
     {
         _lastLeftUtc = DateTimeOffset.UtcNow;
 
+        RecordRecentSearch();
+    }
+
+    /// <summary>
+    /// Banks the current search term as a recent-search chip. Called when a search succeeds (so
+    /// it doesn't depend on the page unloading cleanly) and again on leaving as a fallback.
+    /// </summary>
+    private void RecordRecentSearch()
+    {
         string term = SearchTerm.Trim();
         if (term.Length == 0 || string.Equals(RecentSearches.FirstOrDefault(), term, StringComparison.OrdinalIgnoreCase))
         {
@@ -654,6 +663,7 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
             }
 
             _hasCompletedSearch = true;
+            RecordRecentSearch();
             OnEmptyStateChanged();
             Debug.WriteLine($"[SearchStationViewModel] Search completed. Found {results.Count} stations in {SearchResultGroups.Count} groups");
         }

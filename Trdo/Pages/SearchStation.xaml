@@ -436,7 +436,7 @@
                             HorizontalScrollMode="Enabled"
                             VerticalScrollBarVisibility="Disabled"
                             VerticalScrollMode="Disabled">
-                            <ItemsControl ItemsSource="{x:Bind ViewModel.RecentSearches, Mode=OneWay}">
+                            <ItemsControl Margin="0,0,0,14" ItemsSource="{x:Bind ViewModel.RecentSearches, Mode=OneWay}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal" Spacing="6" />
