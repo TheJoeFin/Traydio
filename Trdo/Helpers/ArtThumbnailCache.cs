@@ -52,7 +52,23 @@ internal static class ArtThumbnailCache
     // Bumped by Invalidate so a download already in flight doesn't write its (now stale) result back.
     private static int _generation;
 
-    private static string RemoteName(string url) => RemotePrefix + Hash(url) + Extension;
+    /// <summary>
+    /// Keyed by the URL's canonical form, so callers that hold the raw string (SMTC, a station
+    /// edit) and callers that hold <see cref="Uri.AbsoluteUri"/> (the UI) all reach the same
+    /// file: "http://Example.com" and "http://example.com/" are one entry, not two.
+    /// </summary>
+    private static string RemoteName(string url) => RemotePrefix + Hash(CanonicalUrl(url)) + Extension;
+
+    private static string CanonicalUrl(string url) =>
+        Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri) ? uri.AbsoluteUri : url;
+
+    /// <summary>
+    /// Whether <paramref name="bytes"/> start like a picture. Anything else (a captive portal's
+    /// login page, an error page served with 200) must not reach the disk cache, since a remote
+    /// entry is never re-checked and would stay broken across restarts.
+    /// </summary>
+    private static bool IsCacheableImage(byte[] bytes) =>
+        ImageFormat.DetectMime(bytes) is not null || ImageFormat.IsIcon(bytes);
 
     public static byte[]? TryRead(string name)
     {
@@ -128,7 +144,8 @@ internal static class ArtThumbnailCache
     /// <summary>
     /// Thumbnail for a remote <b>station</b> image: the cached copy if there is one (never
     /// re-checked against the server), otherwise <paramref name="download"/>ed, shrunk and cached.
-    /// Null when the download was refused (over the size limit). Only for art whose URL always
+    /// Null when the download was refused (over the size limit). A download that is not an image
+    /// is returned as-is for the caller to report, but not cached. Only for art whose URL always
     /// serves the same picture; per-track art is often a fixed URL whose content changes, so it
     /// must not come through here.
     /// </summary>
@@ -138,7 +155,14 @@ internal static class ArtThumbnailCache
         byte[]? cached = TryRead(name);
         if (cached is not null)
         {
-            return cached;
+            if (IsCacheableImage(cached))
+            {
+                return cached;
+            }
+
+            // Left by an earlier build that cached whatever came back. Drop it and fetch again.
+            LogService.Warn("AlbumArt", $"Cached station art {name} is not an image ({ImageFormat.Describe(cached)}); discarding it");
+            TryDelete(Path.Combine(Root.Value, name));
         }
 
         int generation = Volatile.Read(ref _generation);
@@ -146,6 +170,13 @@ internal static class ArtThumbnailCache
         if (full is null)
         {
             return null;
+        }
+
+        if (!IsCacheableImage(full))
+        {
+            // Kept off the disk, so the next launch downloads it again rather than replaying this.
+            LogService.Warn("AlbumArt", $"Station art at {url} is not an image ({ImageFormat.Describe(full)}); not caching it");
+            return full;
         }
 
         int length = full.Length;
