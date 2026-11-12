@@ -82,6 +82,13 @@ public class RadioBrowserService
     }
 
     /// <summary>
+    /// How many candidates to fetch for a multi-word name, of which only those containing every
+    /// word are kept. Much wider than a normal page: the longest word is often a common one
+    /// ("radio"), and a page of the caller's size would be used up by stations matching only it.
+    /// </summary>
+    private const int MultiWordCandidateLimit = 500;
+
+    /// <summary>
     /// Searches for radio stations using any combination of name and filters
     /// via the /json/stations/search endpoint.
     /// </summary>
@@ -99,59 +106,97 @@ public class RadioBrowserService
                 return [];
             }
 
-            StringBuilder url = new("json/stations/search?");
-            // The API only does substring matching, so for a multi-word name send the longest
-            // word and require every word client-side below ("p5 hits" finds "P5 Nonstop Hits").
             string[] nameWords = (query.Name ?? string.Empty)
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            AppendParam(url, "name", nameWords.Length > 1
-                ? nameWords.OrderByDescending(w => w.Length).First()
-                : query.Name);
-            AppendParam(url, "country", query.Country);
-            AppendParam(url, "language", query.Language);
-            if (query.Tags is { Count: > 0 })
+            if (nameWords.Length <= 1)
             {
-                AppendParam(url, "tagList", string.Join(",", query.Tags));
-            }
-            AppendParam(url, "codec", query.Codec);
-            if (query.BitrateMin.HasValue)
-            {
-                AppendParam(url, "bitrateMin", query.BitrateMin.Value.ToString());
-            }
-            AppendParam(url, "order", query.Order);
-            AppendParam(url, "reverse", query.Reverse ? "true" : "false");
-            AppendParam(url, "hidebroken", query.HideBroken ? "true" : "false");
-            AppendParam(url, "limit", query.Limit.ToString());
-
-            string requestUrl = url.ToString().TrimEnd('&');
-
-            Debug.WriteLine($"[RadioBrowserService] Search URL: {_httpClient.BaseAddress}{requestUrl}");
-
-            HttpResponseMessage response = await _httpClient.GetAsync(requestUrl, cancellationToken);
-            response.EnsureSuccessStatusCode();
-
-            string content = await response.Content.ReadAsStringAsync(cancellationToken);
-            Debug.WriteLine($"[RadioBrowserService] Received response, length: {content.Length}");
-
-            List<RadioBrowserStation>? stations = JsonSerializer.Deserialize(content, RadioBrowserJsonContext.Default.ListRadioBrowserStation);
-
-            Debug.WriteLine($"[RadioBrowserService] Found {stations?.Count ?? 0} stations");
-
-            if (stations is not null && nameWords.Length > 1)
-            {
-                stations = stations
-                    .Where(s => nameWords.All(w => s.Name.Contains(w, StringComparison.OrdinalIgnoreCase)))
-                    .ToList();
+                return await FetchStationsAsync(BuildSearchUrl(query, query.Name, query.Limit), cancellationToken);
             }
 
-            return stations ?? [];
+            // The API only does substring matching, so for a multi-word name send the longest
+            // word and require every word here ("p5 hits" finds "P5 Nonstop Hits").
+            string longestWord = nameWords.OrderByDescending(w => w.Length).First();
+            List<RadioBrowserStation> candidates = await FetchStationsAsync(
+                BuildSearchUrl(query, longestWord, MultiWordCandidateLimit), cancellationToken);
+            List<RadioBrowserStation> matches = candidates
+                .Where(s => nameWords.All(w => s.Name.Contains(w, StringComparison.OrdinalIgnoreCase)))
+                .Take(query.Limit)
+                .ToList();
+
+            // A full page that still came up short may have cut off matches ranked further down
+            // the longest word's list. Asking for the words as one phrase too catches those
+            // ("BBC Radio 1" however far down the "radio" list it sits); they go after the rest.
+            if (candidates.Count >= MultiWordCandidateLimit && matches.Count < query.Limit)
+            {
+                List<RadioBrowserStation> phraseMatches = await FetchStationsAsync(
+                    BuildSearchUrl(query, string.Join(' ', nameWords), query.Limit), cancellationToken);
+
+                HashSet<string> seen = new(matches.Select(StationKey), StringComparer.OrdinalIgnoreCase);
+                foreach (RadioBrowserStation station in phraseMatches)
+                {
+                    if (matches.Count >= query.Limit)
+                    {
+                        break;
+                    }
+
+                    if (seen.Add(StationKey(station)))
+                    {
+                        matches.Add(station);
+                    }
+                }
+            }
+
+            Debug.WriteLine($"[RadioBrowserService] {matches.Count} stations match every word of '{query.Name}'");
+            return matches;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[RadioBrowserService] Error searching stations:{ex.Message}");
+            Debug.WriteLine($"[RadioBrowserService] Error searching stations: {ex.Message}");
             Debug.WriteLine($"[RadioBrowserService] Stack trace: {ex.StackTrace}");
             throw;
         }
+    }
+
+    private static string StationKey(RadioBrowserStation station) =>
+        string.IsNullOrEmpty(station.StationUuid) ? station.GetStreamUrl() : station.StationUuid;
+
+    private static string BuildSearchUrl(StationSearchQuery query, string? name, int limit)
+    {
+        StringBuilder url = new("json/stations/search?");
+        AppendParam(url, "name", name);
+        AppendParam(url, "country", query.Country);
+        AppendParam(url, "language", query.Language);
+        if (query.Tags is { Count: > 0 })
+        {
+            AppendParam(url, "tagList", string.Join(",", query.Tags));
+        }
+        AppendParam(url, "codec", query.Codec);
+        if (query.BitrateMin.HasValue)
+        {
+            AppendParam(url, "bitrateMin", query.BitrateMin.Value.ToString());
+        }
+        AppendParam(url, "order", query.Order);
+        AppendParam(url, "reverse", query.Reverse ? "true" : "false");
+        AppendParam(url, "hidebroken", query.HideBroken ? "true" : "false");
+        AppendParam(url, "limit", limit.ToString());
+
+        return url.ToString().TrimEnd('&');
+    }
+
+    private static async Task<List<RadioBrowserStation>> FetchStationsAsync(string requestUrl, CancellationToken cancellationToken)
+    {
+        Debug.WriteLine($"[RadioBrowserService] Search URL: {_httpClient.BaseAddress}{requestUrl}");
+
+        using HttpResponseMessage response = await _httpClient.GetAsync(requestUrl, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync(cancellationToken);
+        Debug.WriteLine($"[RadioBrowserService] Received response, length: {content.Length}");
+
+        List<RadioBrowserStation>? stations = JsonSerializer.Deserialize(content, RadioBrowserJsonContext.Default.ListRadioBrowserStation);
+
+        Debug.WriteLine($"[RadioBrowserService] Found {stations?.Count ?? 0} stations");
+        return stations ?? [];
     }
 
     /// <summary>
