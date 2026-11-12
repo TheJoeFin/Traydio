@@ -45,6 +45,7 @@ public sealed partial class SearchStation : Page
         SearchTextBox.Focus(FocusState.Programmatic);
 
         RadioPlayerService.Instance.PlaybackStateChanged += OnPlaybackStateChanged;
+        RadioPlayerService.Instance.BufferingStateChanged += OnBufferingStateChanged;
 
         // A quick trip away (e.g. to the edit page) keeps what's on screen; coming back after a
         // while starts the page fresh instead.
@@ -54,6 +55,7 @@ public sealed partial class SearchStation : Page
     private async void SearchStation_Unloaded(object sender, RoutedEventArgs e)
     {
         RadioPlayerService.Instance.PlaybackStateChanged -= OnPlaybackStateChanged;
+        RadioPlayerService.Instance.BufferingStateChanged -= OnBufferingStateChanged;
         ViewModel.MarkLeft();
         await StopPreviewAsync();
     }
@@ -96,7 +98,8 @@ public sealed partial class SearchStation : Page
 
         _activePreviewButton = button;
         _previewingStationUrl = stationUrl;
-        SetButtonGlyph(button, PauseGlyph);
+        // Loading until the player reports playing.
+        SetButtonGlyph(button, PauseGlyph, buffering: true);
 
         _previewTransitionCts?.Cancel();
         CancellationTokenSource transitionCts = new();
@@ -143,16 +146,48 @@ public sealed partial class SearchStation : Page
         {
             if (_activePreviewButton != null)
             {
-                SetButtonGlyph(_activePreviewButton, isPlaying ? PauseGlyph : PlayGlyph);
+                SetButtonGlyph(
+                    _activePreviewButton,
+                    isPlaying ? PauseGlyph : PlayGlyph,
+                    !isPlaying && RadioPlayerService.Instance.IsBuffering);
             }
         });
     }
 
-    private static void SetButtonGlyph(Button button, string glyph)
+    private void OnBufferingStateChanged(object? sender, bool isBuffering)
     {
-        if (button.Content is FontIcon icon)
+        DispatcherQueue.TryEnqueue(() =>
         {
-            icon.Glyph = glyph;
+            if (_activePreviewButton is null)
+                return;
+
+            RadioPlayerService player = RadioPlayerService.Instance;
+            SetButtonGlyph(_activePreviewButton, player.IsPlaying ? PauseGlyph : PlayGlyph, isBuffering || player.IsBuffering);
+        });
+    }
+
+    /// <summary>
+    /// Shows <paramref name="glyph"/> on the preview button, or a spinner in its place while
+    /// <paramref name="buffering"/> so it's clear the stream is still loading.
+    /// </summary>
+    private static void SetButtonGlyph(Button button, string glyph, bool buffering = false)
+    {
+        if (button.Content is not Grid grid)
+            return;
+
+        foreach (UIElement child in grid.Children)
+        {
+            switch (child)
+            {
+                case FontIcon icon:
+                    icon.Glyph = glyph;
+                    icon.Visibility = buffering ? Visibility.Collapsed : Visibility.Visible;
+                    break;
+                case ProgressRing ring:
+                    ring.IsActive = buffering;
+                    ring.Visibility = buffering ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+            }
         }
     }
 

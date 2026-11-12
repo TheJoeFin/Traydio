@@ -109,7 +109,15 @@
                                             x:Uid="SearchStation_PreviewButton"
                                             Click="PreviewButton_Click"
                                             Tag="{x:Bind}">
-                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                            <!--  Icon and a spinner share a cell; the code-behind swaps them while buffering.  -->
+                                            <Grid Width="14" Height="14">
+                                                <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                                <ProgressRing
+                                                    Width="14"
+                                                    Height="14"
+                                                    IsActive="False"
+                                                    Visibility="Collapsed" />
+                                            </Grid>
                                         </Button>
                                         <Button
                                             x:Uid="SearchStation_EditButton"
