@@ -32,6 +32,22 @@ public sealed partial class StreamMetadataService : IDisposable
     private readonly TimeSpan _pollingInterval = TimeSpan.FromSeconds(10);
 
     /// <summary>
+    /// How long a read of the stream body may go without receiving a single byte before the
+    /// connection is treated as stalled. <see cref="HttpClient.Timeout"/> only covers getting the
+    /// response headers, so without this a connection that silently dies (a Wi-Fi roam, sleep
+    /// and resume, a NAT entry dropped) leaves the read waiting forever. A live stream sends
+    /// audio continuously, so this much silence means it is gone.
+    /// </summary>
+    private static readonly TimeSpan IdleReadTimeout = TimeSpan.FromSeconds(20);
+
+    /// <summary>
+    /// Audio before each metadata block is read and thrown away through this fixed-size buffer,
+    /// however large the server's icy-metaint is. Also holds the metadata block itself, which is
+    /// at most 255 * 16 bytes.
+    /// </summary>
+    private const int IcyReadBufferSize = 8192;
+
+    /// <summary>
     /// Event raised when stream metadata changes.
     /// </summary>
     public event EventHandler<StreamMetadata>? MetadataChanged;
@@ -230,25 +246,18 @@ public sealed partial class StreamMetadataService : IDisposable
                     LogService.Info("StreamMetadataService", $"Robust metadata session connected (metaint={metaInterval})");
 
                     using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                    byte[] buffer = new byte[Math.Max(metaInterval, 4096)];
+                    using CancellationTokenSource idle = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    byte[] buffer = new byte[IcyReadBufferSize];
 
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        // Audio bytes up to the next metadata block are not needed.
-                        await stream.ReadExactlyAsync(buffer.AsMemory(0, metaInterval), cancellationToken);
+                        string metadataStr = await ReadNextMetadataAsync(stream, metaInterval, buffer, idle, cancellationToken);
                         madeProgress = true;
-
-                        await stream.ReadExactlyAsync(buffer.AsMemory(0, 1), cancellationToken);
-                        int metaLength = buffer[0] * 16;
-                        if (metaLength == 0)
+                        if (metadataStr.Length == 0)
                         {
                             continue;
                         }
 
-                        byte[] metaBuffer = new byte[metaLength];
-                        await stream.ReadExactlyAsync(metaBuffer, cancellationToken);
-
-                        string metadataStr = IcyTextDecoder.Decode(metaBuffer).TrimEnd('\0');
                         StreamMetadata metadata = ParseIcyMetadata(metadataStr);
                         if (metadata.HasMetadata)
                         {
@@ -257,9 +266,15 @@ public sealed partial class StreamMetadataService : IDisposable
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 return;
+            }
+            catch (OperationCanceledException)
+            {
+                // Not a stop request: the response headers timed out, or the body went quiet for
+                // longer than IdleReadTimeout. Either way the connection is dead; reconnect.
+                LogService.Info("StreamMetadataService", "Robust metadata session stalled; reconnecting");
             }
             catch (EndOfStreamException)
             {
@@ -359,7 +374,7 @@ public sealed partial class StreamMetadataService : IDisposable
     }
 
     /// <summary>
-    /// Reads ICY metadata from the stream.
+    /// Reads the first ICY metadata block from the stream.
     /// </summary>
     private static async Task<StreamMetadata?> ReadIcyMetadataAsync(
         Stream stream,
@@ -368,80 +383,90 @@ public sealed partial class StreamMetadataService : IDisposable
     {
         try
         {
-            // Read and discard audio data in chunks until we reach the metadata
-            // Using a fixed buffer size reduces memory allocation for large metaInterval values
-            const int chunkSize = 8192;
-            byte[] discardBuffer = new byte[Math.Min(chunkSize, metaInterval)];
-            int totalRead = 0;
+            using CancellationTokenSource idle = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            string metadataStr = await ReadNextMetadataAsync(
+                stream, metaInterval, new byte[IcyReadBufferSize], idle, cancellationToken);
 
-            while (totalRead < metaInterval)
+            if (metadataStr.Length == 0)
             {
-                int bytesToRead = Math.Min(discardBuffer.Length, metaInterval - totalRead);
-                int bytesRead = await stream.ReadAsync(
-                    discardBuffer.AsMemory(0, bytesToRead),
-                    cancellationToken);
-
-                if (bytesRead == 0)
-                {
-                    Debug.WriteLine("[StreamMetadataService] Stream ended before metadata");
-                    return null;
-                }
-
-                totalRead += bytesRead;
-            }
-
-            // Read metadata length byte (multiply by 16 to get actual length)
-            // Reuse the first byte of the discard buffer for efficiency
-            int lengthBytesRead = await stream.ReadAsync(discardBuffer.AsMemory(0, 1), cancellationToken);
-            if (lengthBytesRead == 0)
-            {
-                Debug.WriteLine("[StreamMetadataService] Could not read metadata length");
-                return null;
-            }
-
-            int metaLength = discardBuffer[0] * 16;
-            if (metaLength == 0)
-            {
-                // No metadata in this block
                 Debug.WriteLine("[StreamMetadataService] No metadata in current block");
                 return null;
             }
 
-            // Read metadata
-            byte[] metaBuffer = new byte[metaLength];
-            totalRead = 0;
-
-            while (totalRead < metaLength)
-            {
-                int bytesRead = await stream.ReadAsync(
-                    metaBuffer.AsMemory(totalRead, metaLength - totalRead),
-                    cancellationToken);
-
-                if (bytesRead == 0)
-                {
-                    Debug.WriteLine("[StreamMetadataService] Stream ended before full metadata");
-                    return null;
-                }
-
-                totalRead += bytesRead;
-            }
-
-            // Parse metadata string (null-terminated, padded with zeros).
-            // ICY metadata has no charset signaling. Most stations send UTF-8, but many
-            // legacy Shoutcast/Icecast sources send whatever local codepage the broadcast
-            // software used, which is not valid UTF-8. Decoding those bytes as UTF-8 replaces
-            // every invalid sequence with U+FFFD, permanently destroying the original text.
-            // IcyTextDecoder falls back to Windows-1251 for Cyrillic-looking bytes, else Latin-1.
-            string metadataStr = IcyTextDecoder.Decode(metaBuffer).TrimEnd('\0');
             Debug.WriteLine($"[StreamMetadataService] Raw metadata: {metadataStr}");
-
             return ParseIcyMetadata(metadataStr);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {
+            // Includes the stream ending early and the idle timeout firing on a stalled connection.
             Debug.WriteLine($"[StreamMetadataService] Error reading ICY metadata: {ex.Message}");
             return null;
         }
+    }
+
+    /// <summary>
+    /// Skips the audio up to the next ICY metadata block and returns that block's text, or an
+    /// empty string when the block is empty (the server had nothing to say this interval).
+    /// </summary>
+    /// <param name="buffer">At least <see cref="IcyReadBufferSize"/> bytes; reused across calls.</param>
+    /// <param name="idle">
+    /// Linked to <paramref name="cancellationToken"/>; re-armed with <see cref="IdleReadTimeout"/>
+    /// before every read, so it cancels the read only when no data arrives for that long.
+    /// </param>
+    /// <exception cref="EndOfStreamException">The stream ended before the block was complete.</exception>
+    /// <exception cref="OperationCanceledException">
+    /// <paramref name="cancellationToken"/> was cancelled, or the connection stalled (in which
+    /// case <paramref name="cancellationToken"/> itself is not cancelled).
+    /// </exception>
+    private static async Task<string> ReadNextMetadataAsync(
+        Stream stream,
+        int metaInterval,
+        byte[] buffer,
+        CancellationTokenSource idle,
+        CancellationToken cancellationToken)
+    {
+        CancellationToken token = idle.Token;
+
+        // The audio up to the block is not needed. Read in buffer-sized chunks so a large
+        // icy-metaint costs no extra memory.
+        int remaining = metaInterval;
+        while (remaining > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            idle.CancelAfter(IdleReadTimeout);
+            int read = await stream.ReadAsync(buffer.AsMemory(0, Math.Min(buffer.Length, remaining)), token);
+            if (read == 0)
+            {
+                throw new EndOfStreamException("The stream ended before the metadata block.");
+            }
+
+            remaining -= read;
+        }
+
+        // One length byte, in units of 16 bytes.
+        idle.CancelAfter(IdleReadTimeout);
+        await stream.ReadExactlyAsync(buffer.AsMemory(0, 1), token);
+        int metaLength = buffer[0] * 16;
+        if (metaLength == 0)
+        {
+            return string.Empty;
+        }
+
+        byte[] metaBuffer = new byte[metaLength];
+        idle.CancelAfter(IdleReadTimeout);
+        await stream.ReadExactlyAsync(metaBuffer, token);
+
+        // Null-terminated and padded with zeros. ICY metadata has no charset signaling. Most
+        // stations send UTF-8, but many legacy Shoutcast/Icecast sources send whatever local
+        // codepage the broadcast software used, which is not valid UTF-8. Decoding those bytes
+        // as UTF-8 replaces every invalid sequence with U+FFFD, permanently destroying the
+        // original text. IcyTextDecoder falls back to Windows-1251 for Cyrillic-looking bytes,
+        // else Latin-1.
+        return IcyTextDecoder.Decode(metaBuffer).TrimEnd('\0');
     }
 
     // ICY servers typically re-send the same metadata block on every poll until the track
