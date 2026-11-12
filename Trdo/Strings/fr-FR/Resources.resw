@@ -338,6 +338,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>Consultez à nouveau le tuto pour apprendre à utiliser Traydio.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Mises à jour</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>Cette copie a été installée depuis GitHub et peut se mettre à jour toute seule.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Rechercher des mises à jour</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Redémarrer pour mettre à jour</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>Vous êtes à jour.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>Une mise à jour est disponible.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Impossible de rechercher les mises à jour.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Besoin d&apos;aide ?</value>
   </data>
@@ -623,6 +644,21 @@
   <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
     <value>Régler pour cette station</value>
   </data>
+  <data name="ManualStationWindow_RobustMetadata.Text" xml:space="preserve">
+    <value>Métadonnées robustes</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataDescription.Text" xml:space="preserve">
+    <value>Garde une connexion ouverte avec le flux en permanence uniquement pour lire les informations du titre. Utile pour les stations qui commencent chaque connexion par une publicité ou le nom de la station au lieu du morceau, mais consomme des données supplémentaires (à peu près autant que l'écoute).</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OnContent" xml:space="preserve">
+    <value>Garder la connexion des métadonnées ouverte</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OffContent" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Métadonnées robustes pour cette station</value>
+  </data>
   <data name="ManualStationWindow_Title" xml:space="preserve">
     <value>Traydio - Ajouter une station</value>
   </data>
@@ -646,6 +682,9 @@
   </data>
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Titres récents</value>
+  </data>
+  <data name="NowPlayingPage_RefreshMetadata.Text" xml:space="preserve">
+    <value>Actualiser les métadonnées</value>
   </data>
   <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
     <value>Pistes</value>
@@ -1529,5 +1568,20 @@
   </data>
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>Impossible de modifier le groupe : {0}</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>LibVLC d&apos;abord, Windows en secours</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>Le PC peut se mettre en veille pendant la lecture</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>Le PC reste éveillé pendant la lecture</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Saisissez un terme de recherche pour trouver des stations...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>Base de données de radios internet communautaire avec des milliers de stations dans le monde</value>
   </data>
 </root>

@@ -22,6 +22,7 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
     private bool _providersRunning;
     private string? _runningStreamUrl;
     private PlaybackBackendKind _runningBackend;
+    private bool _runningRobust;
 
     public StreamMetadataOrchestrator(
         StreamMetadataService icyMetadataService,
@@ -52,6 +53,12 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
 
     public StreamMetadata CurrentMetadata => _currentMetadata;
 
+    /// <summary>
+    /// Per-station opt-in: read ICY metadata over one long-lived connection instead of polling
+    /// with short-lived ones. See <see cref="StreamMetadataService.StartPolling"/>.
+    /// </summary>
+    public bool RobustMetadata { get; set; }
+
     public void EnsureForPlayback(
         string streamUrl,
         PlaybackBackendKind backend,
@@ -60,7 +67,8 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
     {
         if (_providersRunning &&
             string.Equals(_runningStreamUrl, streamUrl, StringComparison.OrdinalIgnoreCase) &&
-            _runningBackend == backend)
+            _runningBackend == backend &&
+            _runningRobust == RobustMetadata)
         {
             return;
         }
@@ -106,6 +114,7 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
         _providersRunning = true;
         _runningStreamUrl = streamUrl;
         _runningBackend = backend;
+        _runningRobust = RobustMetadata;
     }
 
     public void StopAll()
@@ -177,7 +186,7 @@ public sealed partial class StreamMetadataOrchestrator : IDisposable
             return;
         }
 
-        _icyMetadataService.StartPolling(pollingUrl);
+        _icyMetadataService.StartPolling(pollingUrl, RobustMetadata);
     }
 
     private static string? GetIcyPollingUrl(string streamUrl)

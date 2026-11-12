@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -825,6 +826,12 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         _activeSourceKind = kind;
     }
+
+    /// <summary>
+    /// Whether the current station reads its now-playing metadata over a long-lived ICY
+    /// connection. Set by the view model from the station's setting before playback starts.
+    /// </summary>
+    public bool RobustMetadata { get; set; }
 
     /// <summary>
     /// What kind of source is currently active. <see cref="StreamWatchdogService"/> reads this
@@ -2048,7 +2055,7 @@ public sealed partial class RadioPlayerService : IDisposable
         // happened to be mid-rebuffer at the moment of pausing, and SetManualBuffering(false)
         // re-reads that same backend state a few lines down - see _isUserPaused.
         _isUserPaused = true;
-        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true");
+        LogService.Info("RadioPlayerService", $"Pause: radio path starting, backend={ActivePlaybackBackend}, _isUserPaused set true, caller={DescribePauseCaller()}");
 
         // Fired first, before any teardown: see PlaybackPausedByUser.
         TryEnqueueOnUi(() => PlaybackPausedByUser?.Invoke(this, EventArgs.Empty));
@@ -2195,9 +2202,31 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Compact "A &lt;- B &lt;- C" description of who called Pause(), for diagnosing unexpected pauses.
+    /// </summary>
+    private static string DescribePauseCaller()
+    {
+        try
+        {
+            var frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
+            var names = frames
+                .Select(f => f.GetMethod())
+                .Where(m => m?.DeclaringType != null)
+                .Take(5)
+                .Select(m => $"{m!.DeclaringType!.Name}.{m.Name}");
+            return string.Join(" <- ", names);
+        }
+        catch (Exception ex)
+        {
+            return $"unknown ({ex.GetType().Name})";
+        }
+    }
+
     private void OnSystemMediaButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
     {
         Debug.WriteLine($"[RadioPlayerService] System media button pressed: {args.Button}");
+        LogService.Info("RadioPlayerService", $"System media button pressed: {args.Button}");
 
         TryEnqueueOnUi(() =>
         {
@@ -2436,7 +2465,7 @@ public sealed partial class RadioPlayerService : IDisposable
                     if (_currentStationFaviconUrl != _currentAlbumArtUrl)
                     {
                         Debug.WriteLine($"[RadioPlayerService] Attempting to set favicon as fallback: {_currentStationFaviconUrl}");
-                        thumbnailSet = await SetAlbumArtAsync(updater, _currentStationFaviconUrl);
+                        thumbnailSet = await SetAlbumArtAsync(updater, _currentStationFaviconUrl, stationArt: true);
 
                         if (thumbnailSet)
                         {
@@ -2481,7 +2510,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
-    private async Task<bool> SetAlbumArtAsync(SystemMediaTransportControlsDisplayUpdater updater, string imageUrl)
+    private async Task<bool> SetAlbumArtAsync(SystemMediaTransportControlsDisplayUpdater updater, string imageUrl, bool stationArt = false)
     {
         try
         {
@@ -2531,7 +2560,12 @@ public sealed partial class RadioPlayerService : IDisposable
             else
             {
                 Debug.WriteLine($"[RadioPlayerService] Downloading album art from: {imageUrl}");
-                byte[]? downloaded = await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
+                // Only the station's own art goes through the on-disk cache; per-track art is
+                // often a fixed URL whose picture changes, so it is fetched every time.
+                byte[]? downloaded = stationArt
+                    ? await ArtThumbnailCache.GetRemoteAsync(
+                        imageUrl, () => ImageDownloader.GetBytesAsync(_httpClient, imageUrl))
+                    : await ImageDownloader.GetBytesAsync(_httpClient, imageUrl);
                 if (downloaded is null)
                 {
                     // Over the size limit; already logged.

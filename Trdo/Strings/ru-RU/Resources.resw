@@ -341,6 +341,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>Посмотрите обучение ещё раз, чтобы узнать, как пользоваться Traydio.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>Эта копия установлена с GitHub и может обновляться самостоятельно.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Перезапустить для обновления</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>У вас последняя версия.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>Доступно обновление.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Не удалось проверить наличие обновлений.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Нужна помощь?</value>
   </data>
@@ -674,6 +695,21 @@
   <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
     <value>Своё значение для этой станции</value>
   </data>
+  <data name="ManualStationWindow_RobustMetadata.Text" xml:space="preserve">
+    <value>Надёжные метаданные</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataDescription.Text" xml:space="preserve">
+    <value>Постоянно держит соединение с потоком открытым только для чтения информации о треке. Помогает станциям, которые начинают каждое новое соединение с рекламы или названия станции вместо песни, но расходует дополнительный трафик (примерно столько же, сколько само прослушивание).</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OnContent" xml:space="preserve">
+    <value>Держать соединение метаданных открытым</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OffContent" xml:space="preserve">
+    <value>Выкл.</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Надёжные метаданные для этой станции</value>
+  </data>
   <data name="ManualStationWindow_Title" xml:space="preserve">
     <value>Traydio — добавить станцию</value>
   </data>
@@ -697,6 +733,9 @@
   </data>
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Недавние треки</value>
+  </data>
+  <data name="NowPlayingPage_RefreshMetadata.Text" xml:space="preserve">
+    <value>Обновить метаданные</value>
   </data>
   <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
     <value>Треки</value>
@@ -1529,5 +1568,20 @@
   </data>
   <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Нажмите, чтобы увидеть подробности</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>Сначала LibVLC, затем Windows</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>ПК может засыпать во время воспроизведения</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>ПК не засыпает во время воспроизведения</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Введите поисковый запрос, чтобы найти станции...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>База данных интернет-радио, создаваемая сообществом, с тысячами станций по всему миру</value>
   </data>
 </root>

@@ -499,7 +499,7 @@
                 animations:Implicit.ShowAnimations="{StaticResource ImplicitCrossFadeShowAnimations}"
                 Visibility="{x:Bind ViewModel.StationCount, Mode=OneWay, Converter={StaticResource CountToEmptyStateVisibilityConverter}}">
                 <StackPanel
-                    MaxWidth="240"
+                    MaxWidth="300"
                     HorizontalAlignment="Center"
                     Spacing="8">
                     <!--  Radio Icon  -->
@@ -536,7 +536,7 @@
                         Style="{StaticResource AccentButtonStyle}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon FontSize="16" Glyph="&#xE710;" />
-                            <TextBlock x:Uid="PlayingPage_AddFirstStation" />
+                            <TextBlock x:Uid="PlayingPage_AddFirstStation" TextWrapping="Wrap" />
                         </StackPanel>
                     </Button>
                 </StackPanel>

@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Trdo.Models"
+    xmlns:pages="using:Trdo.Pages"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     NavigationCacheMode="Required"
     mc:Ignorable="d">
@@ -109,7 +110,15 @@
                                             x:Uid="SearchStation_PreviewButton"
                                             Click="PreviewButton_Click"
                                             Tag="{x:Bind}">
-                                            <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                            <!--  Icon and a spinner share a cell; the code-behind swaps them while buffering.  -->
+                                            <Grid Width="14" Height="14">
+                                                <FontIcon FontSize="14" Glyph="&#xE768;" />
+                                                <ProgressRing
+                                                    Width="14"
+                                                    Height="14"
+                                                    IsActive="False"
+                                                    Visibility="Collapsed" />
+                                            </Grid>
                                         </Button>
                                         <Button
                                             x:Uid="SearchStation_EditButton"
@@ -117,11 +126,17 @@
                                             Tag="{x:Bind}">
                                             <FontIcon FontSize="14" Glyph="&#xE70F;" />
                                         </Button>
+                                        <!--  Add, swapped for a disabled "Added" once this stream is in the list  -->
                                         <Button
                                             x:Uid="SearchStation_AddButton"
                                             Click="AddStationButton_Click"
                                             Style="{StaticResource AccentButtonStyle}"
-                                            Tag="{x:Bind}" />
+                                            Tag="{x:Bind}"
+                                            Visibility="{x:Bind IsAdded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                                        <Button
+                                            Content="{x:Bind pages:SearchStation.AddedLabel}"
+                                            IsEnabled="False"
+                                            Visibility="{x:Bind IsAdded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
@@ -436,7 +451,7 @@
                             HorizontalScrollMode="Enabled"
                             VerticalScrollBarVisibility="Disabled"
                             VerticalScrollMode="Disabled">
-                            <ItemsControl ItemsSource="{x:Bind ViewModel.RecentSearches, Mode=OneWay}">
+                            <ItemsControl Margin="0,0,0,14" ItemsSource="{x:Bind ViewModel.RecentSearches, Mode=OneWay}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal" Spacing="6" />

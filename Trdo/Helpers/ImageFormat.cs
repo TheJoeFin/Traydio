@@ -27,6 +27,16 @@ internal static class ImageFormat
     }
 
     /// <summary>
+    /// Whether the leading bytes are a Windows icon (.ico) header - the usual favicon format,
+    /// which the image decoders read but <see cref="DetectMime"/> does not report.
+    /// </summary>
+    public static bool IsIcon(ReadOnlySpan<byte> bytes) =>
+        bytes.Length >= 6 &&
+        bytes[0] == 0 && bytes[1] == 0 && // reserved
+        bytes[2] == 1 && bytes[3] == 0 && // type 1: icon
+        (bytes[4] | (bytes[5] << 8)) > 0; // image count
+
+    /// <summary>
     /// Reads the pixel size straight from the header of a JPEG, PNG, GIF or BMP, without
     /// decoding anything. Lets callers decide whether an image is worth downscaling before
     /// paying for a decode - a 3000x3000 cover is 36 MB once decoded. Returns false for any

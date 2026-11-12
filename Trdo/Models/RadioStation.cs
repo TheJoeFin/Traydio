@@ -35,6 +35,7 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
     private double _volume = 1.0;
     private double? _bufferLevel;
     private double? _songPopupDelaySeconds;
+    private bool _robustMetadata;
     private string? _stationUuid;
     private string? _tags;
     private string? _country;
@@ -126,6 +127,12 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
     }
 
     /// <summary>
+    /// Re-raises <see cref="FaviconUrl"/> so bound images rebuild from it even though the URL
+    /// itself is unchanged (after the user edits the station and its cached art is dropped).
+    /// </summary>
+    public void RefreshFavicon() => OnPropertyChanged(nameof(FaviconUrl));
+
+    /// <summary>
     /// Whether the row's placeholder icon (see <see cref="FaviconPlaceholderGlyph"/>) should be
     /// shown instead of the favicon/album art image. Kept as its own binding rather than just
     /// letting the image draw over the icon, since a transparent or not-yet-loaded image would
@@ -191,6 +198,27 @@ public partial class RadioStation : INotifyPropertyChanged, IJsonOnDeserialized
                 : Services.SongChangeAnnouncementPolicy.ClampDelay(value.Value);
             if (clamped == _songPopupDelaySeconds) return;
             _songPopupDelaySeconds = clamped;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Advanced, per-station opt-in: read now-playing metadata over one ICY connection that
+    /// stays open the whole time, instead of short polls that each start a new session.
+    /// <para>
+    /// For stations that open every new session with a commercial or intro whose metadata is
+    /// only the station name, so a short poll never sees a real title. The price is a second
+    /// copy of the stream's bandwidth, hence off by default. Stations saved before this
+    /// existed read back as <c>false</c>.
+    /// </para>
+    /// </summary>
+    public bool RobustMetadata
+    {
+        get => _robustMetadata;
+        set
+        {
+            if (value == _robustMetadata) return;
+            _robustMetadata = value;
             OnPropertyChanged();
         }
     }

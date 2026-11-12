@@ -338,6 +338,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>Sieh dir die Anleitung erneut an, um zu erfahren, wie du Traydio benutzt.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>Diese Kopie wurde von GitHub installiert und kann sich selbst aktualisieren.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Zum Aktualisieren neu starten</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>Sie sind auf dem neuesten Stand.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>Ein Update ist verfügbar.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Die Suche nach Updates ist fehlgeschlagen.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Brauchst du Hilfe?</value>
   </data>
@@ -623,6 +644,21 @@
   <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
     <value>Für diesen Sender überschreiben</value>
   </data>
+  <data name="ManualStationWindow_RobustMetadata.Text" xml:space="preserve">
+    <value>Robuste Metadaten</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataDescription.Text" xml:space="preserve">
+    <value>Hält die ganze Zeit eine Verbindung zum Stream offen, nur um die Titelinfos zu lesen. Hilft bei Sendern, die jede neue Verbindung mit Werbung oder dem Sendernamen statt dem Song beginnen, verbraucht aber zusätzliche Daten (etwa so viel wie das Hören selbst).</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OnContent" xml:space="preserve">
+    <value>Metadatenverbindung offen halten</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OffContent" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Robuste Metadaten für diesen Sender</value>
+  </data>
   <data name="ManualStationWindow_Title" xml:space="preserve">
     <value>Traydio - Sender hinzufügen</value>
   </data>
@@ -646,6 +682,9 @@
   </data>
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Zuletzt gespielte Titel</value>
+  </data>
+  <data name="NowPlayingPage_RefreshMetadata.Text" xml:space="preserve">
+    <value>Metadaten aktualisieren</value>
   </data>
   <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
     <value>Titel</value>
@@ -1529,5 +1568,20 @@
   </data>
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>Die Gruppe konnte nicht geändert werden: {0}</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>Zuerst LibVLC, Windows als Fallback</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>PC darf während der Wiedergabe in den Ruhezustand wechseln</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>PC bleibt während der Wiedergabe aktiv</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Suchbegriff eingeben, um Sender zu finden...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>Von der Community betriebene Internetradio-Datenbank mit Tausenden von Sendern weltweit</value>
   </data>
 </root>

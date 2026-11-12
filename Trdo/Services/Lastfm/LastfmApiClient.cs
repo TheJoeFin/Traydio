@@ -33,11 +33,12 @@ internal sealed class LastfmApiClient
     private static HttpClient CreateHttpClient()
     {
         // Same reasoning as RadioBrowserService.CreateHttpClient: the WinINet-based handler can
-        // fail with error 8007277C inside an MSIX app container, so use SocketsHttpHandler and a
-        // direct connection.
+        // fail with error 8007277C inside an MSIX app container, so use SocketsHttpHandler, which
+        // still honours the system proxy.
         SocketsHttpHandler handler = new()
         {
-            UseProxy = false,
+            UseProxy = true,
+            DefaultProxyCredentials = System.Net.CredentialCache.DefaultCredentials,
             AutomaticDecompression = System.Net.DecompressionMethods.All
         };
 

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Trdo.Helpers;
 using Trdo.Models;
 using Trdo.Services;
 using Windows.Storage;
@@ -171,7 +172,12 @@ public sealed partial class AddLocalMusicViewModel : INotifyPropertyChanged
             _editingStation.Name = StationName.Trim();
             _editingStation.LocalFolderPath = FolderPath;
             _editingStation.Volume = VolumePercent / 100;
+            // Editing refreshes the cover: drop the cached thumbnail for the old and new cover.
+            string? previousCover = _editingStation.FaviconUrl;
             _editingStation.FaviconUrl = ResolveCoverUrl(FolderPath);
+            ImageSourceFactory.Forget(previousCover);
+            ImageSourceFactory.Forget(_editingStation.FaviconUrl);
+            _editingStation.RefreshFavicon();
 
             _playerViewModel?.SaveStations();
             return true;

@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Trdo.Helpers;
 using Trdo.Models;
 using Trdo.Services;
 
@@ -29,6 +30,7 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     private double _volumePercent = 100;
     private bool _hasBufferOverride;
     private double _bufferLevel;
+    private bool _robustMetadata;
     private bool _hasSongPopupDelayOverride;
     private double _songPopupDelaySeconds;
     private bool _heroImageFailed;
@@ -67,6 +69,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
 
         HasSongPopupDelayOverride = station.SongPopupDelaySeconds is not null;
         SongPopupDelaySeconds = station.SongPopupDelaySeconds ?? GlobalSongPopupDelaySeconds;
+
+        RobustMetadata = station.RobustMetadata;
 
         PageTitle = LocalizationService.GetString("AddStation_EditPageTitle", "Edit Radio Station");
     }
@@ -242,6 +246,21 @@ public partial class AddStationViewModel : INotifyPropertyChanged
         : string.Format(LocalizationService.GetString("AddStation_BufferSummary_App", "Buffer: {0} (app setting)"), StreamWatchdogService.DescribeBufferLevel(GlobalBufferLevel));
 
     /// <summary>
+    /// Advanced: keep a long-lived ICY connection open for this station's metadata. See
+    /// <see cref="RadioStation.RobustMetadata"/>.
+    /// </summary>
+    public bool RobustMetadata
+    {
+        get => _robustMetadata;
+        set
+        {
+            if (value == _robustMetadata) return;
+            _robustMetadata = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
     /// Whether this station overrides the app-wide track info delay. When false the
     /// station follows the global setting and <see cref="SongPopupDelaySeconds"/> is only
     /// the seed value for the slider.
@@ -372,10 +391,17 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             _editingStation.Name = StationName.Trim();
             _editingStation.StreamUrl = StreamUrl.Trim();
             _editingStation.Homepage = !string.IsNullOrWhiteSpace(Homepage) ? Homepage.Trim() : null;
+            // Editing is the one time station art is refreshed: drop the cached thumbnail for the
+            // old and new URL (they differ if the user changed it) and rebuild from the source.
+            string? previousFavicon = _editingStation.FaviconUrl;
             _editingStation.FaviconUrl = !string.IsNullOrWhiteSpace(FaviconUrl) ? FaviconUrl.Trim() : null;
+            ImageSourceFactory.Forget(previousFavicon);
+            ImageSourceFactory.Forget(_editingStation.FaviconUrl);
+            _editingStation.RefreshFavicon();
             _editingStation.Volume = VolumePercent / 100;
             _editingStation.BufferLevel = HasBufferOverride ? BufferLevel : null;
             _editingStation.SongPopupDelaySeconds = HasSongPopupDelayOverride ? SongPopupDelaySeconds : null;
+            _editingStation.RobustMetadata = RobustMetadata;
 
             // Save the updated stations list - this will automatically reinitialize if it's the selected station
             _playerViewModel?.SaveStations();
@@ -395,6 +421,7 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             newStation.Volume = VolumePercent / 100;
             newStation.BufferLevel = HasBufferOverride ? BufferLevel : null;
             newStation.SongPopupDelaySeconds = HasSongPopupDelayOverride ? SongPopupDelaySeconds : null;
+            newStation.RobustMetadata = RobustMetadata;
 
             // Add to PlayerViewModel if available
             _playerViewModel?.AddStation(newStation);

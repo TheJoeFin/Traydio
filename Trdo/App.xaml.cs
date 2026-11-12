@@ -417,6 +417,7 @@ public partial class App : Application
         try
         {
             await CastingContextService.Instance.InitializeAsync(queue);
+            await Trdo.Services.Playback.SonosRecoveryService.TryRecoverAsync(queue);
         }
         catch (Exception ex)
         {
