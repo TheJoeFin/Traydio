@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Trdo.Models"
+    xmlns:pages="using:Trdo.Pages"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     NavigationCacheMode="Required"
     mc:Ignorable="d">
@@ -125,11 +126,17 @@
                                             Tag="{x:Bind}">
                                             <FontIcon FontSize="14" Glyph="&#xE70F;" />
                                         </Button>
+                                        <!--  Add, swapped for a disabled "Added" once this stream is in the list  -->
                                         <Button
                                             x:Uid="SearchStation_AddButton"
                                             Click="AddStationButton_Click"
                                             Style="{StaticResource AccentButtonStyle}"
-                                            Tag="{x:Bind}" />
+                                            Tag="{x:Bind}"
+                                            Visibility="{x:Bind IsAdded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                                        <Button
+                                            Content="{x:Bind pages:SearchStation.AddedLabel}"
+                                            IsEnabled="False"
+                                            Visibility="{x:Bind IsAdded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>

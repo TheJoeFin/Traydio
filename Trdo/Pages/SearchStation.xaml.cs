@@ -243,25 +243,34 @@ public sealed partial class SearchStation : Page
         }
     }
 
+    /// <summary>Label of the disabled button that replaces "Add" once a stream is in the list.</summary>
+    public static string AddedLabel => LocalizationService.GetString("SearchStation_AddedLabel", "Added");
+
     private async void AddStationButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is RadioBrowserStation station)
         {
+            if (station.IsAdded)
+                return;
+
+            // Holding Shift keeps the search open so several stations can be added in a row.
+            // Read before anything is awaited: stopping a preview fades it out first, and by the
+            // time that finishes the key has usually been let go.
+            bool shiftHeld = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Shift)
+                .HasFlag(CoreVirtualKeyStates.Down);
+
+            // Set before the await too, so a second click during the fade can't add it twice.
+            // The row's "Added" state is bound to this, so it follows the stream (not the
+            // button) when the list recycles its rows.
+            station.IsAdded = true;
+
             await StopPreviewAsync();
 
             PlayerViewModel.Shared.AddStation(station.ToRadioStation());
 
-            // Holding Shift keeps the search open so several stations can be added in a row;
-            // the button is disabled and relabelled so a station can't be added twice.
-            var shiftHeld = InputKeyboardSource
-                .GetKeyStateForCurrentThread(VirtualKey.Shift)
-                .HasFlag(CoreVirtualKeyStates.Down);
             if (shiftHeld)
-            {
-                button.IsEnabled = false;
-                button.Content = LocalizationService.GetString("SearchStation_AddedLabel", "Added");
                 return;
-            }
 
             // Save right away and return to the main page
             _shellViewModel?.NavigateToPlayingPage();

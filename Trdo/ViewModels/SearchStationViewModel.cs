@@ -692,6 +692,8 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
                 query,
                 cts.Token);
 
+            MarkStationsAlreadyAdded(results);
+
             SearchResultGroups.Clear();
             foreach (StationSearchResultGroup group in StationSearchGroupingPolicy.Group(results))
             {
@@ -733,6 +735,22 @@ public partial class SearchStationViewModel : INotifyPropertyChanged
         finally
         {
             IsSearching = false;
+        }
+    }
+
+    /// <summary>
+    /// Flags the results whose stream is already in the station list, so they show "Added"
+    /// instead of offering to add the same stream a second time.
+    /// </summary>
+    private static void MarkStationsAlreadyAdded(List<RadioBrowserStation> results)
+    {
+        HashSet<string> saved = new(
+            PlayerViewModel.Shared.Stations.Select(station => station.StreamUrl),
+            StringComparer.Ordinal);
+
+        foreach (RadioBrowserStation result in results)
+        {
+            result.IsAdded = saved.Contains(result.GetStreamUrl());
         }
     }
 
