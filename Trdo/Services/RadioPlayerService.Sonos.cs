@@ -585,6 +585,19 @@ public sealed partial class RadioPlayerService
         }
 
         _sonosState = state;
+
+        // Kept across launches so startup recovery only ever takes back this app's own cast,
+        // not a speaker someone else is playing the same station on (SonosRecoveryService).
+        if (state == SonosPlaybackState.Idle)
+        {
+            SettingsService.ClearActiveSonosCast();
+        }
+        else if (state == SonosPlaybackState.Playing && _activeSourceKind == AudioSourceKind.Radio &&
+                 _sonosDevice is { } castDevice && _streamUrl is { Length: > 0 } castStream)
+        {
+            SettingsService.SetActiveSonosCast(castDevice.Uuid, castStream);
+        }
+
         bool wasPlaying = previous == SonosPlaybackState.Playing;
         bool isPlaying = state == SonosPlaybackState.Playing;
         bool wasBuffering = previous == SonosPlaybackState.Starting;
@@ -951,7 +964,12 @@ public sealed partial class RadioPlayerService
             try
             {
                 using CancellationTokenSource cts = new(SonosStopOnExitTimeout);
-                controller.StopAsync(device, cts.Token).Wait(SonosStopOnExitTimeout);
+                if (controller.StopAsync(device, cts.Token).Wait(SonosStopOnExitTimeout))
+                {
+                    // Stopped, so there is nothing for the next launch to take back. If it could
+                    // not be stopped the speaker plays on, and the record lets recovery adopt it.
+                    SettingsService.ClearActiveSonosCast();
+                }
             }
             catch (Exception ex)
             {

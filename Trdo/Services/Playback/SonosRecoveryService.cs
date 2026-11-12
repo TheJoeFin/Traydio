@@ -12,9 +12,14 @@ namespace Trdo.Services.Playback;
 
 /// <summary>
 /// After a crash or an unclean exit a Sonos speaker keeps playing the stream this app gave it.
-/// At startup this looks for such a speaker among the ones used on this network before, and
-/// if one is playing a station from the list, selects that station and takes control of the
-/// speaker again instead of leaving it running unmanaged.
+/// At startup this looks for that speaker, and if it is still playing that stream and the
+/// stream is a station in the list, selects the station and takes control of the speaker again
+/// instead of leaving it running unmanaged.
+/// <para>
+/// Only the cast recorded in <see cref="SettingsService.ActiveSonosCast"/> is ever adopted: a
+/// speaker that another PC or the Sonos app is playing one of the same stations on is left alone,
+/// so a later Pause or idle timeout here can't stop music someone else is controlling.
+/// </para>
 /// </summary>
 internal static class SonosRecoveryService
 {
@@ -33,6 +38,12 @@ internal static class SonosRecoveryService
                 $"({remembered.Count(device => device.Protocol == CastProtocol.Sonos)} Sonos), " +
                 $"{PlayerViewModel.Shared.Stations.Count} station(s) loaded, " +
                 $"networkKey={(CastingContextService.Instance.NetworkKey is null ? "none" : "set")}");
+
+            if (SettingsService.ActiveSonosCast is not { } lastCast)
+            {
+                LogService.Info(Component, "Skipped: this app did not leave a Sonos cast running");
+                return;
+            }
 
             // Only people who have cast on this network get discovery started on their behalf.
             if (!remembered.Any(device => device.Protocol == CastProtocol.Sonos))
@@ -66,11 +77,17 @@ internal static class SonosRecoveryService
                             continue;
                         }
 
-                        LogService.Info(Component, $"Checking live speaker '{device.Name}' ({device.Address}:{device.Port}, {device.Uuid})");
-                        if (await TryAdoptAsync(device, controller, timeout.Token))
+                        if (!string.Equals(device.Uuid, lastCast.SpeakerUuid, StringComparison.OrdinalIgnoreCase))
                         {
-                            return;
+                            LogService.Info(Component, $"Ignoring speaker '{device.Name}' ({device.Uuid}): not the one this app was casting to");
+                            continue;
                         }
+
+                        LogService.Info(Component, $"Checking live speaker '{device.Name}' ({device.Address}:{device.Port}, {device.Uuid})");
+
+                        // The one speaker it could be; whatever it is doing now, the search is over.
+                        await TryAdoptAsync(device, controller, lastCast, timeout.Token);
+                        return;
                     }
 
                     await Task.Delay(PollInterval, timeout.Token);
@@ -85,7 +102,7 @@ internal static class SonosRecoveryService
         }
         catch (OperationCanceledException)
         {
-            LogService.Info(Component, $"Gave up after {SearchWindow.TotalSeconds:0}s: no speaker was found playing one of this app's stations");
+            LogService.Info(Component, $"Gave up after {SearchWindow.TotalSeconds:0}s: the speaker this app was casting to did not show up");
         }
         catch (Exception ex)
         {
@@ -93,7 +110,12 @@ internal static class SonosRecoveryService
         }
     }
 
-    private static async Task<bool> TryAdoptAsync(SonosDevice device, SonosController controller, CancellationToken cancellationToken)
+    /// <param name="cast">What this app last left playing, and on which speaker (<paramref name="device"/>).</param>
+    private static async Task TryAdoptAsync(
+        SonosDevice device,
+        SonosController controller,
+        (string SpeakerUuid, string StreamUrl) cast,
+        CancellationToken cancellationToken)
     {
         string? transportUri;
         try
@@ -105,7 +127,9 @@ internal static class SonosRecoveryService
             LogService.Info(Component, $"'{device.Name}' transport state: {state}");
             if (state != SonosTransportState.Playing)
             {
-                return false;
+                // The cast this app left running has ended; nothing to take back next time either.
+                ForgetCast(cast);
+                return;
             }
 
             transportUri = (await controller.GetPositionInfoAsync(device, query.Token)).TrackUri;
@@ -115,14 +139,24 @@ internal static class SonosRecoveryService
                                         or OperationCanceledException)
                                    && !cancellationToken.IsCancellationRequested)
         {
+            // Kept on record, so the next launch asks again.
             LogService.Warn(Component, $"Couldn't read what Sonos '{device.Name}' is playing: {ex.Message}");
-            return false;
+            return;
         }
 
         if (SonosPolicy.StreamUrlFromTransportUri(transportUri) is not { } streamUrl)
         {
             LogService.Info(Component, $"'{device.Name}' is not playing an internet radio URI; skipping");
-            return false;
+            ForgetCast(cast);
+            return;
+        }
+
+        // Something else has been put on the speaker since; that is someone else's playback now.
+        if (!SonosPolicy.IsSameStream(cast.StreamUrl, streamUrl))
+        {
+            LogService.Info(Component, $"'{device.Name}' is now playing {LogService.Redact(streamUrl)}, not the stream this app left on it; leaving it alone");
+            ForgetCast(cast);
+            return;
         }
 
         PlayerViewModel viewModel = PlayerViewModel.Shared;
@@ -131,7 +165,7 @@ internal static class SonosRecoveryService
         if (station is null)
         {
             LogService.Info(Component, $"Sonos '{device.Name}' is playing {LogService.Redact(streamUrl)}, which matches no station in the list");
-            return false;
+            return;
         }
 
         // The user may have started something while the speaker was being asked.
@@ -140,7 +174,7 @@ internal static class SonosRecoveryService
         if (player.IsCasting || player.IsPlaying || player.IsBuffering)
         {
             LogService.Info(Component, "Not adopting: playback started while the speaker was being checked");
-            return true;
+            return;
         }
 
         // Selecting without playing: with the player idle this only points it at the station.
@@ -153,6 +187,17 @@ internal static class SonosRecoveryService
         LogService.Info(Component, adopted
             ? $"Adopted '{device.Name}' playing '{station.Name}'"
             : $"AdoptRunningSonos refused (sourceKind={player.ActiveSourceKind}, casting={player.IsCasting}, playing={player.IsPlaying})");
-        return true;
+    }
+
+    /// <summary>
+    /// Drops the record of <paramref name="cast"/>, unless the user has meanwhile started a new
+    /// cast (which replaced it with one worth keeping).
+    /// </summary>
+    private static void ForgetCast((string SpeakerUuid, string StreamUrl) cast)
+    {
+        if (SettingsService.ActiveSonosCast == cast)
+        {
+            SettingsService.ClearActiveSonosCast();
+        }
     }
 }

@@ -44,12 +44,16 @@ public static class SettingsService
     private const string RadioStaticLevelKey = "RadioStaticLevel";
     private const string LocalMusicLoopModeKey = "LocalMusicLoopMode";
     private const string RecentStationSearchesKey = "RecentStationSearches";
+    private const string ActiveSonosCastKey = "ActiveSonosCast";
 
     /// <summary>
     /// Separates entries in <see cref="RecentStationSearches"/>. A control character rather than
     /// a punctuation mark, so it can't collide with anything a search term could contain.
     /// </summary>
     private const char RecentStationSearchesSeparator = '\u001f';
+
+    /// <summary>Separates the speaker UUID from the stream URL in <see cref="ActiveSonosCast"/>; neither can contain it.</summary>
+    private const char ActiveSonosCastSeparator = '\u001f';
 
     public static event EventHandler? MusicSearchServicesChanged;
     public static event EventHandler? CastIdleTimeoutChanged;
@@ -1016,6 +1020,69 @@ public static class SettingsService
             IReadOnlyList<string> updated = RecentSearchesPolicy.Add(RecentStationSearches, term);
             ApplicationData.Current.LocalSettings.Values[RecentStationSearchesKey] =
                 string.Join(RecentStationSearchesSeparator, updated);
+        }
+        catch
+        {
+            // Silently fail if unable to save
+        }
+    }
+
+    /// <summary>
+    /// The Sonos speaker (by UUID) and radio stream this app has playing, or last had playing
+    /// when it exited without stopping it. Null once that playback ended through this app. Lets
+    /// startup recovery take back only a cast this app started and never saw finish (a crash, a
+    /// kill), never a speaker that someone else happens to be playing the same station on.
+    /// </summary>
+    public static (string SpeakerUuid, string StreamUrl)? ActiveSonosCast
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(ActiveSonosCastKey, out object? value) &&
+                    value is string raw &&
+                    raw.Split(ActiveSonosCastSeparator) is [{ Length: > 0 } uuid, { Length: > 0 } streamUrl])
+                {
+                    return (uuid, streamUrl);
+                }
+            }
+            catch
+            {
+                // Fall through to "none".
+            }
+
+            return null;
+        }
+    }
+
+    public static void SetActiveSonosCast(string speakerUuid, string streamUrl)
+    {
+        try
+        {
+            string raw = speakerUuid + ActiveSonosCastSeparator + streamUrl;
+            IPropertySet values = ApplicationData.Current.LocalSettings.Values;
+            if (values.TryGetValue(ActiveSonosCastKey, out object? current) && raw.Equals(current as string, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            values[ActiveSonosCastKey] = raw;
+            LogChange(ActiveSonosCastKey, "<set>"); // the stream address itself stays out of the log
+        }
+        catch
+        {
+            // Silently fail if unable to save
+        }
+    }
+
+    public static void ClearActiveSonosCast()
+    {
+        try
+        {
+            if (ApplicationData.Current.LocalSettings.Values.Remove(ActiveSonosCastKey))
+            {
+                LogChange(ActiveSonosCastKey, "<cleared>");
+            }
         }
         catch
         {
