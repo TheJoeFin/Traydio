@@ -213,6 +213,45 @@
   </PropertyGroup>
 
   <!--
+    Traydio only plays audio (LibVLC is created with the no-video option), but VideoLAN.LibVLC.Windows ships
+    all ~300 plugins and libvlc loads every one of them at startup to build its plugin registry -
+    roughly 100 MB of mapped image. Exclude the video, subtitle, hardware-decode, streaming-out,
+    capture/disc/DVB and scripting plugins. Kept: audio codecs (avcodec, mft, mpg123, flac, opus,
+    vorbis, ...), all demuxers, packetizers, audio output/filters, and the file/http(s)/tcp/udp
+    access modules plus gnutls for TLS. If a stream type stops playing, remove the matching line.
+    The package reads Vlc<Arch>ExcludeFiles (paths relative to its per-arch folder; %2A = *).
+  -->
+  <ItemGroup>
+    <VlcPrunedPlugin Include="lua\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\lua\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\video_output\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\video_filter\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\video_chroma\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\video_splitter\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\spu\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\text_renderer\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\visualization\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\stream_out\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\mux\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\access_output\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\services_discovery\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\meta_engine\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\keystore\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\stream_extractor\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\d3d9\%2A%2A" />
+    <VlcPrunedPlugin Include="plugins\d3d11\%2A%2A" />
+    <!-- access: keep filesystem, http, https, tcp, udp, idummy, imem, attachment, concat -->
+    <VlcPrunedPlugin Include="plugins\access\libaccess_mms_plugin.dll;plugins\access\libaccess_srt_plugin.dll;plugins\access\libaccess_wasapi_plugin.dll;plugins\access\libcdda_plugin.dll;plugins\access\libdcp_plugin.dll;plugins\access\libdtv_plugin.dll;plugins\access\libftp_plugin.dll;plugins\access\liblibbluray_plugin.dll;plugins\access\liblive555_plugin.dll;plugins\access\libnfs_plugin.dll;plugins\access\librist_plugin.dll;plugins\access\librtp_plugin.dll;plugins\access\libsatip_plugin.dll;plugins\access\libscreen_plugin.dll;plugins\access\libsdp_plugin.dll;plugins\access\libsftp_plugin.dll;plugins\access\libshm_plugin.dll;plugins\access\libsmb_plugin.dll;plugins\access\libtimecode_plugin.dll;plugins\access\libvcd_plugin.dll;plugins\access\libvdr_plugin.dll;plugins\access\%2A.jar" />
+    <!-- codec: drop video, subtitle, teletext and hardware-decode plugins; keep audio codecs -->
+    <VlcPrunedPlugin Include="plugins\codec\libaom_plugin.dll;plugins\codec\libdav1d_plugin.dll;plugins\codec\libvpx_plugin.dll;plugins\codec\libx26410b_plugin.dll;plugins\codec\libtheora_plugin.dll;plugins\codec\libjpeg_plugin.dll;plugins\codec\libpng_plugin.dll;plugins\codec\librawvideo_plugin.dll;plugins\codec\librtpvideo_plugin.dll;plugins\codec\libd3d11va_plugin.dll;plugins\codec\libdxva2_plugin.dll;plugins\codec\libcrystalhd_plugin.dll;plugins\codec\libcc_plugin.dll;plugins\codec\libcdg_plugin.dll;plugins\codec\libcvdsub_plugin.dll;plugins\codec\libdvbsub_plugin.dll;plugins\codec\libkate_plugin.dll;plugins\codec\liblibass_plugin.dll;plugins\codec\libspudec_plugin.dll;plugins\codec\libstl_plugin.dll;plugins\codec\libsubsdec_plugin.dll;plugins\codec\libsubstx3g_plugin.dll;plugins\codec\libsubsusf_plugin.dll;plugins\codec\libsvcdsub_plugin.dll;plugins\codec\libtextst_plugin.dll;plugins\codec\libttml_plugin.dll;plugins\codec\libwebvtt_plugin.dll;plugins\codec\libzvbi_plugin.dll;plugins\codec\libscte18_plugin.dll;plugins\codec\libscte27_plugin.dll;plugins\codec\libfluidsynth_plugin.dll;plugins\codec\liboggspots_plugin.dll" />
+    <!-- misc: drop add-on repositories and the fingerprinter; keep gnutls (TLS) and xml -->
+    <VlcPrunedPlugin Include="plugins\misc\libaddonsfsstorage_plugin.dll;plugins\misc\libaddonsvorepository_plugin.dll;plugins\misc\libfingerprinter_plugin.dll" />
+
+    <VlcWindowsX64ExcludeFiles Include="@(VlcPrunedPlugin)" />
+    <VlcWindowsArm64ExcludeFiles Include="@(VlcPrunedPlugin)" />
+  </ItemGroup>
+
+  <!--
     TagLibSharp resolves the file-type class for each track by MIME type and instantiates it
     via Activator.CreateInstance, so nothing references those constructors statically and the
     trimmer strips them - TagLib.File.Create then throws MissingMethodException in Release
