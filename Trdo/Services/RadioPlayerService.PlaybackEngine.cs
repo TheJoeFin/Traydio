@@ -558,6 +558,7 @@ public sealed partial class RadioPlayerService
             return;
         }
 
+        _metadataOrchestrator.RobustMetadata = RobustMetadata;
         _metadataOrchestrator.EnsureForPlayback(
             _streamUrl,
             _playbackEngineSelector.ActiveBackendKind,

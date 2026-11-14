@@ -338,6 +338,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>再次查看教程，了解如何使用 Traydio。</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>此副本从 GitHub 安装，可以自动更新。</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>重启以更新</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>已是最新版本。</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>有可用更新。</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>无法检查更新。</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>需要帮助？</value>
   </data>
@@ -623,6 +644,21 @@
   <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
     <value>为此电台覆盖</value>
   </data>
+  <data name="ManualStationWindow_RobustMetadata.Text" xml:space="preserve">
+    <value>稳健元数据</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataDescription.Text" xml:space="preserve">
+    <value>始终保持与流的连接，仅用于读取曲目信息。适用于每次新连接都以广告或电台名称（而不是歌曲）开头的电台，但会额外使用流量（约与收听相当）。</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OnContent" xml:space="preserve">
+    <value>保持元数据连接</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OffContent" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>此电台的稳健元数据</value>
+  </data>
   <data name="ManualStationWindow_Title" xml:space="preserve">
     <value>Traydio - 添加电台</value>
   </data>
@@ -646,6 +682,9 @@
   </data>
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>最近播放</value>
+  </data>
+  <data name="NowPlayingPage_RefreshMetadata.Text" xml:space="preserve">
+    <value>刷新元数据</value>
   </data>
   <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
     <value>曲目</value>
@@ -1529,5 +1568,20 @@
   </data>
   <data name="GroupSpeakersPage_Failed" xml:space="preserve">
     <value>无法更改分组：{0}</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>优先使用 LibVLC，Windows 作为备用</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>播放时电脑可以进入睡眠</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>播放时电脑保持唤醒</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>输入搜索词以查找电台...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>由社区维护的网络电台数据库，收录全球数千个电台</value>
   </data>
 </root>

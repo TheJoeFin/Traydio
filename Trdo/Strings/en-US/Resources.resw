@@ -341,6 +341,27 @@
   <data name="AboutPage_HelpBody.Text" xml:space="preserve">
     <value>View the tutorial again to learn how to use Traydio.</value>
   </data>
+  <data name="AboutPage_UpdatesTitle.Text" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="AboutPage_UpdatesBody.Text" xml:space="preserve">
+    <value>This copy was installed from GitHub and can update itself.</value>
+  </data>
+  <data name="AboutPage_CheckForUpdates.Content" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="AboutPage_RestartToUpdate.Content" xml:space="preserve">
+    <value>Restart to update</value>
+  </data>
+  <data name="AboutPage_UpdateUpToDate" xml:space="preserve">
+    <value>You're up to date.</value>
+  </data>
+  <data name="AboutPage_UpdateAvailable" xml:space="preserve">
+    <value>An update is available.</value>
+  </data>
+  <data name="AboutPage_UpdateError" xml:space="preserve">
+    <value>Couldn't check for updates.</value>
+  </data>
   <data name="AboutPage_HelpTitle.Text" xml:space="preserve">
     <value>Need Help?</value>
   </data>
@@ -674,6 +695,21 @@
   <data name="ManualStationWindow_SongPopupDelayOverride.OnContent" xml:space="preserve">
     <value>Override for this station</value>
   </data>
+  <data name="ManualStationWindow_RobustMetadata.Text" xml:space="preserve">
+    <value>Robust metadata</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataDescription.Text" xml:space="preserve">
+    <value>Keeps a connection to the stream open the whole time just to read track info. Helps stations that begin every new connection with a commercial or the station name instead of the song, but uses extra data (about as much as listening).</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OnContent" xml:space="preserve">
+    <value>Keep metadata connection open</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ManualStationWindow_RobustMetadataToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Robust metadata for this station</value>
+  </data>
   <data name="ManualStationWindow_Title" xml:space="preserve">
     <value>Traydio - Add Station</value>
   </data>
@@ -697,6 +733,9 @@
   </data>
   <data name="NowPlayingPage_RecentTracks.Text" xml:space="preserve">
     <value>Recent Tracks</value>
+  </data>
+  <data name="NowPlayingPage_RefreshMetadata.Text" xml:space="preserve">
+    <value>Refresh metadata</value>
   </data>
   <data name="NowPlayingPage_TrackList.Text" xml:space="preserve">
     <value>Tracks</value>
@@ -1425,6 +1464,12 @@
   <data name="SearchStation_AddButton.Content" xml:space="preserve">
     <value>Add Station</value>
   </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add station and return. Hold Shift while clicking to add several stations without leaving search.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Added</value>
+  </data>
   <data name="SearchStation_Title.Text" xml:space="preserve">
     <value>Search Radio Stations</value>
   </data>
@@ -1529,5 +1574,20 @@
   </data>
   <data name="PlayingPage_NowPlayingInfo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Click for details</value>
+  </data>
+  <data name="SettingsPage_PlaybackEngine_AutoDescription" xml:space="preserve">
+    <value>LibVLC first, Windows fallback</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_On" xml:space="preserve">
+    <value>PC can sleep while playing</value>
+  </data>
+  <data name="SettingsPage_AllowSleepToggle_Off" xml:space="preserve">
+    <value>PC stays awake while playing</value>
+  </data>
+  <data name="SearchStation_EnterSearchTerm" xml:space="preserve">
+    <value>Enter a search term to find stations...</value>
+  </data>
+  <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
+    <value>Community-driven internet radio database with thousands of stations worldwide</value>
   </data>
 </root>

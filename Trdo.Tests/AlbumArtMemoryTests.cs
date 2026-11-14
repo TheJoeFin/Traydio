@@ -65,6 +65,18 @@ public sealed class AlbumArtMemoryTests
     }
 
     [TestMethod]
+    public void Icon_IsRecognizedButHtmlAndCursorsAreNot()
+    {
+        // ICONDIR: reserved 0, type 1 (icon), one image.
+        Assert.IsTrue(ImageFormat.IsIcon([0x00, 0x00, 0x01, 0x00, 0x01, 0x00]));
+
+        Assert.IsFalse(ImageFormat.IsIcon("<!DOCTYPE html>"u8));
+        Assert.IsFalse(ImageFormat.IsIcon([0x00, 0x00, 0x02, 0x00, 0x01, 0x00])); // type 2: cursor
+        Assert.IsFalse(ImageFormat.IsIcon([0x00, 0x00, 0x01, 0x00, 0x00, 0x00])); // no images
+        Assert.IsFalse(ImageFormat.IsIcon([0x00, 0x00, 0x01, 0x00]));             // truncated
+    }
+
+    [TestMethod]
     public void EmbeddedArt_SameContentSharesOneUrlAndRoundTrips()
     {
         byte[] image = [0xFF, 0xD8, 0xFF, 0x01, 0x02, 0x03, 0xA1];

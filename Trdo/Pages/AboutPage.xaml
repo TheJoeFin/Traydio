@@ -64,6 +64,42 @@
                         TextWrapping="Wrap" />
                 </Grid>
 
+                <!--  Updates (GitHub installs only)  -->
+                <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.IsGitHubInstall}">
+                    <TextBlock
+                        x:Uid="AboutPage_UpdatesTitle"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap" />
+
+                    <TextBlock
+                        x:Uid="AboutPage_UpdatesBody"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextWrapping="Wrap" />
+
+                    <TextBlock
+                        Text="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+
+                    <ProgressRing
+                        Width="20"
+                        Height="20"
+                        HorizontalAlignment="Left"
+                        IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            x:Uid="AboutPage_CheckForUpdates"
+                            Click="CheckForUpdatesButton_Click"
+                            IsEnabled="{x:Bind ViewModel.CanCheck, Mode=OneWay}" />
+                        <Button
+                            x:Uid="AboutPage_RestartToUpdate"
+                            Click="RestartToUpdateButton_Click"
+                            IsEnabled="{x:Bind ViewModel.CanRestart, Mode=OneWay}"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+                </StackPanel>
+
                 <!--  Description  -->
                 <StackPanel Spacing="8">
                     <TextBlock

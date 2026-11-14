@@ -260,4 +260,42 @@ public sealed class SonosPolicyTests
         StringAssert.Contains(request, "ST: urn:schemas-upnp-org:device:ZonePlayer:1\r\n");
         StringAssert.EndsWith(request, "\r\n\r\n");
     }
+
+    [TestMethod]
+    [DataRow("x-rincon-mp3radio://stream.example.com:8000/live", "http://stream.example.com:8000/live")]
+    [DataRow("x-rincon-mp3radio://https://stream.example.com/live.mp3", "https://stream.example.com/live.mp3")]
+    [DataRow("http://stream.example.com/live", "http://stream.example.com/live")]
+    [DataRow("aac://http//radiomilwaukee.streamguys.net/live", "http://radiomilwaukee.streamguys.net/live")]
+    [DataRow("aac://https//stream.example.com/live", "https://stream.example.com/live")]
+    public void StreamUrlFromTransportUri_RadioUris_AreTurnedBackIntoStreamUrls(string transportUri, string expected)
+    {
+        Assert.AreEqual(expected, SonosPolicy.StreamUrlFromTransportUri(transportUri));
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow("x-rincon:RINCON_123")]
+    [DataRow("x-sonos-spotify:track")]
+    [DataRow("x-rincon-mp3radio://")]
+    public void StreamUrlFromTransportUri_NotARadioStream_ReturnsNull(string? transportUri)
+    {
+        Assert.IsNull(SonosPolicy.StreamUrlFromTransportUri(transportUri));
+    }
+
+    [TestMethod]
+    public void IsSameStream_IgnoresSchemeHostCaseAndTrailingSlash()
+    {
+        Assert.IsTrue(SonosPolicy.IsSameStream("https://Stream.Example.com/live/", "http://stream.example.com/live"));
+        Assert.IsTrue(SonosPolicy.IsSameStream("http://stream.example.com:8000/live", "http://stream.example.com:8000/live"));
+    }
+
+    [TestMethod]
+    public void IsSameStream_DifferentPathPortOrMissing_IsNotSame()
+    {
+        Assert.IsFalse(SonosPolicy.IsSameStream("http://stream.example.com/a", "http://stream.example.com/b"));
+        Assert.IsFalse(SonosPolicy.IsSameStream("http://stream.example.com:8000/a", "http://stream.example.com:8001/a"));
+        Assert.IsFalse(SonosPolicy.IsSameStream(null, null));
+        Assert.IsFalse(SonosPolicy.IsSameStream("not a url", "not a url"));
+    }
 }

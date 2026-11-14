@@ -95,6 +95,20 @@ public sealed partial class NowPlayingPage : Page
         ViewModel.ToggleCurrentTrackFavorite();
     }
 
+    private void RefreshMetadataFlyout_Opening(object? sender, object e)
+    {
+        if (sender is MenuFlyout { Items.Count: > 0 } flyout)
+        {
+            flyout.Items[0].IsEnabled = ViewModel.CanRefreshMetadata;
+        }
+    }
+
+    private async void RefreshMetadata_Click(object sender, RoutedEventArgs e)
+    {
+        Debug.WriteLine("[NowPlayingPage] Refresh metadata requested");
+        await ViewModel.RefreshMetadataAsync();
+    }
+
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         Debug.WriteLine("[NowPlayingPage] Music service settings button clicked");

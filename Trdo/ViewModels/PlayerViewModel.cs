@@ -288,6 +288,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             // before playback starts, so the first connection already uses them.
             _player.Volume = _selectedStation.Volume;
             _player.Watchdog.StationBufferLevelOverride = _selectedStation.BufferLevel;
+            _player.RobustMetadata = _selectedStation.RobustMetadata;
 
             // Startup calls Initialize()/Play() directly rather than going through
             // TransitionToStationAsync, so there is no outgoing source whose reads this could
@@ -777,7 +778,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             string? trackArtUrl = CurrentMetadata?.AlbumArtUrl;
             string? faviconUrl = SelectedStation?.FaviconUrl;
             LogAlbumArtChoice(trackArtUrl, faviconUrl);
-            return CreateImageSource(trackArtUrl) ?? CreateImageSource(faviconUrl);
+            return CreateImageSource(trackArtUrl) ?? CreateImageSource(faviconUrl, stationArt: true);
         }
     }
 
@@ -824,7 +825,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         ? Visibility.Visible
         : Visibility.Collapsed;
 
-    public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl);
+    public ImageSource? SelectedStationFaviconImageSource => CreateImageSource(SelectedStation?.FaviconUrl, stationArt: true);
 
     public Visibility SelectedStationFallbackIconVisibility => SelectedStationFaviconImageSource is null
         ? Visibility.Visible
@@ -2306,6 +2307,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         // stream connects, so setting it afterwards would not take effect until the
         // next switch. Also covers SaveStations, which re-enters here after an edit.
         _player.Watchdog.StationBufferLevelOverride = station.BufferLevel;
+        _player.RobustMetadata = station.RobustMetadata;
 
         CancelStationTransition();
         CancellationTokenSource transitionCts = new();
@@ -2394,7 +2396,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     /// own cover on disk. See <see cref="ImageSourceFactory"/> for why those two need special
     /// handling rather than a plain <see cref="BitmapImage"/>.
     /// </summary>
-    private static ImageSource? CreateImageSource(string? url) => ImageSourceFactory.Create(url);
+    private static ImageSource? CreateImageSource(string? url, bool stationArt = false) => ImageSourceFactory.Create(url, stationArt);
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)
     {

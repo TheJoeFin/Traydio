@@ -12,7 +12,7 @@ namespace Trdo.Converters;
 public partial class StringToImageSourceConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, string language) =>
-        value is string url ? ImageSourceFactory.Create(url) : null;
+        value is string url ? ImageSourceFactory.Create(url, stationArt: true) : null;
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {

@@ -16,6 +16,16 @@ public sealed partial class AboutPage : Page
         DataContext = ViewModel;
     }
 
+    private void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = ViewModel.CheckForUpdates();
+    }
+
+    private void RestartToUpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = ViewModel.RestartToUpdate();
+    }
+
     private void GitHubButton_Click(object sender, RoutedEventArgs e)
     {
         _ = ViewModel.OpenGitHub();

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Trdo.Models;
@@ -6,8 +7,29 @@ namespace Trdo.Models;
 /// <summary>
 /// Represents a radio station from the Radio Browser API
 /// </summary>
-public class RadioBrowserStation
+public class RadioBrowserStation : INotifyPropertyChanged
 {
+    private bool _isAdded;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Whether this stream is already in the user's station list, so search shows "Added" in
+    /// place of its Add button. Set from the list when results arrive and when it is added.
+    /// Local state only; never part of the directory's JSON.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsAdded
+    {
+        get => _isAdded;
+        set
+        {
+            if (value == _isAdded) return;
+            _isAdded = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdded)));
+        }
+    }
+
     [JsonPropertyName("changeuuid")]
     public string ChangeUuid { get; set; } = string.Empty;
 

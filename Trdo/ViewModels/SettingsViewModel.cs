@@ -626,7 +626,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             PlaybackEngineMode.NativeOnly => "Windows Media Foundation only",
             PlaybackEngineMode.NativePreferred => "Windows first, LibVLC fallback",
-            _ => "LibVLC first, Windows fallback"
+            _ => LocalizationService.GetString("SettingsPage_PlaybackEngine_AutoDescription", "LibVLC first, Windows fallback")
         };
 
     public IReadOnlyList<string> CastIdleTimeoutLabels { get; } = Array.ConvertAll(
@@ -664,8 +664,8 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     }
 
     public string AllowSleepToggleText => AllowSleepWhilePlaying
-        ? "PC can sleep while playing"
-        : "PC stays awake while playing";
+        ? LocalizationService.GetString("SettingsPage_AllowSleepToggle_On", "PC can sleep while playing")
+        : LocalizationService.GetString("SettingsPage_AllowSleepToggle_Off", "PC stays awake while playing");
 
     public bool IsWatchdogEnabled
     {

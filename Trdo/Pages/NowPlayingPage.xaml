@@ -15,9 +15,28 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:CountToHasItemsVisibilityConverter x:Key="CountToHasItemsVisibilityConverter" />
         <converters:BooleanToFavoriteGlyphConverter x:Key="BooleanToFavoriteGlyphConverter" />
+
+        <!--
+            Shared by the track card and the page itself. Some streams report the wrong title
+            (or none) when the metadata session starts, so this re-reads it on demand.
+        -->
+        <MenuFlyout x:Key="RefreshMetadataFlyout" Opening="RefreshMetadataFlyout_Opening">
+            <MenuFlyoutItem
+                x:Uid="NowPlayingPage_RefreshMetadata"
+                Click="RefreshMetadata_Click">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE72C;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
     </Page.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8">
+    <!--  Transparent so empty areas of the page are hit-testable for the context menu.  -->
+    <Grid
+        Background="Transparent"
+        ContextFlyout="{StaticResource RefreshMetadataFlyout}"
+        RowDefinitions="Auto,Auto,*"
+        RowSpacing="8">
         <!--  Page Title  -->
         <TextBlock
             x:Uid="NowPlayingPage_Title"
@@ -65,6 +84,7 @@
                 <Grid
                     Padding="16"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    ContextFlyout="{StaticResource RefreshMetadataFlyout}"
                     CornerRadius="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

@@ -1,9 +1,12 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Core;
 using Trdo.Controls;
 using Trdo.Models;
 using Trdo.Services;
@@ -42,6 +45,7 @@ public sealed partial class SearchStation : Page
         SearchTextBox.Focus(FocusState.Programmatic);
 
         RadioPlayerService.Instance.PlaybackStateChanged += OnPlaybackStateChanged;
+        RadioPlayerService.Instance.BufferingStateChanged += OnBufferingStateChanged;
 
         // A quick trip away (e.g. to the edit page) keeps what's on screen; coming back after a
         // while starts the page fresh instead.
@@ -51,6 +55,7 @@ public sealed partial class SearchStation : Page
     private async void SearchStation_Unloaded(object sender, RoutedEventArgs e)
     {
         RadioPlayerService.Instance.PlaybackStateChanged -= OnPlaybackStateChanged;
+        RadioPlayerService.Instance.BufferingStateChanged -= OnBufferingStateChanged;
         ViewModel.MarkLeft();
         await StopPreviewAsync();
     }
@@ -93,7 +98,8 @@ public sealed partial class SearchStation : Page
 
         _activePreviewButton = button;
         _previewingStationUrl = stationUrl;
-        SetButtonGlyph(button, PauseGlyph);
+        // Loading until the player reports playing.
+        SetButtonGlyph(button, PauseGlyph, buffering: true);
 
         _previewTransitionCts?.Cancel();
         CancellationTokenSource transitionCts = new();
@@ -140,16 +146,48 @@ public sealed partial class SearchStation : Page
         {
             if (_activePreviewButton != null)
             {
-                SetButtonGlyph(_activePreviewButton, isPlaying ? PauseGlyph : PlayGlyph);
+                SetButtonGlyph(
+                    _activePreviewButton,
+                    isPlaying ? PauseGlyph : PlayGlyph,
+                    !isPlaying && RadioPlayerService.Instance.IsBuffering);
             }
         });
     }
 
-    private static void SetButtonGlyph(Button button, string glyph)
+    private void OnBufferingStateChanged(object? sender, bool isBuffering)
     {
-        if (button.Content is FontIcon icon)
+        DispatcherQueue.TryEnqueue(() =>
         {
-            icon.Glyph = glyph;
+            if (_activePreviewButton is null)
+                return;
+
+            RadioPlayerService player = RadioPlayerService.Instance;
+            SetButtonGlyph(_activePreviewButton, player.IsPlaying ? PauseGlyph : PlayGlyph, isBuffering || player.IsBuffering);
+        });
+    }
+
+    /// <summary>
+    /// Shows <paramref name="glyph"/> on the preview button, or a spinner in its place while
+    /// <paramref name="buffering"/> so it's clear the stream is still loading.
+    /// </summary>
+    private static void SetButtonGlyph(Button button, string glyph, bool buffering = false)
+    {
+        if (button.Content is not Grid grid)
+            return;
+
+        foreach (UIElement child in grid.Children)
+        {
+            switch (child)
+            {
+                case FontIcon icon:
+                    icon.Glyph = glyph;
+                    icon.Visibility = buffering ? Visibility.Collapsed : Visibility.Visible;
+                    break;
+                case ProgressRing ring:
+                    ring.IsActive = buffering;
+                    ring.Visibility = buffering ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+            }
         }
     }
 
@@ -205,13 +243,34 @@ public sealed partial class SearchStation : Page
         }
     }
 
+    /// <summary>Label of the disabled button that replaces "Add" once a stream is in the list.</summary>
+    public static string AddedLabel => LocalizationService.GetString("SearchStation_AddedLabel", "Added");
+
     private async void AddStationButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is RadioBrowserStation station)
         {
+            if (station.IsAdded)
+                return;
+
+            // Holding Shift keeps the search open so several stations can be added in a row.
+            // Read before anything is awaited: stopping a preview fades it out first, and by the
+            // time that finishes the key has usually been let go.
+            bool shiftHeld = InputKeyboardSource
+                .GetKeyStateForCurrentThread(VirtualKey.Shift)
+                .HasFlag(CoreVirtualKeyStates.Down);
+
+            // Set before the await too, so a second click during the fade can't add it twice.
+            // The row's "Added" state is bound to this, so it follows the stream (not the
+            // button) when the list recycles its rows.
+            station.IsAdded = true;
+
             await StopPreviewAsync();
 
             PlayerViewModel.Shared.AddStation(station.ToRadioStation());
+
+            if (shiftHeld)
+                return;
 
             // Save right away and return to the main page
             _shellViewModel?.NavigateToPlayingPage();
