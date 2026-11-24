@@ -221,6 +221,19 @@
                             x:Uid="SettingsPage_TrayDoubleClickNote"
                             Style="{StaticResource SettingDescriptionStyle}"
                             TextWrapping="Wrap" />
+                        <!-- Items follow the TrayWheelAction enum order. -->
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayWheel"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayWheelActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_Volume" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_SwitchStation" />
+                        </ComboBox>
+                        <TextBlock
+                            x:Uid="SettingsPage_TrayWheelNote"
+                            Style="{StaticResource SettingDescriptionStyle}"
+                            TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 
