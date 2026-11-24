@@ -25,7 +25,7 @@ namespace Trdo;
 /// </summary>
 public partial class App : Application
 {
-    private TrayIcon? _trayIcon;
+    private ShellTrayIcon? _trayIcon;
     private TrayClickSequencer? _leftClickSequencer;
     private TrayClickSequencer? _rightClickSequencer;
     private TrayPopupWindow? _trayPopupWindow;
@@ -532,7 +532,7 @@ public partial class App : Application
         if (_trayIcon is not null)
             return;
 
-        _trayIcon = new(0, "Assets/Radio.ico", "Traydio");
+        _trayIcon = ShellTrayIcon.CreateForCurrentApp("Assets/Radio.ico", "Traydio");
         _trayIcon.Selected += TrayIcon_Selected;
         _trayIcon.ContextMenu += TrayIcon_ContextMenu;
         _trayIcon.LeftDoubleClick += TrayIcon_LeftDoubleClick;
@@ -552,7 +552,7 @@ public partial class App : Application
         }
     }
 
-    private void TrayIcon_Selected(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_Selected(object? sender, EventArgs args)
     {
         // Captured now, not when a deferred click finally runs: the flyout needs to know
         // whether this is the click that light-dismissed it.
@@ -563,7 +563,7 @@ public partial class App : Application
             () => RunTrayAction(SettingsService.TrayLeftClickAction, clickedAtUtc));
     }
 
-    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_ContextMenu(object? sender, EventArgs args)
     {
         DateTime clickedAtUtc = DateTime.UtcNow;
 
@@ -572,7 +572,7 @@ public partial class App : Application
             () => RunTrayAction(SettingsService.TrayRightClickAction, clickedAtUtc));
     }
 
-    private void TrayIcon_LeftDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_LeftDoubleClick(object? sender, EventArgs args)
     {
         TrayClickAction action = SettingsService.TrayLeftDoubleClickAction;
 
@@ -584,7 +584,7 @@ public partial class App : Application
         _leftClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
     }
 
-    private void TrayIcon_RightDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_RightDoubleClick(object? sender, EventArgs args)
     {
         TrayClickAction action = SettingsService.TrayRightDoubleClickAction;
 
@@ -1035,7 +1035,7 @@ public partial class App : Application
         {
             if (force)
             {
-                // WinUIEx only sends a native tooltip update when the value changes.
+                // ShellTrayIcon only sends a native tooltip update when the value changes.
                 _trayIcon.Tooltip = "\u200B";
             }
 

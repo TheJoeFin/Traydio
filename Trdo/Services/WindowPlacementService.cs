@@ -1,8 +1,8 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
 using System.Drawing;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Windows.Win32;
@@ -17,9 +17,7 @@ internal static partial class WindowPlacementService
 {
     private const int WindowMargin = 12;
     private static PointInt32? _lastAnchorPoint;
-    private static nint _trayIconWindowHandle;
-    private static uint _trayIconId;
-    private static bool _hasTrayIconSource;
+    private static ShellTrayIcon? _trayIcon;
 
     public static void CapturePointerAnchor()
     {
@@ -49,14 +47,9 @@ internal static partial class WindowPlacementService
         _lastAnchorPoint = null;
     }
 
-    public static void SetTrayIconSource(TrayIcon trayIcon)
+    public static void SetTrayIconSource(ShellTrayIcon trayIcon)
     {
-        if (TryGetTrayIconWindowHandle(trayIcon, out nint hwnd))
-        {
-            _trayIconWindowHandle = hwnd;
-            _trayIconId = trayIcon.TrayIconId;
-            _hasTrayIconSource = true;
-        }
+        _trayIcon = trayIcon;
     }
 
     public static void PositionWindowNearAnchor(Window window, int width, int height)
@@ -294,42 +287,31 @@ internal static partial class WindowPlacementService
     {
         iconRect = default;
 
-        if (!_hasTrayIconSource || _trayIconWindowHandle == 0)
+        if (_trayIcon is null)
             return false;
 
+        // Read per call: the icon falls back from GUID to uID identity if the shell refuses the GUID.
+        ShellTrayIconIdentity identity = _trayIcon.Identity;
+        if (identity.WindowHandle == 0)
+            return false;
 
         NOTIFYICONIDENTIFIER identifier = new()
         {
             cbSize = (uint)Marshal.SizeOf<NOTIFYICONIDENTIFIER>(),
-            hWnd = (HWND)_trayIconWindowHandle,
-            uID = _trayIconId,
         };
 
+        // The shell wants the icon identified one way or the other, not both.
+        if (identity.Guid is Guid guid)
+        {
+            identifier.guidItem = guid;
+        }
+        else
+        {
+            identifier.hWnd = (HWND)identity.WindowHandle;
+            identifier.uID = identity.Id;
+        }
+
         return PInvoke.Shell_NotifyIconGetRect(in identifier, out iconRect) == 0;
-    }
-
-    private static bool TryGetTrayIconWindowHandle(TrayIcon trayIcon, out nint hwnd)
-    {
-        hwnd = 0;
-
-        try
-        {
-            FieldInfo? field = typeof(TrayIcon).GetField(
-                "_windowHandle",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (field?.GetValue(trayIcon) is nint handle && handle != 0)
-            {
-                hwnd = handle;
-                return true;
-            }
-        }
-        catch
-        {
-            // WinUIEx internals may change across versions
-        }
-
-        return false;
     }
 
     private static bool TryGetTaskbarRect(out RECT rc, out uint edge)
