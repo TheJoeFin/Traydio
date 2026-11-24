@@ -30,6 +30,8 @@ public sealed partial class RadioPlayerService : IDisposable
     private const string VolumeKey = "RadioVolume";
     private const string WatchdogEnabledKey = "WatchdogEnabled";
     private string? _streamUrl;
+    /// <summary>The address the caller asked for; differs from <see cref="_streamUrl"/> once a playlist (.pls/.m3u/.asx) has been resolved to its stream.</summary>
+    private string? _requestedStreamUrl;
     private string? _currentStationName;
     private string? _currentStationFaviconUrl;
     private string? _currentAlbumArtUrl;
@@ -755,7 +757,7 @@ public sealed partial class RadioPlayerService : IDisposable
         Debug.WriteLine($"[RadioPlayerService] URI created successfully: {uri}");
 
         // If changing stations, reset the first play flag
-        if (_streamUrl != streamUrl)
+        if (_requestedStreamUrl != streamUrl)
         {
             _hasPlayedOnce = false;
             ResetPlaybackFailureTracking();
@@ -767,6 +769,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
 
         // Update the stream URL
+        _requestedStreamUrl = streamUrl;
         _streamUrl = streamUrl;
         Debug.WriteLine($"[RadioPlayerService] _streamUrl updated to: {_streamUrl}");
 
@@ -1033,6 +1036,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         ClearActiveBackendSource();
         _streamUrl = null;
+        _requestedStreamUrl = null;
         _currentStationName = null;
         _currentStationFaviconUrl = null;
         _currentAlbumArtUrl = null;

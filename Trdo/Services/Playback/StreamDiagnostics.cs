@@ -166,6 +166,36 @@ public static class StreamDiagnostics
         }
     }
 
+    /// <summary>
+    /// True when the address names a playlist file (.pls, .m3u, .asx) by extension. HLS
+    /// (.m3u8) is deliberately excluded: both engines play it natively.
+    /// </summary>
+    public static bool HasPlaylistExtension(string? streamUrl)
+    {
+        if (!Uri.TryCreate(streamUrl, UriKind.Absolute, out Uri? uri))
+        {
+            return false;
+        }
+
+        string path = uri.AbsolutePath;
+        return path.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) ||
+               path.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) ||
+               path.EndsWith(".asx", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Fetches a playlist address and returns the first stream URL inside it, or
+    /// <c>null</c> when the address isn't a playlist or has no usable entry.
+    /// </summary>
+    public static async Task<string?> ResolvePlaylistEntryAsync(
+        string playlistUrl,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default)
+    {
+        StreamDiagnosis diagnosis = await ProbeAsync(playlistUrl, httpClient, cancellationToken: cancellationToken);
+        return diagnosis.Result == StreamProbeResult.PlaylistFile ? diagnosis.PlaylistEntryUrl : null;
+    }
+
     private static async Task<StreamDiagnosis> ClassifyResponseAsync(
         Uri uri,
         HttpResponseMessage response,

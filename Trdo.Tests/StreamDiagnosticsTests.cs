@@ -296,6 +296,19 @@ public sealed class StreamDiagnosticsTests
     }
 
     [TestMethod]
+    [DataRow("http://example.com/listen.pls", true)]
+    [DataRow("http://example.com/listen.PLS?x=1", true)]
+    [DataRow("http://example.com/listen.m3u", true)]
+    [DataRow("http://example.com/listen.asx", true)]
+    [DataRow("http://example.com/live/hls.m3u8", false)]
+    [DataRow("http://example.com:8000/live", false)]
+    [DataRow("not a url", false)]
+    public void HasPlaylistExtension_MatchesOnlyPlaylistFiles(string url, bool expected)
+    {
+        Assert.AreEqual(expected, StreamDiagnostics.HasPlaylistExtension(url));
+    }
+
+    [TestMethod]
     public void ExtractFirstPlaylistEntry_SkipsCommentsAndNonUrlLines()
     {
         const string m3u = "#EXTM3U\n#EXTINF:-1,Some Title\n\nnot-a-url\nhttp://stream.example.com/live\n";

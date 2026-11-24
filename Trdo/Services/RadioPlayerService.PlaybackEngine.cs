@@ -91,6 +91,33 @@ public sealed partial class RadioPlayerService
             throw new InvalidOperationException("No stream URL set. Call SetStreamUrl first.");
         }
 
+        // A .pls/.m3u/.asx address is a pointer, not audio. Follow it to the real stream so the
+        // station plays as saved; on any failure keep the original so diagnostics still explain it.
+        if (StreamDiagnostics.HasPlaylistExtension(_streamUrl))
+        {
+            string playlistUrl = _streamUrl;
+            string? entry = null;
+            try
+            {
+                entry = await StreamDiagnostics.ResolvePlaylistEntryAsync(playlistUrl, _httpClient, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LogService.Warn("RadioPlayerService", $"Playlist resolve failed: {ex.Message}");
+            }
+
+            if (entry is not null && string.Equals(_streamUrl, playlistUrl, StringComparison.Ordinal))
+            {
+                LogService.Info("RadioPlayerService",
+                    $"Resolved playlist {LogService.Redact(playlistUrl)} -> {LogService.Redact(entry)}");
+                _streamUrl = entry;
+            }
+        }
+
         _libVlcBackend?.NetworkCachingMs = (int)RequiredBufferDuration.TotalMilliseconds;
 
         // Report the value LibVLC will actually use - a configured 0 becomes its own default.
