@@ -23,6 +23,38 @@ public static class PlaylistImportExportService
         };
     }
 
+    /// <summary>File extensions the import window accepts.</summary>
+    public static readonly string[] SupportedExtensions = [".m3u", ".m3u8", ".pls"];
+
+    /// <summary>True when <paramref name="path"/> has an extension <see cref="ImportFromFile"/> understands.</summary>
+    public static bool IsSupportedFile(string path) =>
+        Array.Exists(SupportedExtensions, e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// True when <paramref name="candidate"/> is already in <paramref name="existing"/>. Matches
+    /// on every imported field, so a re-import of an unchanged export adds nothing while a
+    /// renamed or re-pointed station still counts as new.
+    /// </summary>
+    public static bool IsDuplicate(IEnumerable<RadioStation> existing, RadioStation candidate)
+    {
+        foreach (RadioStation station in existing)
+        {
+            if (string.Equals(station.Name, candidate.Name, StringComparison.Ordinal) &&
+                string.Equals(station.StreamUrl, candidate.StreamUrl, StringComparison.Ordinal) &&
+                string.Equals(station.Homepage, candidate.Homepage, StringComparison.Ordinal) &&
+                string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Exports to PLS when <paramref name="asPls"/> is set, otherwise M3U.</summary>
+    public static string Export(IEnumerable<RadioStation> stations, bool asPls) =>
+        asPls ? ExportToPls(stations) : ExportToM3u(stations);
+
     /// <summary>
     /// Exports radio stations to M3U format.
     /// </summary>

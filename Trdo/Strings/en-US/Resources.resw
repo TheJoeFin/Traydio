@@ -1548,6 +1548,24 @@
   <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
     <value>Add local music...</value>
   </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Import and export stations</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Choose files...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Select none</value>
+  </data>
   <data name="MiniPlayer_WindowTitle" xml:space="preserve">
     <value>Traydio Mini Player</value>
   </data>

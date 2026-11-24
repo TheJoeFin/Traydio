@@ -802,10 +802,6 @@
                                 x:Uid="SettingsPage_ExportStations"
                                 Click="ExportButton_Click" />
                         </StackPanel>
-                        <InfoBar
-                            x:Name="ImportExportInfoBar"
-                            IsClosable="True"
-                            IsOpen="False" />
                     </StackPanel>
                 </Border>
 

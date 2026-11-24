@@ -47,6 +47,7 @@
     <Compile Include="..\Trdo\Services\RadioStationJsonContext.cs" Link="Services\RadioStationJsonContext.cs" />
     <Compile Include="..\Trdo\Services\StationStorageFormat.cs" Link="Services\StationStorageFormat.cs" />
     <Compile Include="..\Trdo\Services\StationIdentityPolicy.cs" Link="Services\StationIdentityPolicy.cs" />
+    <Compile Include="..\Trdo\Services\PlaylistImportExportService.cs" Link="Services\PlaylistImportExportService.cs" />
     <Compile Include="..\Trdo\Services\StationSelectionPolicy.cs" Link="Services\StationSelectionPolicy.cs" />
     <Compile Include="..\Trdo\Models\StationGroup.cs" Link="Models\StationGroup.cs" />
     <Compile Include="..\Trdo\Models\StationDivider.cs" Link="Models\StationDivider.cs" />

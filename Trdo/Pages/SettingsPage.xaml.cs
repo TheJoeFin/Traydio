@@ -123,62 +123,20 @@ public sealed partial class SettingsPage : Page
         return dim + t * (1.0 - dim);
     }
 
-    private async void ImportButton_Click(object sender, RoutedEventArgs e)
+    private void ImportButton_Click(object sender, RoutedEventArgs e) => OpenImportExportWindow(startAsImport: true);
+
+    private void ExportButton_Click(object sender, RoutedEventArgs e) => OpenImportExportWindow(startAsImport: false);
+
+    /// <summary>
+    /// Import/export lives in its own window rather than this flyout page: the flyout
+    /// light-dismisses (which would kill a file picker or a drag in progress) and is too
+    /// small to preview a whole station list.
+    /// </summary>
+    private static void OpenImportExportWindow(bool startAsImport)
     {
-        try
-        {
-            nint hwnd = PInvoke.GetActiveWindow();
-            int count = await ViewModel.ImportStationsAsync(hwnd);
-
-            if (count > 0)
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = $"Imported {count} station{(count == 1 ? "" : "s")}.";
-            }
-            else
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "No stations were imported.";
-            }
-
-            ImportExportInfoBar.IsOpen = true;
-        }
-        catch (Exception ex)
-        {
-            ImportExportInfoBar.Severity = InfoBarSeverity.Error;
-            ImportExportInfoBar.Message = string.Format(
-                LocalizationService.GetString("SettingsPage_ImportFailed", "Import failed: {0}"), ex.Message);
-            ImportExportInfoBar.IsOpen = true;
-        }
-    }
-
-    private async void ExportButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            nint hwnd = PInvoke.GetActiveWindow();
-            bool exported = await ViewModel.ExportStationsAsync(hwnd);
-
-            if (exported)
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = "Stations exported successfully.";
-            }
-            else
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "Export cancelled or no stations to export.";
-            }
-
-            ImportExportInfoBar.IsOpen = true;
-        }
-        catch (Exception ex)
-        {
-            ImportExportInfoBar.Severity = InfoBarSeverity.Error;
-            ImportExportInfoBar.Message = string.Format(
-                LocalizationService.GetString("SettingsPage_ExportFailed", "Export failed: {0}"), ex.Message);
-            ImportExportInfoBar.IsOpen = true;
-        }
+        ImportExportWindow window = new(startAsImport);
+        WindowHelper.Track(window);
+        window.Activate();
     }
 
     private async void OpenLogsFolderButton_Click(object sender, RoutedEventArgs e)
