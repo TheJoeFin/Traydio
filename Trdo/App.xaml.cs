@@ -123,6 +123,9 @@ public partial class App : Application
 
         // The tooltip names the button that plays/pauses, so it goes stale when that moves.
         SettingsService.TrayClickActionsChanged += (_, _) => UpdatePlayPauseCommandText();
+
+        // The wheel hook is only installed while a wheel action is assigned.
+        SettingsService.TrayWheelActionChanged += (_, _) => ApplyTrayWheelSetting();
     }
 
     private const string CrashLogComponent = "Crash";
@@ -537,7 +540,9 @@ public partial class App : Application
         _trayIcon.ContextMenu += TrayIcon_ContextMenu;
         _trayIcon.LeftDoubleClick += TrayIcon_LeftDoubleClick;
         _trayIcon.RightDoubleClick += TrayIcon_RightDoubleClick;
+        _trayIcon.MouseWheel += TrayIcon_MouseWheel;
         _trayIcon.IsVisible = true;
+        ApplyTrayWheelSetting();
 
         DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
         _leftClickSequencer ??= new TrayClickSequencer(dispatcher);
@@ -592,6 +597,95 @@ public partial class App : Application
             return;
 
         _rightClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    // ---- mouse wheel over the tray icon ----
+
+    // How long scrolling must pause before queued station steps are applied. Each step starts
+    // a stream, so scrolling through five stations should land on the fifth, not play all five.
+    private static readonly TimeSpan StationWheelSettleDelay = TimeSpan.FromMilliseconds(300);
+
+    // Most stations one burst of scrolling may skip, so a runaway wheel can't spin the list.
+    private const int MaxStationWheelSteps = 20;
+
+    private int _wheelPendingDelta;
+    private int _pendingStationSteps;
+    private DispatcherQueueTimer? _stationWheelTimer;
+
+    /// <summary>Starts or stops listening to the wheel to match the setting.</summary>
+    private void ApplyTrayWheelSetting()
+    {
+        bool enabled = SettingsService.TrayWheelAction != TrayWheelAction.None;
+
+        _wheelPendingDelta = 0;
+        _pendingStationSteps = 0;
+        _stationWheelTimer?.Stop();
+
+        if (_trayIcon is not null)
+            _trayIcon.IsWheelEnabled = enabled;
+    }
+
+    private void TrayIcon_MouseWheel(object? sender, int delta)
+    {
+        TrayWheelAction action = SettingsService.TrayWheelAction;
+        if (action == TrayWheelAction.None)
+            return;
+
+        int notches = TrayWheelPolicy.TakeNotches(ref _wheelPendingDelta, delta);
+        if (notches == 0)
+            return;
+
+        switch (action)
+        {
+            case TrayWheelAction.Volume:
+                _playerVm.VolumePercent = TrayWheelPolicy.StepVolumePercent(_playerVm.VolumePercent, notches);
+                break;
+
+            case TrayWheelAction.SwitchStation:
+                // Nothing to switch to until a station exists; unlike a click there is no
+                // sensible fallback, and a flyout popping up on a scroll would be hostile.
+                if (!_playerVm.CanPlay)
+                    break;
+
+                _pendingStationSteps = Math.Clamp(
+                    _pendingStationSteps + TrayWheelPolicy.StationSteps(notches),
+                    -MaxStationWheelSteps,
+                    MaxStationWheelSteps);
+                RestartStationWheelTimer();
+                break;
+        }
+    }
+
+    private void RestartStationWheelTimer()
+    {
+        if (_stationWheelTimer is null)
+        {
+            DispatcherQueue? dispatcher = _uiDispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
+            if (dispatcher is null)
+                return;
+
+            _stationWheelTimer = dispatcher.CreateTimer();
+            _stationWheelTimer.IsRepeating = false;
+            _stationWheelTimer.Interval = StationWheelSettleDelay;
+            _stationWheelTimer.Tick += (_, _) => ApplyPendingStationSteps();
+        }
+
+        _stationWheelTimer.Stop();
+        _stationWheelTimer.Start();
+    }
+
+    private void ApplyPendingStationSteps()
+    {
+        int steps = _pendingStationSteps;
+        _pendingStationSteps = 0;
+
+        for (int i = 0; i < Math.Abs(steps); i++)
+        {
+            if (steps > 0)
+                _playerVm.NextStationOrTrack();
+            else
+                _playerVm.PreviousStationOrTrack();
+        }
     }
 
     /// <summary>

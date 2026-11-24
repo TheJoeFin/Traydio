@@ -441,6 +441,23 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         set => SetTrayClickAction(TrayClickButton.RightDouble, TrayClickPolicy.Parse(value, SettingsService.TrayRightDoubleClickAction));
     }
 
+    /// <summary>
+    /// ComboBox index for what the mouse wheel does over the tray icon. The items are listed in
+    /// <see cref="TrayWheelAction"/> order, so the index is the enum value.
+    /// </summary>
+    public int TrayWheelActionIndex
+    {
+        get => (int)SettingsService.TrayWheelAction;
+        set
+        {
+            TrayWheelAction action = TrayWheelPolicy.Parse(value, SettingsService.TrayWheelAction);
+            if (action == SettingsService.TrayWheelAction) return;
+
+            SettingsService.TrayWheelAction = action;
+            OnPropertyChanged();
+        }
+    }
+
     private static TrayClickAssignments CurrentTrayClickAssignments => new(
         SettingsService.TrayLeftClickAction,
         SettingsService.TrayRightClickAction,

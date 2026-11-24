@@ -1241,6 +1241,21 @@
   <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
     <value>Right double-click</value>
   </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Scroll wheel over the icon</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Do nothing</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Change volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Switch station</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Scroll up to raise the volume or go to the previous station, and down to lower it or go to the next. While this is on, scrolling over the icon is used by Traydio instead of the taskbar.</value>
+  </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>
   </data>

@@ -28,6 +28,7 @@ public static class SettingsService
     private const string TrayLeftClickActionKey = "TrayLeftClickAction";
     private const string TrayRightClickActionKey = "TrayRightClickAction";
     private const string TrayLeftDoubleClickActionKey = "TrayLeftDoubleClickAction";
+    private const string TrayWheelActionKey = "TrayWheelAction";
     private const string TrayRightDoubleClickActionKey = "TrayRightDoubleClickAction";
     private const string PlaybackEngineModeKey = "PlaybackEngineMode";
     private const string CastIdleTimeoutMinutesKey = "CastIdleTimeoutMinutes";
@@ -580,6 +581,53 @@ public static class SettingsService
     {
         get => GetTrayClickAction(TrayRightDoubleClickActionKey, TrayClickPolicy.DefaultDoubleClickAction);
         set => SetTrayClickAction(TrayRightDoubleClickActionKey, value);
+    }
+
+    /// <summary>Raised when <see cref="TrayWheelAction"/> changes, so the tray icon can start or stop listening to the wheel.</summary>
+    public static event EventHandler? TrayWheelActionChanged;
+
+    /// <summary>
+    /// Gets or sets what turning the mouse wheel over the tray icon does. Off by default:
+    /// anything other than <see cref="TrayWheelAction.None"/> installs a system-wide mouse hook
+    /// and swallows scrolls over the icon, which only users who asked for it should pay for.
+    /// </summary>
+    public static TrayWheelAction TrayWheelAction
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(TrayWheelActionKey, out object? value))
+                {
+                    return value switch
+                    {
+                        int i => TrayWheelPolicy.Parse(i, TrayWheelPolicy.DefaultAction),
+                        string s when int.TryParse(s, out int parsed) => TrayWheelPolicy.Parse(parsed, TrayWheelPolicy.DefaultAction),
+                        _ => TrayWheelPolicy.DefaultAction
+                    };
+                }
+            }
+            catch
+            {
+                // Fall through to the default
+            }
+
+            return TrayWheelPolicy.DefaultAction;
+        }
+        set
+        {
+            try
+            {
+                ApplicationData.Current.LocalSettings.Values[TrayWheelActionKey] = (int)value;
+                LogChange(TrayWheelActionKey, value);
+            }
+            catch
+            {
+                // Settings storage unavailable; nothing to persist to
+            }
+
+            TrayWheelActionChanged?.Invoke(null, EventArgs.Empty);
+        }
     }
 
     /// <summary>
