@@ -59,7 +59,7 @@
             FontWeight="SemiBold" />
 
         <!--  Settings Content  -->
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="1" StateChanged="SettingsScrollView_StateChanged">
             <StackPanel Padding="0,0,8,8" Spacing="12">
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">

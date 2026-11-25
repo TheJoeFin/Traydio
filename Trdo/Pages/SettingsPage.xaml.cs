@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using Trdo.Controls;
 using Trdo.Services;
@@ -35,6 +36,32 @@ public sealed partial class SettingsPage : Page
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
         RadioPlayerService.Instance.Watchdog.AudioLevelUpdated -= OnAudioLevelUpdated;
+    }
+
+    /// <summary>
+    /// Closes any open dropdown when the user scrolls the page. A ScrollView keeps taking the
+    /// mouse wheel while a ComboBox is open, which slides the page out from under the dropdown
+    /// and leaves it floating over the window (issue #163). Only user scrolling counts: the
+    /// <see cref="ScrollingInteractionState.Animation"/> state is left alone so that scrolling a
+    /// focused control into view does not close the dropdown just opened on it.
+    /// </summary>
+    private void SettingsScrollView_StateChanged(ScrollView sender, object args)
+    {
+        if (sender.State is ScrollingInteractionState.Interaction or ScrollingInteractionState.Inertia)
+            CloseDropDowns(sender);
+    }
+
+    private static void CloseDropDowns(DependencyObject parent)
+    {
+        int count = VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < count; i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+            if (child is ComboBox comboBox)
+                comboBox.IsDropDownOpen = false;
+            else
+                CloseDropDowns(child);
+        }
     }
 
     /// <summary>
