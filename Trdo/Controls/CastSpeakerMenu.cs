@@ -135,7 +135,8 @@ internal sealed class CastSpeakerMenu
         {
             items.Add(new MenuFlyoutItem
             {
-                Text = LocalizationService.GetString("CastDeviceDialog_Searching", "Looking for devices on your network…"),
+                // Shared with the cast pages' x:Uid, so the lookup names the property.
+                Text = LocalizationService.GetString("CastDeviceDialog_Searching/Text", "Looking for devices on your network…"),
                 IsEnabled = false,
             });
         }
