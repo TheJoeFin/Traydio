@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using Trdo.Models;
 using Trdo.Services;
 
@@ -46,7 +48,7 @@ public class PlaylistImportExportServiceTests
         string pls = PlaylistImportExportService.Export(stations, asPls: true);
         List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.pls", pls);
 
-        Assert.AreEqual(2, back.Count);
+        Assert.HasCount(2, back);
         Assert.AreEqual("Two", back[1].Name);
         Assert.AreEqual("http://two/live", back[1].StreamUrl);
     }
@@ -59,7 +61,7 @@ public class PlaylistImportExportServiceTests
         string m3u = PlaylistImportExportService.Export(stations, asPls: false);
         List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
 
-        Assert.AreEqual(1, back.Count);
+        Assert.HasCount(1, back);
         Assert.AreEqual("One", back[0].Name);
     }
 }
