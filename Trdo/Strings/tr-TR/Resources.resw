@@ -620,6 +620,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Gelişmiş</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Logo olarak kullanmak için buraya bir görüntü bırakın</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Görüntü seç…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>İstasyon logosu olarak kullan</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Bu dosya desteklenen bir görüntü değil.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Görüntü çok büyük. 20 MB'tan küçük bir görüntü seçin.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Bu görüntü kullanılamadı.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Arabellek düzeyi</value>
   </data>

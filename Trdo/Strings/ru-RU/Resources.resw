@@ -620,6 +620,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Дополнительно</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Перетащите изображение сюда, чтобы сделать его логотипом</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Выбрать изображение…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Использовать как логотип станции</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Этот файл не является поддерживаемым изображением.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Изображение слишком большое. Выберите файл меньше 20 МБ.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Не удалось использовать это изображение.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Размер буфера</value>
   </data>

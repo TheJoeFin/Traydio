@@ -617,6 +617,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Avancé</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Déposez une image ici pour l’utiliser comme logo</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Choisir une image…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Utiliser comme logo de la station</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Ce fichier n’est pas une image prise en charge.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Cette image est trop volumineuse. Choisissez-en une de moins de 20 Mo.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Impossible d’utiliser cette image.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Niveau du tampon</value>
   </data>

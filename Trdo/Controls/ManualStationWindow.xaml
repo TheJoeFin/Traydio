@@ -19,8 +19,13 @@
         <MicaBackdrop />
     </ex:WindowEx.SystemBackdrop>
 
-    <Grid RowDefinitions="Auto,*,Auto">
-
+    <!--  The whole window accepts a dropped image; a null background would not hit-test.  -->
+    <Grid
+        x:Name="RootGrid"
+        AllowDrop="True"
+        Background="Transparent"
+        DragLeave="Window_DragLeave"
+        RowDefinitions="Auto,*,Auto">
 
         <TitleBar x:Name="ModernTitlebar" Title="{x:Bind ViewModel.PageTitle, Mode=OneWay}">
             <TitleBar.IconSource>
@@ -33,9 +38,9 @@
             <StackPanel Margin="24,16,24,16" Spacing="12">
 
                 <!--
-                    Hero preview of the station logo. Collapses entirely when there
-                    is no usable image, so a station without one loses no space to
-                    an empty frame. Uniform keeps non-square logos undistorted.
+                    Hero preview of the station logo. When there is no usable image
+                    a shorter drop hint takes its place. Uniform keeps non-square
+                    logos undistorted.
                 -->
                 <Border
                     Height="140"
@@ -50,6 +55,31 @@
                         ImageFailed="HeroImage_ImageFailed"
                         Source="{x:Bind ViewModel.HeroImageSource, Mode=OneWay}"
                         Stretch="Uniform" />
+                </Border>
+
+                <Border
+                    MinHeight="72"
+                    Padding="12"
+                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource ControlCornerRadius}"
+                    Visibility="{x:Bind ViewModel.ShowsImageDropHint, Mode=OneWay}">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="4">
+                        <FontIcon
+                            FontSize="20"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Glyph="&#xEB9F;" />
+                        <TextBlock
+                            x:Uid="ManualStationWindow_DropImageHint"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            HorizontalTextAlignment="Center"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
                 </Border>
 
                 <!--  Station Name Input  -->
@@ -89,6 +119,15 @@
                         x:Uid="AddStation_LogoUrlPlaceholder"
                         Text="{x:Bind ViewModel.FaviconUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
+                    <Button
+                        x:Uid="ManualStationWindow_ChooseImage"
+                        Click="ChooseImageButton_Click"
+                        IsEnabled="{x:Bind ViewModel.CanImportImage, Mode=OneWay}" />
+                    <InfoBar
+                        IsClosable="False"
+                        IsOpen="{x:Bind ViewModel.HasImageError, Mode=OneWay}"
+                        Message="{x:Bind ViewModel.ImageError, Mode=OneWay}"
+                        Severity="Warning" />
                 </StackPanel>
 
                 <!--  Per-station playback settings, collapsed by default  -->
@@ -252,6 +291,15 @@
                 </Button>
             </Grid>
         </Border>
+
+        <!--  Shown while a drag is over the window  -->
+        <Border
+            x:Name="DropOverlay"
+            Grid.RowSpan="3"
+            Background="{ThemeResource AccentFillColorDefaultBrush}"
+            IsHitTestVisible="False"
+            Opacity="0.18"
+            Visibility="Collapsed" />
 
     </Grid>
 

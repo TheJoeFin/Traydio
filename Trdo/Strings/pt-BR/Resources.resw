@@ -617,6 +617,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Avançado</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Solte uma imagem aqui para usá-la como logotipo</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Escolher imagem…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Usar como logotipo da estação</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Esse arquivo não é uma imagem compatível.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>A imagem é grande demais. Escolha uma com menos de 20 MB.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Não foi possível usar essa imagem.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Nível do buffer</value>
   </data>

@@ -617,6 +617,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Erweitert</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Bild hier ablegen, um es als Logo zu verwenden</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Bild auswählen…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Als Senderlogo verwenden</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Diese Datei ist kein unterstütztes Bild.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Das Bild ist zu groß. Wählen Sie eines unter 20 MB.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Das Bild konnte nicht verwendet werden.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Pufferstufe</value>
   </data>

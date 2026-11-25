@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Volume is now remembered per station, so each station keeps its own level and restores it when selected (#16)
 
 ### Added
+- Custom station logos from your PC: drag an image onto the station editor window, or use "Choose image…". Traydio keeps its own small copy, so the logo stays even if the original file is moved or deleted. Playlist exports leave out logos stored on your PC (#161)
 - Groups: collapsible folders in the station list, created from the right-click menu and filled by dragging stations into them the same way stations are reordered. A folder remembers whether it is open. Deleting one keeps its stations, moving them back out to the top level; deleting a folder *and* its stations is a separate command that asks first
 - Dividers: a subtle line to break up a long list, with an optional caption. Insert one above any station from its right-click menu, or add one from the list's own menu, then drag it wherever it belongs
 - Sort by name, genre, country or date added. This is a view: your own order, folders and dividers are left exactly as they are and come straight back when you switch to Manual, so sorting to find a station never costs you the arrangement you built. While a sort is on, the list says so and dragging is switched off rather than quietly rewriting your order

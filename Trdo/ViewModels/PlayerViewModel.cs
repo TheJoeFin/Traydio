@@ -1642,6 +1642,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         RemoveFromTree(station);
         RebuildDisplayRows();
         PersistStationList();
+        CustomStationArt.Release(station.FaviconUrl, Stations);
         Debug.WriteLine($"[PlayerViewModel] Station removed, {Stations.Count} stations remaining");
     }
 
@@ -2020,6 +2021,9 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         SyncStationsFromTree();
         RebuildDisplayRows();
         PersistStationList();
+
+        foreach (RadioStation station in doomed)
+            CustomStationArt.Release(station.FaviconUrl, Stations);
     }
 
     /// <summary>Removes a divider. Nothing else moves.</summary>

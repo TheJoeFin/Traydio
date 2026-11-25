@@ -617,6 +617,24 @@
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>متقدم</value>
   </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>أفلت صورة هنا لاستخدامها كشعار</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>اختيار صورة…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>استخدام كشعار للمحطة</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>هذا الملف ليس صورة مدعومة.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>هذه الصورة كبيرة جدًا. اختر صورة أصغر من 20 ميغابايت.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>تعذر استخدام هذه الصورة.</value>
+  </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>مستوى التخزين المؤقت</value>
   </data>
