@@ -630,7 +630,7 @@
     <value>Bu dosya desteklenen bir görüntü değil.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>Görüntü çok büyük. 20 MB'tan küçük bir görüntü seçin.</value>
+    <value>Görüntü çok büyük. {0} MB'tan küçük bir görüntü seçin.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Bu görüntü kullanılamadı.</value>

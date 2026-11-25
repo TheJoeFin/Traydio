@@ -630,7 +630,7 @@
     <value>That file isn't a supported image.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>That image is too large. Choose one under 20 MB.</value>
+    <value>That image is too large. Choose one under {0} MB.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Couldn't use that image.</value>

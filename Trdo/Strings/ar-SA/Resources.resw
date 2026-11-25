@@ -627,7 +627,7 @@
     <value>هذا الملف ليس صورة مدعومة.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>هذه الصورة كبيرة جدًا. اختر صورة أصغر من 20 ميغابايت.</value>
+    <value>هذه الصورة كبيرة جدًا. اختر صورة أصغر من {0} ميغابايت.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>تعذر استخدام هذه الصورة.</value>

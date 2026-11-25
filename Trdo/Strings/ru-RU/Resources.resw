@@ -630,7 +630,7 @@
     <value>Этот файл не является поддерживаемым изображением.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>Изображение слишком большое. Выберите файл меньше 20 МБ.</value>
+    <value>Изображение слишком большое. Выберите файл меньше {0} МБ.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Не удалось использовать это изображение.</value>

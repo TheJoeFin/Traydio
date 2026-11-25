@@ -627,7 +627,7 @@
     <value>该文件不是受支持的图片。</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>图片过大。请选择小于 20 MB 的图片。</value>
+    <value>图片过大。请选择小于 {0} MB 的图片。</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>无法使用该图片。</value>

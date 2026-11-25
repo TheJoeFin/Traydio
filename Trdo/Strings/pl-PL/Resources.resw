@@ -627,7 +627,7 @@
     <value>Ten plik nie jest obsługiwanym obrazem.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>Ten obraz jest za duży. Wybierz obraz mniejszy niż 20 MB.</value>
+    <value>Ten obraz jest za duży. Wybierz obraz mniejszy niż {0} MB.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Nie można użyć tego obrazu.</value>

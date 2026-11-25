@@ -39,8 +39,10 @@ internal static class CustomStationArt
         {
             if (source.Length > CustomStationArtStore.MaxSourceBytes)
             {
-                throw new InvalidDataException(LocalizationService.GetString(
-                    "ManualStationWindow_ImageTooLarge", "That image is too large. Choose one under 20 MB."));
+                throw new InvalidDataException(string.Format(
+                    LocalizationService.GetString(
+                        "ManualStationWindow_ImageTooLarge", "That image is too large. Choose one under {0} MB."),
+                    CustomStationArtStore.MaxSourceBytes / (1024 * 1024)));
             }
 
             using MemoryStream buffer = new();

@@ -627,7 +627,7 @@
     <value>Ese archivo no es una imagen compatible.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>La imagen es demasiado grande. Elige una de menos de 20 MB.</value>
+    <value>La imagen es demasiado grande. Elige una de menos de {0} MB.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>No se pudo usar esa imagen.</value>

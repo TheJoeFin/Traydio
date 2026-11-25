@@ -627,7 +627,7 @@
     <value>Diese Datei ist kein unterstütztes Bild.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>Das Bild ist zu groß. Wählen Sie eines unter 20 MB.</value>
+    <value>Das Bild ist zu groß. Wählen Sie eines unter {0} MB.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Das Bild konnte nicht verwendet werden.</value>

@@ -627,7 +627,7 @@
     <value>Ce fichier n’est pas une image prise en charge.</value>
   </data>
   <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
-    <value>Cette image est trop volumineuse. Choisissez-en une de moins de 20 Mo.</value>
+    <value>Cette image est trop volumineuse. Choisissez-en une de moins de {0} Mo.</value>
   </data>
   <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
     <value>Impossible d’utiliser cette image.</value>
