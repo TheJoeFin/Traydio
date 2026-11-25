@@ -833,6 +833,9 @@
   <data name="PlayingPage_EditLabel.Text" xml:space="preserve">
     <value>Edit label</value>
   </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
   <data name="PlayingPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Get started by adding your favorite radio station to begin listening.</value>
   </data>

@@ -539,6 +539,12 @@
                             <TextBlock x:Uid="PlayingPage_AddFirstStation" TextWrapping="Wrap" />
                         </StackPanel>
                     </Button>
+
+                    <!--  Import (secondary)  -->
+                    <HyperlinkButton
+                        x:Uid="PlayingPage_ImportStations"
+                        HorizontalAlignment="Center"
+                        Click="ImportStationsButton_Click" />
                 </StackPanel>
             </Grid>
         </Grid>

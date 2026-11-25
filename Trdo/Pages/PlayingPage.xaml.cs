@@ -416,6 +416,15 @@ public sealed partial class PlayingPage : Page
         }
     }
 
+    private void ImportStationsButton_Click(object sender, RoutedEventArgs e)
+    {
+        // Own window rather than the flyout: the flyout light-dismisses, which would kill a
+        // file picker or drag in progress.
+        ImportExportWindow window = new(startAsImport: true);
+        WindowHelper.Track(window);
+        window.Activate();
+    }
+
     private void AddStationButton_Click(object sender, RoutedEventArgs e)
     {
         Debug.WriteLine("[PlayingPage] Add station button clicked");
