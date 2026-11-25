@@ -12,14 +12,18 @@ public static class PlaylistImportExportService
     /// Parses radio stations from the contents of a playlist file.
     /// Supports M3U/M3U8 and PLS formats.
     /// </summary>
-    public static List<RadioStation> ImportFromFile(string filePath, string content)
+    /// <param name="unknownStationName">Names a station whose entry has no title and whose
+    /// address has no host to use instead. Passed in because this file is also built into the
+    /// tests, which cannot load string resources.</param>
+    public static List<RadioStation> ImportFromFile(
+        string filePath, string content, string unknownStationName = "Unknown Station")
     {
         string extension = Path.GetExtension(filePath).ToLowerInvariant();
 
         return extension switch
         {
-            ".pls" => ParsePls(content),
-            _ => ParseM3u(content), // .m3u, .m3u8, or fallback
+            ".pls" => ParsePls(content, unknownStationName),
+            _ => ParseM3u(content, unknownStationName), // .m3u, .m3u8, or fallback
         };
     }
 
@@ -110,7 +114,7 @@ public static class PlaylistImportExportService
         !string.IsNullOrWhiteSpace(url) &&
         (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri) || uri.IsFile);
 
-    private static List<RadioStation> ParseM3u(string content)
+    private static List<RadioStation> ParseM3u(string content, string unknownStationName)
     {
         List<RadioStation> stations = [];
         string[] lines = content.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
@@ -155,7 +159,7 @@ public static class PlaylistImportExportService
             if (!string.IsNullOrWhiteSpace(line))
             {
                 string streamUrl = line;
-                string name = currentName ?? GetNameFromUrl(streamUrl);
+                string name = currentName ?? GetNameFromUrl(streamUrl, unknownStationName);
 
                 stations.Add(new RadioStation
                 {
@@ -174,7 +178,7 @@ public static class PlaylistImportExportService
         return stations;
     }
 
-    private static List<RadioStation> ParsePls(string content)
+    private static List<RadioStation> ParsePls(string content, string unknownStationName)
     {
         List<RadioStation> stations = [];
         string[] lines = content.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
@@ -205,7 +209,7 @@ public static class PlaylistImportExportService
             string streamUrl = kvp.Value;
             string name = titles.TryGetValue(kvp.Key, out string? title) && !string.IsNullOrWhiteSpace(title)
                 ? title
-                : GetNameFromUrl(streamUrl);
+                : GetNameFromUrl(streamUrl, unknownStationName);
 
             stations.Add(new RadioStation
             {
@@ -233,7 +237,7 @@ public static class PlaylistImportExportService
         return (0, string.Empty);
     }
 
-    private static string GetNameFromUrl(string url)
+    private static string GetNameFromUrl(string url, string unknownStationName)
     {
         try
         {
@@ -242,7 +246,7 @@ public static class PlaylistImportExportService
         }
         catch
         {
-            return "Unknown Station";
+            return unknownStationName;
         }
     }
 }

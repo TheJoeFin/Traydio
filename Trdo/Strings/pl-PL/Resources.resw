@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Tworzona przez społeczność baza internetowych stacji radiowych z tysiącami stacji z całego świata</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importowanie i eksportowanie stacji</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Podgląd stacji</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Upuść tutaj pliki .pls, .m3u lub .m3u8 albo wybierz pliki, aby wyświetlić podgląd zawartych w nich stacji.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Brak stacji do wyeksportowania.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>W tym pliku nie znaleziono stacji.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>Nieobsługiwane pliki: {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>Pliki, których nie udało się odczytać: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Już w bibliotece</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Nieznana stacja</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importuj: {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Eksportuj: {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Wybrano: {0} z {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Stacje Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Playlista M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Playlista PLS</value>
   </data>
 </root>

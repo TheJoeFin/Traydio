@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de données de radios internet communautaire avec des milliers de stations dans le monde</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importer et exporter des stations</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Prévisualiser les stations</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Déposez ici des fichiers .pls, .m3u ou .m3u8, ou choisissez des fichiers pour prévisualiser leurs stations.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Aucune station à exporter.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>Aucune station trouvée dans ce fichier.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>Fichiers non pris en charge : {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>Fichiers illisibles : {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Déjà dans la bibliothèque</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Station inconnue</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importer {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Exporter {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Sélection : {0} sur {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Stations Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Playlist M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Playlist PLS</value>
   </data>
 </root>

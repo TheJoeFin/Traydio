@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de dados de rádios na internet criada pela comunidade, com milhares de estações de todo o mundo</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importar e exportar estações</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Pré-visualizar estações</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Largue ficheiros .pls, .m3u ou .m3u8 aqui ou escolha ficheiros para pré-visualizar as respetivas estações.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Não existem estações para exportar.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>Não foram encontradas estações nesse ficheiro.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>Ficheiros não suportados: {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>Ficheiros que não foi possível ler: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Já está na biblioteca</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Estação desconhecida</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importar {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Exportar {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Selecionadas: {0} de {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Estações do Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Lista de reprodução M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Lista de reprodução PLS</value>
   </data>
 </root>

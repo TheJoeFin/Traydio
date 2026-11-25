@@ -204,6 +204,7 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
         int skippedFiles = 0;
         int failedFiles = 0;
         int added = 0;
+        string unknownStationName = LocalizationService.GetString("ImportExport_UnknownStation", "Unknown Station");
 
         foreach (StorageFile file in files)
         {
@@ -216,7 +217,7 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
             try
             {
                 string content = await FileIO.ReadTextAsync(file);
-                foreach (RadioStation station in PlaylistImportExportService.ImportFromFile(file.Name, content))
+                foreach (RadioStation station in PlaylistImportExportService.ImportFromFile(file.Name, content, unknownStationName))
                 {
                     bool duplicate =
                         PlaylistImportExportService.IsDuplicate(PlayerViewModel.Shared.Stations, station) ||
@@ -290,16 +291,18 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
         FileSavePicker picker = new();
         WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
         picker.SuggestedStartLocation = PickerLocationId.MusicLibrary;
-        picker.SuggestedFileName = "Traydio Stations";
+        picker.SuggestedFileName = LocalizationService.GetString("ImportExport_SuggestedFileName", "Traydio Stations");
+        string m3uLabel = LocalizationService.GetString("ImportExport_FileTypeM3u", "M3U Playlist");
+        string plsLabel = LocalizationService.GetString("ImportExport_FileTypePls", "PLS Playlist");
         if (_exportAsPls)
         {
-            picker.FileTypeChoices.Add("PLS Playlist", [".pls"]);
-            picker.FileTypeChoices.Add("M3U Playlist", [".m3u"]);
+            picker.FileTypeChoices.Add(plsLabel, [".pls"]);
+            picker.FileTypeChoices.Add(m3uLabel, [".m3u"]);
         }
         else
         {
-            picker.FileTypeChoices.Add("M3U Playlist", [".m3u"]);
-            picker.FileTypeChoices.Add("PLS Playlist", [".pls"]);
+            picker.FileTypeChoices.Add(m3uLabel, [".m3u"]);
+            picker.FileTypeChoices.Add(plsLabel, [".pls"]);
         }
 
         StorageFile? file = await picker.PickSaveFileAsync();

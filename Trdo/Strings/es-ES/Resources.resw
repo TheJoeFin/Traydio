@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de datos de radio por internet creada por la comunidad, con miles de emisoras de todo el mundo</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importar y exportar estaciones</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Previsualizar estaciones</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Suelta aquí archivos .pls, .m3u o .m3u8, o elige archivos para previsualizar sus estaciones.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>No hay estaciones para exportar.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>No se encontraron estaciones en ese archivo.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>Archivos no compatibles: {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>Archivos que no se pudieron leer: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Ya está en la biblioteca</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Estación desconocida</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importar {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Exportar {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Seleccionadas: {0} de {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Estaciones de Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Lista de reproducción M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Lista de reproducción PLS</value>
   </data>
 </root>

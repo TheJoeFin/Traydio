@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>قاعدة بيانات راديو إنترنت يديرها المجتمع تضم آلاف المحطات حول العالم</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>استيراد المحطات وتصديرها</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>معاينة المحطات</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>أفلت ملفات ‎.pls أو ‎.m3u أو ‎.m3u8 هنا، أو اختر ملفات لمعاينة محطاتها.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>لا توجد محطات لتصديرها.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>لم يتم العثور على محطات في هذا الملف.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>الملفات غير المدعومة: {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>الملفات التي تعذّرت قراءتها: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>موجودة بالفعل في المكتبة</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>محطة غير معروفة</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>استيراد ({0})</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>تصدير ({0})</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>تم تحديد {0} من {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>محطات Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>قائمة تشغيل M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>قائمة تشغيل PLS</value>
   </data>
 </root>

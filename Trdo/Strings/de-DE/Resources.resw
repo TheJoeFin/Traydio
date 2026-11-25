@@ -1602,10 +1602,49 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Von der Community betriebene Internetradio-Datenbank mit Tausenden von Sendern weltweit</value>
   </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Sender importieren und exportieren</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Sendervorschau anzeigen</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Lege .pls-, .m3u- oder .m3u8-Dateien hier ab oder wähle Dateien aus, um eine Vorschau ihrer Sender anzuzeigen.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Es gibt keine Sender zum Exportieren.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>In dieser Datei wurden keine Sender gefunden.</value>
+  </data>
   <data name="ImportExport_FilesUnsupported" xml:space="preserve">
     <value>Nicht unterstützte Dateien: {0}.</value>
   </data>
   <data name="ImportExport_FilesUnreadable" xml:space="preserve">
     <value>Nicht lesbare Dateien: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Bereits in der Bibliothek</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Unbekannter Sender</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>{0} importieren</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>{0} exportieren</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>{0} von {1} ausgewählt</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Traydio-Sender</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>M3U-Playlist</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>PLS-Playlist</value>
   </data>
 </root>
