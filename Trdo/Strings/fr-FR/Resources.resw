@@ -1602,6 +1602,42 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de données de radios internet communautaire avec des milliers de stations dans le monde</value>
   </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Importer</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Molette sur l’icône</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Ne rien faire</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Modifier le volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Changer de station</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Faites défiler vers le haut pour augmenter le volume ou passer à la station précédente, et vers le bas pour le baisser ou passer à la suivante. Tant que cette option est activée, le défilement sur l’icône est utilisé par Traydio au lieu de la barre des tâches.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Importer et exporter des stations</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Importer</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Exporter</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Choisir des fichiers...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Tout sélectionner</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Tout désélectionner</value>
+  </data>
   <data name="ImportExport_WindowTitle" xml:space="preserve">
     <value>Importer et exporter des stations</value>
   </data>
@@ -1646,5 +1682,11 @@
   </data>
   <data name="ImportExport_FileTypePls" xml:space="preserve">
     <value>Playlist PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ajouter la station et revenir. Maintenez la touche Maj enfoncée en cliquant pour ajouter plusieurs stations sans quitter la recherche.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Ajoutée</value>
   </data>
 </root>

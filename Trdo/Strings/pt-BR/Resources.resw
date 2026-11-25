@@ -1602,6 +1602,42 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Banco de dados de rádios da internet feito pela comunidade, com milhares de estações do mundo todo</value>
   </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Roda do mouse sobre o ícone</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Não fazer nada</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Alterar o volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Trocar de estação</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Role para cima para aumentar o volume ou ir para a estação anterior, e para baixo para diminuí-lo ou ir para a próxima. Enquanto esta opção estiver ativada, a rolagem sobre o ícone é usada pelo Traydio em vez da barra de tarefas.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Importar e exportar estações</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Escolher arquivos...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Selecionar tudo</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Limpar seleção</value>
+  </data>
   <data name="ImportExport_WindowTitle" xml:space="preserve">
     <value>Importar e exportar estações</value>
   </data>
@@ -1646,5 +1682,11 @@
   </data>
   <data name="ImportExport_FileTypePls" xml:space="preserve">
     <value>Playlist PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Adicionar a estação e voltar. Mantenha a tecla Shift pressionada ao clicar para adicionar várias estações sem sair da pesquisa.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Adicionada</value>
   </data>
 </root>

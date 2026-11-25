@@ -1602,6 +1602,42 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Dünya genelinde binlerce istasyon içeren, topluluk tarafından oluşturulan internet radyo veritabanı</value>
   </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>İçe aktar</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Simge üzerinde fare tekerleği</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Hiçbir şey yapma</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Ses düzeyini değiştir</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>İstasyon değiştir</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Ses düzeyini artırmak veya önceki istasyona geçmek için yukarı, sesi azaltmak veya sonraki istasyona geçmek için aşağı kaydırın. Bu özellik açıkken simge üzerindeki kaydırmayı görev çubuğu yerine Traydio kullanır.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>İstasyonları içe ve dışa aktarma</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>İçe aktar</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Dışa aktar</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Dosya seç...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Tümünü seç</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Seçimi temizle</value>
+  </data>
   <data name="ImportExport_WindowTitle" xml:space="preserve">
     <value>İstasyonları içe ve dışa aktarma</value>
   </data>
@@ -1646,5 +1682,11 @@
   </data>
   <data name="ImportExport_FileTypePls" xml:space="preserve">
     <value>PLS çalma listesi</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>İstasyonu ekleyip geri dönün. Aramadan çıkmadan birden çok istasyon eklemek için tıklarken Shift tuşunu basılı tutun.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Eklendi</value>
   </data>
 </root>
