@@ -64,4 +64,36 @@ public class PlaylistImportExportServiceTests
         Assert.HasCount(1, back);
         Assert.AreEqual("One", back[0].Name);
     }
+
+    [TestMethod]
+    [DataRow("file:///C:/Users/someone/logo.png")]
+    [DataRow(@"C:\Users\someone\logo.png")]
+    [DataRow(@"\\server\share\logo.png")]
+    [DataRow(@"art\logo.png")]
+    public void Export_M3u_LeavesOutALocalLogo(string logo)
+    {
+        RadioStation station = Station("One", "http://one/live");
+        station.FaviconUrl = logo;
+
+        string m3u = PlaylistImportExportService.Export([station], asPls: false);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
+
+        Assert.DoesNotContain("#EXTIMG", m3u);
+        Assert.DoesNotContain("logo.png", m3u);
+        Assert.IsNull(back[0].FaviconUrl);
+        Assert.IsTrue(PlaylistImportExportService.IsDuplicate([station], back[0]));
+    }
+
+    [TestMethod]
+    public void Export_M3u_KeepsAWebLogo()
+    {
+        RadioStation station = Station("One", "http://one/live");
+        station.FaviconUrl = "https://one/logo.png";
+
+        string m3u = PlaylistImportExportService.Export([station], asPls: false);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
+
+        Assert.AreEqual("https://one/logo.png", back[0].FaviconUrl);
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate([station], Station("One", "http://one/live")));
+    }
 }

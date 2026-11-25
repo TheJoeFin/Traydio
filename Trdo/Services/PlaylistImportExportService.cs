@@ -33,7 +33,8 @@ public static class PlaylistImportExportService
     /// <summary>
     /// True when <paramref name="candidate"/> is already in <paramref name="existing"/>. Matches
     /// on every imported field, so a re-import of an unchanged export adds nothing while a
-    /// renamed or re-pointed station still counts as new.
+    /// renamed or re-pointed station still counts as new. A logo on this PC also matches a
+    /// candidate with none, since an export leaves it out.
     /// </summary>
     public static bool IsDuplicate(IEnumerable<RadioStation> existing, RadioStation candidate)
     {
@@ -42,7 +43,8 @@ public static class PlaylistImportExportService
             if (string.Equals(station.Name, candidate.Name, StringComparison.Ordinal) &&
                 string.Equals(station.StreamUrl, candidate.StreamUrl, StringComparison.Ordinal) &&
                 string.Equals(station.Homepage, candidate.Homepage, StringComparison.Ordinal) &&
-                string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal))
+                (string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal) ||
+                 (string.IsNullOrEmpty(candidate.FaviconUrl) && IsLocalPath(station.FaviconUrl))))
             {
                 return true;
             }
@@ -70,7 +72,9 @@ public static class PlaylistImportExportService
             if (!string.IsNullOrWhiteSpace(station.Homepage))
                 sb.AppendLine($"#EXTVLCOPT:url={station.Homepage}");
 
-            if (!string.IsNullOrWhiteSpace(station.FaviconUrl))
+            // A logo on this PC is left out: it would not load anywhere else, and the path can
+            // carry the Windows user name.
+            if (!string.IsNullOrWhiteSpace(station.FaviconUrl) && !IsLocalPath(station.FaviconUrl))
                 sb.AppendLine($"#EXTIMG:{station.FaviconUrl}");
 
             sb.AppendLine(station.StreamUrl);
@@ -100,6 +104,11 @@ public static class PlaylistImportExportService
         sb.AppendLine("Version=2");
         return sb.ToString();
     }
+
+    // A file:// URL, a drive or network share path, or a relative path.
+    private static bool IsLocalPath(string? url) =>
+        !string.IsNullOrWhiteSpace(url) &&
+        (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri) || uri.IsFile);
 
     private static List<RadioStation> ParseM3u(string content)
     {
