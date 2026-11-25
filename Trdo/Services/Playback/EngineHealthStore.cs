@@ -160,7 +160,7 @@ public sealed class EngineHealthStore
             return false;
         }
 
-        var updated = new EngineHealthRecord
+        EngineHealthRecord updated = new()
         {
             Preferred = backend,
             NativeFailures = backend == PlaybackBackendKind.Native ? 0 : existing?.NativeFailures ?? 0,

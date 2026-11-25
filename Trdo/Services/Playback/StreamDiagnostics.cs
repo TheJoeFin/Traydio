@@ -118,12 +118,12 @@ public static class StreamDiagnostics
             };
         }
 
-        using var timeoutCts = new CancellationTokenSource(timeout ?? DefaultProbeTimeout);
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+        using CancellationTokenSource timeoutCts = new(timeout ?? DefaultProbeTimeout);
+        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            using HttpRequestMessage request = new(HttpMethod.Get, uri);
             request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
 
             // Icecast/Shoutcast servers describe themselves in the response headers when

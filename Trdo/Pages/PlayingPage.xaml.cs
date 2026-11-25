@@ -222,11 +222,11 @@ public sealed partial class PlayingPage : Page
         double radius = (SleepTimerRingDiameter - SleepTimerRingStrokeThickness) / 2;
         double circumferenceUnits = 2 * Math.PI * radius / SleepTimerRingStrokeThickness;
 
-        SleepTimerRingProgress.StrokeDashArray = new DoubleCollection
-        {
+        SleepTimerRingProgress.StrokeDashArray =
+        [
             circumferenceUnits * progress,
             circumferenceUnits
-        };
+        ];
     }
 
     private void SleepTimerMenuItem_Click(object sender, RoutedEventArgs e)

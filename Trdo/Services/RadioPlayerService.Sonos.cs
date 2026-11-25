@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -346,7 +347,7 @@ public sealed partial class RadioPlayerService
                 albumArt = null; // a favicon is a local path for these; nothing the speaker can fetch
             }
 
-            var candidates = SonosPolicy.TransportUriCandidates(sourceUrl, kind);
+            IReadOnlyList<string> candidates = SonosPolicy.TransportUriCandidates(sourceUrl, kind);
             if (candidates.Count == 0)
             {
                 throw new InvalidOperationException("There is no address to send to the speaker.");

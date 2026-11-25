@@ -68,7 +68,7 @@ public static class IcyTextDecoder
                 return false;
             }
 
-            if (isHigh || b is >= (byte)'A' and <= (byte)'Z' or >= (byte)'a' and <= (byte)'z')
+            if (isHigh || b is (>= (byte)'A' and <= (byte)'Z') or (>= (byte)'a' and <= (byte)'z'))
             {
                 runLength++;
                 if (isHigh)
@@ -97,7 +97,7 @@ public static class IcyTextDecoder
     }
 
     private static bool IsWindows1251CyrillicLetter(byte b) =>
-        b >= 0xC0
+        b is >= 0xC0
         // Ё ё, plus the Ukrainian/Belarusian letters Є є І і Ї ї Ў ў
-        || b is 0xA8 or 0xB8 or 0xAA or 0xBA or 0xB2 or 0xB3 or 0xAF or 0xBF or 0xA1 or 0xA2;
+        or 0xA8 or 0xB8 or 0xAA or 0xBA or 0xB2 or 0xB3 or 0xAF or 0xBF or 0xA1 or 0xA2;
 }

@@ -40,7 +40,7 @@ public static partial class SonosGroupNames
             return;
 
         IPropertySet values = ApplicationData.Current.LocalSettings.Values;
-        ApplicationDataCompositeValue names = new();
+        ApplicationDataCompositeValue names = [];
         if (values.TryGetValue(SettingsKey, out object? stored) && stored is ApplicationDataCompositeValue existing)
         {
             foreach (KeyValuePair<string, object> pair in existing)

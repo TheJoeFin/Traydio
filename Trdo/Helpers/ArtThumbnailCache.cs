@@ -111,7 +111,7 @@ internal static class ArtThumbnailCache
     /// </summary>
     public static async Task WriteAsync(string name, byte[] thumb, string? supersedesPrefix = null)
     {
-        if (thumb.Length == 0 || thumb.Length > MaxThumbBytes)
+        if (thumb.Length is 0 or > MaxThumbBytes)
         {
             return;
         }

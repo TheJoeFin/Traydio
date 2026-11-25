@@ -84,7 +84,7 @@ public static class PlaylistImportExportService
     /// </summary>
     public static string ExportToPls(IEnumerable<RadioStation> stations)
     {
-        List<RadioStation> list = new(stations);
+        List<RadioStation> list = [.. stations];
         StringBuilder sb = new();
         sb.AppendLine("[playlist]");
         sb.AppendLine($"NumberOfEntries={list.Count}");

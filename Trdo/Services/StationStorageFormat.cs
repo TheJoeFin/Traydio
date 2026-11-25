@@ -48,7 +48,7 @@ public static class StationStorageFormat
     {
         ArgumentNullException.ThrowIfNull(stations);
         return JsonSerializer.Serialize(
-            new List<RadioStation>(stations),
+            [.. stations],
             RadioStationJsonContext.Default.ListRadioStation);
     }
 

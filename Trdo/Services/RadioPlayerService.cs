@@ -2212,8 +2212,8 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         try
         {
-            var frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
-            var names = frames
+            StackFrame[] frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
+            IEnumerable<string> names = frames
                 .Select(f => f.GetMethod())
                 .Where(m => m?.DeclaringType != null)
                 .Take(5)
@@ -2611,7 +2611,7 @@ public sealed partial class RadioPlayerService : IDisposable
             // thread, so a bare bool written inside the callback would always still read false
             // here - which used to make every call look like a failure and fall through to the
             // favicon, then to clearing the thumbnail entirely, even when the set had worked.
-            var tcs = new TaskCompletionSource<bool>();
+            TaskCompletionSource<bool> tcs = new();
             void SetThumbnail()
             {
                 // Checked here rather than only before enqueuing below: this can run on the UI

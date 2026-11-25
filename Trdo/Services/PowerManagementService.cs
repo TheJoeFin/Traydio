@@ -69,7 +69,7 @@ internal static partial class PowerManagementService
                     };
 
                     _powerRequest = PowerCreateRequest(ref context);
-                    if (_powerRequest == 0 || _powerRequest == -1)
+                    if (_powerRequest is 0 or -1)
                     {
                         Debug.WriteLine($"[PowerManagementService] PowerCreateRequest failed: {Marshal.GetLastWin32Error()}");
                         _powerRequest = 0;
