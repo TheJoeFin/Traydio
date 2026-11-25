@@ -563,9 +563,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Pencereyi Göster</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>İptal</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Yayınla</value>
   </data>

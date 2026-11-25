@@ -560,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>显示窗口</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>取消</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>投放</value>
   </data>

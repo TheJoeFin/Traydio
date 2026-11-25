@@ -560,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Afficher la fenêtre</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>Annuler</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Diffuser</value>
   </data>
