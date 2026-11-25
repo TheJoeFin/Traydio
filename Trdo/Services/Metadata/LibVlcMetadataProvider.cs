@@ -80,9 +80,13 @@ public sealed partial class LibVlcMetadataProvider : IDisposable
         string artist = media.Meta(MetadataType.Artist)?.Trim() ?? string.Empty;
         string title = media.Meta(MetadataType.Title)?.Trim() ?? string.Empty;
 
+        // Blank artwork is normalised to null: LibVLC reports "no art" as either null or an empty
+        // string from one read to the next, and UpdateMetadata compares AlbumArtUrl by value, so
+        // the two spellings made an unchanged track look new on every 2s poll.
+        string? artworkUrl = media.Meta(MetadataType.ArtworkURL);
         StreamMetadata metadata = new()
         {
-            AlbumArtUrl = media.Meta(MetadataType.ArtworkURL)
+            AlbumArtUrl = string.IsNullOrWhiteSpace(artworkUrl) ? null : artworkUrl
         };
 
         if (!string.IsNullOrWhiteSpace(nowPlaying))
