@@ -183,10 +183,12 @@ public partial class App : Application
             _miniPlayerWindow = new MiniPlayerWindow();
             WindowHelper.Track(_miniPlayerWindow);
             _miniPlayerWindow.Closed += (_, _) => _miniPlayerWindow = null;
+
+            // Position before activating so the window never flashes at a stale location.
+            // An already open mini player stays wherever the user has it.
+            _miniPlayerWindow.RestorePlacement();
         }
 
-        // Position before activating so the window never flashes at a stale location.
-        WindowPlacementService.PositionWindowNearAnchor(_miniPlayerWindow, 320, 220);
         _miniPlayerWindow.Activate();
     }
 

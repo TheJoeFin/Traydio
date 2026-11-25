@@ -11,6 +11,7 @@ using Trdo.ViewModels;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using WinUIEx;
 
 namespace Trdo.Controls;
@@ -36,6 +37,12 @@ public sealed partial class MiniPlayerWindow : WindowEx
     private const double LargeLogoSize = 72.0;
     private const double SmallIconSize = 24.0;
     private const double SmallToLargeScale = SmallIconSize / LargeLogoSize;
+
+    // Match Width and Height in the XAML.
+    private const int DefaultWidth = 320;
+    private const int DefaultHeight = 220;
+    private const int MinimumRestoredWidth = 160;
+    private const int MinimumRestoredHeight = 120;
 
     public PlayerViewModel ViewModel { get; }
 
@@ -79,8 +86,44 @@ public sealed partial class MiniPlayerWindow : WindowEx
         Closed += OnWindowClosed;
     }
 
+    /// <summary>
+    /// Places a newly created mini player where the last one was closed, or near the click
+    /// that opened it when there is nowhere to go back to.
+    /// </summary>
+    public void RestorePlacement()
+    {
+        if (SettingsService.MiniPlayerBounds is SavedWindowBounds saved)
+        {
+            SavedWindowBounds sized = saved with
+            {
+                Width = Math.Max(saved.Width, MinimumRestoredWidth),
+                Height = Math.Max(saved.Height, MinimumRestoredHeight)
+            };
+
+            if (WindowPlacementService.TryRestoreBounds(this, sized))
+                return;
+        }
+
+        WindowPlacementService.PositionWindowNearAnchor(this, DefaultWidth, DefaultHeight);
+    }
+
+    private void SavePlacement()
+    {
+        // A minimized window reports a parking spot off screen, not where the user put it.
+        if (AppWindow.Presenter is OverlappedPresenter { State: not OverlappedPresenterState.Restored })
+            return;
+
+        uint dpi = PInvoke.GetDpiForWindow((HWND)this.GetWindowHandle());
+        SettingsService.MiniPlayerBounds = new SavedWindowBounds(
+            AppWindow.Position.X,
+            AppWindow.Position.Y,
+            WindowBoundsPolicy.ToLogical(AppWindow.Size.Width, dpi),
+            WindowBoundsPolicy.ToLogical(AppWindow.Size.Height, dpi));
+    }
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
+        SavePlacement();
         _isClosed = true;
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _touchOverlayTimer.Stop();

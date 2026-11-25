@@ -23,8 +23,11 @@ namespace Trdo.Controls;
 /// </summary>
 public sealed partial class TrayPopupWindow : WindowEx
 {
-    private const int PopupWidth = 320;
-    private const int PopupHeight = 500;
+    private const int DefaultPopupWidth = 320;
+    private const int DefaultPopupHeight = 500;
+    // Match MinWidth and MinHeight in the XAML.
+    private const int MinimumPopupWidth = 320;
+    private const int MinimumPopupHeight = 400;
 
     private const int GWL_STYLE = -16;
     private const int GWL_EXSTYLE = -20;
@@ -81,6 +84,11 @@ public sealed partial class TrayPopupWindow : WindowEx
     // interrupts another can start from the current state instead of snapping.
     private int _currentOffset;
     private double _currentOpacity;
+
+    // The size and scale the popup was last shown at, so a resize by the user can be told
+    // apart from the sizing done here.
+    private SizeInt32 _shownSize;
+    private uint _shownDpi;
 
     public TrayPopupWindow()
     {
@@ -187,11 +195,19 @@ public sealed partial class TrayPopupWindow : WindowEx
     {
         EnsureShellPage();
 
+        // Showing again while already up must not throw away a resize made since last time.
+        if (_isPopupVisible)
+            RememberSizeIfResized();
+
         // Reset navigation on each open, matching the old flyout behavior.
         _shellPage?.ResetNavigation();
 
         // Position before showing so the window never flashes at a stale location.
-        WindowPlacementService.PositionWindowNearAnchor(this, PopupWidth, PopupHeight);
+        int width = WindowBoundsPolicy.RestoreExtent(
+            SettingsService.TrayPopupWidth, DefaultPopupWidth, MinimumPopupWidth);
+        int height = WindowBoundsPolicy.RestoreExtent(
+            SettingsService.TrayPopupHeight, DefaultPopupHeight, MinimumPopupHeight);
+        WindowPlacementService.PositionWindowNearAnchor(this, width, height);
         _baseX = AppWindow.Position.X;
         _baseY = AppWindow.Position.Y;
 
@@ -207,6 +223,9 @@ public sealed partial class TrayPopupWindow : WindowEx
         this.Show();
         Activate();
         PInvoke.SetForegroundWindow(_hwnd);
+
+        _shownSize = AppWindow.Size;
+        _shownDpi = PInvoke.GetDpiForWindow(_hwnd);
 
         // The hosted page stays loaded while the popup is hidden, so being subscribed is
         // not the same as being able to show a dialog. Tell the error service when there
@@ -226,10 +245,34 @@ public sealed partial class TrayPopupWindow : WindowEx
         if (!_isPopupVisible)
             return;
 
+        RememberSizeIfResized();
+
         _isPopupVisible = false;
         _lastDismissedAtUtc = DateTime.UtcNow;
         PlaybackErrorService.Instance.SetHostWindowVisible(false);
         PlayHideAnimation();
+    }
+
+    /// <summary>
+    /// Saves the size the user dragged the popup to. Only a dimension that changed since the
+    /// show is written, so one shrunk to fit a small monitor is not saved over the user's own.
+    /// </summary>
+    private void RememberSizeIfResized()
+    {
+        SizeInt32 size = AppWindow.Size;
+        uint dpi = PInvoke.GetDpiForWindow(_hwnd);
+
+        // A change of scale resizes the window by itself; that is not the user choosing a size.
+        if (dpi != _shownDpi)
+            return;
+
+        if (size.Width != _shownSize.Width)
+            SettingsService.TrayPopupWidth = WindowBoundsPolicy.ToLogical(size.Width, dpi);
+
+        if (size.Height != _shownSize.Height)
+            SettingsService.TrayPopupHeight = WindowBoundsPolicy.ToLogical(size.Height, dpi);
+
+        _shownSize = size;
     }
 
     private void PlayShowAnimation(uint dpi)
@@ -259,6 +302,12 @@ public sealed partial class TrayPopupWindow : WindowEx
         // show animation is still running, and snapping to the resting state
         // first would read as a visible jump.
         _isHiding = true;
+
+        // Resizing from the top or left edge moves the window, so slide out from where it is
+        // now rather than jumping back to where it was shown.
+        _baseX = AppWindow.Position.X;
+        _baseY = AppWindow.Position.Y - _currentOffset;
+
         _durationMs = HideDurationMs;
         _fromOffset = _currentOffset;
         _toOffset = ScaleForDpi(HideSlideDistance, dpi);

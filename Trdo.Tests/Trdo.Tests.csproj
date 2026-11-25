@@ -82,6 +82,7 @@
     <Compile Include="..\Trdo\Helpers\EmbeddedArtStore.cs" Link="Helpers\EmbeddedArtStore.cs" />
     <Compile Include="..\Trdo\Services\CustomStationArtStore.cs" Link="Services\CustomStationArtStore.cs" />
     <Compile Include="..\Trdo\Services\Metadata\IcyTextDecoder.cs" Link="Services\Metadata\IcyTextDecoder.cs" />
+    <Compile Include="..\Trdo\Services\WindowBoundsPolicy.cs" Link="Services\WindowBoundsPolicy.cs" />
   </ItemGroup>
 
 </Project>

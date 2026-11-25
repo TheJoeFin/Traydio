@@ -36,6 +36,9 @@ public static class SettingsService
     private const string IsMiniPlayerTopmostKey = "IsMiniPlayerTopmost";
     private const string IsMiniPlayerTitleBarHiddenKey = "IsMiniPlayerTitleBarHidden";
     private const string AllowSleepWhilePlayingKey = "AllowSleepWhilePlaying";
+    private const string TrayPopupWidthKey = "TrayPopupWidth";
+    private const string TrayPopupHeightKey = "TrayPopupHeight";
+    private const string MiniPlayerBoundsKey = "MiniPlayerBounds";
     private const string IsSongChangePopupEnabledKey = "IsSongChangePopupEnabled";
     private const string SongChangePopupDelaySecondsKey = "SongChangePopupDelaySeconds";
     private const string SongChangePopupDwellSecondsKey = "SongChangePopupDwellSeconds";
@@ -811,6 +814,66 @@ public static class SettingsService
         set => SetDoubleSetting(
             SongChangePopupDwellSecondsKey,
             SongChangeAnnouncementPolicy.ClampDwell(value));
+    }
+
+    /// <summary>
+    /// The width the user last dragged the tray flyout to, in logical pixels. Zero until they
+    /// have resized it.
+    /// </summary>
+    public static double TrayPopupWidth
+    {
+        get => GetDoubleSetting(TrayPopupWidthKey, defaultValue: 0);
+        set => SetDoubleSetting(TrayPopupWidthKey, value);
+    }
+
+    /// <summary>The height counterpart to <see cref="TrayPopupWidth"/>.</summary>
+    public static double TrayPopupHeight
+    {
+        get => GetDoubleSetting(TrayPopupHeightKey, defaultValue: 0);
+        set => SetDoubleSetting(TrayPopupHeightKey, value);
+    }
+
+    /// <summary>
+    /// Where the mini player was when it was last closed, or null if it never has been.
+    /// </summary>
+    public static SavedWindowBounds? MiniPlayerBounds
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(MiniPlayerBoundsKey, out object? value) &&
+                    SavedWindowBounds.TryParse(value as string, out SavedWindowBounds bounds))
+                {
+                    return bounds;
+                }
+            }
+            catch
+            {
+                // Fall through to the default.
+            }
+
+            return null;
+        }
+        set
+        {
+            try
+            {
+                if (value is SavedWindowBounds bounds)
+                {
+                    ApplicationData.Current.LocalSettings.Values[MiniPlayerBoundsKey] = bounds.Serialize();
+                    LogChange(MiniPlayerBoundsKey, bounds.Serialize());
+                }
+                else
+                {
+                    ApplicationData.Current.LocalSettings.Values.Remove(MiniPlayerBoundsKey);
+                }
+            }
+            catch
+            {
+                // Silently fail if unable to save
+            }
+        }
     }
 
     private static double GetDoubleSetting(string key, double defaultValue)
