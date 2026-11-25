@@ -41,7 +41,7 @@ public sealed partial class CastPage : Page
     }
 
     private void GroupSpeakersButton_Click(object sender, RoutedEventArgs e) =>
-        (FindShellViewModel())?.NavigateToGroupSpeakersPage();
+        FindShellViewModel()?.NavigateToGroupSpeakersPage();
 
     private ShellViewModel? FindShellViewModel()
     {

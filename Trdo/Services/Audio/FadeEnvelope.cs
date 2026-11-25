@@ -62,7 +62,7 @@ internal sealed class FadeEnvelope
         // on the target exactly when the fade is due instead of a rounding error short of it.
         _level = _position >= _frames
             ? _target
-            : _start + (_target - _start) * ((float)_position / _frames);
+            : _start + ((_target - _start) * ((float)_position / _frames));
 
         return _level;
     }

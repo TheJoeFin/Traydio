@@ -725,7 +725,7 @@ public sealed partial class PlayingPage : Page
     private void VolumeControl_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         int delta = e.GetCurrentPoint((UIElement)sender).Properties.MouseWheelDelta;
-        double change = (delta / 120.0) * 0.02;
+        double change = delta / 120.0 * 0.02;
         ViewModel.Volume = Math.Clamp(ViewModel.Volume + change, 0, 2);
         e.Handled = true;
     }
@@ -738,7 +738,7 @@ public sealed partial class PlayingPage : Page
     private void SpeakerVolumeControl_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         int delta = e.GetCurrentPoint((UIElement)sender).Properties.MouseWheelDelta;
-        double change = (delta / 120.0) * 2;
+        double change = delta / 120.0 * 2;
         ViewModel.SpeakerVolume = Math.Clamp(ViewModel.SpeakerVolume + change, 0, 100);
         e.Handled = true;
     }

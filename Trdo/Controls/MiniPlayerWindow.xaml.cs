@@ -118,8 +118,8 @@ public sealed partial class MiniPlayerWindow : WindowEx
         // Compute the translation that maps IdleStationLogoGrid's center to ActiveStationIconGrid's center.
         Point idlePt = IdleStationLogoGrid.TransformToVisual(WindowLayout).TransformPoint(new Point(0, 0));
         Point activePt = ActiveStationIconGrid.TransformToVisual(WindowLayout).TransformPoint(new Point(0, 0));
-        double offsetX = (activePt.X + SmallIconSize / 2) - (idlePt.X + LargeLogoSize / 2);
-        double offsetY = (activePt.Y + SmallIconSize / 2) - (idlePt.Y + LargeLogoSize / 2);
+        double offsetX = activePt.X + (SmallIconSize / 2) - (idlePt.X + (LargeLogoSize / 2));
+        double offsetY = activePt.Y + (SmallIconSize / 2) - (idlePt.Y + (LargeLogoSize / 2));
 
         _morphStoryboard?.Stop();
 

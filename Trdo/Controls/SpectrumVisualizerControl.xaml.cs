@@ -146,7 +146,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             // Spring: F = SpringK*(target - pos) - DampingD*vel
             double acceleration = (SpringK * (_targetLevels[i] - _currentLevels[i])) - (DampingD * _velocities[i]);
             _velocities[i] += acceleration * dt;
-            _currentLevels[i] = Math.Clamp(_currentLevels[i] + _velocities[i] * dt, 0, CanvasHeight);
+            _currentLevels[i] = Math.Clamp(_currentLevels[i] + (_velocities[i] * dt), 0, CanvasHeight);
 
             double barHeight = Math.Max(2.0, _currentLevels[i]);
             _bars[i].Height = barHeight;
@@ -195,7 +195,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             // Mix all channels to mono.
             float mono = 0;
             for (int ch = 0; ch < _channels; ch++)
-                mono += BitConverter.ToSingle(e.Buffer, i + ch * bytesPerSample);
+                mono += BitConverter.ToSingle(e.Buffer, i + (ch * bytesPerSample));
             mono /= _channels;
 
             // Hanning window to reduce spectral leakage.
@@ -239,7 +239,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             {
                 float re = fftData[bin].X;
                 float im = fftData[bin].Y;
-                sum += MathF.Sqrt(re * re + im * im);
+                sum += MathF.Sqrt((re * re) + (im * im));
             }
 
             float avg = sum / (binHigh - binLow + 1);

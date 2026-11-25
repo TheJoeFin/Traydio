@@ -82,7 +82,7 @@ internal static class FlacMetadataReader
         if (!TryReadUInt32LE(data, ref offset, out uint vendorLength))
             return metadata;
 
-        long afterVendor = (long)offset + vendorLength;
+        long afterVendor = offset + vendorLength;
         if (afterVendor > data.Length)
             return metadata;
 
@@ -95,7 +95,7 @@ internal static class FlacMetadataReader
             if (!TryReadUInt32LE(data, ref offset, out uint commentLength))
                 break;
 
-            long commentEnd = (long)offset + commentLength;
+            long commentEnd = offset + commentLength;
             if (commentEnd > data.Length)
                 break;
 

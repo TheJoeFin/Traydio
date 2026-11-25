@@ -174,7 +174,7 @@ public sealed partial class StreamWatchdogService : IDisposable
 
             double previousEffectiveLevel = EffectiveBufferLevel;
             _stationBufferLevelOverride = clamped;
-            Debug.WriteLine($"[Watchdog] Station buffer override set to: {(clamped?.ToString() ?? "none")}");
+            Debug.WriteLine($"[Watchdog] Station buffer override set to: {clamped?.ToString() ?? "none"}");
 
             if (Math.Abs(previousEffectiveLevel - EffectiveBufferLevel) > 0.0001)
             {
@@ -210,8 +210,8 @@ public sealed partial class StreamWatchdogService : IDisposable
             if (level <= 0) return 0;
             if (level >= 3) return 8000;
             if (level <= 1) return (int)(level * 2000);
-            if (level <= 2) return (int)(2000 + (level - 1) * 2000);
-            return (int)(4000 + (level - 2) * 4000);
+            if (level <= 2) return (int)(2000 + ((level - 1) * 2000));
+            return (int)(4000 + ((level - 2) * 4000));
         }
     }
 
@@ -282,7 +282,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 _currentBufferLevel = bufferLevelValue switch
                 {
                     double d => Math.Clamp(d, 0, MaxBufferLevel),
-                    int i => Math.Clamp((double)i, 0, MaxBufferLevel),
+                    int i => Math.Clamp(i, 0, MaxBufferLevel),
                     string s when double.TryParse(s, out double d2) => Math.Clamp(d2, 0, MaxBufferLevel),
                     _ => DefaultBufferLevel
                 };
@@ -325,7 +325,7 @@ public sealed partial class StreamWatchdogService : IDisposable
                 double timeout = value switch
                 {
                     double d => d,
-                    int i => (double)i,
+                    int i => i,
                     string s when double.TryParse(s, out double d2) => d2,
                     _ => DefaultSilenceTimeoutSeconds
                 };

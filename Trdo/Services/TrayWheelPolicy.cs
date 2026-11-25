@@ -53,7 +53,7 @@ public static class TrayWheelPolicy
     /// The new volume (percent, 0-200) after <paramref name="notches"/> of scrolling: up raises it.
     /// </summary>
     public static double StepVolumePercent(double currentPercent, int notches) =>
-        Math.Clamp(currentPercent + notches * VolumeStepPercent, MinVolumePercent, MaxVolumePercent);
+        Math.Clamp(currentPercent + (notches * VolumeStepPercent), MinVolumePercent, MaxVolumePercent);
 
     /// <summary>
     /// How many stations to move by for <paramref name="notches"/> of scrolling. Scrolling down

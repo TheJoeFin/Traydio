@@ -96,7 +96,7 @@ public sealed partial class SettingsPage : Page
         const float decayFactor = 0.55f;
         _displayLevel = normalized > _displayLevel
             ? normalized
-            : _displayLevel * (1f - decayFactor) + normalized * decayFactor;
+            : (_displayLevel * (1f - decayFactor)) + (normalized * decayFactor);
 
         // Each bar has a threshold; opacity ramps proportionally above it
         // so even small fluctuations produce visible movement.
@@ -119,7 +119,7 @@ public sealed partial class SettingsPage : Page
         if (level <= threshold) return dim;
         // Ramp from dim → 1.0 over 0.15 of level range above the threshold
         float t = Math.Min((level - threshold) / 0.15f, 1f);
-        return dim + t * (1.0 - dim);
+        return dim + (t * (1.0 - dim));
     }
 
     private void ImportButton_Click(object sender, RoutedEventArgs e) => OpenImportExportWindow(startAsImport: true);
