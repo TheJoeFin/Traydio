@@ -956,7 +956,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>تفعيل</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>فشل التصدير: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -968,7 +968,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>استيراد/تصدير المحطات</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>فشل الاستيراد: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">

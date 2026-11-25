@@ -58,7 +58,7 @@ public sealed partial class ImportExportWindow : WindowEx
         }
         catch (Exception ex)
         {
-            ViewModel.ReportError(ex.Message);
+            ReportImportFailure(ex);
         }
     }
 
@@ -113,7 +113,7 @@ public sealed partial class ImportExportWindow : WindowEx
         }
         catch (Exception ex)
         {
-            ViewModel.ReportError(ex.Message);
+            ReportImportFailure(ex);
         }
         finally
         {
@@ -137,9 +137,22 @@ public sealed partial class ImportExportWindow : WindowEx
         }
         catch (Exception ex)
         {
-            ViewModel.ReportError(ex.Message);
+            if (ViewModel.IsImport)
+            {
+                ReportImportFailure(ex);
+            }
+            else
+            {
+                ReportExportFailure(ex);
+            }
         }
     }
+
+    private void ReportImportFailure(Exception ex) => ViewModel.ReportError(string.Format(
+        LocalizationService.GetString("ImportExport_ImportFailed", "Import failed: {0}"), ex.Message));
+
+    private void ReportExportFailure(Exception ex) => ViewModel.ReportError(string.Format(
+        LocalizationService.GetString("ImportExport_ExportFailed", "Export failed: {0}"), ex.Message));
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
 

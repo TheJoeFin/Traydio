@@ -1037,7 +1037,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Enable</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Export failed: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -1049,7 +1049,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>Import / Export stations</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>Import failed: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
