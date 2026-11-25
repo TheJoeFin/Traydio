@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Import and export window: drag playlist files (M3U, M3U8 or PLS) onto it or choose them, then tick which stations to bring in — ones you already have start unticked. Exporting lets you pick the stations and the format. The empty station list offers the import too (#159, #162)
 - The flyout remembers the size you drag it to, and the mini player remembers its size and where you left it
+- "Move to top" and "Move to bottom" in a station's right-click menu, to move it within its folder or the main list without a long drag (#94)
 - "Email the developer" link on the About page
 - Custom station logos from your PC: drag an image onto the station editor window, or use "Choose image…". Traydio keeps its own small copy, so the logo stays even if the original file is moved or deleted. Playlist exports leave out logos stored on your PC (#161)
 - Groups: collapsible folders in the station list, created from the right-click menu and filled by dragging stations into them the same way stations are reordered. A folder remembers whether it is open. Deleting one keeps its stations, moving them back out to the top level; deleting a folder *and* its stations is a separate command that asks first

@@ -1953,6 +1953,37 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Moves a station to the top or bottom of the list it is in: its folder's contents, or
+    /// the top level. It never changes which folder the station belongs to. This spares a long
+    /// drag through a list that scrolls faster than it can be aimed (issue #94).
+    /// </summary>
+    public void MoveStationToEdge(RadioStation station, bool toTop)
+    {
+        if (station is null || !CanMoveStationToEdge(station, toTop))
+            return;
+
+        StationGroup? parent = FindParentGroup(station);
+        List<object> siblings = parent?.Children ?? _topLevelNodes;
+
+        siblings.RemoveAt(IndexOfReference(siblings, station, 0));
+        siblings.Insert(toTop ? 0 : siblings.Count, station);
+        parent?.NotifyChildrenChanged();
+
+        SyncStationsFromTree();
+        RebuildDisplayRows();
+        PersistStationList();
+        UpdateSelectedStationId();
+    }
+
+    /// <summary>False when the station is already at that end of its list.</summary>
+    public bool CanMoveStationToEdge(RadioStation station, bool toTop)
+    {
+        List<object> siblings = FindParentGroup(station)?.Children ?? _topLevelNodes;
+        int index = IndexOfReference(siblings, station, 0);
+        return index >= 0 && index != (toTop ? 0 : siblings.Count - 1);
+    }
+
+    /// <summary>
     /// Removes a folder. Its contents move up to the top level at the folder's old position,
     /// in order, so nothing is lost and no confirmation is needed - exactly the reasoning that
     /// makes removing a single station immediate.

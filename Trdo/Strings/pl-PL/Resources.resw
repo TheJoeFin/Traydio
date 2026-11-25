@@ -818,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Przenieś do grupy</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Przenieś na górę</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Przenieś na dół</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Nowy separator</value>
   </data>

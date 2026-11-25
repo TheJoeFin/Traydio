@@ -1109,6 +1109,8 @@ public sealed partial class PlayingPage : Page
 
         RadioStation? station = null;
         MenuFlyoutItem? visitWebsiteItem = null;
+        MenuFlyoutItem? moveToTopItem = null;
+        MenuFlyoutItem? moveToBottomItem = null;
         foreach (MenuFlyoutItemBase item in flyout.Items)
         {
             if (item is MenuFlyoutItem { Tag: RadioStation tagged } menuItem)
@@ -1118,8 +1120,20 @@ public sealed partial class PlayingPage : Page
                 // there is no VisitWebsiteMenuItem to nameof() here, so the literal is it.
                 if (menuItem.Name == "VisitWebsiteMenuItem")
                     visitWebsiteItem = menuItem;
+                else if (menuItem.Name == "MoveToTopMenuItem")
+                    moveToTopItem = menuItem;
+                else if (menuItem.Name == "MoveToBottomMenuItem")
+                    moveToBottomItem = menuItem;
             }
         }
+
+        // Like dragging, these rearrange the user's own order, which is not what is on screen
+        // under a view sort or a view grouping.
+        bool canRearrange = station is not null && !ViewModel.IsViewSorted && !ViewModel.IsGroupedView;
+        if (moveToTopItem is not null)
+            moveToTopItem.IsEnabled = canRearrange && ViewModel.CanMoveStationToEdge(station!, toTop: true);
+        if (moveToBottomItem is not null)
+            moveToBottomItem.IsEnabled = canRearrange && ViewModel.CanMoveStationToEdge(station!, toTop: false);
 
         // A local album has no website to visit, but it does have a folder worth revealing -
         // same spot in the menu, same intent ("show me where this came from"), different
@@ -1178,6 +1192,18 @@ public sealed partial class PlayingPage : Page
         // Folders are not on screen under a view sort or a view grouping, so moving between
         // them would be an invisible change.
         subItem.IsEnabled = subItem.Items.Count > 1 && !ViewModel.IsViewSorted && !ViewModel.IsGroupedView;
+    }
+
+    private void MoveToTop_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem { Tag: RadioStation station })
+            ViewModel.MoveStationToEdge(station, toTop: true);
+    }
+
+    private void MoveToBottom_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem { Tag: RadioStation station })
+            ViewModel.MoveStationToEdge(station, toTop: false);
     }
 
     private void MoveToGroup_Click(object sender, RoutedEventArgs e)

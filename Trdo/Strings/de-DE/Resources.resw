@@ -818,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>In Gruppe verschieben</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Nach oben verschieben</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Nach unten verschieben</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Neue Trennlinie</value>
   </data>

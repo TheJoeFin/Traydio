@@ -872,6 +872,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Gruba taşı</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>En üste taşı</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>En alta taşı</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Yeni Ayırıcı</value>
   </data>
