@@ -906,7 +906,7 @@
     <value>Visiter le site Web</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Autoriser l&apos;ordinateur à se mettre en veille selon son planning habituel pendant que la radio joue. Notez que Windows peut empêcher la mise en veille tant qu&apos;un flux audio est en cours de lecture.</value>
+    <value>Autoriser l&apos;ordinateur à se mettre en veille selon son planning habituel pendant que la radio joue. Lorsque cette option est désactivée, Traydio garde le PC éveillé, mais l&apos;écran peut tout de même s&apos;éteindre. Notez que Windows peut empêcher la mise en veille tant qu&apos;un flux audio est en cours de lecture.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Autoriser la mise en veille du PC</value>

@@ -906,7 +906,7 @@
     <value>访问网站</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>允许电脑在播放电台时按正常计划进入睡眠。请注意，只要有音频在播放，Windows 本身可能会让电脑保持唤醒状态。</value>
+    <value>允许电脑在播放电台时按正常计划进入睡眠。关闭此选项时，Traydio 会让电脑保持唤醒，但屏幕仍可关闭。请注意，只要有音频在播放，Windows 本身可能会让电脑保持唤醒状态。</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>允许电脑睡眠</value>

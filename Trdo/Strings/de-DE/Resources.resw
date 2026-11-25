@@ -906,7 +906,7 @@
     <value>Website besuchen</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Lässt den Computer während der Radiowiedergabe nach dem normalen Zeitplan in den Ruhezustand wechseln. Beachte, dass Windows selbst den PC wach halten kann, solange Audio abgespielt wird.</value>
+    <value>Lässt den Computer während der Radiowiedergabe nach dem normalen Zeitplan in den Ruhezustand wechseln. Ist diese Option aus, hält Traydio den PC wach, der Bildschirm kann sich aber trotzdem ausschalten. Beachte, dass Windows selbst den PC wach halten kann, solange Audio abgespielt wird.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>PC in den Ruhezustand versetzen zulassen</value>

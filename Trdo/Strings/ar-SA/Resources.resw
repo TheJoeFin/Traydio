@@ -906,7 +906,7 @@
     <value>زيارة الموقع الإلكتروني</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>السماح للكمبيوتر بالدخول في وضع السكون وفق جدوله المعتاد أثناء تشغيل الراديو. لاحظ أن نظام Windows نفسه قد يبقي الكمبيوتر نشطًا أثناء تشغيل أي صوت.</value>
+    <value>السماح للكمبيوتر بالدخول في وضع السكون وفق جدوله المعتاد أثناء تشغيل الراديو. عند إيقاف هذا الخيار، يبقي Traydio الكمبيوتر نشطًا، لكن يمكن للشاشة أن تنطفئ. لاحظ أن نظام Windows نفسه قد يبقي الكمبيوتر نشطًا أثناء تشغيل أي صوت.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>السماح للكمبيوتر بالسكون</value>

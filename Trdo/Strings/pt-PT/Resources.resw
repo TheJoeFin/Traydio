@@ -906,7 +906,7 @@
     <value>Visitar sítio Web</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Permite que o computador entre em suspensão de acordo com o seu horário normal enquanto o rádio está a tocar. Note que o próprio Windows pode manter o PC ativo enquanto qualquer áudio estiver a ser reproduzido.</value>
+    <value>Permite que o computador entre em suspensão de acordo com o seu horário normal enquanto o rádio está a tocar. Quando esta opção está desativada, o Traydio mantém o PC ativo, mas o ecrã pode desligar-se na mesma. Note que o próprio Windows pode manter o PC ativo enquanto qualquer áudio estiver a ser reproduzido.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Permitir que o PC suspenda</value>

@@ -906,7 +906,7 @@
     <value>Visitar sitio web</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Permite que el equipo entre en suspensión según su programación normal mientras la radio está reproduciéndose. Ten en cuenta que Windows puede mantener el PC despierto mientras haya audio en reproducción.</value>
+    <value>Permite que el equipo entre en suspensión según su programación normal mientras la radio está reproduciéndose. Si esta opción está desactivada, Traydio mantiene el PC activo, pero la pantalla puede apagarse. Ten en cuenta que Windows puede mantener el PC despierto mientras haya audio en reproducción.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Permitir que el PC duerma</value>

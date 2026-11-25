@@ -906,7 +906,7 @@
     <value>Odwiedź stronę internetową</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Pozwól komputerowi przejść w tryb uśpienia zgodnie z normalnym harmonogramem podczas odtwarzania radia. Pamiętaj, że sam system Windows może utrzymywać komputer aktywny podczas odtwarzania dowolnego dźwięku.</value>
+    <value>Pozwól komputerowi przejść w tryb uśpienia zgodnie z normalnym harmonogramem podczas odtwarzania radia. Gdy ta opcja jest wyłączona, Traydio nie pozwala komputerowi zasnąć, ale ekran nadal może się wyłączyć. Pamiętaj, że sam system Windows może utrzymywać komputer aktywny podczas odtwarzania dowolnego dźwięku.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Zezwól komputerowi na przejście w tryb uśpienia</value>

@@ -987,7 +987,7 @@
     <value>Visit Website</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Let the computer go to sleep on its normal schedule while radio is playing. Note that Windows itself may keep the PC awake while any audio is playing.</value>
+    <value>Let the computer go to sleep on its normal schedule while radio is playing. When this is off, Traydio keeps the PC awake, but the screen can still turn off. Note that Windows itself may keep the PC awake while any audio is playing.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Allow PC to sleep</value>

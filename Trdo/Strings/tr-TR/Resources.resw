@@ -984,7 +984,7 @@
     <value>Web Sitesini Ziyaret Et</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Radyo çalarken bilgisayarın normal zamanlamasına göre uykuya geçmesine izin verin. Windows'un, herhangi bir ses çalarken bilgisayarı uyanık tutabileceğini unutmayın.</value>
+    <value>Radyo çalarken bilgisayarın normal zamanlamasına göre uykuya geçmesine izin verin. Bu seçenek kapalıyken Traydio bilgisayarı uyanık tutar, ancak ekran yine de kapanabilir. Windows'un, herhangi bir ses çalarken bilgisayarı uyanık tutabileceğini unutmayın.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Bilgisayarın uykuya geçmesine izin ver</value>
