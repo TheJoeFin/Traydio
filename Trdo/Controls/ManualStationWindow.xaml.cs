@@ -93,7 +93,7 @@ public sealed partial class ManualStationWindow : WindowEx
         }
         catch (Exception ex)
         {
-            ViewModel.ReportImageError(ex.Message);
+            ViewModel.ReportImageFailure(ex);
         }
     }
 
@@ -137,7 +137,7 @@ public sealed partial class ManualStationWindow : WindowEx
         }
         catch (Exception ex)
         {
-            ViewModel.ReportImageError(ex.Message);
+            ViewModel.ReportImageFailure(ex);
         }
         finally
         {

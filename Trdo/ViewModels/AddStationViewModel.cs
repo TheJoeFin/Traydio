@@ -242,6 +242,13 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     /// <summary>Shows <paramref name="message"/> as the reason an image could not be used.</summary>
     public void ReportImageError(string message) => ImageError = message;
 
+    /// <summary>Logs an unexpected failure to use an image and shows a general message for it.</summary>
+    public void ReportImageFailure(Exception ex)
+    {
+        LogService.Warn("AlbumArt", $"Could not import station image: {ex.GetType().Name}: {ex.Message}");
+        ReportImageError(LocalizationService.GetString("ManualStationWindow_ImageFailed", "Couldn't use that image."));
+    }
+
     /// <summary>
     /// Uses an image file from this PC as the station logo: copies it into the app's data folder
     /// and points <see cref="FaviconUrl"/> at the copy.
@@ -269,8 +276,7 @@ public partial class AddStationViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            LogService.Warn("AlbumArt", $"Could not import station image: {ex.GetType().Name}: {ex.Message}");
-            ImageError = LocalizationService.GetString("ManualStationWindow_ImageFailed", "Couldn't use that image.");
+            ReportImageFailure(ex);
         }
         finally
         {
