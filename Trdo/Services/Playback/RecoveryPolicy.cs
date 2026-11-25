@@ -65,7 +65,9 @@ public sealed class RecoveryPolicy
     private int _backOffsSinceStable;
     private int _autoBufferBump;
     private DateTime? _playingSince;
-    private bool _hasGivenUp;
+    // volatile: HasGivenUp is read from the poll and silence-monitor threads outside the
+    // watchdog's recovery gate, purely to avoid re-arming silence detection after a give-up.
+    private volatile bool _hasGivenUp;
 
     public RecoveryPolicy(
         Func<DateTime>? clock = null,

@@ -32,7 +32,10 @@ public sealed partial class StreamWatchdogService : IDisposable
     // natively (see RadioPlayerService's SMTC DisplayUpdater fix for the same pattern).
     private volatile bool _isDisposed;
     private bool _isEnabled;
-    private bool _userIntendedPlayback;
+    // volatile: written by the UI thread (play/pause), the poll thread and the silence-monitor timer
+    // thread, and read across all three. GiveUp relies on the policy's give-up flag being visible
+    // before the cleared intent is.
+    private volatile bool _userIntendedPlayback;
     private DateTime _lastStateCheck;
     private int _consecutiveFailures;
     private TimeSpan _lastPosition;
@@ -501,8 +504,13 @@ public sealed partial class StreamWatchdogService : IDisposable
                 return;
             }
 
-            // Stream is playing - NAudio silence monitor handles actual audio detection
-            if (!_userIntendedPlayback)
+            // Stream is playing - NAudio silence monitor handles actual audio detection.
+            // Not after the ladder has given up, though: GiveUp clears the intent precisely so the
+            // silence monitor stays off, and the backend still reports "playing" for a stream that
+            // is producing no sound. Re-arming here would restart the monitor, which would detect
+            // the same silence every few seconds with nothing left to recover. A user play or a
+            // station change resets the policy (RadioPlayerService.Play -> ResetForStation).
+            if (!_userIntendedPlayback && !_policy.HasGivenUp)
             {
                 _userIntendedPlayback = true;
                 StartSilenceMonitor();
@@ -746,9 +754,37 @@ public sealed partial class StreamWatchdogService : IDisposable
         if (!_isEnabled || !_userIntendedPlayback)
             return;
 
+        // Decide whether there is anything to recover *before* the diagnostics dump and the
+        // "refreshing" status below: both are loud (the dump alone is ~32 log lines) and used to
+        // be emitted even when AttemptRecoveryAsync was going to return without doing anything.
+        // This is only a noise filter - AttemptRecoveryAsync still takes the gate atomically, so a
+        // race between this check and that call costs at most one redundant log line.
+        if (_policy.HasGivenUp)
+        {
+            // Nothing left to try. Leave the monitor stopped (it fires once per silence and would
+            // otherwise be restarted by the finally below) until Play()/a station change resets
+            // the policy and NotifyUserIntentionToPlay starts it again.
+            LogService.Info("Watchdog",
+                "Silence detected but recovery has already given up for this stream; silence monitoring paused");
+            StopSilenceMonitor();
+            return;
+        }
+
         try
         {
+            // Stop here and restart in the finally below even when a recovery is already running:
+            // the monitor fires once per silence, and the restart is what re-arms it so a recovery
+            // that fails to restore sound is noticed again.
             StopSilenceMonitor();
+
+            if (Volatile.Read(ref _recoveryGate) != 0)
+            {
+                // A recovery is already in flight and will act on this silence itself; skip the
+                // diagnostics dump and status message, which would describe an attempt that never
+                // happens.
+                Debug.WriteLine("[Watchdog] Silence detected while a recovery is already running; not starting another");
+                return;
+            }
 
             Debug.WriteLine("[Watchdog] NAudio silence detected - attempting stream recovery");
 
