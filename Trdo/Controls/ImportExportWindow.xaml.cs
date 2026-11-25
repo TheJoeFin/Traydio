@@ -2,7 +2,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Trdo.Services;
 using Trdo.ViewModels;
 using Windows.ApplicationModel.DataTransfer;

@@ -1,6 +1,6 @@
+using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
 using Trdo.Services;
 using Trdo.Services.Lastfm;
 using Windows.System;

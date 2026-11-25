@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Trdo.Models;
@@ -9,8 +8,6 @@ using Trdo.Services;
 using Trdo.Services.Lastfm;
 using Trdo.Services.Playback;
 using Windows.ApplicationModel;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace Trdo.ViewModels;
 
