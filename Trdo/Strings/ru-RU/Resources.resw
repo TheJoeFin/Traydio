@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Перейти на GitHub разработчика</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Написать разработчику</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Отмена</value>
   </data>

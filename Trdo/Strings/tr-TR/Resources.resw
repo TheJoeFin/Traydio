@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Geliştiricinin GitHub Sayfasını Ziyaret Et</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Geliştiriciye e-posta gönder</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>İptal</value>
   </data>

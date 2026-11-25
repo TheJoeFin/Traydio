@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>زيارة صفحة GitHub الخاصة بالمطوّر</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>مراسلة المطوّر عبر البريد الإلكتروني</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>إلغاء</value>
   </data>

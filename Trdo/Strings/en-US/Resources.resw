@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Visit Developer&apos;s GitHub</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Email the developer</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Cancel</value>
   </data>

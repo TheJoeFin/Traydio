@@ -31,6 +31,11 @@ public sealed partial class AboutPage : Page
         _ = ViewModel.OpenGitHub();
     }
 
+    private void EmailDeveloperButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = ViewModel.ContactDeveloper();
+    }
+
     private void DeveloperGitHubButton_Click(object sender, RoutedEventArgs e)
     {
         _ = ViewModel.OpenDeveloperGitHub();

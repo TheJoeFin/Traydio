@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>访问开发者的 GitHub</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>给开发者发邮件</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>取消</value>
   </data>
