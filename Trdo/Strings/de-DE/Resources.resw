@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Von der Community betriebene Internetradio-Datenbank mit Tausenden von Sendern weltweit</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Nicht unterstützte Dateien: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Nicht lesbare Dateien: {0}.</value>
+  </data>
 </root>

@@ -1587,6 +1587,12 @@
   <data name="ImportExport_SelectNone.Content" xml:space="preserve">
     <value>Select none</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>{0} file(s) were unsupported.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>{0} file(s) could not be read.</value>
+  </data>
   <data name="MiniPlayer_WindowTitle" xml:space="preserve">
     <value>Traydio Mini Player</value>
   </data>

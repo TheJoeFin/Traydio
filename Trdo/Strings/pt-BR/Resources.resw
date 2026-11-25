@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Banco de dados de rádios da internet feito pela comunidade, com milhares de estações do mundo todo</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Arquivos não compatíveis: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Arquivos que não puderam ser lidos: {0}.</value>
+  </data>
 </root>

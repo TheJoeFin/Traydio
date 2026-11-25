@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Dünya genelinde binlerce istasyon içeren, topluluk tarafından oluşturulan internet radyo veritabanı</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Desteklenmeyen dosya sayısı: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Okunamayan dosya sayısı: {0}.</value>
+  </data>
 </root>

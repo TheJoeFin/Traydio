@@ -238,12 +238,9 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
         if (failedFiles > 0 || skippedFiles > 0 || added == 0)
         {
             StatusIsError = true;
-            StatusMessage = added == 0 && failedFiles == 0 && skippedFiles == 0
+            StatusMessage = failedFiles == 0 && skippedFiles == 0
                 ? LocalizationService.GetString("ImportExport_NoStationsFound", "No stations were found in that file.")
-                : string.Format(
-                    LocalizationService.GetString("ImportExport_FilesSkipped", "{0} file(s) were unsupported and {1} could not be read."),
-                    skippedFiles,
-                    failedFiles);
+                : DescribeSkippedFiles(skippedFiles, failedFiles);
         }
         else
         {
@@ -321,6 +318,27 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
     {
         StatusIsError = true;
         StatusMessage = message;
+    }
+
+    /// <summary>One sentence for each kind of file that was passed over, omitting a kind with none.</summary>
+    private static string DescribeSkippedFiles(int unsupported, int unreadable)
+    {
+        List<string> sentences = [];
+        if (unsupported > 0)
+        {
+            sentences.Add(string.Format(
+                LocalizationService.GetString("ImportExport_FilesUnsupported", "{0} file(s) were unsupported."),
+                unsupported));
+        }
+
+        if (unreadable > 0)
+        {
+            sentences.Add(string.Format(
+                LocalizationService.GetString("ImportExport_FilesUnreadable", "{0} file(s) could not be read."),
+                unreadable));
+        }
+
+        return string.Join(Environment.NewLine, sentences);
     }
 
     private void AddItem(ImportExportItem item)

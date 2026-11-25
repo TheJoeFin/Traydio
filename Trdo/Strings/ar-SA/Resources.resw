@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>قاعدة بيانات راديو إنترنت يديرها المجتمع تضم آلاف المحطات حول العالم</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>الملفات غير المدعومة: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>الملفات التي تعذّرت قراءتها: {0}.</value>
+  </data>
 </root>

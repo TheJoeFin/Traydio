@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>База данных интернет-радио, создаваемая сообществом, с тысячами станций по всему миру</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Неподдерживаемые файлы: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Файлы, которые не удалось прочитать: {0}.</value>
+  </data>
 </root>

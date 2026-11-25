@@ -1602,4 +1602,10 @@
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>由社区维护的网络电台数据库，收录全球数千个电台</value>
   </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>不支持的文件数：{0}。</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>无法读取的文件数：{0}。</value>
+  </data>
 </root>
