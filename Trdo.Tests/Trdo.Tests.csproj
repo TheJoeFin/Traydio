@@ -69,6 +69,7 @@
     <Compile Include="..\Trdo\Services\FavoriteTrackExportService.cs" Link="Services\FavoriteTrackExportService.cs" />
     <Compile Include="..\Trdo\Services\Audio\RadioStaticProfile.cs" Link="Services\Audio\RadioStaticProfile.cs" />
     <Compile Include="..\Trdo\Services\Audio\FadeEnvelope.cs" Link="Services\Audio\FadeEnvelope.cs" />
+    <Compile Include="..\Trdo\Services\Audio\PcmGain.cs" Link="Services\Audio\PcmGain.cs" />
     <Compile Include="..\Trdo\Models\TrayClickAction.cs" Link="Models\TrayClickAction.cs" />
     <Compile Include="..\Trdo\Services\TrayClickPolicy.cs" Link="Services\TrayClickPolicy.cs" />
     <Compile Include="..\Trdo\Services\TrayIconIdentityPolicy.cs" Link="Services\TrayIconIdentityPolicy.cs" />
