@@ -453,12 +453,12 @@ public partial class App : Application
         _songChangePopupPreviewTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _songChangePopupPreviewTimer.Interval = TimeSpan.FromSeconds(2);
         _songChangePopupPreviewTimer.IsRepeating = true;
-        _songChangePopupPreviewTimer.Tick += (_, _) =>
+        _songChangePopupPreviewTimer.Tick += AppLifetime.GuardTick(nameof(App), () =>
         {
             EnsureSongChangePopupWindow();
             _songChangePopupWindow?.ShowSongChange(samples[index % samples.Length]);
             index++;
-        };
+        });
         _songChangePopupPreviewTimer.Start();
     }
 #endif
@@ -669,7 +669,7 @@ public partial class App : Application
             _stationWheelTimer = dispatcher.CreateTimer();
             _stationWheelTimer.IsRepeating = false;
             _stationWheelTimer.Interval = StationWheelSettleDelay;
-            _stationWheelTimer.Tick += (_, _) => ApplyPendingStationSteps();
+            _stationWheelTimer.Tick += AppLifetime.GuardTick(nameof(App), ApplyPendingStationSteps);
         }
 
         _stationWheelTimer.Stop();
@@ -715,12 +715,21 @@ public partial class App : Application
         {
             _timer = dispatcher.CreateTimer();
             _timer.IsRepeating = false;
-            _timer.Tick += (_, _) =>
-            {
-                Action? pending = _pendingSingleClick;
-                _pendingSingleClick = null;
-                pending?.Invoke();
-            };
+            _timer.Tick += AppLifetime.GuardTick(nameof(TrayClickSequencer), RunPendingSingleClick);
+        }
+
+        private void RunPendingSingleClick()
+        {
+            Action? pending = _pendingSingleClick;
+            _pendingSingleClick = null;
+            pending?.Invoke();
+        }
+
+        /// <summary>Drops a click still waiting out the double-click interval, on quit.</summary>
+        public void Cancel()
+        {
+            _timer.Stop();
+            _pendingSingleClick = null;
         }
 
         /// <summary>
@@ -1196,12 +1205,28 @@ public partial class App : Application
             return;
         _isShuttingDown = true;
 
+        // Before anything is closed or disposed. Every timer Tick handler checks this and stops
+        // its timer instead of running: Exit() below is followed by WinUI draining this thread's
+        // dispatcher, and a tick that fires in that drain and reaches a closed window or the
+        // disposed player fails the process fast (see AppLifetime).
+        AppLifetime.BeginShutdown();
+
         Debug.WriteLine("[App] Shutting down");
 
         try
         {
             _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
             SettingsService.SongChangePopupEnabledChanged -= OnSongChangePopupEnabledChanged;
+
+            // Timers nothing else stops on quit. The flag above is the backstop for these and
+            // for the ones that can be restarted during the teardown below; this is the stop.
+            _leftClickSequencer?.Cancel();
+            _rightClickSequencer?.Cancel();
+            _stationWheelTimer?.Stop();
+#if DEBUG
+            _songChangePopupPreviewTimer?.Stop();
+#endif
+            _playerVm.StopTimers();
 
             _trayPopupWindow?.Close();
             _miniPlayerWindow?.Close();

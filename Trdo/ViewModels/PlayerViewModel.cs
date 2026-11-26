@@ -1153,7 +1153,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             _sleepTimer = dispatcherQueue.CreateTimer();
             _sleepTimer.Interval = TimeSpan.FromSeconds(1);
             _sleepTimer.IsRepeating = true;
-            _sleepTimer.Tick += (_, _) => TickSleepTimer();
+            _sleepTimer.Tick += AppLifetime.GuardTick(nameof(PlayerViewModel), TickSleepTimer);
         }
 
         _sleepTimer.Start();
@@ -1173,6 +1173,19 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         _sleepTimer?.Stop();
         IsSleepTimerActive = false;
         LogService.Info("PlayerViewModel", "Sleep timer cancelled");
+    }
+
+    /// <summary>
+    /// Stops the sleep and scrub-bar timers, called from App.ShutdownAndExit() before the player
+    /// is disposed. Nothing else stops them on quit, and a tick in WinUI's final dispatcher drain
+    /// would reach the disposed player. The player's own teardown can still raise the state
+    /// changes that restart the scrub-bar timer, which is why each tick also checks
+    /// <see cref="AppLifetime.IsShuttingDown"/>.
+    /// </summary>
+    public void StopTimers()
+    {
+        _sleepTimer?.Stop();
+        _localMusicPositionTimer?.Stop();
     }
 
     private void TickSleepTimer()
@@ -1332,7 +1345,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
                 _localMusicPositionTimer = dispatcherQueue.CreateTimer();
                 _localMusicPositionTimer.Interval = TimeSpan.FromMilliseconds(250);
                 _localMusicPositionTimer.IsRepeating = true;
-                _localMusicPositionTimer.Tick += (_, _) => TickLocalMusicPosition();
+                _localMusicPositionTimer.Tick += AppLifetime.GuardTick(nameof(PlayerViewModel), TickLocalMusicPosition);
             }
 
             _localMusicPositionTimer.Start();
