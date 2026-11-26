@@ -7,6 +7,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
+using Trdo.Services;
 
 namespace Trdo.Controls;
 
@@ -61,7 +62,14 @@ public sealed partial class SpectrumVisualizerControl : UserControl
         StartAnimationTimer();
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    private void OnUnloaded(object sender, RoutedEventArgs e) => Stop();
+
+    /// <summary>
+    /// Stops the frame timer and the loopback capture. Runs on Unloaded, and is also called by
+    /// the hosting window's Closed handler, since Unloaded is not guaranteed to arrive before the
+    /// app's final dispatcher drain. Safe to call more than once.
+    /// </summary>
+    public void Stop()
     {
         StopAnimationTimer();
         StopCapture();
@@ -127,6 +135,21 @@ public sealed partial class SpectrumVisualizerControl : UserControl
     }
 
     private void OnAnimationTick(DispatcherQueueTimer sender, object args)
+    {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceFrame();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SpectrumVisualizerControl), ex);
+        }
+    }
+
+    private void AdvanceFrame()
     {
         DateTime now = DateTime.UtcNow;
         double dt = Math.Min((now - _lastFrameTime).TotalSeconds, 0.05);

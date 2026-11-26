@@ -128,6 +128,11 @@ public sealed partial class MiniPlayerWindow : WindowEx
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _touchOverlayTimer.Stop();
         _touchOverlayTimer.Tick -= TouchOverlayTimer_Tick;
+
+        // Its own Unloaded does this too, but that is not guaranteed to run before WinUI's
+        // final dispatcher drain when the window is closed on quit.
+        SpectrumVisualizer.Stop();
+
         _morphStoryboard?.Stop();
         _morphStoryboard = null;
         _hoverControlsStoryboard?.Stop();
@@ -400,9 +405,17 @@ public sealed partial class MiniPlayerWindow : WindowEx
 
     private void TouchOverlayTimer_Tick(DispatcherQueueTimer sender, object args)
     {
-        if (_isClosed) return;
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender)) return;
         _touchOverlayTimer.Stop();
-        HideOverlayControls();
+
+        try
+        {
+            HideOverlayControls();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(MiniPlayerWindow), ex);
+        }
     }
 
     private void ShowOverlayControls()
