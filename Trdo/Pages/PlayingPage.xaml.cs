@@ -1371,13 +1371,19 @@ public sealed partial class PlayingPage : Page
     {
         sender.Stop();
 
-        if (!ShouldUseNowPlayingMarquee())
-        {
-            SetNowPlayingScrolling(false);
+        // Unloaded, which unsubscribes this, is not guaranteed to run before WinUI's final
+        // dispatcher drain on quit; this page and its XAML are torn down by then.
+        if (AppLifetime.IsShuttingDown)
             return;
-        }
 
-        SetNowPlayingScrolling(true);
+        try
+        {
+            SetNowPlayingScrolling(ShouldUseNowPlayingMarquee());
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(PlayingPage), ex);
+        }
     }
 
     private void UpdateNowPlayingMarqueeState()

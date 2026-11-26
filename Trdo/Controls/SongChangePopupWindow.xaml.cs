@@ -217,11 +217,21 @@ public sealed partial class SongChangePopupWindow : Window
 
     private void AutoHideTimer_Tick(DispatcherQueueTimer sender, object args)
     {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
         // Never yank the pill out from under an open menu.
         if (_isMenuOpen)
             return;
 
-        HidePopup();
+        try
+        {
+            HidePopup();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SongChangePopupWindow), ex);
+        }
     }
 
     /// <summary>
@@ -525,6 +535,21 @@ public sealed partial class SongChangePopupWindow : Window
     }
 
     private void AnimationTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceAnimation();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SongChangePopupWindow), ex);
+        }
+    }
+
+    private void AdvanceAnimation()
     {
         double progress = _animationClock.Elapsed.TotalMilliseconds / _durationMs;
         bool finished = progress >= 1;
