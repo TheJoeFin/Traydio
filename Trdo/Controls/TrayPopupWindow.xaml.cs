@@ -65,6 +65,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     private ShellPage? _shellPage;
     private bool _isShowing;
     private bool _isPopupVisible;
+    private bool _isClosed;
     private int _keepOpenCount;
     private DateTime _lastDismissedAtUtc = DateTime.MinValue;
 
@@ -105,12 +106,35 @@ public sealed partial class TrayPopupWindow : WindowEx
         _hideTimer = DispatcherQueue.CreateTimer();
         _hideTimer.Interval = TimeSpan.FromMilliseconds(150);
         _hideTimer.IsRepeating = false;
-        _hideTimer.Tick += (_, _) => HideIfFocusLeftWindow();
+        _hideTimer.Tick += HideTimer_Tick;
 
         _animationTimer = DispatcherQueue.CreateTimer();
         _animationTimer.Interval = FrameInterval;
         _animationTimer.IsRepeating = true;
         _animationTimer.Tick += AnimationTimer_Tick;
+
+        Closed += OnWindowClosed;
+    }
+
+    /// <summary>
+    /// Stops both timers for good, as SongChangePopupWindow and MiniPlayerWindow do. App makes a
+    /// new popup if this one is closed any other way (Alt+F4), but mostly it is closed on quit,
+    /// usually from its own Quit button, so while visible and active. Closing it can deactivate
+    /// it, which would start the light-dismiss
+    /// timer, and a hide in progress keeps the animation timer running. Either tick would then
+    /// reach AppWindow on the closed window (HidePopup, PlayHideAnimation, ApplyFrame) during
+    /// WinUI's final dispatcher drain and fail the process fast - the likely source of the
+    /// Partner Center crashes under DispatcherQueueController::ShutdownQueue.
+    /// </summary>
+    private void OnWindowClosed(object sender, WindowEventArgs args)
+    {
+        _isClosed = true;
+        _isPopupVisible = false;
+        _hideTimer.Stop();
+        _hideTimer.Tick -= HideTimer_Tick;
+        _animationTimer.Stop();
+        _animationTimer.Tick -= AnimationTimer_Tick;
+        _animationClock.Reset();
     }
 
     public bool IsPopupVisible => _isPopupVisible;
@@ -320,6 +344,21 @@ public sealed partial class TrayPopupWindow : WindowEx
 
     private void AnimationTimer_Tick(DispatcherQueueTimer sender, object args)
     {
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceAnimation();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(TrayPopupWindow), ex);
+        }
+    }
+
+    private void AdvanceAnimation()
+    {
         double progress = _animationClock.Elapsed.TotalMilliseconds / _durationMs;
         bool finished = progress >= 1;
         if (finished)
@@ -422,6 +461,10 @@ public sealed partial class TrayPopupWindow : WindowEx
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
     {
+        // The deactivation that closing the window causes can arrive after Closed.
+        if (_isClosed)
+            return;
+
         if (args.WindowActivationState != WindowActivationState.Deactivated)
         {
             _isShowing = false;
@@ -434,6 +477,21 @@ public sealed partial class TrayPopupWindow : WindowEx
 
         _hideTimer.Stop();
         _hideTimer.Start();
+    }
+
+    private void HideTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            HideIfFocusLeftWindow();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(TrayPopupWindow), ex);
+        }
     }
 
     private void HideIfFocusLeftWindow()
