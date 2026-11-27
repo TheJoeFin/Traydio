@@ -1,5 +1,5 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using Trdo.Services.Playback;
 
 namespace Trdo.Tests;
