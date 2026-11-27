@@ -189,12 +189,19 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
+    /// <summary>
+    /// The address the station was set to, as saved: for a playlist (.pls/.m3u/.asx) station
+    /// that is the playlist, not the stream it resolved to. Passing it back to
+    /// <see cref="SetStreamUrl"/> (as watchdog recovery does) therefore re-resolves the playlist
+    /// and counts as the same station rather than a new one.
+    /// </summary>
     public string? StreamUrl
     {
         get
         {
-            Debug.WriteLine($"[RadioPlayerService] StreamUrl getter: {_streamUrl}");
-            return _streamUrl;
+            string? url = _requestedStreamUrl ?? _streamUrl;
+            Debug.WriteLine($"[RadioPlayerService] StreamUrl getter: {url}");
+            return url;
         }
     }
 
