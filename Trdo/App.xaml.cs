@@ -703,13 +703,8 @@ public partial class App : Application
         int steps = _pendingStationSteps;
         _pendingStationSteps = 0;
 
-        for (int i = 0; i < Math.Abs(steps); i++)
-        {
-            if (steps > 0)
-                _playerVm.NextStationOrTrack();
-            else
-                _playerVm.PreviousStationOrTrack();
-        }
+        // One jump to where the scrolling landed, so only that station or track is started.
+        _playerVm.StepStationOrTrack(steps);
     }
 
     /// <summary>

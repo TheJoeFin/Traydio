@@ -1310,6 +1310,39 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Moves <paramref name="steps"/> stations at once (positive is next), or tracks while a music
+    /// folder is selected, starting only where it lands. Calling <see cref="NextStationOrTrack"/>
+    /// that many times instead would start every station or track on the way, and stepping onto
+    /// a folder station would turn the remaining steps into skipped track changes.
+    /// </summary>
+    public void StepStationOrTrack(int steps)
+    {
+        if (steps == 0)
+            return;
+
+        if (!IsLocalMusicActive)
+        {
+            TryCycleStation(steps, steps > 0 ? "next" : "previous");
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Track step skipped during station transition");
+        }
+        else if (steps == -1)
+        {
+            // Keeps a single "previous" restarting a track that is already under way.
+            PreviousStationOrTrack();
+        }
+        else if (LocalTrackList.Count > 0)
+        {
+            // No wraparound, as with next/previous track.
+            int target = Math.Clamp(CurrentLocalTrackIndex + steps, 0, LocalTrackList.Count - 1);
+            if (target != CurrentLocalTrackIndex)
+                _ = PlayLocalTrackAtIndexAsync(target);
+        }
+    }
+
     /// <summary>Plays an arbitrary track from <see cref="LocalTrackList"/>, e.g. tapped from the details page.</summary>
     public async Task PlayLocalTrackAtIndexAsync(int index)
     {
@@ -2362,11 +2395,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             }
         }
 
-        int newIndex = currentIndex >= 0
-            ? (currentIndex + direction + order.Count) % order.Count
-            : direction > 0
-                ? 0
-                : order.Count - 1;
+        int newIndex = StationSelectionPolicy.CycleIndex(currentIndex, direction, order.Count);
 
         Debug.WriteLine($"[PlayerViewModel] Cycling {directionName} from index {currentIndex} to {newIndex}");
         SelectedStation = order[newIndex];

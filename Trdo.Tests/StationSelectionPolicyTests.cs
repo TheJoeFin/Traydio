@@ -76,4 +76,26 @@ public sealed class StationSelectionPolicyTests
 
         Assert.AreSame(stations[0], StationSelectionPolicy.Resolve(stations, "ID-2", legacyIndex: 0));
     }
+
+    [TestMethod]
+    [DataRow(0, 1, 5, 1)]
+    [DataRow(4, 1, 5, 0)]   // next wraps from the last to the first
+    [DataRow(0, -1, 5, 4)]  // previous wraps from the first to the last
+    [DataRow(1, 3, 5, 4)]   // several steps land in one go
+    [DataRow(3, 4, 5, 2)]   // and wrap past the end
+    [DataRow(1, -7, 5, 4)]  // more steps than stations, backwards
+    [DataRow(-1, 1, 5, 0)]  // nothing selected: next starts at the first
+    [DataRow(-1, 2, 5, 1)]
+    [DataRow(-1, -1, 5, 4)] // and previous at the last
+    [DataRow(-1, -2, 5, 3)]
+    public void CycleIndex_StepsAndWraps(int current, int steps, int count, int expected)
+    {
+        Assert.AreEqual(expected, StationSelectionPolicy.CycleIndex(current, steps, count));
+    }
+
+    [TestMethod]
+    public void CycleIndex_EmptyList_IsMinusOne()
+    {
+        Assert.AreEqual(-1, StationSelectionPolicy.CycleIndex(0, 1, 0));
+    }
 }
