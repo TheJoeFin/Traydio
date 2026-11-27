@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Trdo.Services;
 
@@ -83,19 +85,32 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
     private const uint WheelMessage = 0x8002; // WM_APP + 2
     private const int WH_MOUSE_LL = 14;
     private const nint WM_MOUSEWHEEL = 0x020A;
+    private const uint WM_QUIT = 0x0012;
+    private const uint PM_NOREMOVE = 0x0000;
 
-    // At most one icon owns the hook; the hook procedure is a static function pointer.
-    private static ShellTrayIcon? s_hookOwner;
+    // How old the icon's remembered rectangle may get before a wheel turn asks the shell again.
+    private const long IconRectMaxAgeMs = 1000;
+
+    // At most one icon owns the hook; the hook procedure is a static function pointer. Read on
+    // the hook thread.
+    private static volatile ShellTrayIcon? s_hookOwner;
 
     private readonly Guid _guid;
     private readonly nint _hwnd;
     private nint _hook;
+    private Thread? _hookThread;
+    private uint _hookThreadId;
     private GCHandle _selfHandle;
     private nint _ownedIcon;
     private string _tooltip;
-    private bool _useGuid = true;
+
+    // These three are read on the hook thread and the thread pool as well as the UI thread.
+    private volatile bool _useGuid = true;
+    private volatile bool _added;
+    private volatile IconRect? _iconRect;
+
+    private int _iconRectRefreshing;
     private bool _isVisible;
-    private bool _added;
     private bool _disposed;
     private long _lastKeySelectMs;
 
@@ -148,6 +163,12 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
     /// over the icon is swallowed (so the taskbar underneath doesn't also react); every other
     /// input passes straight through. The hook exists only while this is true, because it
     /// sits in the path of all mouse input system-wide.
+    /// <para>
+    /// For the same reason it runs on a thread of its own rather than the UI thread, which can
+    /// be busy for longer than Windows lets a hook take before removing it, and it only ever
+    /// compares against a remembered icon rectangle: asking Explorer where the icon is happens
+    /// on the thread pool, never while a mouse event is waiting.
+    /// </para>
     /// </remarks>
     public bool IsWheelEnabled
     {
@@ -286,17 +307,20 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
             : NativeMethods.LoadIconW(0, IDI_APPLICATION);
 
         _useGuid = true;
-        if (TryAdd(icon))
-            return;
-
-        LogService.Warn(Component,
-            $"NIM_ADD with GUID {_guid} was refused (held by another process, or a Windows build " +
-            "enforcing the signing rule); falling back to uID identity. The icon will work but " +
-            "won't keep its promoted taskbar placement across an update.");
-
-        _useGuid = false;
         if (!TryAdd(icon))
-            LogService.Error(Component, "NIM_ADD failed even without a GUID; the tray icon is unavailable.");
+        {
+            LogService.Warn(Component,
+                $"NIM_ADD with GUID {_guid} was refused (held by another process, or a Windows build " +
+                "enforcing the signing rule); falling back to uID identity. The icon will work but " +
+                "won't keep its promoted taskbar placement across an update.");
+
+            _useGuid = false;
+            if (!TryAdd(icon))
+                LogService.Error(Component, "NIM_ADD failed even without a GUID; the tray icon is unavailable.");
+        }
+
+        // Where the icon is (and how it is identified) may have changed.
+        InvalidateIconRect();
     }
 
     private bool TryAdd(nint icon)
@@ -330,6 +354,7 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
         _added = false;
         NativeNotifyIconData data = CreateData(0, 0);
         NativeMethods.Shell_NotifyIconW(NIM_DELETE, &data);
+        _iconRect = null;
     }
 
     /// <summary>
@@ -363,22 +388,34 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
 
     // ---- mouse wheel ----
 
+    private readonly record struct HookStart(nint Hook, uint ThreadId, int Error);
+
+    /// <summary>Where the icon was last seen, and when (<see cref="Environment.TickCount64"/>).</summary>
+    private sealed record IconRect(bool Found, NativeRect Rect, long ReadAtMs);
+
     private void InstallWheelHook()
     {
-        nint hook = NativeMethods.SetWindowsHookExW(
-            WH_MOUSE_LL,
-            (nint)(delegate* unmanaged[Stdcall]<int, nint, nint, nint>)&MouseHookProc,
-            NativeMethods.GetModuleHandleW(null),
-            0);
+        // Set first so the hook handles wheel turns from its very first event.
+        s_hookOwner = this;
 
-        if (hook == 0)
+        TaskCompletionSource<HookStart> started = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        Thread thread = new(RunHookThread) { IsBackground = true, Name = "Tray icon wheel hook" };
+        thread.Start(started);
+
+        // Only as long as installing the hook takes; the thread signals before its message loop.
+        HookStart start = started.Task.GetAwaiter().GetResult();
+        if (start.Hook == 0)
         {
-            LogService.Warn(Component, $"Couldn't install the mouse wheel hook (error {Marshal.GetLastWin32Error()}).");
+            if (ReferenceEquals(s_hookOwner, this))
+                s_hookOwner = null;
+            LogService.Warn(Component, $"Couldn't install the mouse wheel hook (error {start.Error}).");
             return;
         }
 
-        _hook = hook;
-        s_hookOwner = this;
+        _hook = start.Hook;
+        _hookThread = thread;
+        _hookThreadId = start.ThreadId;
+        InvalidateIconRect();
     }
 
     private void RemoveWheelHook()
@@ -386,11 +423,50 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
         if (_hook == 0)
             return;
 
-        NativeMethods.UnhookWindowsHookEx(_hook);
-        _hook = 0;
-
+        // Stop handling before unhooking, so nothing is swallowed on the way out.
         if (ReferenceEquals(s_hookOwner, this))
             s_hookOwner = null;
+
+        _hook = 0;
+        NativeMethods.PostThreadMessageW(_hookThreadId, WM_QUIT, 0, 0);
+
+        // Normally immediate; bounded so a wedged hook thread can't hold up quitting. As a
+        // background thread it can't keep the process alive either way.
+        _hookThread?.Join(TimeSpan.FromSeconds(1));
+        _hookThread = null;
+        _hookThreadId = 0;
+    }
+
+    /// <summary>
+    /// The hook thread: installs the hook, then runs the message loop that Windows calls the
+    /// hook from until <see cref="RemoveWheelHook"/> posts <c>WM_QUIT</c>, and unhooks.
+    /// </summary>
+    private static void RunHookThread(object? state)
+    {
+        TaskCompletionSource<HookStart> started = (TaskCompletionSource<HookStart>)state!;
+
+        // Makes this thread's message queue now, so a WM_QUIT posted the moment the hook is
+        // reported installed can't be lost for want of one.
+        MSG msg;
+        NativeMethods.PeekMessageW(&msg, 0, 0, 0, PM_NOREMOVE);
+
+        nint hook = NativeMethods.SetWindowsHookExW(
+            WH_MOUSE_LL,
+            (nint)(delegate* unmanaged[Stdcall]<int, nint, nint, nint>)&MouseHookProc,
+            NativeMethods.GetModuleHandleW(null),
+            0);
+        int error = hook == 0 ? Marshal.GetLastWin32Error() : 0;
+
+        started.SetResult(new HookStart(hook, NativeMethods.GetCurrentThreadId(), error));
+        if (hook == 0)
+            return;
+
+        // Nothing but WM_QUIT is ever posted here; the hook is called from inside GetMessage.
+        while (NativeMethods.GetMessageW(&msg, 0, 0, 0) > 0)
+        {
+        }
+
+        NativeMethods.UnhookWindowsHookEx(hook);
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
@@ -415,16 +491,70 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
         return NativeMethods.CallNextHookEx(0, code, wParam, lParam);
     }
 
+    /// <summary>
+    /// Runs on the hook thread with every mouse event on the machine waiting on it, so it only
+    /// compares against the remembered rectangle. A stale one is still used for this turn while
+    /// a fresh one is fetched for the next.
+    /// </summary>
     private bool TryCaptureWheel(int x, int y, short delta)
     {
-        if (!_added || delta == 0 || !IsPointOverIcon(x, y))
+        if (!_added || delta == 0)
             return false;
+
+        IconRect? known = _iconRect;
+        if (known is null || Environment.TickCount64 - known.ReadAtMs > IconRectMaxAgeMs)
+            RefreshIconRectInBackground();
+
+        if (known is not { Found: true } ||
+            x < known.Rect.left || x >= known.Rect.right || y < known.Rect.top || y >= known.Rect.bottom)
+        {
+            return false;
+        }
 
         NativeMethods.PostMessageW(_hwnd, WheelMessage, delta, 0);
         return true;
     }
 
-    private bool IsPointOverIcon(int x, int y)
+    /// <summary>Forgets where the icon was and, while the wheel is in use, looks it up again.</summary>
+    private void InvalidateIconRect()
+    {
+        _iconRect = null;
+        if (_hook != 0)
+            RefreshIconRectInBackground();
+    }
+
+    /// <summary>
+    /// Asks the shell where the icon is, on the thread pool: <c>Shell_NotifyIconGetRect</c> is a
+    /// call into Explorer, which may be slow to answer. At most one is in flight at a time.
+    /// </summary>
+    private void RefreshIconRectInBackground()
+    {
+        if (Interlocked.Exchange(ref _iconRectRefreshing, 1) != 0)
+            return;
+
+        ThreadPool.UnsafeQueueUserWorkItem(static self => self.RefreshIconRect(), this, preferLocal: false);
+    }
+
+    private void RefreshIconRect()
+    {
+        try
+        {
+            long readAtMs = Environment.TickCount64;
+            NativeRect rect = default;
+            bool found = _added && TryGetIconRect(out rect);
+            _iconRect = new IconRect(found, found ? rect : default, readAtMs);
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn(Component, $"Couldn't read the tray icon's position: {ex.Message}");
+        }
+        finally
+        {
+            Volatile.Write(ref _iconRectRefreshing, 0);
+        }
+    }
+
+    private bool TryGetIconRect(out NativeRect rect)
     {
         NativeIconIdentifier id = default;
         id.cbSize = (uint)sizeof(NativeIconIdentifier);
@@ -440,11 +570,10 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
             id.uID = FallbackId;
         }
 
-        NativeRect rect;
-        if (NativeMethods.Shell_NotifyIconGetRect(&id, &rect) != 0)
-            return false;
-
-        return x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom;
+        NativeRect found;
+        bool ok = NativeMethods.Shell_NotifyIconGetRect(&id, &found) == 0; // S_OK
+        rect = ok ? found : default;
+        return ok;
     }
 
     // ---- hidden host window ----
@@ -601,6 +730,19 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    private struct MSG
+    {
+        public nint hwnd;
+        public uint message;
+        public nint wParam;
+        public nint lParam;
+        public uint time;
+        public int ptX;
+        public int ptY;
+        public uint lPrivate;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     private struct WNDCLASSEXW
     {
         public uint cbSize;
@@ -637,11 +779,23 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
         [DllImport("user32.dll", ExactSpelling = true)]
         public static extern int PostMessageW(nint hWnd, uint msg, nint wParam, nint lParam);
 
-        [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern ushort RegisterClassExW(WNDCLASSEXW* lpwcx);
+        [DllImport("user32.dll", ExactSpelling = true)]
+        public static extern int PostThreadMessageW(uint idThread, uint msg, nint wParam, nint lParam);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        public static extern int GetMessageW(MSG* lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        public static extern int PeekMessageW(MSG* lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
 
         [DllImport("user32.dll", ExactSpelling = true)]
         public static extern uint GetDoubleClickTime();
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        public static extern uint GetCurrentThreadId();
+
+        [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
+        public static extern ushort RegisterClassExW(WNDCLASSEXW* lpwcx);
 
         [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern nint CreateWindowExW(
