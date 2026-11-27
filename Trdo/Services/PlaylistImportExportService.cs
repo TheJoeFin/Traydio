@@ -36,19 +36,26 @@ public static class PlaylistImportExportService
 
     /// <summary>
     /// True when <paramref name="candidate"/> is already in <paramref name="existing"/>. Matches
-    /// on every imported field, so a re-import of an unchanged export adds nothing while a
-    /// renamed or re-pointed station still counts as new. A logo on this PC also matches a
-    /// candidate with none, since an export leaves it out.
+    /// on every field the file could carry, so a re-import of an unchanged export adds nothing
+    /// while a renamed or re-pointed station still counts as new. A logo on this PC also matches
+    /// a candidate with none, since an export leaves it out.
     /// </summary>
-    public static bool IsDuplicate(IEnumerable<RadioStation> existing, RadioStation candidate)
+    /// <param name="candidateHasDetails">
+    /// False when the candidate came from a file with no room for a homepage or logo (see
+    /// <see cref="CarriesStationDetails"/>). Their absence then says nothing about the station,
+    /// so only the name and address are compared.
+    /// </param>
+    public static bool IsDuplicate(
+        IEnumerable<RadioStation> existing, RadioStation candidate, bool candidateHasDetails = true)
     {
         foreach (RadioStation station in existing)
         {
             if (string.Equals(station.Name, candidate.Name, StringComparison.Ordinal) &&
                 string.Equals(station.StreamUrl, candidate.StreamUrl, StringComparison.Ordinal) &&
-                string.Equals(station.Homepage, candidate.Homepage, StringComparison.Ordinal) &&
-                (string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal) ||
-                 (string.IsNullOrEmpty(candidate.FaviconUrl) && IsLocalPath(station.FaviconUrl))))
+                (!candidateHasDetails ||
+                 (string.Equals(station.Homepage, candidate.Homepage, StringComparison.Ordinal) &&
+                  (string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal) ||
+                   (string.IsNullOrEmpty(candidate.FaviconUrl) && IsLocalPath(station.FaviconUrl))))))
             {
                 return true;
             }
@@ -56,6 +63,13 @@ public static class PlaylistImportExportService
 
         return false;
     }
+
+    /// <summary>
+    /// Whether a playlist file of this kind can hold a station's homepage and logo. M3U can (as
+    /// <c>#EXTVLCOPT:url=</c> and <c>#EXTIMG:</c>); PLS has only an address and a title.
+    /// </summary>
+    public static bool CarriesStationDetails(string filePath) =>
+        !string.Equals(Path.GetExtension(filePath), ".pls", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Exports to PLS when <paramref name="asPls"/> is set, otherwise M3U.</summary>
     public static string Export(IEnumerable<RadioStation> stations, bool asPls) =>

@@ -54,6 +54,33 @@ public class PlaylistImportExportServiceTests
     }
 
     [TestMethod]
+    public void Export_Pls_ReimportOfStationWithDetailsIsDuplicate()
+    {
+        // PLS has no room for a homepage or logo, so their absence must not make it look new.
+        RadioStation station = Station("One", "http://one/live");
+        station.Homepage = "https://one.example/";
+        station.FaviconUrl = "https://one.example/logo.png";
+
+        string pls = PlaylistImportExportService.Export([station], asPls: true);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.pls", pls);
+        bool hasDetails = PlaylistImportExportService.CarriesStationDetails("x.pls");
+
+        Assert.IsFalse(hasDetails);
+        Assert.IsTrue(PlaylistImportExportService.IsDuplicate([station], back[0], hasDetails));
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate([station], Station("Two", "http://one/live"), hasDetails));
+    }
+
+    [TestMethod]
+    [DataRow("a.pls", false)]
+    [DataRow("a.PLS", false)]
+    [DataRow("a.m3u", true)]
+    [DataRow("a.m3u8", true)]
+    public void CarriesStationDetails_OnlyPlsLacksThem(string path, bool expected)
+    {
+        Assert.AreEqual(expected, PlaylistImportExportService.CarriesStationDetails(path));
+    }
+
+    [TestMethod]
     public void Export_M3u_RoundTripsThroughImport()
     {
         RadioStation[] stations = [Station("One", "http://one/live")];

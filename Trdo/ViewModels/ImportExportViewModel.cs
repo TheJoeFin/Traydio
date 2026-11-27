@@ -217,11 +217,12 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
             try
             {
                 string content = await FileIO.ReadTextAsync(file);
+                bool hasDetails = PlaylistImportExportService.CarriesStationDetails(file.Name);
                 foreach (RadioStation station in PlaylistImportExportService.ImportFromFile(file.Name, content, unknownStationName))
                 {
                     bool duplicate =
-                        PlaylistImportExportService.IsDuplicate(PlayerViewModel.Shared.Stations, station) ||
-                        PlaylistImportExportService.IsDuplicate(Items.Select(i => i.Station), station);
+                        PlaylistImportExportService.IsDuplicate(PlayerViewModel.Shared.Stations, station, hasDetails) ||
+                        PlaylistImportExportService.IsDuplicate(Items.Select(i => i.Station), station, hasDetails);
 
                     AddItem(new ImportExportItem(station, file.Name, duplicate, isSelected: !duplicate));
                     added++;
