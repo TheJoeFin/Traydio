@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Platforms>x64;ARM64</Platforms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <!--
-    The app project targets net10.0-windows10.0.19041.0 and pulls in WinUI/WinRT, which cannot
+    The app project targets Windows and pulls in WinUI/WinRT, which cannot
     be loaded by a plain test host. Rather than reference it, link in the individual files that
     are deliberately free of platform dependencies. Keep this list small: anything that needs
     ApplicationData, DispatcherQueue or a media player does not belong here.

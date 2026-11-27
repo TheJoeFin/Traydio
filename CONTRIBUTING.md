@@ -43,8 +43,8 @@ Feature requests are welcome! Please create an issue with:
 See the [README.md](README.md) for build instructions.
 
 ### Prerequisites
-- Visual Studio 2022, Visual Studio 2026, or VS Code
-- .NET 10.0 SDK
+- Visual Studio 2026 with .NET 11 support, or VS Code
+- .NET 11 SDK
 - Windows App SDK
 
 ### Add a new translation

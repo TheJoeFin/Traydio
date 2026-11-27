@@ -27,7 +27,7 @@
 
 Traydio (formerly Trdo) is a modern internet radio player built for Windows with a focus on simplicity and elegance. Stream your favorite radio stations with a beautiful, intuitive interface designed for Windows 11.
 
-Built with .NET 10, WinUI 3, and the Windows App SDK, Traydio provides a native Windows experience with smooth animations and responsive controls.
+Built with .NET 11, WinUI 3, and the Windows App SDK, Traydio provides a native Windows experience with smooth animations and responsive controls.
 
 ## 📰 In the Press
 
@@ -44,7 +44,7 @@ Get the code:
 
 ### With Visual Studio 2026
 
-- Install Visual Studio 2026 (the free community edition is sufficient).
+- Install Visual Studio 2026 with .NET 11 support (the free Community edition is sufficient).
   
     - Install the ".NET desktop development" workload.
     - Install "Windows application development" workload with Windows App SDK
@@ -54,7 +54,7 @@ Get the code:
 ### With Visual Studio Code (VS Code)
 
 - Install Visual Studio Code [https://code.visualstudio.com/](https://code.visualstudio.com/)
-- Install .NET 10 SDK [https://dotnet.microsoft.com/download/dotnet/10.0](https://dotnet.microsoft.com/download/dotnet/10.0)
+- Install the [.NET 11 SDK](https://dotnet.microsoft.com/download/dotnet/11.0)
 - Open `\Trdo\` Folder in VS Code (Same folder as .sln file)
 - Key F5 to launch with debugger
 
@@ -71,7 +71,7 @@ Get the code:
 
 ## 🛠️ Built With
 
-- .NET 10
+- .NET 11
 - WinUI
 - Windows App SDK
 - WinUIEx
