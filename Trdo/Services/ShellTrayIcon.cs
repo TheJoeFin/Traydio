@@ -62,6 +62,7 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
 
     // Events delivered in the low word of lParam under NOTIFYICON_VERSION_4.
     private const uint NIN_SELECT = 0x0400;
+    private const uint NIN_KEYSELECT = 0x0401; // NIN_SELECT | NINF_KEY: Enter or Space on the focused icon
     private const uint WM_CONTEXTMENU = 0x007B;
     private const uint WM_LBUTTONDBLCLK = 0x0203;
     private const uint WM_RBUTTONDBLCLK = 0x0206;
@@ -96,6 +97,7 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
     private bool _isVisible;
     private bool _added;
     private bool _disposed;
+    private long _lastKeySelectMs;
 
     public ShellTrayIcon(Guid guid, string iconPath, string tooltip)
     {
@@ -522,6 +524,17 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
             case NIN_SELECT:
                 Selected?.Invoke(this, EventArgs.Empty);
                 break;
+            case NIN_KEYSELECT:
+                // Keyboard activation does what a click does. A repeat within the double-click
+                // time counts as the same key press, so a doubled notification can't open the
+                // flyout and close it again straight away.
+                long nowMs = Environment.TickCount64;
+                if (nowMs - _lastKeySelectMs >= NativeMethods.GetDoubleClickTime())
+                {
+                    _lastKeySelectMs = nowMs;
+                    Selected?.Invoke(this, EventArgs.Empty);
+                }
+                break;
             case WM_CONTEXTMENU:
                 ContextMenu?.Invoke(this, EventArgs.Empty);
                 break;
@@ -626,6 +639,9 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
 
         [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern ushort RegisterClassExW(WNDCLASSEXW* lpwcx);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        public static extern uint GetDoubleClickTime();
 
         [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern nint CreateWindowExW(
