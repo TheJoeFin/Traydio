@@ -45,7 +45,7 @@ public sealed class StreamDiagnosticsTests
         string? contentType = null,
         params (string Name, string Value)[] headers)
     {
-        var response = new HttpResponseMessage(status)
+        HttpResponseMessage response = new(status)
         {
             Content = new ByteArrayContent(Encoding.UTF8.GetBytes(body))
         };
@@ -65,14 +65,14 @@ public sealed class StreamDiagnosticsTests
 
     private static async Task<StreamDiagnosis> ProbeAsync(Func<HttpResponseMessage> factory, string url = StreamUrl)
     {
-        using var handler = new StubHandler(factory);
+        using StubHandler handler = new(factory);
         using HttpClient client = CreateClient(handler);
         return await StreamDiagnostics.ProbeAsync(url, client, TimeSpan.FromSeconds(5));
     }
 
     private static async Task<StreamDiagnosis> ProbeThrowingAsync(Exception exception)
     {
-        using var handler = new StubHandler(() => throw exception);
+        using StubHandler handler = new(() => throw exception);
         using HttpClient client = CreateClient(handler);
         return await StreamDiagnostics.ProbeAsync(StreamUrl, client, TimeSpan.FromSeconds(5));
     }
@@ -97,7 +97,7 @@ public sealed class StreamDiagnosticsTests
     [TestMethod]
     public async Task Probe_RequestsIcyMetadataSoTheServerIdentifiesItself()
     {
-        using var handler = new StubHandler(() => Respond(HttpStatusCode.OK, "audio", "audio/mpeg"));
+        using StubHandler handler = new(() => Respond(HttpStatusCode.OK, "audio", "audio/mpeg"));
         using HttpClient client = CreateClient(handler);
 
         await StreamDiagnostics.ProbeAsync(StreamUrl, client, TimeSpan.FromSeconds(5));
@@ -265,7 +265,7 @@ public sealed class StreamDiagnosticsTests
     [TestMethod]
     public async Task MalformedUrl_IsReportedWithoutMakingARequest()
     {
-        using var handler = new StubHandler(() => throw new InvalidOperationException("should not be called"));
+        using StubHandler handler = new(() => throw new InvalidOperationException("should not be called"));
         using HttpClient client = CreateClient(handler);
 
         StreamDiagnosis diagnosis = await StreamDiagnostics.ProbeAsync("not a url", client);
@@ -277,9 +277,9 @@ public sealed class StreamDiagnosticsTests
     [TestMethod]
     public async Task CallerCancellation_PropagatesRatherThanBeingReportedAsATimeout()
     {
-        using var handler = new StubHandler(() => throw new OperationCanceledException());
+        using StubHandler handler = new(() => throw new OperationCanceledException());
         using HttpClient client = CreateClient(handler);
-        using var cts = new CancellationTokenSource();
+        using CancellationTokenSource cts = new();
         await cts.CancelAsync();
 
         // Assert.ThrowsException matches the exact type, and the runtime may surface either
@@ -293,6 +293,19 @@ public sealed class StreamDiagnosticsTests
         {
             // Expected: caller cancellation must not be reported as a stream timeout.
         }
+    }
+
+    [TestMethod]
+    [DataRow("http://example.com/listen.pls", true)]
+    [DataRow("http://example.com/listen.PLS?x=1", true)]
+    [DataRow("http://example.com/listen.m3u", true)]
+    [DataRow("http://example.com/listen.asx", true)]
+    [DataRow("http://example.com/live/hls.m3u8", false)]
+    [DataRow("http://example.com:8000/live", false)]
+    [DataRow("not a url", false)]
+    public void HasPlaylistExtension_MatchesOnlyPlaylistFiles(string url, bool expected)
+    {
+        Assert.AreEqual(expected, StreamDiagnostics.HasPlaylistExtension(url));
     }
 
     [TestMethod]

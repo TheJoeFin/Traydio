@@ -24,7 +24,7 @@ public sealed class EngineHealthStoreTests
 
         public int WriteCount { get; private set; }
 
-        public IReadOnlyCollection<string> Keys => new List<string>(_values.Keys);
+        public IReadOnlyCollection<string> Keys => [.. _values.Keys];
 
         public bool TryRead(string key, [NotNullWhen(true)] out string? value) =>
             _values.TryGetValue(key, out value);
@@ -284,7 +284,7 @@ public sealed class EngineHealthStoreTests
     [TestMethod]
     public void SerializeThenDeserialize_RoundTripsEveryField()
     {
-        var original = new EngineHealthRecord
+        EngineHealthRecord original = new()
         {
             Preferred = PlaybackBackendKind.LibVlc,
             NativeFailures = 3,

@@ -124,7 +124,7 @@ public sealed partial class LibVlcLogCapture : IDisposable
             return;
         }
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append(context).Append(": last ").Append(lines.Count).Append(" LibVLC log line(s):");
         foreach (string line in lines)
         {

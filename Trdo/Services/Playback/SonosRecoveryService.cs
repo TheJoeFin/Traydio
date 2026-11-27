@@ -114,7 +114,7 @@ internal static class SonosRecoveryService
     private static async Task TryAdoptAsync(
         SonosDevice device,
         SonosController controller,
-        (string SpeakerUuid, string StreamUrl) cast,
+        (string SpeakerUuid, string StreamUrl, string StationUrl) cast,
         CancellationToken cancellationToken)
     {
         string? transportUri;
@@ -159,9 +159,14 @@ internal static class SonosRecoveryService
             return;
         }
 
+        // By the station's saved address first: for a playlist (.pls/.m3u) station the speaker
+        // reports the entry it resolved to, which no station in the list is saved as.
         PlayerViewModel viewModel = PlayerViewModel.Shared;
-        RadioStation? station = viewModel.Stations.FirstOrDefault(candidate =>
-            candidate.SourceKind == AudioSourceKind.Radio && SonosPolicy.IsSameStream(candidate.StreamUrl, streamUrl));
+        RadioStation? station =
+            viewModel.Stations.FirstOrDefault(candidate =>
+                candidate.SourceKind == AudioSourceKind.Radio && SonosPolicy.IsSameStream(candidate.StreamUrl, cast.StationUrl)) ??
+            viewModel.Stations.FirstOrDefault(candidate =>
+                candidate.SourceKind == AudioSourceKind.Radio && SonosPolicy.IsSameStream(candidate.StreamUrl, streamUrl));
         if (station is null)
         {
             LogService.Info(Component, $"Sonos '{device.Name}' is playing {LogService.Redact(streamUrl)}, which matches no station in the list");
@@ -193,7 +198,7 @@ internal static class SonosRecoveryService
     /// Drops the record of <paramref name="cast"/>, unless the user has meanwhile started a new
     /// cast (which replaced it with one worth keeping).
     /// </summary>
-    private static void ForgetCast((string SpeakerUuid, string StreamUrl) cast)
+    private static void ForgetCast((string SpeakerUuid, string StreamUrl, string StationUrl) cast)
     {
         if (SettingsService.ActiveSonosCast == cast)
         {

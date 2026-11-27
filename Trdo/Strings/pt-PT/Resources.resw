@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Visitar o GitHub do programador</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Enviar e-mail ao programador</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Cancelar</value>
   </data>
@@ -557,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Mostrar janela</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>Cancelar</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Transmitir</value>
   </data>
@@ -613,6 +613,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Avançado</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Largue uma imagem aqui para a utilizar como logótipo</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Escolher imagem…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Utilizar como logótipo da estação</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Esse ficheiro não é uma imagem suportada.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>A imagem é demasiado grande. Escolha uma com menos de {0} MB.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Não foi possível utilizar essa imagem.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Nível do buffer</value>
@@ -800,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Mover para grupo</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Mover para o início</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Mover para o fim</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Nova divisória</value>
   </data>
@@ -888,7 +912,7 @@
     <value>Visitar sítio Web</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Permite que o computador entre em suspensão de acordo com o seu horário normal enquanto o rádio está a tocar. Note que o próprio Windows pode manter o PC ativo enquanto qualquer áudio estiver a ser reproduzido.</value>
+    <value>Permite que o computador entre em suspensão de acordo com o seu horário normal enquanto o rádio está a tocar. Quando esta opção está desativada, o Traydio mantém o PC ativo, mas o ecrã pode desligar-se na mesma. Note que o próprio Windows pode manter o PC ativo enquanto qualquer áudio estiver a ser reproduzido.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Permitir que o PC suspenda</value>
@@ -938,7 +962,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Ativar</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Falha na exportação: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -950,7 +974,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>Importar/exportar estações</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>Falha na importação: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de dados de rádios na internet criada pela comunidade, com milhares de estações de todo o mundo</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Roda do rato sobre o ícone</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Não fazer nada</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Alterar o volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Mudar de estação</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Desloque para cima para aumentar o volume ou ir para a estação anterior, e para baixo para o diminuir ou ir para a seguinte. Enquanto esta opção estiver ativada, o deslocamento sobre o ícone é utilizado pelo Traydio em vez da barra de tarefas.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Importar e exportar estações</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Escolher ficheiros...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Selecionar tudo</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Anular seleção</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importar e exportar estações</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Pré-visualizar estações</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Largue ficheiros .pls, .m3u ou .m3u8 aqui ou escolha ficheiros para pré-visualizar as respetivas estações.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Não existem estações para exportar.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>Não foram encontradas estações nesse ficheiro.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Ficheiros não suportados: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Ficheiros que não foi possível ler: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Já está na biblioteca</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Estação desconhecida</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importar {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Exportar {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Selecionadas: {0} de {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Estações do Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Lista de reprodução M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Lista de reprodução PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Adicionar a estação e voltar. Mantenha a tecla Shift premida ao clicar para adicionar várias estações sem sair da pesquisa.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Adicionada</value>
   </data>
 </root>

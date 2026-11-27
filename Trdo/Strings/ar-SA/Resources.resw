@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>زيارة صفحة GitHub الخاصة بالمطوّر</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>مراسلة المطوّر عبر البريد الإلكتروني</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>إلغاء</value>
   </data>
@@ -557,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>إظهار النافذة</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>إلغاء</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>إرسال</value>
   </data>
@@ -613,6 +613,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>متقدم</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>أفلت صورة هنا لاستخدامها كشعار</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>اختيار صورة…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>استخدام كشعار للمحطة</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>هذا الملف ليس صورة مدعومة.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>هذه الصورة كبيرة جدًا. اختر صورة أصغر من {0} ميغابايت.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>تعذر استخدام هذه الصورة.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>مستوى التخزين المؤقت</value>
@@ -800,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>نقل إلى مجموعة</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>نقل إلى الأعلى</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>نقل إلى الأسفل</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>فاصل جديد</value>
   </data>
@@ -888,7 +912,7 @@
     <value>زيارة الموقع الإلكتروني</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>السماح للكمبيوتر بالدخول في وضع السكون وفق جدوله المعتاد أثناء تشغيل الراديو. لاحظ أن نظام Windows نفسه قد يبقي الكمبيوتر نشطًا أثناء تشغيل أي صوت.</value>
+    <value>السماح للكمبيوتر بالدخول في وضع السكون وفق جدوله المعتاد أثناء تشغيل الراديو. عند إيقاف هذا الخيار، يبقي Traydio الكمبيوتر نشطًا، لكن يمكن للشاشة أن تنطفئ. لاحظ أن نظام Windows نفسه قد يبقي الكمبيوتر نشطًا أثناء تشغيل أي صوت.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>السماح للكمبيوتر بالسكون</value>
@@ -938,7 +962,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>تفعيل</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>فشل التصدير: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -950,7 +974,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>استيراد/تصدير المحطات</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>فشل الاستيراد: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>قاعدة بيانات راديو إنترنت يديرها المجتمع تضم آلاف المحطات حول العالم</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>استيراد</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>عجلة التمرير فوق الأيقونة</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>لا شيء</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>تغيير مستوى الصوت</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>تبديل المحطة</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>مرّر لأعلى لرفع مستوى الصوت أو الانتقال إلى المحطة السابقة، ولأسفل لخفضه أو الانتقال إلى المحطة التالية. أثناء تفعيل هذا الخيار، يستخدم Traydio التمرير فوق الأيقونة بدلًا من شريط المهام.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>استيراد المحطات وتصديرها</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>استيراد</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>تصدير</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>اختيار ملفات...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>تحديد الكل</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>إلغاء تحديد الكل</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>استيراد المحطات وتصديرها</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>معاينة المحطات</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>أفلت ملفات ‎.pls أو ‎.m3u أو ‎.m3u8 هنا، أو اختر ملفات لمعاينة محطاتها.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>لا توجد محطات لتصديرها.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>لم يتم العثور على محطات في هذا الملف.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>الملفات غير المدعومة: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>الملفات التي تعذّرت قراءتها: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>موجودة بالفعل في المكتبة</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>محطة غير معروفة</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>استيراد ({0})</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>تصدير ({0})</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>تم تحديد {0} من {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>محطات Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>قائمة تشغيل M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>قائمة تشغيل PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>إضافة المحطة والرجوع. اضغط باستمرار على مفتاح Shift أثناء النقر لإضافة عدة محطات دون مغادرة البحث.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>تمت الإضافة</value>
   </data>
 </root>

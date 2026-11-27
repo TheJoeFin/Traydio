@@ -1,8 +1,8 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
 using System.Drawing;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Windows.Win32;
@@ -17,9 +17,7 @@ internal static partial class WindowPlacementService
 {
     private const int WindowMargin = 12;
     private static PointInt32? _lastAnchorPoint;
-    private static nint _trayIconWindowHandle;
-    private static uint _trayIconId;
-    private static bool _hasTrayIconSource;
+    private static ShellTrayIcon? _trayIcon;
 
     public static void CapturePointerAnchor()
     {
@@ -49,14 +47,9 @@ internal static partial class WindowPlacementService
         _lastAnchorPoint = null;
     }
 
-    public static void SetTrayIconSource(TrayIcon trayIcon)
+    public static void SetTrayIconSource(ShellTrayIcon trayIcon)
     {
-        if (TryGetTrayIconWindowHandle(trayIcon, out nint hwnd))
-        {
-            _trayIconWindowHandle = hwnd;
-            _trayIconId = trayIcon.TrayIconId;
-            _hasTrayIconSource = true;
-        }
+        _trayIcon = trayIcon;
     }
 
     public static void PositionWindowNearAnchor(Window window, int width, int height)
@@ -72,8 +65,9 @@ internal static partial class WindowPlacementService
         // anchor's monitor, not the window: a hidden window keeps the DPI of
         // wherever it last was, which goes stale across monitor/scale changes.
         uint dpi = GetDpiForAnchor(anchor, window);
-        int physWidth = ToPhysical(width, dpi);
-        int physHeight = ToPhysical(height, dpi);
+        // A size remembered from a larger monitor must not overhang this one.
+        int physWidth = System.Math.Min(ToPhysical(width, dpi), workArea.Width);
+        int physHeight = System.Math.Min(ToPhysical(height, dpi), workArea.Height);
 
         int x;
         int y;
@@ -161,6 +155,38 @@ internal static partial class WindowPlacementService
         y = System.Math.Clamp(y, workArea.Y, maxY);
 
         window.AppWindow.MoveAndResize(new RectInt32(x, y, physWidth, physHeight));
+    }
+
+    /// <summary>
+    /// Puts a window back where it was left, nudged fully inside that display's work area.
+    /// Returns false, moving nothing, when the spot is no longer on any display - a monitor
+    /// that has been unplugged, say - so the caller can place the window afresh.
+    /// </summary>
+    public static bool TryRestoreBounds(Window window, SavedWindowBounds saved)
+    {
+        DisplayArea? displayArea = DisplayArea.GetFromRect(
+            new RectInt32(saved.X, saved.Y, saved.Width, saved.Height),
+            DisplayAreaFallback.None);
+        if (displayArea is null)
+            return false;
+
+        RectInt32 workArea = displayArea.WorkArea;
+        PointInt32 probe = new(
+            System.Math.Clamp(saved.X, workArea.X, workArea.X + workArea.Width - 1),
+            System.Math.Clamp(saved.Y, workArea.Y, workArea.Y + workArea.Height - 1));
+
+        uint dpi = GetDpiForAnchor(probe, window);
+        int physWidth = System.Math.Min(ToPhysical(saved.Width, dpi), workArea.Width);
+        int physHeight = System.Math.Min(ToPhysical(saved.Height, dpi), workArea.Height);
+
+        int x = System.Math.Clamp(saved.X, workArea.X, workArea.X + workArea.Width - physWidth);
+        int y = System.Math.Clamp(saved.Y, workArea.Y, workArea.Y + workArea.Height - physHeight);
+
+        // Move before sizing: arriving on a monitor with a different scale rescales the
+        // window, which would otherwise be applied on top of the size computed for it.
+        window.AppWindow.Move(new PointInt32(x, y));
+        window.AppWindow.Resize(new SizeInt32(physWidth, physHeight));
+        return true;
     }
 
     /// <summary>
@@ -294,42 +320,31 @@ internal static partial class WindowPlacementService
     {
         iconRect = default;
 
-        if (!_hasTrayIconSource || _trayIconWindowHandle == 0)
+        if (_trayIcon is null)
             return false;
 
+        // Read per call: the icon falls back from GUID to uID identity if the shell refuses the GUID.
+        ShellTrayIconIdentity identity = _trayIcon.Identity;
+        if (identity.WindowHandle == 0)
+            return false;
 
         NOTIFYICONIDENTIFIER identifier = new()
         {
             cbSize = (uint)Marshal.SizeOf<NOTIFYICONIDENTIFIER>(),
-            hWnd = (HWND)_trayIconWindowHandle,
-            uID = _trayIconId,
         };
 
+        // The shell wants the icon identified one way or the other, not both.
+        if (identity.Guid is Guid guid)
+        {
+            identifier.guidItem = guid;
+        }
+        else
+        {
+            identifier.hWnd = (HWND)identity.WindowHandle;
+            identifier.uID = identity.Id;
+        }
+
         return PInvoke.Shell_NotifyIconGetRect(in identifier, out iconRect) == 0;
-    }
-
-    private static bool TryGetTrayIconWindowHandle(TrayIcon trayIcon, out nint hwnd)
-    {
-        hwnd = 0;
-
-        try
-        {
-            FieldInfo? field = typeof(TrayIcon).GetField(
-                "_windowHandle",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (field?.GetValue(trayIcon) is nint handle && handle != 0)
-            {
-                hwnd = handle;
-                return true;
-            }
-        }
-        catch
-        {
-            // WinUIEx internals may change across versions
-        }
-
-        return false;
     }
 
     private static bool TryGetTaskbarRect(out RECT rc, out uint edge)

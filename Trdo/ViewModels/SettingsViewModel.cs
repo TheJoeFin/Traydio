@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Trdo.Models;
@@ -9,8 +8,6 @@ using Trdo.Services;
 using Trdo.Services.Lastfm;
 using Trdo.Services.Playback;
 using Windows.ApplicationModel;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace Trdo.ViewModels;
 
@@ -441,6 +438,23 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         set => SetTrayClickAction(TrayClickButton.RightDouble, TrayClickPolicy.Parse(value, SettingsService.TrayRightDoubleClickAction));
     }
 
+    /// <summary>
+    /// ComboBox index for what the mouse wheel does over the tray icon. The items are listed in
+    /// <see cref="TrayWheelAction"/> order, so the index is the enum value.
+    /// </summary>
+    public int TrayWheelActionIndex
+    {
+        get => (int)SettingsService.TrayWheelAction;
+        set
+        {
+            TrayWheelAction action = TrayWheelPolicy.Parse(value, SettingsService.TrayWheelAction);
+            if (action == SettingsService.TrayWheelAction) return;
+
+            SettingsService.TrayWheelAction = action;
+            OnPropertyChanged();
+        }
+    }
+
     private static TrayClickAssignments CurrentTrayClickAssignments => new(
         SettingsService.TrayLeftClickAction,
         SettingsService.TrayRightClickAction,
@@ -832,94 +846,6 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
         // Reflect actual state after operation
         UpdateStartupStateFromTask();
-    }
-
-    /// <summary>
-    /// Imports radio stations from a playlist file (M3U, M3U8, or PLS).
-    /// </summary>
-    public async Task<int> ImportStationsAsync(nint windowHandle)
-    {
-        FileOpenPicker picker = new();
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-        picker.SuggestedStartLocation = PickerLocationId.MusicLibrary;
-        picker.FileTypeFilter.Add(".m3u");
-        picker.FileTypeFilter.Add(".m3u8");
-        picker.FileTypeFilter.Add(".pls");
-
-        StorageFile? file = await picker.PickSingleFileAsync();
-        if (file is null)
-            return 0;
-
-        string content = await FileIO.ReadTextAsync(file);
-        List<RadioStation> imported = PlaylistImportExportService.ImportFromFile(file.Path, content);
-
-        if (imported.Count == 0)
-            return 0;
-
-        PlayerViewModel player = PlayerViewModel.Shared;
-        int addedCount = 0;
-        foreach (RadioStation station in imported)
-        {
-            bool alreadyExists = false;
-            foreach (RadioStation existing in player.Stations)
-            {
-                if (string.Equals(existing.Name, station.Name, StringComparison.Ordinal) &&
-                    string.Equals(existing.StreamUrl, station.StreamUrl, StringComparison.Ordinal) &&
-                    string.Equals(existing.Homepage, station.Homepage, StringComparison.Ordinal) &&
-                    string.Equals(existing.FaviconUrl, station.FaviconUrl, StringComparison.Ordinal))
-                {
-                    alreadyExists = true;
-                    break;
-                }
-            }
-
-            if (!alreadyExists)
-            {
-                // This adds to the collection directly rather than going through
-                // PlayerViewModel.AddStation, so stamp what that path would have stamped.
-                // Imported stations carry no directory details, which makes them exactly the
-                // candidates the "refresh station info" command exists for.
-                station.Id = StationIdentityPolicy.NewId();
-                station.DateAdded ??= DateTimeOffset.UtcNow;
-
-                player.Stations.Add(station);
-                addedCount++;
-            }
-        }
-
-        if (addedCount > 0)
-            RadioStationService.Instance.SaveStations(player.Stations);
-
-        return addedCount;
-    }
-
-    /// <summary>
-    /// Exports all radio stations to a playlist file (M3U, M3U8, or PLS).
-    /// </summary>
-    public async Task<bool> ExportStationsAsync(nint windowHandle)
-    {
-        PlayerViewModel player = PlayerViewModel.Shared;
-        if (player.Stations.Count == 0)
-            return false;
-
-        FileSavePicker picker = new();
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-        picker.SuggestedStartLocation = PickerLocationId.MusicLibrary;
-        picker.SuggestedFileName = "Traydio Stations";
-        picker.FileTypeChoices.Add("M3U Playlist", [".m3u"]);
-        picker.FileTypeChoices.Add("PLS Playlist", [".pls"]);
-
-        StorageFile? file = await picker.PickSaveFileAsync();
-        if (file is null)
-            return false;
-
-        string extension = Path.GetExtension(file.Name).ToLowerInvariant();
-        string content = extension == ".pls"
-            ? PlaylistImportExportService.ExportToPls(player.Stations)
-            : PlaylistImportExportService.ExportToM3u(player.Stations);
-
-        await FileIO.WriteTextAsync(file, content);
-        return true;
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

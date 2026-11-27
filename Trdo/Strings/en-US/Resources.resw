@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Visit Developer&apos;s GitHub</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Email the developer</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -560,9 +563,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Show Window</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Cast</value>
   </data>
@@ -616,6 +616,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Advanced</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Drop an image here to use it as the logo</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Choose image…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Use as station logo</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>That file isn't a supported image.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>That image is too large. Choose one under {0} MB.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Couldn't use that image.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Buffer level</value>
@@ -830,6 +848,9 @@
   <data name="PlayingPage_EditLabel.Text" xml:space="preserve">
     <value>Edit label</value>
   </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
   <data name="PlayingPage_EmptySubtitle.Text" xml:space="preserve">
     <value>Get started by adding your favorite radio station to begin listening.</value>
   </data>
@@ -853,6 +874,12 @@
   </data>
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Move to group</value>
+  </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Move to top</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Move to bottom</value>
   </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>New Divider</value>
@@ -966,7 +993,7 @@
     <value>Visit Website</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Let the computer go to sleep on its normal schedule while radio is playing. Note that Windows itself may keep the PC awake while any audio is playing.</value>
+    <value>Let the computer go to sleep on its normal schedule while radio is playing. When this is off, Traydio keeps the PC awake, but the screen can still turn off. Note that Windows itself may keep the PC awake while any audio is playing.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Allow PC to sleep</value>
@@ -1016,7 +1043,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Enable</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Export failed: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -1028,7 +1055,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>Import / Export stations</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>Import failed: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1240,6 +1267,21 @@
   </data>
   <data name="SettingsPage_TrayRightDoubleClick.Header" xml:space="preserve">
     <value>Right double-click</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Scroll wheel over the icon</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Do nothing</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Change volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Switch station</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Scroll up to raise the volume or go to the previous station, and down to lower it or go to the next. While this is on, scrolling over the icon is used by Traydio instead of the taskbar.</value>
   </data>
   <data name="ShellPage_TitleBar.Title" xml:space="preserve">
     <value>Traydio</value>
@@ -1532,6 +1574,69 @@
   </data>
   <data name="SearchStation_AddLocalMusic.Text" xml:space="preserve">
     <value>Add local music...</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Import and export stations</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Choose files...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Select none</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Import and export stations</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Preview stations</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Drop .pls, .m3u or .m3u8 files here, or choose files to preview their stations.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>There are no stations to export.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>No stations were found in that file.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>{0} file(s) were unsupported.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>{0} file(s) could not be read.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Already in library</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Unknown Station</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Import {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Export {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>{0} of {1} selected</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Traydio Stations</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>M3U Playlist</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>PLS Playlist</value>
   </data>
   <data name="MiniPlayer_WindowTitle" xml:space="preserve">
     <value>Traydio Mini Player</value>

@@ -1,9 +1,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +41,7 @@ public sealed partial class CastPage : Page
     }
 
     private void GroupSpeakersButton_Click(object sender, RoutedEventArgs e) =>
-        (FindShellViewModel())?.NavigateToGroupSpeakersPage();
+        FindShellViewModel()?.NavigateToGroupSpeakersPage();
 
     private ShellViewModel? FindShellViewModel()
     {

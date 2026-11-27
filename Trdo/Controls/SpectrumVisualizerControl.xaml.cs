@@ -7,6 +7,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
+using Trdo.Services;
 
 namespace Trdo.Controls;
 
@@ -61,7 +62,14 @@ public sealed partial class SpectrumVisualizerControl : UserControl
         StartAnimationTimer();
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    private void OnUnloaded(object sender, RoutedEventArgs e) => Stop();
+
+    /// <summary>
+    /// Stops the frame timer and the loopback capture. Runs on Unloaded, and is also called by
+    /// the hosting window's Closed handler, since Unloaded is not guaranteed to arrive before the
+    /// app's final dispatcher drain. Safe to call more than once.
+    /// </summary>
+    public void Stop()
     {
         StopAnimationTimer();
         StopCapture();
@@ -128,6 +136,21 @@ public sealed partial class SpectrumVisualizerControl : UserControl
 
     private void OnAnimationTick(DispatcherQueueTimer sender, object args)
     {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceFrame();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SpectrumVisualizerControl), ex);
+        }
+    }
+
+    private void AdvanceFrame()
+    {
         DateTime now = DateTime.UtcNow;
         double dt = Math.Min((now - _lastFrameTime).TotalSeconds, 0.05);
         _lastFrameTime = now;
@@ -146,7 +169,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             // Spring: F = SpringK*(target - pos) - DampingD*vel
             double acceleration = (SpringK * (_targetLevels[i] - _currentLevels[i])) - (DampingD * _velocities[i]);
             _velocities[i] += acceleration * dt;
-            _currentLevels[i] = Math.Clamp(_currentLevels[i] + _velocities[i] * dt, 0, CanvasHeight);
+            _currentLevels[i] = Math.Clamp(_currentLevels[i] + (_velocities[i] * dt), 0, CanvasHeight);
 
             double barHeight = Math.Max(2.0, _currentLevels[i]);
             _bars[i].Height = barHeight;
@@ -195,7 +218,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             // Mix all channels to mono.
             float mono = 0;
             for (int ch = 0; ch < _channels; ch++)
-                mono += BitConverter.ToSingle(e.Buffer, i + ch * bytesPerSample);
+                mono += BitConverter.ToSingle(e.Buffer, i + (ch * bytesPerSample));
             mono /= _channels;
 
             // Hanning window to reduce spectral leakage.
@@ -239,7 +262,7 @@ public sealed partial class SpectrumVisualizerControl : UserControl
             {
                 float re = fftData[bin].X;
                 float im = fftData[bin].Y;
-                sum += MathF.Sqrt(re * re + im * im);
+                sum += MathF.Sqrt((re * re) + (im * im));
             }
 
             float avg = sum / (binHigh - binLow + 1);

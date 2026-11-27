@@ -1,0 +1,126 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using Trdo.Models;
+using Trdo.Services;
+
+namespace Trdo.Tests;
+
+[TestClass]
+public class PlaylistImportExportServiceTests
+{
+    private static RadioStation Station(string name, string url) =>
+        new() { Name = name, StreamUrl = url };
+
+    [TestMethod]
+    [DataRow("a.pls", true)]
+    [DataRow("a.PLS", true)]
+    [DataRow("a.m3u", true)]
+    [DataRow("a.m3u8", true)]
+    [DataRow("a.txt", false)]
+    [DataRow("a", false)]
+    public void IsSupportedFile_MatchesPlaylistExtensions(string path, bool expected)
+    {
+        Assert.AreEqual(expected, PlaylistImportExportService.IsSupportedFile(path));
+    }
+
+    [TestMethod]
+    public void IsDuplicate_MatchesIdenticalStation()
+    {
+        RadioStation[] existing = [Station("A", "http://a/live")];
+
+        Assert.IsTrue(PlaylistImportExportService.IsDuplicate(existing, Station("A", "http://a/live")));
+    }
+
+    [TestMethod]
+    public void IsDuplicate_RenamedOrRepointedStationIsNew()
+    {
+        RadioStation[] existing = [Station("A", "http://a/live")];
+
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate(existing, Station("B", "http://a/live")));
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate(existing, Station("A", "http://a/other")));
+    }
+
+    [TestMethod]
+    public void Export_Pls_RoundTripsThroughImport()
+    {
+        RadioStation[] stations = [Station("One", "http://one/live"), Station("Two", "http://two/live")];
+
+        string pls = PlaylistImportExportService.Export(stations, asPls: true);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.pls", pls);
+
+        Assert.HasCount(2, back);
+        Assert.AreEqual("Two", back[1].Name);
+        Assert.AreEqual("http://two/live", back[1].StreamUrl);
+    }
+
+    [TestMethod]
+    public void Export_Pls_ReimportOfStationWithDetailsIsDuplicate()
+    {
+        // PLS has no room for a homepage or logo, so their absence must not make it look new.
+        RadioStation station = Station("One", "http://one/live");
+        station.Homepage = "https://one.example/";
+        station.FaviconUrl = "https://one.example/logo.png";
+
+        string pls = PlaylistImportExportService.Export([station], asPls: true);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.pls", pls);
+        bool hasDetails = PlaylistImportExportService.CarriesStationDetails("x.pls");
+
+        Assert.IsFalse(hasDetails);
+        Assert.IsTrue(PlaylistImportExportService.IsDuplicate([station], back[0], hasDetails));
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate([station], Station("Two", "http://one/live"), hasDetails));
+    }
+
+    [TestMethod]
+    [DataRow("a.pls", false)]
+    [DataRow("a.PLS", false)]
+    [DataRow("a.m3u", true)]
+    [DataRow("a.m3u8", true)]
+    public void CarriesStationDetails_OnlyPlsLacksThem(string path, bool expected)
+    {
+        Assert.AreEqual(expected, PlaylistImportExportService.CarriesStationDetails(path));
+    }
+
+    [TestMethod]
+    public void Export_M3u_RoundTripsThroughImport()
+    {
+        RadioStation[] stations = [Station("One", "http://one/live")];
+
+        string m3u = PlaylistImportExportService.Export(stations, asPls: false);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
+
+        Assert.HasCount(1, back);
+        Assert.AreEqual("One", back[0].Name);
+    }
+
+    [TestMethod]
+    [DataRow("file:///C:/Users/someone/logo.png")]
+    [DataRow(@"C:\Users\someone\logo.png")]
+    [DataRow(@"\\server\share\logo.png")]
+    [DataRow(@"art\logo.png")]
+    public void Export_M3u_LeavesOutALocalLogo(string logo)
+    {
+        RadioStation station = Station("One", "http://one/live");
+        station.FaviconUrl = logo;
+
+        string m3u = PlaylistImportExportService.Export([station], asPls: false);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
+
+        Assert.DoesNotContain("#EXTIMG", m3u);
+        Assert.DoesNotContain("logo.png", m3u);
+        Assert.IsNull(back[0].FaviconUrl);
+        Assert.IsTrue(PlaylistImportExportService.IsDuplicate([station], back[0]));
+    }
+
+    [TestMethod]
+    public void Export_M3u_KeepsAWebLogo()
+    {
+        RadioStation station = Station("One", "http://one/live");
+        station.FaviconUrl = "https://one/logo.png";
+
+        string m3u = PlaylistImportExportService.Export([station], asPls: false);
+        List<RadioStation> back = PlaylistImportExportService.ImportFromFile("x.m3u", m3u);
+
+        Assert.AreEqual("https://one/logo.png", back[0].FaviconUrl);
+        Assert.IsFalse(PlaylistImportExportService.IsDuplicate([station], Station("One", "http://one/live")));
+    }
+}

@@ -60,7 +60,7 @@ public sealed class RadioStaticProfileTests
             swell = RadioStaticProfile.NextSwell(swell, random.NextDouble());
 
             Assert.IsTrue(
-                swell >= RadioStaticProfile.SwellMin && swell <= RadioStaticProfile.SwellMax,
+                swell is >= RadioStaticProfile.SwellMin and <= RadioStaticProfile.SwellMax,
                 $"Swell escaped its range at step {i}: {swell}");
         }
     }
@@ -84,7 +84,7 @@ public sealed class RadioStaticProfileTests
             double length = RadioStaticProfile.NextSweepLengthSeconds(random.NextDouble());
 
             Assert.IsTrue(
-                length >= RadioStaticProfile.SweepMinLengthSeconds && length <= RadioStaticProfile.SweepMaxLengthSeconds,
+                length is >= RadioStaticProfile.SweepMinLengthSeconds and <= RadioStaticProfile.SweepMaxLengthSeconds,
                 $"Sweep length escaped its range at step {i}: {length}");
         }
     }
@@ -114,7 +114,7 @@ public sealed class RadioStaticProfileTests
             float start = RadioStaticProfile.StartingCarrierFrequency(random.NextDouble());
 
             Assert.IsTrue(
-                start >= RadioStaticProfile.CarrierMinHz && start <= RadioStaticProfile.CarrierMaxHz,
+                start is >= RadioStaticProfile.CarrierMinHz and <= RadioStaticProfile.CarrierMaxHz,
                 $"Starting frequency escaped the band at step {i}: {start}");
 
             seen.Add(start);
@@ -142,7 +142,7 @@ public sealed class RadioStaticProfileTests
             frequency = RadioStaticProfile.NextCarrierFrequency(frequency, random.NextDouble());
 
             Assert.IsTrue(
-                frequency >= RadioStaticProfile.CarrierMinHz && frequency <= RadioStaticProfile.CarrierMaxHz,
+                frequency is >= RadioStaticProfile.CarrierMinHz and <= RadioStaticProfile.CarrierMaxHz,
                 $"Carrier escaped its range at step {i}: {frequency}");
         }
     }

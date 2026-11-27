@@ -1,11 +1,15 @@
 ﻿using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Trdo.Helpers;
 using Trdo.Models;
 using Trdo.Services;
+using Windows.Storage;
 
 namespace Trdo.ViewModels;
 
@@ -34,6 +38,14 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     private bool _hasSongPopupDelayOverride;
     private double _songPopupDelaySeconds;
     private bool _heroImageFailed;
+    private bool _isImportingImage;
+    private string _imageError = string.Empty;
+    private bool _isClosed;
+    /// <summary>
+    /// Image copies made for this editor that no saved station uses yet. <see cref="Save"/> keeps
+    /// the one chosen; the rest, or all of them on cancel, are deleted.
+    /// </summary>
+    private readonly List<string> _importedImages = [];
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler<RadioStation>? StationAdded;
@@ -142,8 +154,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
 
             // A new URL deserves a fresh attempt even if the previous one 404'd.
             _heroImageFailed = false;
-            OnPropertyChanged(nameof(HeroImageSource));
-            OnPropertyChanged(nameof(HasHeroImage));
+            ImageError = string.Empty;
+            OnHeroImageChanged();
         }
     }
 
@@ -162,11 +174,23 @@ public partial class AddStationViewModel : INotifyPropertyChanged
                 return null;
 
             string trimmed = FaviconUrl.Trim();
-            return IsValidUrl(trimmed) ? new BitmapImage(new Uri(trimmed, UriKind.Absolute)) : null;
+            if (IsValidUrl(trimmed))
+                return new BitmapImage(new Uri(trimmed, UriKind.Absolute));
+
+            // An image on this PC. The existence check keeps a half-typed path from reaching the
+            // loader, which would substitute another image from the same folder; network shares
+            // are skipped because that check can stall the UI on one.
+            return Uri.TryCreate(trimmed, UriKind.Absolute, out Uri? uri) &&
+                   uri.IsFile && !uri.IsUnc && File.Exists(uri.LocalPath)
+                ? ImageSourceFactory.Create(trimmed, stationArt: true)
+                : null;
         }
     }
 
     public bool HasHeroImage => HeroImageSource is not null;
+
+    /// <summary>Whether to show the "drop an image here" box in the preview's place.</summary>
+    public bool ShowsImageDropHint => !HasHeroImage;
 
     /// <summary>
     /// Called by the view when the preview image fails to download or decode, so
@@ -176,8 +200,103 @@ public partial class AddStationViewModel : INotifyPropertyChanged
     {
         if (_heroImageFailed) return;
         _heroImageFailed = true;
+        OnHeroImageChanged();
+    }
+
+    private void OnHeroImageChanged()
+    {
         OnPropertyChanged(nameof(HeroImageSource));
         OnPropertyChanged(nameof(HasHeroImage));
+        OnPropertyChanged(nameof(ShowsImageDropHint));
+    }
+
+    /// <summary>False while an image is still being copied in.</summary>
+    public bool CanImportImage => !_isImportingImage;
+
+    private bool IsImportingImage
+    {
+        set
+        {
+            if (value == _isImportingImage) return;
+            _isImportingImage = value;
+            OnPropertyChanged(nameof(CanImportImage));
+            OnPropertyChanged(nameof(CanSave));
+        }
+    }
+
+    /// <summary>Why the last dropped or chosen image was not used; empty when there is nothing to report.</summary>
+    public string ImageError
+    {
+        get => _imageError;
+        private set
+        {
+            if (value == _imageError) return;
+            _imageError = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasImageError));
+        }
+    }
+
+    public bool HasImageError => _imageError.Length > 0;
+
+    /// <summary>Shows <paramref name="message"/> as the reason an image could not be used.</summary>
+    public void ReportImageError(string message) => ImageError = message;
+
+    /// <summary>Logs an unexpected failure to use an image and shows a general message for it.</summary>
+    public void ReportImageFailure(Exception ex)
+    {
+        LogService.Warn("AlbumArt", $"Could not import station image: {ex.GetType().Name}: {ex.Message}");
+        ReportImageError(LocalizationService.GetString("ManualStationWindow_ImageFailed", "Couldn't use that image."));
+    }
+
+    /// <summary>
+    /// Uses an image file from this PC as the station logo: copies it into the app's data folder
+    /// and points <see cref="FaviconUrl"/> at the copy.
+    /// </summary>
+    public async Task SetImageFromFileAsync(StorageFile file)
+    {
+        if (_isImportingImage) return;
+
+        IsImportingImage = true;
+        ImageError = string.Empty;
+        try
+        {
+            string url = await CustomStationArt.ImportAsync(file);
+            _importedImages.Add(url);
+
+            // The window can be closed while the copy is being made.
+            if (_isClosed)
+                DiscardUnsavedImages();
+            else
+                FaviconUrl = url;
+        }
+        catch (InvalidDataException ex)
+        {
+            ImageError = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ReportImageFailure(ex);
+        }
+        finally
+        {
+            IsImportingImage = false;
+        }
+    }
+
+    /// <summary>
+    /// Deletes image copies this editor made that no station ended up using. Called when the
+    /// editor closes; after a successful <see cref="Save"/> there are none left.
+    /// </summary>
+    public void DiscardUnsavedImages()
+    {
+        _isClosed = true;
+        foreach (string url in _importedImages)
+        {
+            CustomStationArt.Release(url, _playerViewModel?.Stations ?? []);
+        }
+
+        _importedImages.Clear();
     }
 
     /// <summary>
@@ -336,7 +455,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
 
     public bool CanSave => !string.IsNullOrWhiteSpace(StationName) &&
                            !string.IsNullOrWhiteSpace(StreamUrl) &&
-                           !HasValidationError;
+                           !HasValidationError &&
+                           !_isImportingImage;
 
     private void ValidateInput()
     {
@@ -385,6 +505,9 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             return false;
         }
 
+        string? replacedFavicon = null;
+        string? savedFavicon = !string.IsNullOrWhiteSpace(FaviconUrl) ? FaviconUrl.Trim() : null;
+
         if (_editingStation != null)
         {
             // Edit mode - update existing station
@@ -394,7 +517,8 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             // Editing is the one time station art is refreshed: drop the cached thumbnail for the
             // old and new URL (they differ if the user changed it) and rebuild from the source.
             string? previousFavicon = _editingStation.FaviconUrl;
-            _editingStation.FaviconUrl = !string.IsNullOrWhiteSpace(FaviconUrl) ? FaviconUrl.Trim() : null;
+            replacedFavicon = previousFavicon;
+            _editingStation.FaviconUrl = savedFavicon;
             ImageSourceFactory.Forget(previousFavicon);
             ImageSourceFactory.Forget(_editingStation.FaviconUrl);
             _editingStation.RefreshFavicon();
@@ -417,7 +541,7 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             newStation.Name = StationName.Trim();
             newStation.StreamUrl = StreamUrl.Trim();
             newStation.Homepage = !string.IsNullOrWhiteSpace(Homepage) ? Homepage.Trim() : null;
-            newStation.FaviconUrl = !string.IsNullOrWhiteSpace(FaviconUrl) ? FaviconUrl.Trim() : null;
+            newStation.FaviconUrl = savedFavicon;
             newStation.Volume = VolumePercent / 100;
             newStation.BufferLevel = HasBufferOverride ? BufferLevel : null;
             newStation.SongPopupDelaySeconds = HasSongPopupDelayOverride ? SongPopupDelaySeconds : null;
@@ -430,11 +554,30 @@ public partial class AddStationViewModel : INotifyPropertyChanged
             StationAdded?.Invoke(this, newStation);
         }
 
+        // Delete the copies this save made obsolete: the image it replaced, and any tried and
+        // then swapped out before saving.
+        List<string?> urlsInUse = [savedFavicon];
+        foreach (RadioStation station in _playerViewModel?.Stations ?? [])
+        {
+            urlsInUse.Add(station.FaviconUrl);
+        }
+
+        List<string?> obsolete = [replacedFavicon, .. _importedImages];
+        foreach (string? url in obsolete)
+        {
+            CustomStationArt.Release(url, urlsInUse);
+        }
+
+        _importedImages.Clear();
+
         return true;
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
+        // An image import can finish after the editor has closed; nothing is left to update.
+        if (_isClosed) return;
+
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

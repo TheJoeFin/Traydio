@@ -103,14 +103,14 @@ internal static class ImageFormat
             }
 
             // Markers without a length: TEM, RSTn, SOI, EOI.
-            if (marker == 0x01 || (marker >= 0xD0 && marker <= 0xD9))
+            if (marker is 0x01 or (>= 0xD0 and <= 0xD9))
             {
                 i += 2;
                 continue;
             }
 
             // SOFn carries the frame size; DHT (C4), JPG (C8) and DAC (CC) share the range but don't.
-            if (marker >= 0xC0 && marker <= 0xCF && marker != 0xC4 && marker != 0xC8 && marker != 0xCC)
+            if (marker is >= 0xC0 and <= 0xCF and not 0xC4 and not 0xC8 and not 0xCC)
             {
                 if (i + 8 >= bytes.Length)
                     return false;

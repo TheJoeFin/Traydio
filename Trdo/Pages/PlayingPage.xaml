@@ -82,6 +82,24 @@
                             </MenuFlyoutSubItem.Icon>
                         </MenuFlyoutSubItem>
                         <MenuFlyoutItem
+                            x:Name="MoveToTopMenuItem"
+                            x:Uid="PlayingPage_MoveToTop"
+                            Click="MoveToTop_Click"
+                            Tag="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74A;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Name="MoveToBottomMenuItem"
+                            x:Uid="PlayingPage_MoveToBottom"
+                            Click="MoveToBottom_Click"
+                            Tag="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74B;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
                             x:Uid="PlayingPage_InsertDividerAbove"
                             Click="InsertDividerAbove_Click"
                             Tag="{x:Bind}">
@@ -539,6 +557,12 @@
                             <TextBlock x:Uid="PlayingPage_AddFirstStation" TextWrapping="Wrap" />
                         </StackPanel>
                     </Button>
+
+                    <!--  Import (secondary)  -->
+                    <HyperlinkButton
+                        x:Uid="PlayingPage_ImportStations"
+                        HorizontalAlignment="Center"
+                        Click="ImportStationsButton_Click" />
                 </StackPanel>
             </Grid>
         </Grid>

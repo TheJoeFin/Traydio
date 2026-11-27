@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using Trdo.Controls;
 using Trdo.Services;
@@ -7,7 +8,6 @@ using Trdo.Services.Audio;
 using Trdo.Services.Playback;
 using Trdo.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Win32;
 
 
 namespace Trdo.Pages;
@@ -36,6 +36,32 @@ public sealed partial class SettingsPage : Page
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
         RadioPlayerService.Instance.Watchdog.AudioLevelUpdated -= OnAudioLevelUpdated;
+    }
+
+    /// <summary>
+    /// Closes any open dropdown when the user scrolls the page. A ScrollView keeps taking the
+    /// mouse wheel while a ComboBox is open, which slides the page out from under the dropdown
+    /// and leaves it floating over the window (issue #163). Only user scrolling counts: the
+    /// <see cref="ScrollingInteractionState.Animation"/> state is left alone so that scrolling a
+    /// focused control into view does not close the dropdown just opened on it.
+    /// </summary>
+    private void SettingsScrollView_StateChanged(ScrollView sender, object args)
+    {
+        if (sender.State is ScrollingInteractionState.Interaction or ScrollingInteractionState.Inertia)
+            CloseDropDowns(sender);
+    }
+
+    private static void CloseDropDowns(DependencyObject parent)
+    {
+        int count = VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < count; i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+            if (child is ComboBox comboBox)
+                comboBox.IsDropDownOpen = false;
+            else
+                CloseDropDowns(child);
+        }
     }
 
     /// <summary>
@@ -97,7 +123,7 @@ public sealed partial class SettingsPage : Page
         const float decayFactor = 0.55f;
         _displayLevel = normalized > _displayLevel
             ? normalized
-            : _displayLevel * (1f - decayFactor) + normalized * decayFactor;
+            : (_displayLevel * (1f - decayFactor)) + (normalized * decayFactor);
 
         // Each bar has a threshold; opacity ramps proportionally above it
         // so even small fluctuations produce visible movement.
@@ -120,66 +146,20 @@ public sealed partial class SettingsPage : Page
         if (level <= threshold) return dim;
         // Ramp from dim → 1.0 over 0.15 of level range above the threshold
         float t = Math.Min((level - threshold) / 0.15f, 1f);
-        return dim + t * (1.0 - dim);
+        return dim + (t * (1.0 - dim));
     }
 
-    private async void ImportButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            nint hwnd = PInvoke.GetActiveWindow();
-            int count = await ViewModel.ImportStationsAsync(hwnd);
+    private void ImportButton_Click(object sender, RoutedEventArgs e) => OpenImportExportWindow(startAsImport: true);
 
-            if (count > 0)
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = $"Imported {count} station{(count == 1 ? "" : "s")}.";
-            }
-            else
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "No stations were imported.";
-            }
+    private void ExportButton_Click(object sender, RoutedEventArgs e) => OpenImportExportWindow(startAsImport: false);
 
-            ImportExportInfoBar.IsOpen = true;
-        }
-        catch (Exception ex)
-        {
-            ImportExportInfoBar.Severity = InfoBarSeverity.Error;
-            ImportExportInfoBar.Message = string.Format(
-                LocalizationService.GetString("SettingsPage_ImportFailed", "Import failed: {0}"), ex.Message);
-            ImportExportInfoBar.IsOpen = true;
-        }
-    }
-
-    private async void ExportButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            nint hwnd = PInvoke.GetActiveWindow();
-            bool exported = await ViewModel.ExportStationsAsync(hwnd);
-
-            if (exported)
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Success;
-                ImportExportInfoBar.Message = "Stations exported successfully.";
-            }
-            else
-            {
-                ImportExportInfoBar.Severity = InfoBarSeverity.Informational;
-                ImportExportInfoBar.Message = "Export cancelled or no stations to export.";
-            }
-
-            ImportExportInfoBar.IsOpen = true;
-        }
-        catch (Exception ex)
-        {
-            ImportExportInfoBar.Severity = InfoBarSeverity.Error;
-            ImportExportInfoBar.Message = string.Format(
-                LocalizationService.GetString("SettingsPage_ExportFailed", "Export failed: {0}"), ex.Message);
-            ImportExportInfoBar.IsOpen = true;
-        }
-    }
+    /// <summary>
+    /// Import/export lives in its own window rather than this flyout page: the flyout
+    /// light-dismisses (which would kill a file picker or a drag in progress) and is too
+    /// small to preview a whole station list.
+    /// </summary>
+    private static void OpenImportExportWindow(bool startAsImport) =>
+        (Application.Current as App)?.ShowImportExportWindow(startAsImport);
 
     private async void OpenLogsFolderButton_Click(object sender, RoutedEventArgs e)
     {

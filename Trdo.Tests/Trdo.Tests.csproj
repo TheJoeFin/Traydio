@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Platforms>x64;ARM64</Platforms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <!--
-    The app project targets net10.0-windows10.0.19041.0 and pulls in WinUI/WinRT, which cannot
+    The app project targets Windows and pulls in WinUI/WinRT, which cannot
     be loaded by a plain test host. Rather than reference it, link in the individual files that
     are deliberately free of platform dependencies. Keep this list small: anything that needs
     ApplicationData, DispatcherQueue or a media player does not belong here.
@@ -47,6 +47,7 @@
     <Compile Include="..\Trdo\Services\RadioStationJsonContext.cs" Link="Services\RadioStationJsonContext.cs" />
     <Compile Include="..\Trdo\Services\StationStorageFormat.cs" Link="Services\StationStorageFormat.cs" />
     <Compile Include="..\Trdo\Services\StationIdentityPolicy.cs" Link="Services\StationIdentityPolicy.cs" />
+    <Compile Include="..\Trdo\Services\PlaylistImportExportService.cs" Link="Services\PlaylistImportExportService.cs" />
     <Compile Include="..\Trdo\Services\StationSelectionPolicy.cs" Link="Services\StationSelectionPolicy.cs" />
     <Compile Include="..\Trdo\Models\StationGroup.cs" Link="Models\StationGroup.cs" />
     <Compile Include="..\Trdo\Models\StationDivider.cs" Link="Models\StationDivider.cs" />
@@ -70,13 +71,18 @@
     <Compile Include="..\Trdo\Services\Audio\FadeEnvelope.cs" Link="Services\Audio\FadeEnvelope.cs" />
     <Compile Include="..\Trdo\Models\TrayClickAction.cs" Link="Models\TrayClickAction.cs" />
     <Compile Include="..\Trdo\Services\TrayClickPolicy.cs" Link="Services\TrayClickPolicy.cs" />
+    <Compile Include="..\Trdo\Services\TrayIconIdentityPolicy.cs" Link="Services\TrayIconIdentityPolicy.cs" />
+    <Compile Include="..\Trdo\Models\TrayWheelAction.cs" Link="Models\TrayWheelAction.cs" />
+    <Compile Include="..\Trdo\Services\TrayWheelPolicy.cs" Link="Services\TrayWheelPolicy.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\LastfmSignature.cs" Link="Services\Lastfm\LastfmSignature.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\LastfmErrorCode.cs" Link="Services\Lastfm\LastfmErrorCode.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" Link="Services\Lastfm\LastfmScrobbleEligibilityPolicy.cs" />
     <Compile Include="..\Trdo\Services\Lastfm\ScrobbleTimingTracker.cs" Link="Services\Lastfm\ScrobbleTimingTracker.cs" />
     <Compile Include="..\Trdo\Helpers\ImageFormat.cs" Link="Helpers\ImageFormat.cs" />
     <Compile Include="..\Trdo\Helpers\EmbeddedArtStore.cs" Link="Helpers\EmbeddedArtStore.cs" />
+    <Compile Include="..\Trdo\Services\CustomStationArtStore.cs" Link="Services\CustomStationArtStore.cs" />
     <Compile Include="..\Trdo\Services\Metadata\IcyTextDecoder.cs" Link="Services\Metadata\IcyTextDecoder.cs" />
+    <Compile Include="..\Trdo\Services\WindowBoundsPolicy.cs" Link="Services\WindowBoundsPolicy.cs" />
   </ItemGroup>
 
 </Project>

@@ -23,8 +23,11 @@ namespace Trdo.Controls;
 /// </summary>
 public sealed partial class TrayPopupWindow : WindowEx
 {
-    private const int PopupWidth = 320;
-    private const int PopupHeight = 500;
+    private const int DefaultPopupWidth = 320;
+    private const int DefaultPopupHeight = 500;
+    // Match MinWidth and MinHeight in the XAML.
+    private const int MinimumPopupWidth = 320;
+    private const int MinimumPopupHeight = 400;
 
     private const int GWL_STYLE = -16;
     private const int GWL_EXSTYLE = -20;
@@ -62,6 +65,7 @@ public sealed partial class TrayPopupWindow : WindowEx
     private ShellPage? _shellPage;
     private bool _isShowing;
     private bool _isPopupVisible;
+    private bool _isClosed;
     private int _keepOpenCount;
     private DateTime _lastDismissedAtUtc = DateTime.MinValue;
 
@@ -82,6 +86,11 @@ public sealed partial class TrayPopupWindow : WindowEx
     private int _currentOffset;
     private double _currentOpacity;
 
+    // The size and scale the popup was last shown at, so a resize by the user can be told
+    // apart from the sizing done here.
+    private SizeInt32 _shownSize;
+    private uint _shownDpi;
+
     public TrayPopupWindow()
     {
         InitializeComponent();
@@ -97,12 +106,49 @@ public sealed partial class TrayPopupWindow : WindowEx
         _hideTimer = DispatcherQueue.CreateTimer();
         _hideTimer.Interval = TimeSpan.FromMilliseconds(150);
         _hideTimer.IsRepeating = false;
-        _hideTimer.Tick += (_, _) => HideIfFocusLeftWindow();
+        _hideTimer.Tick += HideTimer_Tick;
 
         _animationTimer = DispatcherQueue.CreateTimer();
         _animationTimer.Interval = FrameInterval;
         _animationTimer.IsRepeating = true;
         _animationTimer.Tick += AnimationTimer_Tick;
+
+        Closed += OnWindowClosed;
+    }
+
+    /// <summary>
+    /// Stops both timers for good, as SongChangePopupWindow and MiniPlayerWindow do. App makes a
+    /// new popup if this one is closed any other way (Alt+F4), but mostly it is closed on quit,
+    /// usually from its own Quit button, so while visible and active. Closing it can deactivate
+    /// it, which would start the light-dismiss
+    /// timer, and a hide in progress keeps the animation timer running. Either tick would then
+    /// reach AppWindow on the closed window (HidePopup, PlayHideAnimation, ApplyFrame) during
+    /// WinUI's final dispatcher drain and fail the process fast - the likely source of the
+    /// Partner Center crashes under DispatcherQueueController::ShutdownQueue.
+    /// </summary>
+    private void OnWindowClosed(object sender, WindowEventArgs args)
+    {
+        // Closed while still up (its own Quit button) skips HidePopup, the usual place a resize
+        // is saved, so save it here or the last one of the session is lost.
+        if (_isPopupVisible)
+        {
+            try
+            {
+                RememberSizeIfResized();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TrayPopupWindow] Couldn't save the size on close: {ex.Message}");
+            }
+        }
+
+        _isClosed = true;
+        _isPopupVisible = false;
+        _hideTimer.Stop();
+        _hideTimer.Tick -= HideTimer_Tick;
+        _animationTimer.Stop();
+        _animationTimer.Tick -= AnimationTimer_Tick;
+        _animationClock.Reset();
     }
 
     public bool IsPopupVisible => _isPopupVisible;
@@ -187,11 +233,19 @@ public sealed partial class TrayPopupWindow : WindowEx
     {
         EnsureShellPage();
 
+        // Showing again while already up must not throw away a resize made since last time.
+        if (_isPopupVisible)
+            RememberSizeIfResized();
+
         // Reset navigation on each open, matching the old flyout behavior.
         _shellPage?.ResetNavigation();
 
         // Position before showing so the window never flashes at a stale location.
-        WindowPlacementService.PositionWindowNearAnchor(this, PopupWidth, PopupHeight);
+        int width = WindowBoundsPolicy.RestoreExtent(
+            SettingsService.TrayPopupWidth, DefaultPopupWidth, MinimumPopupWidth);
+        int height = WindowBoundsPolicy.RestoreExtent(
+            SettingsService.TrayPopupHeight, DefaultPopupHeight, MinimumPopupHeight);
+        WindowPlacementService.PositionWindowNearAnchor(this, width, height);
         _baseX = AppWindow.Position.X;
         _baseY = AppWindow.Position.Y;
 
@@ -207,6 +261,9 @@ public sealed partial class TrayPopupWindow : WindowEx
         this.Show();
         Activate();
         PInvoke.SetForegroundWindow(_hwnd);
+
+        _shownSize = AppWindow.Size;
+        _shownDpi = PInvoke.GetDpiForWindow(_hwnd);
 
         // The hosted page stays loaded while the popup is hidden, so being subscribed is
         // not the same as being able to show a dialog. Tell the error service when there
@@ -226,10 +283,34 @@ public sealed partial class TrayPopupWindow : WindowEx
         if (!_isPopupVisible)
             return;
 
+        RememberSizeIfResized();
+
         _isPopupVisible = false;
         _lastDismissedAtUtc = DateTime.UtcNow;
         PlaybackErrorService.Instance.SetHostWindowVisible(false);
         PlayHideAnimation();
+    }
+
+    /// <summary>
+    /// Saves the size the user dragged the popup to. Only a dimension that changed since the
+    /// show is written, so one shrunk to fit a small monitor is not saved over the user's own.
+    /// </summary>
+    private void RememberSizeIfResized()
+    {
+        SizeInt32 size = AppWindow.Size;
+        uint dpi = PInvoke.GetDpiForWindow(_hwnd);
+
+        // A change of scale resizes the window by itself; that is not the user choosing a size.
+        if (dpi != _shownDpi)
+            return;
+
+        if (size.Width != _shownSize.Width)
+            SettingsService.TrayPopupWidth = WindowBoundsPolicy.ToLogical(size.Width, dpi);
+
+        if (size.Height != _shownSize.Height)
+            SettingsService.TrayPopupHeight = WindowBoundsPolicy.ToLogical(size.Height, dpi);
+
+        _shownSize = size;
     }
 
     private void PlayShowAnimation(uint dpi)
@@ -259,6 +340,12 @@ public sealed partial class TrayPopupWindow : WindowEx
         // show animation is still running, and snapping to the resting state
         // first would read as a visible jump.
         _isHiding = true;
+
+        // Resizing from the top or left edge moves the window, so slide out from where it is
+        // now rather than jumping back to where it was shown.
+        _baseX = AppWindow.Position.X;
+        _baseY = AppWindow.Position.Y - _currentOffset;
+
         _durationMs = HideDurationMs;
         _fromOffset = _currentOffset;
         _toOffset = ScaleForDpi(HideSlideDistance, dpi);
@@ -270,6 +357,21 @@ public sealed partial class TrayPopupWindow : WindowEx
     }
 
     private void AnimationTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceAnimation();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(TrayPopupWindow), ex);
+        }
+    }
+
+    private void AdvanceAnimation()
     {
         double progress = _animationClock.Elapsed.TotalMilliseconds / _durationMs;
         bool finished = progress >= 1;
@@ -373,6 +475,10 @@ public sealed partial class TrayPopupWindow : WindowEx
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
     {
+        // The deactivation that closing the window causes can arrive after Closed.
+        if (_isClosed)
+            return;
+
         if (args.WindowActivationState != WindowActivationState.Deactivated)
         {
             _isShowing = false;
@@ -385,6 +491,21 @@ public sealed partial class TrayPopupWindow : WindowEx
 
         _hideTimer.Stop();
         _hideTimer.Start();
+    }
+
+    private void HideTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            HideIfFocusLeftWindow();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(TrayPopupWindow), ex);
+        }
     }
 
     private void HideIfFocusLeftWindow()

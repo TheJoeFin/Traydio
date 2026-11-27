@@ -5,7 +5,8 @@ using Trdo.Models;
 namespace Trdo.Services;
 
 /// <summary>
-/// Resolves which station should be selected on startup from what was persisted.
+/// Decides which station should be selected: on startup from what was persisted, and when
+/// stepping through the list (<see cref="CycleIndex"/>).
 /// <para>
 /// Selection used to be stored as a bare index into the station list. That stopped being
 /// workable once folders, collapsing and view sorts could move a station: the index would
@@ -45,5 +46,25 @@ public static class StationSelectionPolicy
             return stations[legacyIndex];
 
         return stations[0];
+    }
+
+    /// <summary>
+    /// The index <paramref name="steps"/> stations on from <paramref name="currentIndex"/> in a
+    /// list of <paramref name="count"/>, wrapping at either end (positive is next). With nothing
+    /// selected (an index outside the list), next starts from the first station and previous
+    /// from the last. Returns -1 for an empty list.
+    /// </summary>
+    public static int CycleIndex(int currentIndex, int steps, int count)
+    {
+        if (count <= 0)
+            return -1;
+
+        if (currentIndex < 0 || currentIndex >= count)
+        {
+            // Just outside the end the first step comes from, so that step lands on that end.
+            currentIndex = steps >= 0 ? -1 : count;
+        }
+
+        return (((currentIndex + steps) % count) + count) % count;
     }
 }

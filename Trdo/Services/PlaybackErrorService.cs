@@ -281,7 +281,7 @@ public sealed class PlaybackErrorService
         _reviewTimer = _uiQueue.CreateTimer();
         _reviewTimer.Interval = ReviewInterval;
         _reviewTimer.IsRepeating = true;
-        _reviewTimer.Tick += (_, _) => ReviewCore();
+        _reviewTimer.Tick += AppLifetime.GuardTick(nameof(PlaybackErrorService), ReviewCore);
     }
 
     /// <summary>

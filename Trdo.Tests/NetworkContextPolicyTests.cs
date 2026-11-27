@@ -1,7 +1,7 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Trdo.Services.Playback;
 
 namespace Trdo.Tests;

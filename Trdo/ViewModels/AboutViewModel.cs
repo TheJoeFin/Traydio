@@ -27,7 +27,7 @@ public partial class AboutViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool ShowContactDeveloper => SelectedRating > 0 && SelectedRating <= 3;
+    public bool ShowContactDeveloper => SelectedRating is > 0 and <= 3;
 
     public string AppName => "Traydio";
     public string AppDescription => Trdo.Services.LocalizationService.GetString(
@@ -101,7 +101,7 @@ public partial class AboutViewModel : INotifyPropertyChanged
         // On success Windows shuts the app down and relaunches it on the new version.
     }
 
-    public string GitHubUrl =>"https://github.com/TheJoeFin/Trdo";
+    public string GitHubUrl => "https://github.com/TheJoeFin/Trdo";
     public string GitHubDisplayText => "github.com/TheJoeFin/Trdo";
 
     public string DeveloperName => "Joe Finney (TheJoeFin)";

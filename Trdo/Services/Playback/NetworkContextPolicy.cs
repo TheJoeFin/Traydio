@@ -55,7 +55,7 @@ public static class NetworkContextPolicy
         int prefix = Math.Clamp(prefixLength, 0, 32);
         for (int i = 0; i < bytes.Length; i++)
         {
-            int bits = Math.Clamp(prefix - i * 8, 0, 8);
+            int bits = Math.Clamp(prefix - (i * 8), 0, 8);
             bytes[i] &= (byte)(0xFF << (8 - bits));
         }
         return $"{new IPAddress(bytes)}/{prefix}";

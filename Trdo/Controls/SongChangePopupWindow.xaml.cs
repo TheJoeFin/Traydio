@@ -217,11 +217,21 @@ public sealed partial class SongChangePopupWindow : Window
 
     private void AutoHideTimer_Tick(DispatcherQueueTimer sender, object args)
     {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
         // Never yank the pill out from under an open menu.
         if (_isMenuOpen)
             return;
 
-        HidePopup();
+        try
+        {
+            HidePopup();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SongChangePopupWindow), ex);
+        }
     }
 
     /// <summary>
@@ -416,8 +426,8 @@ public sealed partial class SongChangePopupWindow : Window
             return (0, 0);
         }
 
-        int width = (window.right - window.left) - (client.right - client.left);
-        int height = (window.bottom - window.top) - (client.bottom - client.top);
+        int width = window.right - window.left - (client.right - client.left);
+        int height = window.bottom - window.top - (client.bottom - client.top);
 
         return (Math.Max(0, width), Math.Max(0, height));
     }
@@ -454,7 +464,7 @@ public sealed partial class SongChangePopupWindow : Window
         // beneath it — which is why a left click dismisses it, turning an intercepted
         // click into the action the user most likely wanted. Once hidden the HWND is
         // SW_HIDE'd, so it intercepts nothing the rest of the time.
-        int exStyle = (int)PInvoke.GetWindowLong((HWND)_hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+        int exStyle = PInvoke.GetWindowLong((HWND)_hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
         _ = PInvoke.SetWindowLong(
             (HWND)_hwnd,
             WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
@@ -469,7 +479,7 @@ public sealed partial class SongChangePopupWindow : Window
                 (HWND)_hwnd,
                 DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
                 &cornerPreference,
-                (uint)sizeof(DWM_WINDOW_CORNER_PREFERENCE));
+                sizeof(DWM_WINDOW_CORNER_PREFERENCE));
         }
 
         // WinUI only creates and renders the XAML content once the window has
@@ -525,6 +535,21 @@ public sealed partial class SongChangePopupWindow : Window
     }
 
     private void AnimationTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        if (AppLifetime.StopIfShuttingDown(sender))
+            return;
+
+        try
+        {
+            AdvanceAnimation();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(SongChangePopupWindow), ex);
+        }
+    }
+
+    private void AdvanceAnimation()
     {
         double progress = _animationClock.Elapsed.TotalMilliseconds / _durationMs;
         bool finished = progress >= 1;

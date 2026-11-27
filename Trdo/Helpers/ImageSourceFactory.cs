@@ -301,8 +301,10 @@ internal static class ImageSourceFactory
                 return raced.Download;
             }
 
-            DownloadEntry entry = new(task);
-            entry.Node = DownloadOrder.AddLast(key);
+            DownloadEntry entry = new(task)
+            {
+                Node = DownloadOrder.AddLast(key)
+            };
             DownloadCache[key] = entry;
         }
 

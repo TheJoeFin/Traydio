@@ -12,16 +12,68 @@ public static class PlaylistImportExportService
     /// Parses radio stations from the contents of a playlist file.
     /// Supports M3U/M3U8 and PLS formats.
     /// </summary>
-    public static List<RadioStation> ImportFromFile(string filePath, string content)
+    /// <param name="unknownStationName">Names a station whose entry has no title and whose
+    /// address has no host to use instead. Passed in because this file is also built into the
+    /// tests, which cannot load string resources.</param>
+    public static List<RadioStation> ImportFromFile(
+        string filePath, string content, string unknownStationName = "Unknown Station")
     {
         string extension = Path.GetExtension(filePath).ToLowerInvariant();
 
         return extension switch
         {
-            ".pls" => ParsePls(content),
-            _ => ParseM3u(content), // .m3u, .m3u8, or fallback
+            ".pls" => ParsePls(content, unknownStationName),
+            _ => ParseM3u(content, unknownStationName), // .m3u, .m3u8, or fallback
         };
     }
+
+    /// <summary>File extensions the import window accepts.</summary>
+    public static readonly string[] SupportedExtensions = [".m3u", ".m3u8", ".pls"];
+
+    /// <summary>True when <paramref name="path"/> has an extension <see cref="ImportFromFile"/> understands.</summary>
+    public static bool IsSupportedFile(string path) =>
+        Array.Exists(SupportedExtensions, e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// True when <paramref name="candidate"/> is already in <paramref name="existing"/>. Matches
+    /// on every field the file could carry, so a re-import of an unchanged export adds nothing
+    /// while a renamed or re-pointed station still counts as new. A logo on this PC also matches
+    /// a candidate with none, since an export leaves it out.
+    /// </summary>
+    /// <param name="candidateHasDetails">
+    /// False when the candidate came from a file with no room for a homepage or logo (see
+    /// <see cref="CarriesStationDetails"/>). Their absence then says nothing about the station,
+    /// so only the name and address are compared.
+    /// </param>
+    public static bool IsDuplicate(
+        IEnumerable<RadioStation> existing, RadioStation candidate, bool candidateHasDetails = true)
+    {
+        foreach (RadioStation station in existing)
+        {
+            if (string.Equals(station.Name, candidate.Name, StringComparison.Ordinal) &&
+                string.Equals(station.StreamUrl, candidate.StreamUrl, StringComparison.Ordinal) &&
+                (!candidateHasDetails ||
+                 (string.Equals(station.Homepage, candidate.Homepage, StringComparison.Ordinal) &&
+                  (string.Equals(station.FaviconUrl, candidate.FaviconUrl, StringComparison.Ordinal) ||
+                   (string.IsNullOrEmpty(candidate.FaviconUrl) && IsLocalPath(station.FaviconUrl))))))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Whether a playlist file of this kind can hold a station's homepage and logo. M3U can (as
+    /// <c>#EXTVLCOPT:url=</c> and <c>#EXTIMG:</c>); PLS has only an address and a title.
+    /// </summary>
+    public static bool CarriesStationDetails(string filePath) =>
+        !string.Equals(Path.GetExtension(filePath), ".pls", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Exports to PLS when <paramref name="asPls"/> is set, otherwise M3U.</summary>
+    public static string Export(IEnumerable<RadioStation> stations, bool asPls) =>
+        asPls ? ExportToPls(stations) : ExportToM3u(stations);
 
     /// <summary>
     /// Exports radio stations to M3U format.
@@ -38,7 +90,9 @@ public static class PlaylistImportExportService
             if (!string.IsNullOrWhiteSpace(station.Homepage))
                 sb.AppendLine($"#EXTVLCOPT:url={station.Homepage}");
 
-            if (!string.IsNullOrWhiteSpace(station.FaviconUrl))
+            // A logo on this PC is left out: it would not load anywhere else, and the path can
+            // carry the Windows user name.
+            if (!string.IsNullOrWhiteSpace(station.FaviconUrl) && !IsLocalPath(station.FaviconUrl))
                 sb.AppendLine($"#EXTIMG:{station.FaviconUrl}");
 
             sb.AppendLine(station.StreamUrl);
@@ -52,7 +106,7 @@ public static class PlaylistImportExportService
     /// </summary>
     public static string ExportToPls(IEnumerable<RadioStation> stations)
     {
-        List<RadioStation> list = new(stations);
+        List<RadioStation> list = [.. stations];
         StringBuilder sb = new();
         sb.AppendLine("[playlist]");
         sb.AppendLine($"NumberOfEntries={list.Count}");
@@ -69,7 +123,12 @@ public static class PlaylistImportExportService
         return sb.ToString();
     }
 
-    private static List<RadioStation> ParseM3u(string content)
+    // A file:// URL, a drive or network share path, or a relative path.
+    private static bool IsLocalPath(string? url) =>
+        !string.IsNullOrWhiteSpace(url) &&
+        (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri) || uri.IsFile);
+
+    private static List<RadioStation> ParseM3u(string content, string unknownStationName)
     {
         List<RadioStation> stations = [];
         string[] lines = content.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
@@ -114,7 +173,7 @@ public static class PlaylistImportExportService
             if (!string.IsNullOrWhiteSpace(line))
             {
                 string streamUrl = line;
-                string name = currentName ?? GetNameFromUrl(streamUrl);
+                string name = currentName ?? GetNameFromUrl(streamUrl, unknownStationName);
 
                 stations.Add(new RadioStation
                 {
@@ -133,7 +192,7 @@ public static class PlaylistImportExportService
         return stations;
     }
 
-    private static List<RadioStation> ParsePls(string content)
+    private static List<RadioStation> ParsePls(string content, string unknownStationName)
     {
         List<RadioStation> stations = [];
         string[] lines = content.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
@@ -164,7 +223,7 @@ public static class PlaylistImportExportService
             string streamUrl = kvp.Value;
             string name = titles.TryGetValue(kvp.Key, out string? title) && !string.IsNullOrWhiteSpace(title)
                 ? title
-                : GetNameFromUrl(streamUrl);
+                : GetNameFromUrl(streamUrl, unknownStationName);
 
             stations.Add(new RadioStation
             {
@@ -192,7 +251,7 @@ public static class PlaylistImportExportService
         return (0, string.Empty);
     }
 
-    private static string GetNameFromUrl(string url)
+    private static string GetNameFromUrl(string url, string unknownStationName)
     {
         try
         {
@@ -201,7 +260,7 @@ public static class PlaylistImportExportService
         }
         catch
         {
-            return "Unknown Station";
+            return unknownStationName;
         }
     }
 }

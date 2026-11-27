@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Перейти на GitHub разработчика</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Написать разработчику</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Отмена</value>
   </data>
@@ -560,9 +563,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Показать окно</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>Отмена</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Транслировать</value>
   </data>
@@ -616,6 +616,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Дополнительно</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Перетащите изображение сюда, чтобы сделать его логотипом</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Выбрать изображение…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Использовать как логотип станции</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Этот файл не является поддерживаемым изображением.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Изображение слишком большое. Выберите файл меньше {0} МБ.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Не удалось использовать это изображение.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Размер буфера</value>
@@ -854,6 +872,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Переместить в группу</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Переместить в начало</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Переместить в конец</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Новый разделитель</value>
   </data>
@@ -966,7 +990,7 @@
     <value>Перейти на сайт</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Разрешить компьютеру переходить в спящий режим по обычному расписанию во время воспроизведения радио. Учтите, что сама Windows может не давать компьютеру уснуть, пока воспроизводится любой звук.</value>
+    <value>Разрешить компьютеру переходить в спящий режим по обычному расписанию во время воспроизведения радио. Если параметр выключен, Traydio не даёт компьютеру уснуть, но экран всё равно может отключаться. Учтите, что сама Windows может не давать компьютеру уснуть, пока воспроизводится любой звук.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Разрешить спящий режим</value>
@@ -1016,7 +1040,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Включить</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Не удалось выполнить экспорт: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -1028,7 +1052,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>Импорт / экспорт станций</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>Не удалось выполнить импорт: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>База данных интернет-радио, создаваемая сообществом, с тысячами станций по всему миру</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Колесо мыши над значком</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Ничего не делать</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Изменять громкость</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Переключать станции</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Прокрутите вверх, чтобы увеличить громкость или перейти к предыдущей станции, и вниз, чтобы уменьшить её или перейти к следующей. Пока эта функция включена, прокрутку над значком обрабатывает Traydio, а не панель задач.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Импорт и экспорт станций</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Выбрать файлы...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Снять выделение</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Импорт и экспорт станций</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Предпросмотр станций</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Перетащите сюда файлы .pls, .m3u или .m3u8 либо выберите файлы, чтобы просмотреть станции из них.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Нет станций для экспорта.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>В этом файле станции не найдены.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Неподдерживаемые файлы: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Файлы, которые не удалось прочитать: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Уже в библиотеке</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Неизвестная станция</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Импортировать: {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Экспортировать: {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Выбрано: {0} из {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Станции Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Плейлист M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Плейлист PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Добавить станцию и вернуться. Удерживайте Shift при щелчке, чтобы добавить несколько станций, не выходя из поиска.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Добавлено</value>
   </data>
 </root>

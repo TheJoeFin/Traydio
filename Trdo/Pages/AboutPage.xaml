@@ -254,6 +254,10 @@
                         Margin="0,8,0,0"
                         Click="GitHubButton_Click"
                         Content="{x:Bind ViewModel.GitHubDisplayText}" />
+
+                    <HyperlinkButton Click="EmailDeveloperButton_Click">
+                        <TextBlock x:Uid="AboutPage_EmailDeveloper" TextWrapping="Wrap" />
+                    </HyperlinkButton>
                 </StackPanel>
 
                 <!--  Developer Section  -->

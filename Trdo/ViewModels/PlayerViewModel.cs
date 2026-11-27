@@ -1153,7 +1153,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             _sleepTimer = dispatcherQueue.CreateTimer();
             _sleepTimer.Interval = TimeSpan.FromSeconds(1);
             _sleepTimer.IsRepeating = true;
-            _sleepTimer.Tick += (_, _) => TickSleepTimer();
+            _sleepTimer.Tick += AppLifetime.GuardTick(nameof(PlayerViewModel), TickSleepTimer);
         }
 
         _sleepTimer.Start();
@@ -1173,6 +1173,19 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         _sleepTimer?.Stop();
         IsSleepTimerActive = false;
         LogService.Info("PlayerViewModel", "Sleep timer cancelled");
+    }
+
+    /// <summary>
+    /// Stops the sleep and scrub-bar timers, called from App.ShutdownAndExit() before the player
+    /// is disposed. Nothing else stops them on quit, and a tick in WinUI's final dispatcher drain
+    /// would reach the disposed player. The player's own teardown can still raise the state
+    /// changes that restart the scrub-bar timer, which is why each tick also checks
+    /// <see cref="AppLifetime.IsShuttingDown"/>.
+    /// </summary>
+    public void StopTimers()
+    {
+        _sleepTimer?.Stop();
+        _localMusicPositionTimer?.Stop();
     }
 
     private void TickSleepTimer()
@@ -1297,6 +1310,39 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Moves <paramref name="steps"/> stations at once (positive is next), or tracks while a music
+    /// folder is selected, starting only where it lands. Calling <see cref="NextStationOrTrack"/>
+    /// that many times instead would start every station or track on the way, and stepping onto
+    /// a folder station would turn the remaining steps into skipped track changes.
+    /// </summary>
+    public void StepStationOrTrack(int steps)
+    {
+        if (steps == 0)
+            return;
+
+        if (!IsLocalMusicActive)
+        {
+            TryCycleStation(steps, steps > 0 ? "next" : "previous");
+        }
+        else if (_stationTransitionCts is not null)
+        {
+            Debug.WriteLine("[PlayerViewModel] Track step skipped during station transition");
+        }
+        else if (steps == -1)
+        {
+            // Keeps a single "previous" restarting a track that is already under way.
+            PreviousStationOrTrack();
+        }
+        else if (LocalTrackList.Count > 0)
+        {
+            // No wraparound, as with next/previous track.
+            int target = Math.Clamp(CurrentLocalTrackIndex + steps, 0, LocalTrackList.Count - 1);
+            if (target != CurrentLocalTrackIndex)
+                _ = PlayLocalTrackAtIndexAsync(target);
+        }
+    }
+
     /// <summary>Plays an arbitrary track from <see cref="LocalTrackList"/>, e.g. tapped from the details page.</summary>
     public async Task PlayLocalTrackAtIndexAsync(int index)
     {
@@ -1332,7 +1378,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
                 _localMusicPositionTimer = dispatcherQueue.CreateTimer();
                 _localMusicPositionTimer.Interval = TimeSpan.FromMilliseconds(250);
                 _localMusicPositionTimer.IsRepeating = true;
-                _localMusicPositionTimer.Tick += (_, _) => TickLocalMusicPosition();
+                _localMusicPositionTimer.Tick += AppLifetime.GuardTick(nameof(PlayerViewModel), TickLocalMusicPosition);
             }
 
             _localMusicPositionTimer.Start();
@@ -1518,6 +1564,37 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Adds several stations at the top level with one rebuild and one save, as
+    /// <see cref="AddStation"/> would one at a time. Used by playlist import.
+    /// </summary>
+    public void AddStations(IReadOnlyList<RadioStation> stations)
+    {
+        if (stations.Count == 0)
+            return;
+
+        bool wasEmpty = Stations.Count == 0;
+
+        foreach (RadioStation station in stations)
+        {
+            if (string.IsNullOrWhiteSpace(station.Id))
+                station.Id = StationIdentityPolicy.NewId();
+            station.DateAdded ??= DateTimeOffset.UtcNow;
+
+            Stations.Add(station);
+            _topLevelNodes.Add(station);
+        }
+
+        RebuildDisplayRows();
+        PersistStationList();
+
+        if (wasEmpty)
+        {
+            Debug.WriteLine("[PlayerViewModel] First stations added in a batch, selecting the first automatically");
+            SelectedStation = stations[0];
+        }
+    }
+
+    /// <summary>
     /// Adds a batch of brand-new stations already grouped inside a brand-new folder, in a
     /// single persist. Used when adding a local-music "artist" folder whose album subfolders
     /// should appear as individual stations, already grouped together, rather than an
@@ -1642,6 +1719,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         RemoveFromTree(station);
         RebuildDisplayRows();
         PersistStationList();
+        CustomStationArt.Release(station.FaviconUrl, Stations);
         Debug.WriteLine($"[PlayerViewModel] Station removed, {Stations.Count} stations remaining");
     }
 
@@ -1952,6 +2030,37 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Moves a station to the top or bottom of the list it is in: its folder's contents, or
+    /// the top level. It never changes which folder the station belongs to. This spares a long
+    /// drag through a list that scrolls faster than it can be aimed (issue #94).
+    /// </summary>
+    public void MoveStationToEdge(RadioStation station, bool toTop)
+    {
+        if (station is null || !CanMoveStationToEdge(station, toTop))
+            return;
+
+        StationGroup? parent = FindParentGroup(station);
+        List<object> siblings = parent?.Children ?? _topLevelNodes;
+
+        siblings.RemoveAt(IndexOfReference(siblings, station, 0));
+        siblings.Insert(toTop ? 0 : siblings.Count, station);
+        parent?.NotifyChildrenChanged();
+
+        SyncStationsFromTree();
+        RebuildDisplayRows();
+        PersistStationList();
+        UpdateSelectedStationId();
+    }
+
+    /// <summary>False when the station is already at that end of its list.</summary>
+    public bool CanMoveStationToEdge(RadioStation station, bool toTop)
+    {
+        List<object> siblings = FindParentGroup(station)?.Children ?? _topLevelNodes;
+        int index = IndexOfReference(siblings, station, 0);
+        return index >= 0 && index != (toTop ? 0 : siblings.Count - 1);
+    }
+
+    /// <summary>
     /// Removes a folder. Its contents move up to the top level at the folder's old position,
     /// in order, so nothing is lost and no confirmation is needed - exactly the reasoning that
     /// makes removing a single station immediate.
@@ -2020,6 +2129,9 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
         SyncStationsFromTree();
         RebuildDisplayRows();
         PersistStationList();
+
+        foreach (RadioStation station in doomed)
+            CustomStationArt.Release(station.FaviconUrl, Stations);
     }
 
     /// <summary>Removes a divider. Nothing else moves.</summary>
@@ -2283,11 +2395,7 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
             }
         }
 
-        int newIndex = currentIndex >= 0
-            ? (currentIndex + direction + order.Count) % order.Count
-            : direction > 0
-                ? 0
-                : order.Count - 1;
+        int newIndex = StationSelectionPolicy.CycleIndex(currentIndex, direction, order.Count);
 
         Debug.WriteLine($"[PlayerViewModel] Cycling {directionName} from index {currentIndex} to {newIndex}");
         SelectedStation = order[newIndex];

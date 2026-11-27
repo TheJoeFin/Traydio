@@ -118,12 +118,12 @@ public static class StreamDiagnostics
             };
         }
 
-        using var timeoutCts = new CancellationTokenSource(timeout ?? DefaultProbeTimeout);
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+        using CancellationTokenSource timeoutCts = new(timeout ?? DefaultProbeTimeout);
+        using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            using HttpRequestMessage request = new(HttpMethod.Get, uri);
             request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
 
             // Icecast/Shoutcast servers describe themselves in the response headers when
@@ -164,6 +164,36 @@ public static class StreamDiagnostics
                 Detail = $"{ex.GetType().Name}: {ex.Message}"
             };
         }
+    }
+
+    /// <summary>
+    /// True when the address names a playlist file (.pls, .m3u, .asx) by extension. HLS
+    /// (.m3u8) is deliberately excluded: both engines play it natively.
+    /// </summary>
+    public static bool HasPlaylistExtension(string? streamUrl)
+    {
+        if (!Uri.TryCreate(streamUrl, UriKind.Absolute, out Uri? uri))
+        {
+            return false;
+        }
+
+        string path = uri.AbsolutePath;
+        return path.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) ||
+               path.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase) ||
+               path.EndsWith(".asx", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Fetches a playlist address and returns the first stream URL inside it, or
+    /// <c>null</c> when the address isn't a playlist or has no usable entry.
+    /// </summary>
+    public static async Task<string?> ResolvePlaylistEntryAsync(
+        string playlistUrl,
+        HttpClient httpClient,
+        CancellationToken cancellationToken = default)
+    {
+        StreamDiagnosis diagnosis = await ProbeAsync(playlistUrl, httpClient, cancellationToken: cancellationToken);
+        return diagnosis.Result == StreamProbeResult.PlaylistFile ? diagnosis.PlaylistEntryUrl : null;
     }
 
     private static async Task<StreamDiagnosis> ClassifyResponseAsync(

@@ -133,7 +133,7 @@ public sealed class CastRendererDiscovery : IDisposable
     [DynamicDependency(DynamicallyAccessedMemberTypes.NonPublicConstructors, typeof(RendererItem))]
     private static RendererItem HoldCopy(RendererItem item)
     {
-        ConstructorInfo ctor = s_wrapperCtor ??=typeof(RendererItem).GetConstructor(
+        ConstructorInfo ctor = s_wrapperCtor ??= typeof(RendererItem).GetConstructor(
             BindingFlags.NonPublic | BindingFlags.Instance, null, [typeof(IntPtr)], null)
             ?? throw new InvalidOperationException("LibVLCSharp's RendererItem(IntPtr) constructor was not found.");
         return (RendererItem)ctor.Invoke([item.NativeReference]);

@@ -118,7 +118,7 @@ public static class LogService
         // point. Must happen outside Gate: the writer thread needs it to make progress.
         FlushToDisk();
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine(BuildHeader());
         sb.AppendLine();
 
@@ -223,7 +223,7 @@ public static class LogService
 
         try
         {
-            var uri = new Uri(url);
+            Uri uri = new(url);
 
             // Keep the port and path: two stations frequently share a host and differ only
             // by mount point or port, so host-only lines can't be told apart when
@@ -451,7 +451,7 @@ public static class LogService
 
         // Append so a prior session's tail is preserved; share read so the user can
         // open the file (or ReadRecentText run) while we hold it.
-        var stream = new FileStream(_logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+        FileStream stream = new(_logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
         _writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false))
         {
             AutoFlush = false
@@ -559,8 +559,8 @@ public static class LogService
             // opens with FileShare.Read, which refuses to tolerate the existing writer, so it
             // throws for the active log every time - silently leaving the copy with nothing but
             // the previous rolled generation.
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var reader = new StreamReader(stream, Encoding.UTF8);
+            using FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using StreamReader reader = new(stream, Encoding.UTF8);
             return reader.ReadToEnd();
         }
         catch

@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>访问开发者的 GitHub</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>给开发者发邮件</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>取消</value>
   </data>
@@ -557,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>显示窗口</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>取消</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>投放</value>
   </data>
@@ -613,6 +613,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>高级</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>将图片拖放到此处用作标志</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>选择图片…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>用作电台标志</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>该文件不是受支持的图片。</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>图片过大。请选择小于 {0} MB 的图片。</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>无法使用该图片。</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>缓冲级别</value>
@@ -800,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>移动到分组</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>移到顶部</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>移到底部</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>新建分隔线</value>
   </data>
@@ -888,7 +912,7 @@
     <value>访问网站</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>允许电脑在播放电台时按正常计划进入睡眠。请注意，只要有音频在播放，Windows 本身可能会让电脑保持唤醒状态。</value>
+    <value>允许电脑在播放电台时按正常计划进入睡眠。关闭此选项时，Traydio 会让电脑保持唤醒，但屏幕仍可关闭。请注意，只要有音频在播放，Windows 本身可能会让电脑保持唤醒状态。</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>允许电脑睡眠</value>
@@ -938,7 +962,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>启用</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>导出失败：{0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -950,7 +974,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>导入/导出电台</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>导入失败：{0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>由社区维护的网络电台数据库，收录全球数千个电台</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>在图标上滚动滚轮</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>不执行任何操作</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>调节音量</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>切换电台</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>向上滚动可调高音量或切换到上一个电台，向下滚动可调低音量或切换到下一个电台。启用此功能后，在图标上的滚动操作将由 Traydio 处理，而不是任务栏。</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>导入和导出电台</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>选择文件...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>全不选</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>导入和导出电台</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>预览电台</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>将 .pls、.m3u 或 .m3u8 文件拖放到此处，或选择文件以预览其中的电台。</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>没有可导出的电台。</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>在该文件中未找到电台。</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>不支持的文件数：{0}。</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>无法读取的文件数：{0}。</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>已在库中</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>未知电台</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>导入 {0} 个</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>导出 {0} 个</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>已选择 {0} 个，共 {1} 个</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Traydio 电台</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>M3U 播放列表</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>PLS 播放列表</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加电台并返回。点击时按住 Shift 键可添加多个电台，而无需离开搜索页面。</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>已添加</value>
   </data>
 </root>

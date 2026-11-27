@@ -2,7 +2,6 @@ using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -30,6 +29,8 @@ public sealed partial class RadioPlayerService : IDisposable
     private const string VolumeKey = "RadioVolume";
     private const string WatchdogEnabledKey = "WatchdogEnabled";
     private string? _streamUrl;
+    /// <summary>The address the caller asked for; differs from <see cref="_streamUrl"/> once a playlist (.pls/.m3u/.asx) has been resolved to its stream.</summary>
+    private string? _requestedStreamUrl;
     private string? _currentStationName;
     private string? _currentStationFaviconUrl;
     private string? _currentAlbumArtUrl;
@@ -188,12 +189,19 @@ public sealed partial class RadioPlayerService : IDisposable
         }
     }
 
+    /// <summary>
+    /// The address the station was set to, as saved: for a playlist (.pls/.m3u/.asx) station
+    /// that is the playlist, not the stream it resolved to. Passing it back to
+    /// <see cref="SetStreamUrl"/> (as watchdog recovery does) therefore re-resolves the playlist
+    /// and counts as the same station rather than a new one.
+    /// </summary>
     public string? StreamUrl
     {
         get
         {
-            Debug.WriteLine($"[RadioPlayerService] StreamUrl getter: {_streamUrl}");
-            return _streamUrl;
+            string? url = _requestedStreamUrl ?? _streamUrl;
+            Debug.WriteLine($"[RadioPlayerService] StreamUrl getter: {url}");
+            return url;
         }
     }
 
@@ -755,7 +763,7 @@ public sealed partial class RadioPlayerService : IDisposable
         Debug.WriteLine($"[RadioPlayerService] URI created successfully: {uri}");
 
         // If changing stations, reset the first play flag
-        if (_streamUrl != streamUrl)
+        if (_requestedStreamUrl != streamUrl)
         {
             _hasPlayedOnce = false;
             ResetPlaybackFailureTracking();
@@ -767,6 +775,7 @@ public sealed partial class RadioPlayerService : IDisposable
         }
 
         // Update the stream URL
+        _requestedStreamUrl = streamUrl;
         _streamUrl = streamUrl;
         Debug.WriteLine($"[RadioPlayerService] _streamUrl updated to: {_streamUrl}");
 
@@ -1033,6 +1042,7 @@ public sealed partial class RadioPlayerService : IDisposable
 
         ClearActiveBackendSource();
         _streamUrl = null;
+        _requestedStreamUrl = null;
         _currentStationName = null;
         _currentStationFaviconUrl = null;
         _currentAlbumArtUrl = null;
@@ -2209,8 +2219,8 @@ public sealed partial class RadioPlayerService : IDisposable
     {
         try
         {
-            var frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
-            var names = frames
+            StackFrame[] frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
+            IEnumerable<string> names = frames
                 .Select(f => f.GetMethod())
                 .Where(m => m?.DeclaringType != null)
                 .Take(5)
@@ -2608,7 +2618,7 @@ public sealed partial class RadioPlayerService : IDisposable
             // thread, so a bare bool written inside the callback would always still read false
             // here - which used to make every call look like a failure and fall through to the
             // favicon, then to clearing the thumbnail entirely, even when the set had worked.
-            var tcs = new TaskCompletionSource<bool>();
+            TaskCompletionSource<bool> tcs = new();
             void SetThumbnail()
             {
                 // Checked here rather than only before enqueuing below: this can run on the UI

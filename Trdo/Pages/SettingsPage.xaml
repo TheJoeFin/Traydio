@@ -59,7 +59,7 @@
             FontWeight="SemiBold" />
 
         <!--  Settings Content  -->
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="1" StateChanged="SettingsScrollView_StateChanged">
             <StackPanel Padding="0,0,8,8" Spacing="12">
                 <Border Style="{StaticResource SettingCardStyle}">
                     <StackPanel Spacing="10">
@@ -219,6 +219,19 @@
                         </ComboBox>
                         <TextBlock
                             x:Uid="SettingsPage_TrayDoubleClickNote"
+                            Style="{StaticResource SettingDescriptionStyle}"
+                            TextWrapping="Wrap" />
+                        <!-- Items follow the TrayWheelAction enum order. -->
+                        <ComboBox
+                            x:Uid="SettingsPage_TrayWheel"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="{x:Bind ViewModel.TrayWheelActionIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_None" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_Volume" />
+                            <ComboBoxItem x:Uid="SettingsPage_TrayWheelAction_SwitchStation" />
+                        </ComboBox>
+                        <TextBlock
+                            x:Uid="SettingsPage_TrayWheelNote"
                             Style="{StaticResource SettingDescriptionStyle}"
                             TextWrapping="Wrap" />
                     </StackPanel>
@@ -789,10 +802,6 @@
                                 x:Uid="SettingsPage_ExportStations"
                                 Click="ExportButton_Click" />
                         </StackPanel>
-                        <InfoBar
-                            x:Name="ImportExportInfoBar"
-                            IsClosable="True"
-                            IsOpen="False" />
                     </StackPanel>
                 </Border>
 

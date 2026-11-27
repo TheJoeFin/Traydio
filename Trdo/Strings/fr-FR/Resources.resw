@@ -392,6 +392,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Visiter le GitHub du développeur</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Envoyer un e-mail au développeur</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>Annuler</value>
   </data>
@@ -557,9 +560,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Afficher la fenêtre</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>Annuler</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Diffuser</value>
   </data>
@@ -613,6 +613,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Avancé</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Déposez une image ici pour l’utiliser comme logo</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Choisir une image…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>Utiliser comme logo de la station</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Ce fichier n’est pas une image prise en charge.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Cette image est trop volumineuse. Choisissez-en une de moins de {0} Mo.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Impossible d’utiliser cette image.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Niveau du tampon</value>
@@ -800,6 +818,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Déplacer vers le groupe</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>Placer en haut</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>Placer en bas</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Nouveau séparateur</value>
   </data>
@@ -888,7 +912,7 @@
     <value>Visiter le site Web</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Autoriser l&apos;ordinateur à se mettre en veille selon son planning habituel pendant que la radio joue. Notez que Windows peut empêcher la mise en veille tant qu&apos;un flux audio est en cours de lecture.</value>
+    <value>Autoriser l&apos;ordinateur à se mettre en veille selon son planning habituel pendant que la radio joue. Lorsque cette option est désactivée, Traydio garde le PC éveillé, mais l&apos;écran peut tout de même s&apos;éteindre. Notez que Windows peut empêcher la mise en veille tant qu&apos;un flux audio est en cours de lecture.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Autoriser la mise en veille du PC</value>
@@ -938,7 +962,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Activer</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Échec de l&apos;exportation : {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -950,7 +974,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>Importer / Exporter les stations</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>Échec de l&apos;importation : {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Base de données de radios internet communautaire avec des milliers de stations dans le monde</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>Importer</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Molette sur l’icône</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Ne rien faire</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Modifier le volume</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>Changer de station</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Faites défiler vers le haut pour augmenter le volume ou passer à la station précédente, et vers le bas pour le baisser ou passer à la suivante. Tant que cette option est activée, le défilement sur l’icône est utilisé par Traydio au lieu de la barre des tâches.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>Importer et exporter des stations</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>Importer</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Exporter</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Choisir des fichiers...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Tout sélectionner</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Tout désélectionner</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>Importer et exporter des stations</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>Prévisualiser les stations</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>Déposez ici des fichiers .pls, .m3u ou .m3u8, ou choisissez des fichiers pour prévisualiser leurs stations.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Aucune station à exporter.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>Aucune station trouvée dans ce fichier.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Fichiers non pris en charge : {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Fichiers illisibles : {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Déjà dans la bibliothèque</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Station inconnue</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>Importer {0}</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Exporter {0}</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Sélection : {0} sur {1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Stations Traydio</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>Playlist M3U</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>Playlist PLS</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ajouter la station et revenir. Maintenez la touche Maj enfoncée en cliquant pour ajouter plusieurs stations sans quitter la recherche.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Ajoutée</value>
   </data>
 </root>

@@ -25,11 +25,12 @@ namespace Trdo;
 /// </summary>
 public partial class App : Application
 {
-    private TrayIcon? _trayIcon;
+    private ShellTrayIcon? _trayIcon;
     private TrayClickSequencer? _leftClickSequencer;
     private TrayClickSequencer? _rightClickSequencer;
     private TrayPopupWindow? _trayPopupWindow;
     private MiniPlayerWindow? _miniPlayerWindow;
+    private ImportExportWindow? _importExportWindow;
     private SongChangePopupWindow? _songChangePopupWindow;
     private string? _lastKnownNowPlayingDisplayText;
 
@@ -123,6 +124,9 @@ public partial class App : Application
 
         // The tooltip names the button that plays/pauses, so it goes stale when that moves.
         SettingsService.TrayClickActionsChanged += (_, _) => UpdatePlayPauseCommandText();
+
+        // The wheel hook is only installed while a wheel action is assigned.
+        SettingsService.TrayWheelActionChanged += (_, _) => ApplyTrayWheelSetting();
     }
 
     private const string CrashLogComponent = "Crash";
@@ -180,11 +184,34 @@ public partial class App : Application
             _miniPlayerWindow = new MiniPlayerWindow();
             WindowHelper.Track(_miniPlayerWindow);
             _miniPlayerWindow.Closed += (_, _) => _miniPlayerWindow = null;
+
+            // Position before activating so the window never flashes at a stale location.
+            // An already open mini player stays wherever the user has it.
+            _miniPlayerWindow.RestorePlacement();
         }
 
-        // Position before activating so the window never flashes at a stale location.
-        WindowPlacementService.PositionWindowNearAnchor(_miniPlayerWindow, 320, 220);
         _miniPlayerWindow.Activate();
+    }
+
+    /// <summary>
+    /// Opens the import/export window, or brings the open one to the front. One at a time: each
+    /// window checks for stations already in the library only when it builds its preview, so
+    /// two committing the same files would add those stations twice.
+    /// </summary>
+    public void ShowImportExportWindow(bool startAsImport)
+    {
+        if (_importExportWindow is null)
+        {
+            _importExportWindow = new ImportExportWindow(startAsImport);
+            WindowHelper.Track(_importExportWindow);
+            _importExportWindow.Closed += (_, _) => _importExportWindow = null;
+        }
+        else
+        {
+            _importExportWindow.RequestMode(startAsImport);
+        }
+
+        _importExportWindow.Activate();
     }
 
     /// <summary>
@@ -448,12 +475,12 @@ public partial class App : Application
         _songChangePopupPreviewTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _songChangePopupPreviewTimer.Interval = TimeSpan.FromSeconds(2);
         _songChangePopupPreviewTimer.IsRepeating = true;
-        _songChangePopupPreviewTimer.Tick += (_, _) =>
+        _songChangePopupPreviewTimer.Tick += AppLifetime.GuardTick(nameof(App), () =>
         {
             EnsureSongChangePopupWindow();
             _songChangePopupWindow?.ShowSongChange(samples[index % samples.Length]);
             index++;
-        };
+        });
         _songChangePopupPreviewTimer.Start();
     }
 #endif
@@ -532,12 +559,14 @@ public partial class App : Application
         if (_trayIcon is not null)
             return;
 
-        _trayIcon = new(0, "Assets/Radio.ico", "Traydio");
+        _trayIcon = ShellTrayIcon.CreateForCurrentApp("Assets/Radio.ico", "Traydio");
         _trayIcon.Selected += TrayIcon_Selected;
         _trayIcon.ContextMenu += TrayIcon_ContextMenu;
         _trayIcon.LeftDoubleClick += TrayIcon_LeftDoubleClick;
         _trayIcon.RightDoubleClick += TrayIcon_RightDoubleClick;
+        _trayIcon.MouseWheel += TrayIcon_MouseWheel;
         _trayIcon.IsVisible = true;
+        ApplyTrayWheelSetting();
 
         DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
         _leftClickSequencer ??= new TrayClickSequencer(dispatcher);
@@ -552,7 +581,7 @@ public partial class App : Application
         }
     }
 
-    private void TrayIcon_Selected(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_Selected(object? sender, EventArgs args)
     {
         // Captured now, not when a deferred click finally runs: the flyout needs to know
         // whether this is the click that light-dismissed it.
@@ -563,7 +592,7 @@ public partial class App : Application
             () => RunTrayAction(SettingsService.TrayLeftClickAction, clickedAtUtc));
     }
 
-    private void TrayIcon_ContextMenu(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_ContextMenu(object? sender, EventArgs args)
     {
         DateTime clickedAtUtc = DateTime.UtcNow;
 
@@ -572,7 +601,7 @@ public partial class App : Application
             () => RunTrayAction(SettingsService.TrayRightClickAction, clickedAtUtc));
     }
 
-    private void TrayIcon_LeftDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_LeftDoubleClick(object? sender, EventArgs args)
     {
         TrayClickAction action = SettingsService.TrayLeftDoubleClickAction;
 
@@ -584,7 +613,7 @@ public partial class App : Application
         _leftClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
     }
 
-    private void TrayIcon_RightDoubleClick(TrayIcon sender, TrayIconEventArgs args)
+    private void TrayIcon_RightDoubleClick(object? sender, EventArgs args)
     {
         TrayClickAction action = SettingsService.TrayRightDoubleClickAction;
 
@@ -592,6 +621,90 @@ public partial class App : Application
             return;
 
         _rightClickSequencer?.OnDoubleClick(() => RunTrayAction(action, DateTime.UtcNow));
+    }
+
+    // ---- mouse wheel over the tray icon ----
+
+    // How long scrolling must pause before queued station steps are applied. Each step starts
+    // a stream, so scrolling through five stations should land on the fifth, not play all five.
+    private static readonly TimeSpan StationWheelSettleDelay = TimeSpan.FromMilliseconds(300);
+
+    // Most stations one burst of scrolling may skip, so a runaway wheel can't spin the list.
+    private const int MaxStationWheelSteps = 20;
+
+    private int _wheelPendingDelta;
+    private int _pendingStationSteps;
+    private DispatcherQueueTimer? _stationWheelTimer;
+
+    /// <summary>Starts or stops listening to the wheel to match the setting.</summary>
+    private void ApplyTrayWheelSetting()
+    {
+        bool enabled = SettingsService.TrayWheelAction != TrayWheelAction.None;
+
+        _wheelPendingDelta = 0;
+        _pendingStationSteps = 0;
+        _stationWheelTimer?.Stop();
+
+        if (_trayIcon is not null)
+            _trayIcon.IsWheelEnabled = enabled;
+    }
+
+    private void TrayIcon_MouseWheel(object? sender, int delta)
+    {
+        TrayWheelAction action = SettingsService.TrayWheelAction;
+        if (action == TrayWheelAction.None)
+            return;
+
+        int notches = TrayWheelPolicy.TakeNotches(ref _wheelPendingDelta, delta);
+        if (notches == 0)
+            return;
+
+        switch (action)
+        {
+            case TrayWheelAction.Volume:
+                _playerVm.VolumePercent = TrayWheelPolicy.StepVolumePercent(_playerVm.VolumePercent, notches);
+                break;
+
+            case TrayWheelAction.SwitchStation:
+                // Nothing to switch to until a station exists; unlike a click there is no
+                // sensible fallback, and a flyout popping up on a scroll would be hostile.
+                if (!_playerVm.CanPlay)
+                    break;
+
+                _pendingStationSteps = Math.Clamp(
+                    _pendingStationSteps + TrayWheelPolicy.StationSteps(notches),
+                    -MaxStationWheelSteps,
+                    MaxStationWheelSteps);
+                RestartStationWheelTimer();
+                break;
+        }
+    }
+
+    private void RestartStationWheelTimer()
+    {
+        if (_stationWheelTimer is null)
+        {
+            DispatcherQueue? dispatcher = _uiDispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
+            if (dispatcher is null)
+                return;
+
+            _stationWheelTimer = dispatcher.CreateTimer();
+            _stationWheelTimer.IsRepeating = false;
+            _stationWheelTimer.Interval = StationWheelSettleDelay;
+            _stationWheelTimer.Tick += AppLifetime.GuardTick(nameof(App), ApplyPendingStationSteps);
+        }
+
+        _stationWheelTimer.Stop();
+        _stationWheelTimer.Start();
+    }
+
+    private void ApplyPendingStationSteps()
+    {
+        int steps = _pendingStationSteps;
+        _pendingStationSteps = 0;
+
+        // One jump to where the scrolling landed, so only that station or track is started.
+        _playerVm.StepStationOrTrack(steps);
     }
 
     /// <summary>
@@ -619,12 +732,21 @@ public partial class App : Application
         {
             _timer = dispatcher.CreateTimer();
             _timer.IsRepeating = false;
-            _timer.Tick += (_, _) =>
-            {
-                Action? pending = _pendingSingleClick;
-                _pendingSingleClick = null;
-                pending?.Invoke();
-            };
+            _timer.Tick += AppLifetime.GuardTick(nameof(TrayClickSequencer), RunPendingSingleClick);
+        }
+
+        private void RunPendingSingleClick()
+        {
+            Action? pending = _pendingSingleClick;
+            _pendingSingleClick = null;
+            pending?.Invoke();
+        }
+
+        /// <summary>Drops a click still waiting out the double-click interval, on quit.</summary>
+        public void Cancel()
+        {
+            _timer.Stop();
+            _pendingSingleClick = null;
         }
 
         /// <summary>
@@ -815,6 +937,10 @@ public partial class App : Application
     /// </param>
     public void ShowFlyout(DateTime? clickedAtUtc = null)
     {
+        // A pop-out window closed as part of quitting must not bring up a new flyout.
+        if (AppLifetime.IsShuttingDown)
+            return;
+
         // Unlike TryShowFlyout/ShowMiniPlayerWindow (invoked from a button
         // inside the app, where the pointer position is meaningful), this is
         // always a click/tap/pen activation of the tray icon itself. Touch
@@ -1035,7 +1161,7 @@ public partial class App : Application
         {
             if (force)
             {
-                // WinUIEx only sends a native tooltip update when the value changes.
+                // ShellTrayIcon only sends a native tooltip update when the value changes.
                 _trayIcon.Tooltip = "\u200B";
             }
 
@@ -1100,6 +1226,12 @@ public partial class App : Application
             return;
         _isShuttingDown = true;
 
+        // Before anything is closed or disposed. Every timer Tick handler checks this and stops
+        // its timer instead of running: Exit() below is followed by WinUI draining this thread's
+        // dispatcher, and a tick that fires in that drain and reaches a closed window or the
+        // disposed player fails the process fast (see AppLifetime).
+        AppLifetime.BeginShutdown();
+
         Debug.WriteLine("[App] Shutting down");
 
         try
@@ -1107,9 +1239,20 @@ public partial class App : Application
             _uiSettings.ColorValuesChanged -= OnColorValuesChanged;
             SettingsService.SongChangePopupEnabledChanged -= OnSongChangePopupEnabledChanged;
 
+            // Timers nothing else stops on quit. The flag above is the backstop for these and
+            // for the ones that can be restarted during the teardown below; this is the stop.
+            _leftClickSequencer?.Cancel();
+            _rightClickSequencer?.Cancel();
+            _stationWheelTimer?.Stop();
+#if DEBUG
+            _songChangePopupPreviewTimer?.Stop();
+#endif
+            _playerVm.StopTimers();
+
             _trayPopupWindow?.Close();
             _miniPlayerWindow?.Close();
             _songChangePopupWindow?.Close();
+            _importExportWindow?.Close();
 
             if (_trayIcon is not null)
             {

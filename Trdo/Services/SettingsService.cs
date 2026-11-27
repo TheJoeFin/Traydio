@@ -28,6 +28,7 @@ public static class SettingsService
     private const string TrayLeftClickActionKey = "TrayLeftClickAction";
     private const string TrayRightClickActionKey = "TrayRightClickAction";
     private const string TrayLeftDoubleClickActionKey = "TrayLeftDoubleClickAction";
+    private const string TrayWheelActionKey = "TrayWheelAction";
     private const string TrayRightDoubleClickActionKey = "TrayRightDoubleClickAction";
     private const string PlaybackEngineModeKey = "PlaybackEngineMode";
     private const string CastIdleTimeoutMinutesKey = "CastIdleTimeoutMinutes";
@@ -35,6 +36,9 @@ public static class SettingsService
     private const string IsMiniPlayerTopmostKey = "IsMiniPlayerTopmost";
     private const string IsMiniPlayerTitleBarHiddenKey = "IsMiniPlayerTitleBarHidden";
     private const string AllowSleepWhilePlayingKey = "AllowSleepWhilePlaying";
+    private const string TrayPopupWidthKey = "TrayPopupWidth";
+    private const string TrayPopupHeightKey = "TrayPopupHeight";
+    private const string MiniPlayerBoundsKey = "MiniPlayerBounds";
     private const string IsSongChangePopupEnabledKey = "IsSongChangePopupEnabled";
     private const string SongChangePopupDelaySecondsKey = "SongChangePopupDelaySeconds";
     private const string SongChangePopupDwellSecondsKey = "SongChangePopupDwellSeconds";
@@ -52,7 +56,7 @@ public static class SettingsService
     /// </summary>
     private const char RecentStationSearchesSeparator = '\u001f';
 
-    /// <summary>Separates the speaker UUID from the stream URL in <see cref="ActiveSonosCast"/>; neither can contain it.</summary>
+    /// <summary>Separates the speaker UUID and the two URLs in <see cref="ActiveSonosCast"/>; none of them can contain it.</summary>
     private const char ActiveSonosCastSeparator = '\u001f';
 
     public static event EventHandler? MusicSearchServicesChanged;
@@ -582,6 +586,53 @@ public static class SettingsService
         set => SetTrayClickAction(TrayRightDoubleClickActionKey, value);
     }
 
+    /// <summary>Raised when <see cref="TrayWheelAction"/> changes, so the tray icon can start or stop listening to the wheel.</summary>
+    public static event EventHandler? TrayWheelActionChanged;
+
+    /// <summary>
+    /// Gets or sets what turning the mouse wheel over the tray icon does. Off by default:
+    /// anything other than <see cref="TrayWheelAction.None"/> installs a system-wide mouse hook
+    /// and swallows scrolls over the icon, which only users who asked for it should pay for.
+    /// </summary>
+    public static TrayWheelAction TrayWheelAction
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(TrayWheelActionKey, out object? value))
+                {
+                    return value switch
+                    {
+                        int i => TrayWheelPolicy.Parse(i, TrayWheelPolicy.DefaultAction),
+                        string s when int.TryParse(s, out int parsed) => TrayWheelPolicy.Parse(parsed, TrayWheelPolicy.DefaultAction),
+                        _ => TrayWheelPolicy.DefaultAction
+                    };
+                }
+            }
+            catch
+            {
+                // Fall through to the default
+            }
+
+            return TrayWheelPolicy.DefaultAction;
+        }
+        set
+        {
+            try
+            {
+                ApplicationData.Current.LocalSettings.Values[TrayWheelActionKey] = (int)value;
+                LogChange(TrayWheelActionKey, value);
+            }
+            catch
+            {
+                // Settings storage unavailable; nothing to persist to
+            }
+
+            TrayWheelActionChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
+
     /// <summary>
     /// One-shot upgrade of the pre-2.1 <c>TrayClickBehavior</c> switch into the per-button
     /// keys. Runs at startup, before anything reads the tray settings.
@@ -763,6 +814,66 @@ public static class SettingsService
         set => SetDoubleSetting(
             SongChangePopupDwellSecondsKey,
             SongChangeAnnouncementPolicy.ClampDwell(value));
+    }
+
+    /// <summary>
+    /// The width the user last dragged the tray flyout to, in logical pixels. Zero until they
+    /// have resized it.
+    /// </summary>
+    public static double TrayPopupWidth
+    {
+        get => GetDoubleSetting(TrayPopupWidthKey, defaultValue: 0);
+        set => SetDoubleSetting(TrayPopupWidthKey, value);
+    }
+
+    /// <summary>The height counterpart to <see cref="TrayPopupWidth"/>.</summary>
+    public static double TrayPopupHeight
+    {
+        get => GetDoubleSetting(TrayPopupHeightKey, defaultValue: 0);
+        set => SetDoubleSetting(TrayPopupHeightKey, value);
+    }
+
+    /// <summary>
+    /// Where the mini player was when it was last closed, or null if it never has been.
+    /// </summary>
+    public static SavedWindowBounds? MiniPlayerBounds
+    {
+        get
+        {
+            try
+            {
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(MiniPlayerBoundsKey, out object? value) &&
+                    SavedWindowBounds.TryParse(value as string, out SavedWindowBounds bounds))
+                {
+                    return bounds;
+                }
+            }
+            catch
+            {
+                // Fall through to the default.
+            }
+
+            return null;
+        }
+        set
+        {
+            try
+            {
+                if (value is SavedWindowBounds bounds)
+                {
+                    ApplicationData.Current.LocalSettings.Values[MiniPlayerBoundsKey] = bounds.Serialize();
+                    LogChange(MiniPlayerBoundsKey, bounds.Serialize());
+                }
+                else
+                {
+                    ApplicationData.Current.LocalSettings.Values.Remove(MiniPlayerBoundsKey);
+                }
+            }
+            catch
+            {
+                // Silently fail if unable to save
+            }
+        }
     }
 
     private static double GetDoubleSetting(string key, double defaultValue)
@@ -1033,17 +1144,27 @@ public static class SettingsService
     /// startup recovery take back only a cast this app started and never saw finish (a crash, a
     /// kill), never a speaker that someone else happens to be playing the same station on.
     /// </summary>
-    public static (string SpeakerUuid, string StreamUrl)? ActiveSonosCast
+    /// <remarks>
+    /// <c>StreamUrl</c> is what the speaker was given; <c>StationUrl</c> is the station's saved
+    /// address. They differ for a playlist (.pls/.m3u) station, whose entry is what plays. A
+    /// record from before the station address was kept reads back with the two the same.
+    /// </remarks>
+    public static (string SpeakerUuid, string StreamUrl, string StationUrl)? ActiveSonosCast
     {
         get
         {
             try
             {
                 if (ApplicationData.Current.LocalSettings.Values.TryGetValue(ActiveSonosCastKey, out object? value) &&
-                    value is string raw &&
-                    raw.Split(ActiveSonosCastSeparator) is [{ Length: > 0 } uuid, { Length: > 0 } streamUrl])
+                    value is string raw)
                 {
-                    return (uuid, streamUrl);
+                    switch (raw.Split(ActiveSonosCastSeparator))
+                    {
+                        case [{ Length: > 0 } uuid, { Length: > 0 } streamUrl, { Length: > 0 } stationUrl]:
+                            return (uuid, streamUrl, stationUrl);
+                        case [{ Length: > 0 } uuid, { Length: > 0 } streamUrl]:
+                            return (uuid, streamUrl, streamUrl);
+                    }
                 }
             }
             catch
@@ -1055,11 +1176,11 @@ public static class SettingsService
         }
     }
 
-    public static void SetActiveSonosCast(string speakerUuid, string streamUrl)
+    public static void SetActiveSonosCast(string speakerUuid, string streamUrl, string stationUrl)
     {
         try
         {
-            string raw = speakerUuid + ActiveSonosCastSeparator + streamUrl;
+            string raw = speakerUuid + ActiveSonosCastSeparator + streamUrl + ActiveSonosCastSeparator + stationUrl;
             IPropertySet values = ApplicationData.Current.LocalSettings.Values;
             if (values.TryGetValue(ActiveSonosCastKey, out object? current) && raw.Equals(current as string, StringComparison.Ordinal))
             {

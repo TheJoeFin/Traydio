@@ -11,6 +11,7 @@ using Trdo.ViewModels;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 using WinUIEx;
 
 namespace Trdo.Controls;
@@ -36,6 +37,12 @@ public sealed partial class MiniPlayerWindow : WindowEx
     private const double LargeLogoSize = 72.0;
     private const double SmallIconSize = 24.0;
     private const double SmallToLargeScale = SmallIconSize / LargeLogoSize;
+
+    // Match Width and Height in the XAML.
+    private const int DefaultWidth = 320;
+    private const int DefaultHeight = 220;
+    private const int MinimumRestoredWidth = 160;
+    private const int MinimumRestoredHeight = 120;
 
     public PlayerViewModel ViewModel { get; }
 
@@ -79,12 +86,53 @@ public sealed partial class MiniPlayerWindow : WindowEx
         Closed += OnWindowClosed;
     }
 
+    /// <summary>
+    /// Places a newly created mini player where the last one was closed, or near the click
+    /// that opened it when there is nowhere to go back to.
+    /// </summary>
+    public void RestorePlacement()
+    {
+        if (SettingsService.MiniPlayerBounds is SavedWindowBounds saved)
+        {
+            SavedWindowBounds sized = saved with
+            {
+                Width = Math.Max(saved.Width, MinimumRestoredWidth),
+                Height = Math.Max(saved.Height, MinimumRestoredHeight)
+            };
+
+            if (WindowPlacementService.TryRestoreBounds(this, sized))
+                return;
+        }
+
+        WindowPlacementService.PositionWindowNearAnchor(this, DefaultWidth, DefaultHeight);
+    }
+
+    private void SavePlacement()
+    {
+        // A minimized window reports a parking spot off screen, not where the user put it.
+        if (AppWindow.Presenter is OverlappedPresenter { State: not OverlappedPresenterState.Restored })
+            return;
+
+        uint dpi = PInvoke.GetDpiForWindow((HWND)this.GetWindowHandle());
+        SettingsService.MiniPlayerBounds = new SavedWindowBounds(
+            AppWindow.Position.X,
+            AppWindow.Position.Y,
+            WindowBoundsPolicy.ToLogical(AppWindow.Size.Width, dpi),
+            WindowBoundsPolicy.ToLogical(AppWindow.Size.Height, dpi));
+    }
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
+        SavePlacement();
         _isClosed = true;
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _touchOverlayTimer.Stop();
         _touchOverlayTimer.Tick -= TouchOverlayTimer_Tick;
+
+        // Its own Unloaded does this too, but that is not guaranteed to run before WinUI's
+        // final dispatcher drain when the window is closed on quit.
+        SpectrumVisualizer.Stop();
+
         _morphStoryboard?.Stop();
         _morphStoryboard = null;
         _hoverControlsStoryboard?.Stop();
@@ -118,8 +166,8 @@ public sealed partial class MiniPlayerWindow : WindowEx
         // Compute the translation that maps IdleStationLogoGrid's center to ActiveStationIconGrid's center.
         Point idlePt = IdleStationLogoGrid.TransformToVisual(WindowLayout).TransformPoint(new Point(0, 0));
         Point activePt = ActiveStationIconGrid.TransformToVisual(WindowLayout).TransformPoint(new Point(0, 0));
-        double offsetX = (activePt.X + SmallIconSize / 2) - (idlePt.X + LargeLogoSize / 2);
-        double offsetY = (activePt.Y + SmallIconSize / 2) - (idlePt.Y + LargeLogoSize / 2);
+        double offsetX = activePt.X + (SmallIconSize / 2) - (idlePt.X + (LargeLogoSize / 2));
+        double offsetY = activePt.Y + (SmallIconSize / 2) - (idlePt.Y + (LargeLogoSize / 2));
 
         _morphStoryboard?.Stop();
 
@@ -357,9 +405,17 @@ public sealed partial class MiniPlayerWindow : WindowEx
 
     private void TouchOverlayTimer_Tick(DispatcherQueueTimer sender, object args)
     {
-        if (_isClosed) return;
+        if (_isClosed || AppLifetime.StopIfShuttingDown(sender)) return;
         _touchOverlayTimer.Stop();
-        HideOverlayControls();
+
+        try
+        {
+            HideOverlayControls();
+        }
+        catch (Exception ex)
+        {
+            AppLifetime.ReportTickFailure(sender, nameof(MiniPlayerWindow), ex);
+        }
     }
 
     private void ShowOverlayControls()

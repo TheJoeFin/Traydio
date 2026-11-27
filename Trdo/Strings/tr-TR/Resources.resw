@@ -395,6 +395,9 @@
   <data name="AboutPage_VisitDeveloperGitHub.Text" xml:space="preserve">
     <value>Geliştiricinin GitHub Sayfasını Ziyaret Et</value>
   </data>
+  <data name="AboutPage_EmailDeveloper.Text" xml:space="preserve">
+    <value>Geliştiriciye e-posta gönder</value>
+  </data>
   <data name="Action_Cancel.Text" xml:space="preserve">
     <value>İptal</value>
   </data>
@@ -560,9 +563,6 @@
   <data name="App_ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Pencereyi Göster</value>
   </data>
-  <data name="CastDeviceDialog.CloseButtonText" xml:space="preserve">
-    <value>İptal</value>
-  </data>
   <data name="CastDeviceDialog.PrimaryButtonText" xml:space="preserve">
     <value>Yayınla</value>
   </data>
@@ -616,6 +616,24 @@
   </data>
   <data name="ManualStationWindow_Advanced.Text" xml:space="preserve">
     <value>Gelişmiş</value>
+  </data>
+  <data name="ManualStationWindow_DropImageHint.Text" xml:space="preserve">
+    <value>Logo olarak kullanmak için buraya bir görüntü bırakın</value>
+  </data>
+  <data name="ManualStationWindow_ChooseImage.Content" xml:space="preserve">
+    <value>Görüntü seç…</value>
+  </data>
+  <data name="ManualStationWindow_DropImageCaption" xml:space="preserve">
+    <value>İstasyon logosu olarak kullan</value>
+  </data>
+  <data name="ManualStationWindow_ImageNotSupported" xml:space="preserve">
+    <value>Bu dosya desteklenen bir görüntü değil.</value>
+  </data>
+  <data name="ManualStationWindow_ImageTooLarge" xml:space="preserve">
+    <value>Görüntü çok büyük. {0} MB'tan küçük bir görüntü seçin.</value>
+  </data>
+  <data name="ManualStationWindow_ImageFailed" xml:space="preserve">
+    <value>Bu görüntü kullanılamadı.</value>
   </data>
   <data name="ManualStationWindow_BufferLevel.Text" xml:space="preserve">
     <value>Arabellek düzeyi</value>
@@ -854,6 +872,12 @@
   <data name="PlayingPage_MoveToGroup.Text" xml:space="preserve">
     <value>Gruba taşı</value>
   </data>
+  <data name="PlayingPage_MoveToTop.Text" xml:space="preserve">
+    <value>En üste taşı</value>
+  </data>
+  <data name="PlayingPage_MoveToBottom.Text" xml:space="preserve">
+    <value>En alta taşı</value>
+  </data>
   <data name="PlayingPage_NewDivider.Text" xml:space="preserve">
     <value>Yeni Ayırıcı</value>
   </data>
@@ -966,7 +990,7 @@
     <value>Web Sitesini Ziyaret Et</value>
   </data>
   <data name="SettingsPage_AllowSleepDescription.Text" xml:space="preserve">
-    <value>Radyo çalarken bilgisayarın normal zamanlamasına göre uykuya geçmesine izin verin. Windows'un, herhangi bir ses çalarken bilgisayarı uyanık tutabileceğini unutmayın.</value>
+    <value>Radyo çalarken bilgisayarın normal zamanlamasına göre uykuya geçmesine izin verin. Bu seçenek kapalıyken Traydio bilgisayarı uyanık tutar, ancak ekran yine de kapanabilir. Windows'un, herhangi bir ses çalarken bilgisayarı uyanık tutabileceğini unutmayın.</value>
   </data>
   <data name="SettingsPage_AllowSleepTitle.Text" xml:space="preserve">
     <value>Bilgisayarın uykuya geçmesine izin ver</value>
@@ -1016,7 +1040,7 @@
   <data name="SettingsPage_Enable.Content" xml:space="preserve">
     <value>Etkinleştir</value>
   </data>
-  <data name="SettingsPage_ExportFailed" xml:space="preserve">
+  <data name="ImportExport_ExportFailed" xml:space="preserve">
     <value>Dışa aktarma başarısız oldu: {0}</value>
   </data>
   <data name="SettingsPage_ExportStations.Content" xml:space="preserve">
@@ -1028,7 +1052,7 @@
   <data name="SettingsPage_ImportExportTitle.Text" xml:space="preserve">
     <value>İstasyonları içe / dışa aktar</value>
   </data>
-  <data name="SettingsPage_ImportFailed" xml:space="preserve">
+  <data name="ImportExport_ImportFailed" xml:space="preserve">
     <value>İçe aktarma başarısız oldu: {0}</value>
   </data>
   <data name="SettingsPage_ImportStations.Content" xml:space="preserve">
@@ -1583,5 +1607,92 @@
   </data>
   <data name="AboutPage_RadioBrowserDescription" xml:space="preserve">
     <value>Dünya genelinde binlerce istasyon içeren, topluluk tarafından oluşturulan internet radyo veritabanı</value>
+  </data>
+  <data name="PlayingPage_ImportStations.Content" xml:space="preserve">
+    <value>İçe aktar</value>
+  </data>
+  <data name="SettingsPage_TrayWheel.Header" xml:space="preserve">
+    <value>Simge üzerinde fare tekerleği</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_None.Content" xml:space="preserve">
+    <value>Hiçbir şey yapma</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_Volume.Content" xml:space="preserve">
+    <value>Ses düzeyini değiştir</value>
+  </data>
+  <data name="SettingsPage_TrayWheelAction_SwitchStation.Content" xml:space="preserve">
+    <value>İstasyon değiştir</value>
+  </data>
+  <data name="SettingsPage_TrayWheelNote.Text" xml:space="preserve">
+    <value>Ses düzeyini artırmak veya önceki istasyona geçmek için yukarı, sesi azaltmak veya sonraki istasyona geçmek için aşağı kaydırın. Bu özellik açıkken simge üzerindeki kaydırmayı görev çubuğu yerine Traydio kullanır.</value>
+  </data>
+  <data name="ImportExport_Title.Title" xml:space="preserve">
+    <value>İstasyonları içe ve dışa aktarma</value>
+  </data>
+  <data name="ImportExport_ModeImport.Content" xml:space="preserve">
+    <value>İçe aktar</value>
+  </data>
+  <data name="ImportExport_ModeExport.Content" xml:space="preserve">
+    <value>Dışa aktar</value>
+  </data>
+  <data name="ImportExport_ChooseFiles.Content" xml:space="preserve">
+    <value>Dosya seç...</value>
+  </data>
+  <data name="ImportExport_SelectAll.Content" xml:space="preserve">
+    <value>Tümünü seç</value>
+  </data>
+  <data name="ImportExport_SelectNone.Content" xml:space="preserve">
+    <value>Seçimi temizle</value>
+  </data>
+  <data name="ImportExport_WindowTitle" xml:space="preserve">
+    <value>İstasyonları içe ve dışa aktarma</value>
+  </data>
+  <data name="ImportExport_DropCaption" xml:space="preserve">
+    <value>İstasyonları önizle</value>
+  </data>
+  <data name="ImportExport_DropHint" xml:space="preserve">
+    <value>İstasyonları önizlemek için .pls, .m3u veya .m3u8 dosyalarını buraya bırakın ya da dosya seçin.</value>
+  </data>
+  <data name="ImportExport_NoStations" xml:space="preserve">
+    <value>Dışa aktarılacak istasyon yok.</value>
+  </data>
+  <data name="ImportExport_NoStationsFound" xml:space="preserve">
+    <value>Bu dosyada istasyon bulunamadı.</value>
+  </data>
+  <data name="ImportExport_FilesUnsupported" xml:space="preserve">
+    <value>Desteklenmeyen dosya sayısı: {0}.</value>
+  </data>
+  <data name="ImportExport_FilesUnreadable" xml:space="preserve">
+    <value>Okunamayan dosya sayısı: {0}.</value>
+  </data>
+  <data name="ImportExport_AlreadyInLibrary" xml:space="preserve">
+    <value>Zaten kitaplıkta</value>
+  </data>
+  <data name="ImportExport_UnknownStation" xml:space="preserve">
+    <value>Bilinmeyen istasyon</value>
+  </data>
+  <data name="ImportExport_ImportCount" xml:space="preserve">
+    <value>İçe aktar ({0})</value>
+  </data>
+  <data name="ImportExport_ExportCount" xml:space="preserve">
+    <value>Dışa aktar ({0})</value>
+  </data>
+  <data name="ImportExport_Summary" xml:space="preserve">
+    <value>Seçilen: {0}/{1}</value>
+  </data>
+  <data name="ImportExport_SuggestedFileName" xml:space="preserve">
+    <value>Traydio İstasyonları</value>
+  </data>
+  <data name="ImportExport_FileTypeM3u" xml:space="preserve">
+    <value>M3U çalma listesi</value>
+  </data>
+  <data name="ImportExport_FileTypePls" xml:space="preserve">
+    <value>PLS çalma listesi</value>
+  </data>
+  <data name="SearchStation_AddButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>İstasyonu ekleyip geri dönün. Aramadan çıkmadan birden çok istasyon eklemek için tıklarken Shift tuşunu basılı tutun.</value>
+  </data>
+  <data name="SearchStation_AddedLabel" xml:space="preserve">
+    <value>Eklendi</value>
   </data>
 </root>

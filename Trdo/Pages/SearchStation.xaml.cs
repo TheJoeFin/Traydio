@@ -5,12 +5,12 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.System;
-using Windows.UI.Core;
 using Trdo.Controls;
 using Trdo.Models;
 using Trdo.Services;
 using Trdo.ViewModels;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace Trdo.Pages;
 

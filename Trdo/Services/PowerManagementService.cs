@@ -15,7 +15,9 @@ internal static partial class PowerManagementService
 {
     private const int POWER_REQUEST_CONTEXT_VERSION = 0;
     private const uint POWER_REQUEST_CONTEXT_SIMPLE_STRING = 0x1;
-    private const int PowerRequestSystemRequired = 0;
+    // POWER_REQUEST_TYPE: 0 = DisplayRequired, 1 = SystemRequired. Using 0 here
+    // previously blocked monitor sleep while playing (issue #139).
+    private const int PowerRequestSystemRequired = 1;
 
     private static readonly object _lock = new();
     private static nint _powerRequest;
@@ -67,7 +69,7 @@ internal static partial class PowerManagementService
                     };
 
                     _powerRequest = PowerCreateRequest(ref context);
-                    if (_powerRequest == 0 || _powerRequest == -1)
+                    if (_powerRequest is 0 or -1)
                     {
                         Debug.WriteLine($"[PowerManagementService] PowerCreateRequest failed: {Marshal.GetLastWin32Error()}");
                         _powerRequest = 0;
