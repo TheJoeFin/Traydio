@@ -56,7 +56,7 @@ public static class SettingsService
     /// </summary>
     private const char RecentStationSearchesSeparator = '\u001f';
 
-    /// <summary>Separates the speaker UUID from the stream URL in <see cref="ActiveSonosCast"/>; neither can contain it.</summary>
+    /// <summary>Separates the speaker UUID and the two URLs in <see cref="ActiveSonosCast"/>; none of them can contain it.</summary>
     private const char ActiveSonosCastSeparator = '\u001f';
 
     public static event EventHandler? MusicSearchServicesChanged;
@@ -1144,17 +1144,27 @@ public static class SettingsService
     /// startup recovery take back only a cast this app started and never saw finish (a crash, a
     /// kill), never a speaker that someone else happens to be playing the same station on.
     /// </summary>
-    public static (string SpeakerUuid, string StreamUrl)? ActiveSonosCast
+    /// <remarks>
+    /// <c>StreamUrl</c> is what the speaker was given; <c>StationUrl</c> is the station's saved
+    /// address. They differ for a playlist (.pls/.m3u) station, whose entry is what plays. A
+    /// record from before the station address was kept reads back with the two the same.
+    /// </remarks>
+    public static (string SpeakerUuid, string StreamUrl, string StationUrl)? ActiveSonosCast
     {
         get
         {
             try
             {
                 if (ApplicationData.Current.LocalSettings.Values.TryGetValue(ActiveSonosCastKey, out object? value) &&
-                    value is string raw &&
-                    raw.Split(ActiveSonosCastSeparator) is [{ Length: > 0 } uuid, { Length: > 0 } streamUrl])
+                    value is string raw)
                 {
-                    return (uuid, streamUrl);
+                    switch (raw.Split(ActiveSonosCastSeparator))
+                    {
+                        case [{ Length: > 0 } uuid, { Length: > 0 } streamUrl, { Length: > 0 } stationUrl]:
+                            return (uuid, streamUrl, stationUrl);
+                        case [{ Length: > 0 } uuid, { Length: > 0 } streamUrl]:
+                            return (uuid, streamUrl, streamUrl);
+                    }
                 }
             }
             catch
@@ -1166,11 +1176,11 @@ public static class SettingsService
         }
     }
 
-    public static void SetActiveSonosCast(string speakerUuid, string streamUrl)
+    public static void SetActiveSonosCast(string speakerUuid, string streamUrl, string stationUrl)
     {
         try
         {
-            string raw = speakerUuid + ActiveSonosCastSeparator + streamUrl;
+            string raw = speakerUuid + ActiveSonosCastSeparator + streamUrl + ActiveSonosCastSeparator + stationUrl;
             IPropertySet values = ApplicationData.Current.LocalSettings.Values;
             if (values.TryGetValue(ActiveSonosCastKey, out object? current) && raw.Equals(current as string, StringComparison.Ordinal))
             {

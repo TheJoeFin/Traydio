@@ -594,9 +594,14 @@ public sealed partial class RadioPlayerService
             SettingsService.ClearActiveSonosCast();
         }
         else if (state == SonosPlaybackState.Playing && _activeSourceKind == AudioSourceKind.Radio &&
-                 _sonosDevice is { } castDevice && _streamUrl is { Length: > 0 } castStream)
+                 _sonosDevice is { } castDevice &&
+                 (SonosPolicy.StreamUrlFromTransportUri(_sonosCurrentUri) ?? _streamUrl) is { Length: > 0 } castStream)
         {
-            SettingsService.SetActiveSonosCast(castDevice.Uuid, castStream);
+            // Both addresses: recovery checks the speaker is still on the stream it was given,
+            // then finds the station by its saved address - a playlist's, for a .pls/.m3u station,
+            // which is not what the speaker reports.
+            string stationUrl = _requestedStreamUrl is { Length: > 0 } requested ? requested : castStream;
+            SettingsService.SetActiveSonosCast(castDevice.Uuid, castStream, stationUrl);
         }
 
         bool wasPlaying = previous == SonosPlaybackState.Playing;
