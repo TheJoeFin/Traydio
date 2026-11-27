@@ -128,6 +128,20 @@ public sealed partial class TrayPopupWindow : WindowEx
     /// </summary>
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
+        // Closed while still up (its own Quit button) skips HidePopup, the usual place a resize
+        // is saved, so save it here or the last one of the session is lost.
+        if (_isPopupVisible)
+        {
+            try
+            {
+                RememberSizeIfResized();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TrayPopupWindow] Couldn't save the size on close: {ex.Message}");
+            }
+        }
+
         _isClosed = true;
         _isPopupVisible = false;
         _hideTimer.Stop();

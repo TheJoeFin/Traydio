@@ -942,6 +942,10 @@ public partial class App : Application
     /// </param>
     public void ShowFlyout(DateTime? clickedAtUtc = null)
     {
+        // A pop-out window closed as part of quitting must not bring up a new flyout.
+        if (AppLifetime.IsShuttingDown)
+            return;
+
         // Unlike TryShowFlyout/ShowMiniPlayerWindow (invoked from a button
         // inside the app, where the pointer position is meaningful), this is
         // always a click/tap/pen activation of the tray icon itself. Touch
