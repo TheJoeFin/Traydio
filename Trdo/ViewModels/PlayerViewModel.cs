@@ -1531,6 +1531,37 @@ public sealed partial class PlayerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Adds several stations at the top level with one rebuild and one save, as
+    /// <see cref="AddStation"/> would one at a time. Used by playlist import.
+    /// </summary>
+    public void AddStations(IReadOnlyList<RadioStation> stations)
+    {
+        if (stations.Count == 0)
+            return;
+
+        bool wasEmpty = Stations.Count == 0;
+
+        foreach (RadioStation station in stations)
+        {
+            if (string.IsNullOrWhiteSpace(station.Id))
+                station.Id = StationIdentityPolicy.NewId();
+            station.DateAdded ??= DateTimeOffset.UtcNow;
+
+            Stations.Add(station);
+            _topLevelNodes.Add(station);
+        }
+
+        RebuildDisplayRows();
+        PersistStationList();
+
+        if (wasEmpty)
+        {
+            Debug.WriteLine("[PlayerViewModel] First stations added in a batch, selecting the first automatically");
+            SelectedStation = stations[0];
+        }
+    }
+
+    /// <summary>
     /// Adds a batch of brand-new stations already grouped inside a brand-new folder, in a
     /// single persist. Used when adding a local-music "artist" folder whose album subfolders
     /// should appear as individual stations, already grouped together, rather than an

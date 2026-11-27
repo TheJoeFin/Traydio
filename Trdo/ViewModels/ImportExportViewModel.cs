@@ -254,30 +254,14 @@ public sealed class ImportExportViewModel : INotifyPropertyChanged
     /// <summary>Adds the ticked stations to the library and returns how many were added.</summary>
     public int CommitImport()
     {
-        PlayerViewModel player = PlayerViewModel.Shared;
-        int added = 0;
+        List<RadioStation> stations = Items.Where(i => i.IsSelected).Select(i => i.Station).ToList();
 
-        foreach (ImportExportItem item in Items.Where(i => i.IsSelected))
-        {
-            RadioStation station = item.Station;
-
-            // This adds to the collection directly rather than going through
-            // PlayerViewModel.AddStation, so stamp what that path would have stamped.
-            // Imported stations carry no directory details, which makes them exactly the
-            // candidates the "refresh station info" command exists for.
-            station.Id = StationIdentityPolicy.NewId();
-            station.DateAdded ??= DateTimeOffset.UtcNow;
-
-            player.Stations.Add(station);
-            added++;
-        }
-
-        if (added > 0)
-        {
-            RadioStationService.Instance.SaveStations(player.Stations);
-        }
-
-        return added;
+        // Through the view model rather than its Stations collection, so the stations also join
+        // the arrangement the list is drawn from and appear without a restart. Imported stations
+        // carry no directory details, which makes them exactly the candidates the "refresh
+        // station info" command exists for.
+        PlayerViewModel.Shared.AddStations(stations);
+        return stations.Count;
     }
 
     /// <summary>Asks where to save, then writes the ticked stations. Returns the count written, or 0 if cancelled.</summary>
