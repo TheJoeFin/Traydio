@@ -30,6 +30,7 @@ public partial class App : Application
     private TrayClickSequencer? _rightClickSequencer;
     private TrayPopupWindow? _trayPopupWindow;
     private MiniPlayerWindow? _miniPlayerWindow;
+    private ImportExportWindow? _importExportWindow;
     private SongChangePopupWindow? _songChangePopupWindow;
     private string? _lastKnownNowPlayingDisplayText;
 
@@ -190,6 +191,27 @@ public partial class App : Application
         }
 
         _miniPlayerWindow.Activate();
+    }
+
+    /// <summary>
+    /// Opens the import/export window, or brings the open one to the front. One at a time: each
+    /// window checks for stations already in the library only when it builds its preview, so
+    /// two committing the same files would add those stations twice.
+    /// </summary>
+    public void ShowImportExportWindow(bool startAsImport)
+    {
+        if (_importExportWindow is null)
+        {
+            _importExportWindow = new ImportExportWindow(startAsImport);
+            WindowHelper.Track(_importExportWindow);
+            _importExportWindow.Closed += (_, _) => _importExportWindow = null;
+        }
+        else
+        {
+            _importExportWindow.RequestMode(startAsImport);
+        }
+
+        _importExportWindow.Activate();
     }
 
     /// <summary>
@@ -1231,6 +1253,7 @@ public partial class App : Application
             _trayPopupWindow?.Close();
             _miniPlayerWindow?.Close();
             _songChangePopupWindow?.Close();
+            _importExportWindow?.Close();
 
             if (_trayIcon is not null)
             {

@@ -36,6 +36,22 @@ public sealed partial class ImportExportWindow : WindowEx
         this.CenterOnScreen();
     }
 
+    /// <summary>
+    /// Asked for again while already open: switch to <paramref name="import"/>, unless that would
+    /// throw away an import preview the user has already built. The export list is just the
+    /// library, so leaving it loses nothing.
+    /// </summary>
+    public void RequestMode(bool import)
+    {
+        if (import == ViewModel.IsImport || (ViewModel.IsImport && ViewModel.HasItems))
+        {
+            return;
+        }
+
+        // SelectionChanged switches the view model, as a click on the mode buttons does.
+        ModeButtons.SelectedIndex = import ? 0 : 1;
+    }
+
     private void ModeButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         bool import = ModeButtons.SelectedIndex == 0;

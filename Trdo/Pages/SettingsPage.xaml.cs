@@ -158,12 +158,8 @@ public sealed partial class SettingsPage : Page
     /// light-dismisses (which would kill a file picker or a drag in progress) and is too
     /// small to preview a whole station list.
     /// </summary>
-    private static void OpenImportExportWindow(bool startAsImport)
-    {
-        ImportExportWindow window = new(startAsImport);
-        WindowHelper.Track(window);
-        window.Activate();
-    }
+    private static void OpenImportExportWindow(bool startAsImport) =>
+        (Application.Current as App)?.ShowImportExportWindow(startAsImport);
 
     private async void OpenLogsFolderButton_Click(object sender, RoutedEventArgs e)
     {

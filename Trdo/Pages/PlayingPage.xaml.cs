@@ -420,9 +420,7 @@ public sealed partial class PlayingPage : Page
     {
         // Own window rather than the flyout: the flyout light-dismisses, which would kill a
         // file picker or drag in progress.
-        ImportExportWindow window = new(startAsImport: true);
-        WindowHelper.Track(window);
-        window.Activate();
+        (Application.Current as App)?.ShowImportExportWindow(startAsImport: true);
     }
 
     private void AddStationButton_Click(object sender, RoutedEventArgs e)
