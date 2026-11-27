@@ -76,6 +76,7 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
     private const uint IMAGE_ICON = 1;
     private const uint LR_LOADFROMFILE = 0x10;
     private const nint IDI_APPLICATION = 32512;
+    private const int ERROR_TIMEOUT = 1460;
 
     private static readonly uint WM_TASKBARCREATED = NativeMethods.RegisterWindowMessageW("TaskbarCreated");
     private static bool s_classRegistered;
@@ -329,13 +330,36 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
         data.uCallbackMessage = CallbackMessage;
 
         if (NativeMethods.Shell_NotifyIconW(NIM_ADD, &data) == 0)
-            return false;
+        {
+            // A busy Explorer (sign-in, heavy load) can time the add out and still go on to make
+            // the icon. Treating that as a refusal would add a second icon under uID and leave
+            // this one orphaned, so look for it before giving up on it.
+            if (Marshal.GetLastWin32Error() != ERROR_TIMEOUT || !IconExists())
+                return false;
+
+            LogService.Warn(Component, "NIM_ADD timed out, but the shell has the icon; keeping it.");
+        }
 
         // The version isn't persisted by the shell; it must be set after every add.
         data.uVersion = NOTIFYICON_VERSION_4;
         NativeMethods.Shell_NotifyIconW(NIM_SETVERSION, &data);
         _added = true;
         return true;
+    }
+
+    /// <summary>
+    /// Whether the shell has an icon under the identity just added. Only after an add that timed
+    /// out, so the shell has seen that identity from this process a moment ago.
+    /// </summary>
+    private bool IconExists()
+    {
+        if (TryGetIconRect(out _))
+            return true;
+
+        // The rectangle can be unavailable while the icon sits in the overflow. A modify that
+        // sets nothing changes nothing, but only succeeds for an icon the shell knows.
+        NativeNotifyIconData data = CreateData(0, 0);
+        return NativeMethods.Shell_NotifyIconW(NIM_MODIFY, &data) != 0;
     }
 
     private void Modify(uint flags, nint icon)
@@ -761,7 +785,7 @@ internal sealed unsafe class ShellTrayIcon : IDisposable
 
     private static class NativeMethods
     {
-        [DllImport("shell32.dll", ExactSpelling = true)]
+        [DllImport("shell32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern int Shell_NotifyIconW(uint dwMessage, NativeNotifyIconData* lpData);
 
         [DllImport("shell32.dll", ExactSpelling = true)]
