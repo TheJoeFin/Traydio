@@ -16,6 +16,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 {
     private readonly LibVLC _libVlc;
     private readonly LibVlcLogCapture? _logCapture;
+    private readonly LibVlcPcmOutput? _pcmOutput;
     private VlcMediaPlayer _mediaPlayer;
     private Media? _currentMedia;
     private bool _isBuffering;
@@ -29,6 +30,11 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     {
         _libVlc = libVlc;
         _logCapture = logCapture;
+
+        _pcmOutput = LibVlcPcmOutput.TryCreate(out string? failure);
+        if (_pcmOutput is null)
+            LogService.Warn("LibVlcPlaybackBackend", $"Sample-level volume unavailable, using LibVLC's own output: {failure}");
+
         _mediaPlayer = CreateMediaPlayer();
     }
 
@@ -43,6 +49,8 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         player.EndReached += OnPlayerEndReached;
         player.Buffering += OnPlayerBuffering;
         player.EncounteredError += OnPlayerEncounteredError;
+
+        _pcmOutput?.Attach(player);
 
         // A recycled player must keep casting where the one it replaces did.
         if (_renderer is not null && !player.SetRenderer(_renderer))
@@ -322,7 +330,13 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
     public IReadOnlyList<MediaTimeRange> GetBufferedRanges() => [];
 
     // volume is a fraction where 1.0 == 100%; LibVLC accepts 0-200 (200% = amplified).
-    public void SetVolume(double volume) => _mediaPlayer.Volume = (int)Math.Clamp(volume * 100, 0, 200);
+    public void SetVolume(double volume)
+    {
+        if (_pcmOutput is not null)
+            _pcmOutput.Volume = volume;
+        else
+            _mediaPlayer.Volume = (int)Math.Clamp(volume * 100, 0, 200);
+    }
 
     public Task<PlaybackPrepareResult> PrepareAsync(string streamUrl, CancellationToken cancellationToken = default)
     {
@@ -360,6 +374,9 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
 
     public void Play()
     {
+        if (!IsCasting)
+            _pcmOutput?.Start();
+
         // Play returns false when LibVLC rejects the media outright. That is the one
         // synchronous failure signal it offers, and it used to be discarded.
         if (!_mediaPlayer.Play())
@@ -376,7 +393,11 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         }
     }
 
-    public void Pause() => _mediaPlayer.Pause();
+    public void Pause()
+    {
+        _mediaPlayer.Pause();
+        _pcmOutput?.Pause();
+    }
 
     public void Seek(TimeSpan position) => _mediaPlayer.Time = (long)position.TotalMilliseconds;
 
@@ -391,6 +412,7 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         _currentMedia?.Dispose();
         _currentMedia = null;
         _isBuffering = false;
+        _pcmOutput?.Stop();
     }
 
     public void Dispose()
@@ -403,5 +425,6 @@ public sealed partial class LibVlcPlaybackBackend : IPlaybackBackend
         ClearSource();
         DetachMediaPlayer(_mediaPlayer);
         _mediaPlayer.Dispose();
+        _pcmOutput?.Dispose();
     }
 }
